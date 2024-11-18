@@ -1,1 +1,5 @@
-print("Hello world!");
+class Benchmark {
+    runIteration() {
+        print("Hello world!");
+    }
+}

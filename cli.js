@@ -28,13 +28,6 @@ console = {
     log: print
 }
 
-const isD8 = typeof Realm !== "undefined";
-if (isD8)
-    globalThis.readFile = read;
-const isSpiderMonkey = typeof newGlobal !== "undefined";
-if (isSpiderMonkey)
-    globalThis.readFile = readRelativeToScript;
-
 if (typeof testList === "undefined")
     testList = undefined;
 
@@ -51,10 +44,9 @@ load("./JetStreamDriver.js");
 async function runJetStream() {
     try {
         await JetStream.initialize();
-        await JetStream.start();
+        JetStream.start();
     } catch (e) {
-        console.log("JetStream3 failed: " + e);
-        console.log(e.stack);
+        console.log("JetStream2 failed: " + e);
     }
 }
 runJetStream();

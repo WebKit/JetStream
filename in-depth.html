@@ -1,5 +1,5 @@
 <!--
- Copyright (C) 2019-2022 Apple Inc. All rights reserved.
+ Copyright (C) 2019 Apple Inc. All rights reserved.
 
  Redistribution and use in source and binary forms, with or without
  modification, are permitted provided that the following conditions
@@ -27,7 +27,7 @@
 <head>
     <meta charset="utf-8" />
 
-    <title>JetStream 3 In-Depth Analysis</title>
+    <title>JetStream 2 In-Depth Analysis</title>
 
     <link rel="stylesheet" href="JetStream.css">
 
@@ -35,7 +35,7 @@
 <body>
 <h1 class="logo">
     <div id="jetstreams">
-        <a href="index.html" class="logo-image">JetStream 3</a>
+        <a href="index.html" class="logo-image">JetStream 2</a>
     </div>
 </h1>
 <main>
@@ -43,7 +43,7 @@
         <h2>In-Depth Analysis</h2>
 
         <p>
-        JetStream 3 combines together a variety of JavaScript and Web Assembly benchmarks, covering a variety of
+        JetStream 2 combines together a variety of JavaScript and Web Assembly benchmarks, covering a variety of
         advanced workloads and programming techniques, and reports a single score that
         balances them using a geometric mean.
         </p>
@@ -52,13 +52,13 @@
         Each benchmark measures a distinct workload, and no single optimization
         technique is sufficient to speed up all benchmarks. Some benchmarks demonstrate tradeoffs, and
         aggressive or specialized optimizations for one benchmark might make another benchmark slower.
-        JetStream 3 rewards browsers that start up quickly, execute code quickly, and continue running smoothly.
+        JetStream 2 rewards browsers that start up quickly, execute code quickly, and continue running smoothly.
         </p>
 
         <p>
-        Each benchmark in JetStream 3 computes its own individual score. JetStream 3 weighs each
+        Each benchmark in JetStream 2 computes its own individual score. JetStream 2 weighs each
         benchmark equally, taking the geometric mean over each individual benchmark's score to compute
-        the overall JetStream 3 score.
+        the overall JetStream 2 score.
         </p>
 
         <p>
@@ -70,7 +70,7 @@
         </p>
 
         <p>
-        For most of the JavaScript benchmarks in JetStream 3, individual scores
+        For most of the JavaScript benchmarks in JetStream 2, individual scores
         equally weigh startup performance, worst case performance, and average case
         performance. These three metrics are crucial to running performant JavaScript
         in the browser. Fast startup times lead browsers to loading pages more quickly. Good
@@ -79,16 +79,16 @@
         </p>
 
         <p>
-        For JetStream 3's Web Assembly benchmarks, individual scores equally weigh startup time and
+        For JetStream 2's Web Assembly benchmarks, individual scores equally weigh startup time and
         total execution time. An important component of JetStream 1 were the asm.js subset of benchmarks. With the release
         of Web Assembly, the importance of asm.js has lessened since many users of asm.js are
-        now using Web Assembly. JetStream 3 has converted many of the asm.js benchmarks from
+        now using Web Assembly. JetStream 2 has converted many of the asm.js benchmarks from
         JetStream 1 into Web Assembly.
         </p>
 
         <p>
-        All but one of JetStream 3's JavaScript benchmarks run for N iterations, where
-        N is usually 120. JetStream 3 reports the startup score as the time it takes to run the first iteration.
+        All but one of JetStream'2 JavaScript benchmarks run for N iterations, where
+        N is usually 120. JetStream 2 reports the startup score as the time it takes to run the first iteration.
         The worst case score is the average of the worst M iterations, excluding the first iteration.
         M is always less than N, and is usually 4. The average case score is the average
         of all but the first iteration. These three scores are weighed equally using the geometric
@@ -96,7 +96,7 @@
         </p>
 
         <p>
-        JetStream 3 also includes a JavaScript benchmark named WSL. WSL is an implementation of a
+        JetStream 2 also includes a JavaScript benchmark named WSL. WSL is an implementation of a
         GPU shading language written in JavaScript. WSL does not use the above mechanism for scoring
         because it has a long running time. Instead, the WSL benchmark computes its score as the
         geometric mean over two metrics: the time it takes to compile the WSL standard library, and the time
@@ -104,28 +104,21 @@
         </p>
 
         <p>
-        JetStream 3 includes parts of these benchmark suites that came before it: <a href="https://webkit.org/perf/sunspider/sunspider.html">SunSpider</a>,
+        JetStream 2 includes parts of these benchmark suites that came before it: <a href="https://webkit.org/perf/sunspider/sunspider.html">SunSpider</a>,
         <a href="https://developers.google.com/octane/">Octane 2</a>, <a href="https://browserbench.org/JetStream1.1/">JetStream 1</a>,
         <a href="https://browserbench.org/ARES-6/">ARES-6</a>, and <a href="https://v8.github.io/web-tooling-benchmark/">Web Tooling Benchmark</a>.
-        JetStream 3 also includes new benchmarks inspired by <a href="https://krakenbenchmark.mozilla.org">Kraken</a>.
-        JetStream 3 also includes a new set of benchmarks that measure the performance of Web Assembly, Web Workers,
+        JetStream 2 also includes new benchmarks inspired by <a href="https://krakenbenchmark.mozilla.org">Kraken</a>.
+        JetStream 2 also includes a new set of benchmarks that measure the performance of Web Assembly, Web Workers,
         Promises, async iteration, unicode regular expressions, and JavaScript parsing.
         </p>
 
         <p>
-        JetStream 3 runs the same benchmarks as JetStream 3, but updates the benchmark driver to
-        improve score stability. This is achieved by pre-fetching network resources prior to running
-        the benchmarks. This can reduce perturbations on the measurement of JavaScript execution
-        time due to second order effects of pause times induced by network latency.
-        </p>
-
-        <p>
-        Note that scores from JetStream 3 are not comparable to scores to other versions
+        Note that scores from JetStream 2 are not comparable to scores to other versions
         of any JetStream benchmark.
         </p>
 
         <h3>
-        JetStream 3 has 64 subtests:
+        JetStream 2 has 64 subtests:
         </h3>
 
         <dl>
@@ -170,16 +163,6 @@
          Runs Filip Pizlo's &mdash; of the WebKit team &mdash; implementation of a <a href="http://www.filpizlo.com/tsf/"> Typed Stream Format </a>
          in Web Assembly. The original code is compiled from C to Web Assembly using <a href="https://emscripten.org">Emscripten</a>.
          Source code: <a href="wasm/TSF">TSF</a>
-        </dd>
-
-        <dt id="tfjs-wasm">tfjs-wasm</dt>
-        <dd>
-         Tests <a href="https://github.com/tensorflow/tfjs">Tensorflow.js</a> pre-trained machine learning models supported by <a href="https://github.com/tensorflow/tfjs/tree/master/tfjs-backend-wasm">WebAssembly backend</a>. The current benchmark includes models: <a href="https://tfhub.dev/google/tfjs-model/imagenet/mobilenet_v2_100_224/classification/3/default/1">mobilenet</a>, <a href="https://www.npmjs.com/package/@tensorflow-models/knn-classifier">knn-classifier</a>, <a href="https://www.npmjs.com/package/@tensorflow-models/coco-ssd">coco-ssd</a>, <a href="https://www.npmjs.com/package/@tensorflow-models/universal-sentence-encoder">universal-sentence-encoder</a>. Source code: <a href="wasm/">TFJS</a>.
-        </dd>
-
-        <dt id="argon2-wasm">argon2-wasm</dt>
-        <dd>
-         Tests <a href="https://github.com/P-H-C/phc-winner-argon2">Argon2</a>, a password-hashing function (the winner of Password Hashing Competition), in Web Assembly. This is test is based on <a href="https://github.com/antelle/argon2-browser">argon2-browser</a> library. Source code: <a href="wasm/">ARGON2</a>.
         </dd>
 
         <dt id="tagcloud-SP">tagcloud-SP</dt>
@@ -251,15 +234,6 @@
          Source code: <a href="wasm/richards.c">richards.c</a>, <a href="wasm/richards.js">richards.js</a>
         </dd>
 
-        <dt id="8bitbench-wasm">8bitbench-wasm</dt>
-        <dd>
-         A simple 8-bit emulator targeting wasm, written in rust. It aims to represent what an emulator or small game might act like in the real world.
-         <br />
-         Attribution: See <a href="8bitbench/ABOUT.md">8bitbench/ABOUT.md</a>
-         <br />
-         Source code: <a href="8bitbench/js3harness.js">8bitbench/js3harness.js</a>, based off <a href="https://github.com/justinmichaud/8bitbench">https://github.com/justinmichaud/8bitbench</a>
-        </dd>
-
         <dt id="regexp">regexp</dt>
         <dd>
          Collection of regular expressions found by the V8 team in 2010, curated into a benchmark.
@@ -278,26 +252,10 @@
 
         <dt id="raytrace">raytrace</dt>
         <dd>
-         <a href="https://en.wikipedia.org/wiki/Ray_tracing_(graphics)">Ray tracer</a> written in JavaScript using ES6 classes.
-         Tests object construction performance and floating point math.
+        <a href="https://en.wikipedia.org/wiki/Ray_tracing_(graphics)">Ray tracer</a> written in JavaScript using prototype.js. Tests object construction performance
+         and floating point math.
          A similar version of this benchmark was previously published in Octane version 2.
          Source code: <a href="Octane/raytrace.js">raytrace.js</a>
-        </dd>
-
-        <dt id="raytrace-private-class-fields">raytrace-private-class-fields</dt>
-        <dd>
-         <a href="https://en.wikipedia.org/wiki/Ray_tracing_(graphics)">Ray tracer</a> written in JavaScript using ES6 classes and private fields.
-         Tests object construction performance, along with setting default values of private fields, their access speed, and floating point math.
-         A similar version of this benchmark was previously published in Octane version 2.
-         Source code: <a href="class-fields/raytrace-private-class-fields.js">raytrace-private-class-fields.js</a>
-        </dd>
-
-        <dt id="raytrace-public-class-fields">raytrace-public-class-fields</dt>
-        <dd>
-         <a href="https://en.wikipedia.org/wiki/Ray_tracing_(graphics)">Ray tracer</a> written in JavaScript using ES6 classes and public fields.
-         Tests object construction performance, along with setting default values of public fields, and floating point math.
-         A similar version of this benchmark was previously published in Octane version 2.
-         Source code: <a href="class-fields/raytrace-public-class-fields.js">raytrace-public-class-fields.js</a>
         </dd>
 
         <dt id="quicksort-wasm">quicksort-wasm</dt>
@@ -644,48 +602,7 @@
         <dd>
          This is an implementation of a mock file system that stresses the performance of DataView, Promises, and async
          iteration. The benchmark simulates adding and removing files, and swapping the byte order of existing files.
-         Source code: <a href="generators/async-file-system.js">async-file-system.js</a>
-        </dd>
-
-        <dt id="sync-fs">sync-fs</dt>
-        <dd>
-         This is an implementation of a mock file system that stresses the performance of DataView, Promises, and synchronous
-         generators / iterators. The benchmark simulates adding and removing files, and swapping the byte order of existing files.
-         Source code: <a href="generators/sync-file-system.js">sync-file-system.js</a>
-        </dd>
-
-        <dt id="lazy-collections">lazy-collections</dt>
-        <dd>
-         This benchmark iterates over common integer sequences (fibonacci, prime numbers, etc) as lazy collections using eponymous
-         library by <a href="https://robinmalfait.com">Robin Malfait</a> that stresses the performance of generators.
-         Source code: <a href="generators/lazy-collections.js">lazy-collections.js</a>
-        </dd>
-
-        <dt id="js-tokens">js-tokens</dt>
-        <dd>
-         This benchmarks runs <a href="https://github.com/lydell/js-tokens">js-tokens</a>, a lenient and almost spec-compliant JavaScript
-         tokenizer by Simon Lydell, over its own source code and a JSX snippet. Stresses the performance of generators and regular
-         expressions, especially sticky and unicode RegExp patterns with property escapes <code>\p{}</code>.
-         Source code: <a href="generators/js-tokens.js">js-tokens.js</a>
-        </dd>
-
-        <dt id="doxbee-promise">doxbee-promise</dt>
-        <dd>
-         A typical CRUD method extracted from DoxBee that is called when uploading files. The benchmark emulates a situation where
-         10k requests are being made concurrently to execute some mixed async / sync action with fast I/O response times.
-         Authored by <a href="https://blog.spion.dev/posts/analysis-generators-and-other-async-patterns-node.html">Gorki Kosev</a>,
-         <a href="https://github.com/v8/promise-performance-tests">packed by Benedikt Meurer</a>.
-         Source code: <a href="simple/doxbee-promise.js">doxbee-promise.js</a>
-        </dd>
-
-        <dt id="doxbee-async">doxbee-async</dt>
-        <dd>
-         A typical CRUD method extracted from DoxBee that is called when uploading files. The benchmark emulates a situation where
-         10k requests are being made concurrently to execute some mixed async / sync action with fast I/O response times.
-         Uses async / await instead of plain Promise.
-         Authored by <a href="https://blog.spion.dev/posts/analysis-generators-and-other-async-patterns-node.html">Gorki Kosev</a>,
-         <a href="https://github.com/v8/promise-performance-tests">packed by Benedikt Meurer</a>.
-         Source code: <a href="simple/doxbee-async.js">doxbee-async.js</a>
+         Source code: <a href="simple/file-system.js">async-fs.js</a>
         </dd>
 
         <dt id="Air">Air</dt>
@@ -729,68 +646,6 @@
          short-running code.
          A similar version of this benchmark was previously published in SunSpider.
          Source code: <a href="SunSpider/3d-cube.js">3d-cube.js</a>
-        </dd>
-
-        <dt id="bigint-noble-bls12-381">bigint-noble-bls12-381</dt>
-        <dd>
-         <a href="https://hackmd.io/@benjaminion/bls12-381">BLS12-381</a>, pairing-friendly
-         Barreto-Lynn-Scott elliptic curve construction,
-         <a href="https://github.com/paulmillr/noble-bls12-381">implemented in JavaScript</a>
-         by Paul Miller. Tests typed arrays and arithmetic operations on BigInt.
-         Source code: <a href="bigint/noble-bls12-381-bundle.js">noble-bls12-381-bundle.js</a>
-        </dd>
-
-        <dt id="bigint-noble-secp256k1">bigint-noble-secp256k1</dt>
-        <dd>
-         <a href="https://www.secg.org/sec2-v2.pdf">secp256k1</a>, an elliptic curve that could
-         be used for asymmetric encryption, ECDH key agreement protocol and signature schemes,
-         <a href="https://github.com/paulmillr/noble-secp256k1">implemented in JavaScript</a>
-         by Paul Miller. Tests typed arrays and arithmetic operations on BigInt.
-         Source code: <a href="bigint/noble-secp256k1-bundle.js">noble-secp256k1-bundle.js</a>
-        </dd>
-
-        <dt id="bigint-noble-ed25519">bigint-noble-ed25519</dt>
-        <dd>
-         <a href="https://en.wikipedia.org/wiki/EdDSA">ed25519</a>, an elliptic curve that could
-         be used for EDDSA signature scheme and X25519 ECDH key agreement,
-         <a href="https://github.com/paulmillr/noble-ed25519">implemented in JavaScript</a>
-         by Paul Miller. Tests typed arrays and arithmetic operations on BigInt.
-         Source code: <a href="bigint/noble-ed25519-bundle.js">noble-ed25519-bundle.js</a>
-        </dd>
-
-        <dt id="bigint-paillier">bigint-paillier</dt>
-        <dd>
-         <a href="https://en.wikipedia.org/wiki/Paillier_cryptosystem">Paillier cryptosystem</a>,
-         a probabilistic asymmetric algorithm for public key cryptography,
-         <a href="https://github.com/juanelas/paillier-bigint">implemented in JavaScript</a>
-         by Juan Hernández Serrano. Tests arithmetic operations on BigInt.
-         Source code: <a href="bigint/paillier-bundle.js">paillier-bundle.js</a>
-        </dd>
-
-        <dt id="bigint-bigdenary">bigint-bigdenary</dt>
-        <dd>
-         <a href="https://github.com/uzyn/bigdenary">BigDenary</a>, an arbitrary-precision
-         decimal arithmetic, implemented in JavaScript by U-Zyn Chua.
-         Tests arithmetic operations on BigInt.
-         Source code: <a href="bigint/bigdenary-bundle.js">bigdenary-bundle.js</a>
-        </dd>
-
-        <dt id="proxy-mobx">proxy-mobx</dt>
-        <dd>
-         A super minimal, store-only implementation of Reminders.app, written in MobX.
-         Heavily relies on computed getters and utilizes Map / Set collections.
-         Synchronously re-renders into text on every data manipulation.
-         Tests get / set Proxy traps, as well as various Array methods.
-         Source code: <a href="proxy/mobx-benchmark.js">mobx-benchmark.js</a>
-        </dd>
-
-        <dt id="proxy-vue">proxy-vue</dt>
-        <dd>
-         A super minimal, store-only implementation of Reminders.app, written using reactivity
-         API of Vue.js 3.0. Heavily relies on computed getters and utilizes Map / Set collections.
-         Synchronously re-renders into text on every data manipulation.
-         Tests get / set Proxy traps, as well as various Array methods.
-         Source code: <a href="proxy/vue-benchmark.js">vue-benchmark.js</a>
         </dd>
 
         </dl>

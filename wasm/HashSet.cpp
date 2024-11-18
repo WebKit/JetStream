@@ -42,7 +42,7 @@
         }                                                               \
     } while(0)
 
-#define ASSERT_ENABLED 0
+#define ASSERT_DISABLED 1
 
 #define DUMP_HASHTABLE_STATS 0
 #define DUMP_HASHTABLE_STATS_PER_TABLE 0
@@ -1033,7 +1033,7 @@ struct CustomHashTraits : public GenericHashTraits<T> {
         template<typename HashTranslator, typename T> ValueType* lookup(const T&);
         template<typename HashTranslator, typename T> ValueType* inlineLookup(const T&);
 
-#if ASSERT_ENABLED
+#if !ASSERT_DISABLED
         void checkTableConsistency() const;
 #else
         static void checkTableConsistency() { }
@@ -1085,7 +1085,7 @@ struct CustomHashTraits : public GenericHashTraits<T> {
         iterator makeKnownGoodIterator(ValueType* pos) { return iterator(this, pos, m_table + m_tableSize, HashItemKnownGood); }
         const_iterator makeKnownGoodConstIterator(ValueType* pos) const { return const_iterator(this, pos, m_table + m_tableSize, HashItemKnownGood); }
 
-#if ASSERT_ENABLED
+#if !ASSERT_DISABLED
         void checkTableConsistencyExceptSize() const;
 #else
         static void checkTableConsistencyExceptSize() { }
@@ -1182,7 +1182,7 @@ struct CustomHashTraits : public GenericHashTraits<T> {
         return key;
     }
 
-#if !ASSERT_ENABLED
+#if ASSERT_DISABLED
 
     template<typename Key, typename Value, typename Extractor, typename HashFunctions, typename Traits, typename KeyTraits>
     template<typename HashTranslator, typename T>
@@ -1951,7 +1951,7 @@ struct CustomHashTraits : public GenericHashTraits<T> {
         return *this;
     }
 
-#if ASSERT_ENABLED
+#if !ASSERT_DISABLED
 
     template<typename Key, typename Value, typename Extractor, typename HashFunctions, typename Traits, typename KeyTraits>
     void HashTable<Key, Value, Extractor, HashFunctions, Traits, KeyTraits>::checkTableConsistency() const
@@ -1993,7 +1993,7 @@ struct CustomHashTraits : public GenericHashTraits<T> {
         ASSERT(m_tableSize == m_tableSizeMask + 1);
     }
 
-#endif // ASSERT_ENABLED
+#endif // ASSERT_DISABLED
 
 #if CHECK_HASHTABLE_ITERATORS
 

@@ -29,7 +29,7 @@
 
 # Below this line is (mostly) a CSV file describing the licenses used in
 # the sub-libraries of Web Tooling Benchmark that are included as part
-# of JetStream 3.
+# of JetStream 2.
 
 # The CSV is formatted as:
 OSS Project Name,  OSS Project URL,  Version,  License Name,  OSS License URL
