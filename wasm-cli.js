@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018 Apple Inc. All rights reserved.
+ * Copyright (C) 2020 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,23 +25,12 @@
 
 const isInBrowser = false;
 console = {
-    log: print
+    log: () => { }
 }
 
-const isD8 = typeof Realm !== "undefined";
-if (isD8)
-    readFile = read;
+testList = ["HashSet-wasm", "tsf-wasm", "quicksort-wasm", "gcc-loops-wasm", "richards-wasm"];
 
-if (typeof testList === "undefined")
-    testList = undefined;
-
-if (typeof testIterationCount === "undefined")
-    testIterationCount = undefined;
-
-if (typeof runMode !== "undefined" && runMode == "RAMification")
-    RAMification = true;
-else
-    RAMification = false;
+RAMification = false;
 
 load("./JetStreamDriver.js");
 
@@ -50,7 +39,7 @@ async function runJetStream() {
         await JetStream.initialize();
         JetStream.start();
     } catch (e) {
-        console.log("JetStream2 failed: " + e);
+        throw e;
     }
 }
 runJetStream();

@@ -1,7 +1,7 @@
 "use strict";
 
 /*
- * Copyright (C) 2018 Apple Inc. All rights reserved.
+ * Copyright (C) 2018-2022 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -25,7 +25,6 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const preloadResources = !isInBrowser;
 const measureTotalTimeAsSubtest = false; // Once we move to preloading all resources, it would be good to turn this on.
 
 if (typeof RAMification === "undefined")
@@ -34,12 +33,64 @@ if (typeof RAMification === "undefined")
 if (typeof testIterationCount === "undefined")
     var testIterationCount = undefined;
 
+if (typeof testIterationCountMap === "undefined")
+    var testIterationCountMap = new Map;
+
+if (typeof testWorstCaseCountMap === "undefined")
+    var testWorstCaseCountMap = new Map;
+
+if (typeof dumpJSONResults === "undefined")
+    var dumpJSONResults = false;
+
 // Used for the promise representing the current benchmark run.
 this.currentResolve = null;
 this.currentReject = null;
 
 const defaultIterationCount = 120;
 const defaultWorstCaseCount = 4;
+
+let showScoreDetails = false;
+let categoryScores = null;
+
+function displayCategoryScores() {
+    if (!categoryScores)
+        return;
+
+    let summaryElement = document.getElementById("result-summary");
+    for (let [category, scores] of categoryScores)
+        summaryElement.innerHTML += `<p> ${category}: ${uiFriendlyNumber(geomean(scores))}</p>`
+
+    categoryScores = null;
+}
+
+function getIterationCount(plan) {
+    if (testIterationCountMap.has(plan.name))
+        return testIterationCountMap.get(plan.name);
+    if (testIterationCount)
+        return testIterationCount;
+    if (plan.iterations)
+        return plan.iterations;
+    return defaultIterationCount;
+}
+
+function getWorstCaseCount(plan) {
+    if (testWorstCaseCountMap.has(plan.name))
+        return testWorstCaseCountMap.get(plan.name);
+    if (plan.worstCaseCount)
+        return plan.worstCaseCount;
+    return defaultWorstCaseCount;
+}
+
+if (isInBrowser) {
+    document.onkeydown = (keyboardEvent) => {
+        let key = keyboardEvent.key;
+        if (key === "d" || key === "D") {
+            showScoreDetails = true;
+
+            displayCategoryScores();
+        }
+    };
+}
 
 function assert(b, m = "") {
     if (!b)
@@ -124,11 +175,26 @@ const fileLoader = (function() {
             if (!isInBrowser)
                 return Promise.resolve(readFile(url));
 
-            let fetchResponse = await fetch(new Request(url));
+            let response;
+            let tries = 3;
+            while (tries--) {
+                let hasError = false;
+                try {
+                    response = await fetch(url);
+                } catch (e) {
+                    hasError = true;
+                }
+                if (!hasError && response.ok)
+                    break;
+                if (tries)
+                    continue;
+                window.allIsGood = false;
+                throw new Error("Fetch failed");
+            }
             if (url.indexOf(".js") !== -1)
-                return await fetchResponse.text();
+                return await response.text();
             else if (url.indexOf(".wasm") !== -1)
-                return await fetchResponse.arrayBuffer();
+                return await response.arrayBuffer();
 
             throw new Error("should not be reached!");
         }
@@ -148,6 +214,12 @@ const fileLoader = (function() {
 class Driver {
     constructor() {
         this.benchmarks = [];
+        this.blobDataCache = { };
+        this.loadCache = { };
+        this.counter = { };
+        this.counter.loadedResources = 0;
+        this.counter.totalResources = 0;
+        this.counter.failedPreloadResources = 0;
     }
 
     addPlan(plan, BenchmarkClass = DefaultBenchmark) {
@@ -174,7 +246,6 @@ class Driver {
             await updateUI();
 
             try {
-
                 await benchmark.run();
             } catch(e) {
                 JetStream.reportError(benchmark);
@@ -182,6 +253,16 @@ class Driver {
             }
 
             benchmark.updateUIAfterRun();
+
+            if (isInBrowser) {
+                let cache = JetStream.blobDataCache;
+                for (let file of benchmark.plan.files) {
+                    let blobData = cache[file];
+                    blobData.refCount--;
+                    if (!blobData.refCount)
+                        cache[file] = undefined;
+                }
+            }
         }
 
         let totalTime = Date.now() - start;
@@ -197,21 +278,54 @@ class Driver {
         for (let benchmark of this.benchmarks)
             allScores.push(benchmark.score);
 
+        categoryScores = new Map;
+        for (let benchmark of this.benchmarks) {
+            for (let category of Object.keys(benchmark.subTimes()))
+                categoryScores.set(category, []);
+        }
+
+        for (let benchmark of this.benchmarks) {
+            for (let [category, value] of Object.entries(benchmark.subTimes())) {
+                let arr = categoryScores.get(category);
+                arr.push(value);
+            }
+        }
+
         if (isInBrowser) {
             summaryElement.classList.add('done');
             summaryElement.innerHTML = "<div class=\"score\">" + uiFriendlyNumber(geomean(allScores)) + "</div><label>Score</label>";
+            summaryElement.onclick = displayCategoryScores;
+            if (showScoreDetails)
+                displayCategoryScores();
             statusElement.innerHTML = '';
-        } else
+        } else {
+            console.log("\n");
+            for (let [category, scores] of categoryScores)
+                console.log(`${category}: ${uiFriendlyNumber(geomean(scores))}`);
+
             console.log("\nTotal Score: ", uiFriendlyNumber(geomean(allScores)), "\n");
+        }
 
         this.reportScoreToRunBenchmarkRunner();
+        this.dumpJSONResultsIfNeeded();
     }
 
     runCode(string)
     {
         if (!isInBrowser) {
             let scripts = string;
-            let globalObject = runString("");
+            let globalObject;
+            let realm;
+            if (isD8) {
+                realm = Realm.createAllowCrossRealmAccess();
+                globalObject = Realm.global(realm);
+                globalObject.loadString = function(s) {
+                    return Realm.eval(realm, s);
+                };
+                globalObject.readFile = read;
+            } else
+                globalObject = runString("");
+
             globalObject.console = {log:globalObject.print}
             globalObject.top = {
                 currentResolve,
@@ -219,7 +333,8 @@ class Driver {
             };
             for (let script of scripts)
                 globalObject.loadString(script);
-            return globalObject;
+
+            return isD8 ? realm : globalObject;
         }
 
         var magic = document.getElementById("magic");
@@ -286,6 +401,7 @@ class Driver {
     }
 
     async initialize() {
+        await this.prefetchResourcesForBrowser();
         await this.fetchResources();
         this.prepareToRun();
         if (isInBrowser && window.location.search == '?report=true') {
@@ -293,9 +409,40 @@ class Driver {
         }
     }
 
-    async fetchResources() {
+    async prefetchResourcesForBrowser() {
+        if (!isInBrowser)
+            return;
+
+        var promises = [];
         for (let benchmark of this.benchmarks)
-            await benchmark.fetchResources();
+            promises.push(benchmark.prefetchResourcesForBrowser());
+
+        await Promise.all(promises);
+
+        let counter = JetStream.counter;
+        if (counter.failedPreloadResources || counter.loadedResources != counter.totalResources) {
+            for (let benchmark of this.benchmarks) {
+                let allFilesLoaded = await benchmark.retryPrefetchResourcesForBrowser(counter);
+                if (allFilesLoaded)
+                    break;
+            }
+
+            if (counter.failedPreloadResources || counter.loadedResources != counter.totalResources) {
+                // If we've failed to prefetch resources even after a sequential 1 by 1 retry,
+                // then fail out early rather than letting subtests fail with a hang.
+                window.allIsGood = false;
+                throw new Error("Fetch failed"); 
+            }
+        }
+
+        JetStream.loadCache = { }; // Done preloading all the files.
+    }
+
+    async fetchResources() {
+        var promises = [];
+        for (let benchmark of this.benchmarks)
+            promises.push(benchmark.fetchResources());
+        await Promise.all(promises);
 
         if (!isInBrowser)
             return;
@@ -310,14 +457,8 @@ class Driver {
         }
     }
 
-    async reportScoreToRunBenchmarkRunner()
+    resultsJSON()
     {
-        if (!isInBrowser)
-            return;
-
-        if (window.location.search !== '?report=true')
-            return;
-
         let results = {};
         for (let benchmark of this.benchmarks) {
             const subResults = {}
@@ -331,12 +472,32 @@ class Driver {
                     "Time": ["Geometric"],
                 },
                 "tests": subResults,
-            };;
+            };
         }
 
         results = {"JetStream2.0": {"metrics" : {"Score" : ["Geometric"]}, "tests" : results}};
 
-        const content = JSON.stringify(results);
+        return JSON.stringify(results);
+    }
+
+    dumpJSONResultsIfNeeded()
+    {
+        if (dumpJSONResults) {
+            console.log("\n");
+            console.log(this.resultsJSON());
+            console.log("\n");
+        }
+    }
+
+    async reportScoreToRunBenchmarkRunner()
+    {
+        if (!isInBrowser)
+            return;
+
+        if (window.location.search !== '?report=true')
+            return;
+
+        const content = this.resultsJSON();
         await fetch("/report", {
             method: "POST",
             heeaders: {
@@ -353,7 +514,7 @@ class Benchmark {
     constructor(plan)
     {
         this.plan = plan;
-        this.iterations = testIterationCount || plan.iterations || defaultIterationCount;
+        this.iterations = getIterationCount(plan);
         this.isAsync = !!plan.isAsync;
 
         this.scripts = null;
@@ -446,14 +607,15 @@ class Benchmark {
         if (prerunCode)
             addScript(prerunCode);
 
-        if (preloadResources) {
+        if (!isInBrowser) {
             assert(this.scripts && this.scripts.length === this.plan.files.length);
 
             for (let text of this.scripts)
                 addScript(text);
         } else {
+            let cache = JetStream.blobDataCache;
             for (let file of this.plan.files)
-                addScriptWithURL(file);
+                addScriptWithURL(cache[file].blobURL);
         }
 
         let promise = new Promise((resolve, reject) => {
@@ -494,27 +656,163 @@ class Benchmark {
         this.processResults(results);
         if (isInBrowser)
             magicFrame.contentDocument.close();
+        else if (isD8)
+            Realm.dispose(magicFrame);
+    }
+
+    async doLoadBlob(resource) {
+        let response;
+        let tries = 3;
+        while (tries--) {
+            let hasError = false;
+            try {
+                response = await fetch(resource, { cache: "no-store" });
+            } catch (e) {
+                hasError = true;
+            }
+            if (!hasError && response.ok)
+                break;
+            if (tries)
+                continue;
+            throw new Error("Fetch failed");
+        }
+        let blob = await response.blob();
+        var blobData = JetStream.blobDataCache[resource];
+        blobData.blob = blob;
+        blobData.blobURL = URL.createObjectURL(blob);
+        return blobData;
+    }
+
+    async loadBlob(type, prop, resource, incrementRefCount = true) {
+        var blobData = JetStream.blobDataCache[resource];
+        if (!blobData) {
+            blobData = {
+                type: type,
+                prop: prop,
+                resource: resource,
+                blob: null,
+                blobURL: null,
+                refCount: 0
+            };
+            JetStream.blobDataCache[resource] = blobData;
+        }
+
+        if (incrementRefCount)
+            blobData.refCount++;
+
+        let promise = JetStream.loadCache[resource];
+        if (promise)
+            return await promise;
+
+        promise = this.doLoadBlob(resource);
+        JetStream.loadCache[resource] = promise;
+        return await promise;
+    }
+
+    updateCounter() {
+        let counter = JetStream.counter;
+        ++counter.loadedResources;
+        var statusElement = document.getElementById("status");
+        statusElement.innerHTML = `Loading ${counter.loadedResources} of ${counter.totalResources} ...`;
+    }
+
+    prefetchResourcesForBrowser() {
+        if (!isInBrowser)
+            return;
+        let promises = this.plan.files.map((file) => this.loadBlob("file", null, file).then((blobData) => {
+                if (!window.allIsGood)
+                    return;
+                this.updateCounter();
+            }).catch((error) => {
+                // We'll try again later in retryPrefetchResourceForBrowser(). Don't throw an error.
+            }));
+
+        if (this.plan.preload) {
+            this.preloads = [];
+            for (let prop of Object.getOwnPropertyNames(this.plan.preload)) {
+                promises.push(this.loadBlob("preload", prop, this.plan.preload[prop]).then((blobData) => {
+                    if (!window.allIsGood)
+                        return;
+                    this.preloads.push([ blobData.prop, blobData.blobURL ]);
+                    this.updateCounter();
+                }).catch((error) => {
+                    // We'll try again later in retryPrefetchResourceForBrowser(). Don't throw an error.
+                    if (!this.failedPreloads)
+                        this.failedPreloads = { };
+                    this.failedPreloads[prop] = true;
+                    JetStream.counter.failedPreloadResources++;
+                }));
+            }
+        }
+
+        JetStream.counter.totalResources += promises.length;
+        return Promise.all(promises);
+    }
+
+    async retryPrefetchResource(type, prop, file) {
+        let counter = JetStream.counter;
+        var blobData = JetStream.blobDataCache[file];
+        if (blobData.blob) {
+            // The same preload blob may be used by multiple subtests. Though the blob is already loaded,
+            // we still need to check if this subtest failed to load it before. If so, handle accordingly.
+            if (type == "preload") {
+                if (this.failedPreloads && this.failedPreloads[blobData.prop]) {
+                    this.failedPreloads[blobData.prop] = false;
+                    this.preloads.push([ blobData.prop, blobData.blobURL ]);
+                    counter.failedPreloadResources--;
+                }
+            }
+            return !counter.failedPreloadResources && counter.loadedResources == counter.totalResources;
+        }
+
+        // Retry fetching the resource.
+        JetStream.loadCache[file] = null;
+        await this.loadBlob(type, prop, file, false).then((blobData) => {
+            if (!window.allIsGood)
+                return;
+            if (blobData.type == "preload")
+                this.preloads.push([ blobData.prop, blobData.blobURL ]);
+            this.updateCounter();
+        });
+
+        if (!blobData.blob) {
+            window.allIsGood = false;
+            throw new Error("Fetch failed"); 
+        }
+
+        return !counter.failedPreloadResources && counter.loadedResources == counter.totalResources;
+    }
+
+    async retryPrefetchResourcesForBrowser() {
+        if (!isInBrowser)
+            return;
+
+        let counter = JetStream.counter;
+        for (let resource of this.plan.files) {
+            let allDone = await this.retryPrefetchResource("file", null, resource);
+            if (allDone)
+                return true; // All resources loaded, nothing more to do.
+        }
+
+        if (this.plan.preload) {
+            for (let prop of Object.getOwnPropertyNames(this.plan.preload)) {
+                let resource = this.plan.preload[prop];
+                let allDone = await this.retryPrefetchResource("preload", prop, resource);
+                if (allDone)
+                    return true; // All resources loaded, nothing more to do.
+            }
+        }
+        return !counter.failedPreloadResources && counter.loadedResources == counter.totalResources;
     }
 
     fetchResources() {
         if (this._resourcesPromise)
             return this._resourcesPromise;
 
-        let filePromises = preloadResources ? this.plan.files.map((file) => fileLoader.load(file)) : [];
-        let preloads = [];
-        let preloadVariableNames = [];
+        let filePromises = !isInBrowser ? this.plan.files.map((file) => fileLoader.load(file)) : [];
 
-        if (isInBrowser && this.plan.preload) {
-            for (let prop of Object.getOwnPropertyNames(this.plan.preload)) {
-                preloadVariableNames.push(prop);
-                preloads.push(this.plan.preload[prop]);
-            }
-        }
-
-        preloads = preloads.map((file) => fileLoader.load(file));
-
-        let p1 = Promise.all(filePromises).then((texts) => {
-            if (!preloadResources)
+        let promise = Promise.all(filePromises).then((texts) => {
+            if (isInBrowser)
                 return;
             this.scripts = [];
             assert(texts.length === this.plan.files.length);
@@ -522,26 +820,10 @@ class Benchmark {
                 this.scripts.push(text);
         });
 
-        let p2 = Promise.all(preloads).then((data) => {
-            this.preloads = [];
-            this.blobs = [];
-            for (let i = 0; i < data.length; ++i) {
-                let item = data[i];
+        this.preloads = [];
+        this.blobs = [];
 
-                let blob;
-                if (typeof item === "string") {
-                    blob = new Blob([item], {type : 'application/javascript'});
-                } else if (item instanceof ArrayBuffer) {
-                    blob = new Blob([item], {type : 'application/octet-stream'});
-                } else
-                    throw new Error("Unexpected item!");
-
-                this.blobs.push(blob);
-                this.preloads.push([preloadVariableNames[i], URL.createObjectURL(blob)]);
-            }
-        });
-
-        this._resourcesPromise = Promise.all([p1, p2]);
+        this._resourcesPromise = promise;
         return this._resourcesPromise;
     }
 
@@ -578,7 +860,7 @@ class DefaultBenchmark extends Benchmark {
     constructor(...args) {
         super(...args);
 
-        this.worstCaseCount = this.plan.worstCaseCount || defaultWorstCaseCount;
+        this.worstCaseCount = getWorstCaseCount(this.plan);
         this.firstIteration = null;
         this.worst4 = null;
         this.average = null;
@@ -638,15 +920,15 @@ class DefaultBenchmark extends Benchmark {
             return;
         }
 
-        print("    Startup:", uiFriendlyNumber(this.firstIteration));
-        print("    Worst Case:", uiFriendlyNumber(this.worst4));
-        print("    Average:", uiFriendlyNumber(this.average));
-        print("    Score:", uiFriendlyNumber(this.score));
+        console.log("    Startup:", uiFriendlyNumber(this.firstIteration));
+        console.log("    Worst Case:", uiFriendlyNumber(this.worst4));
+        console.log("    Average:", uiFriendlyNumber(this.average));
+        console.log("    Score:", uiFriendlyNumber(this.score));
         if (RAMification) {
-            print("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
-            print("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
+            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
+            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        print("    Wall time:", uiFriendlyDuration(new Date(this.endTime - this.startTime)));
+        console.log("    Wall time:", uiFriendlyDuration(new Date(this.endTime - this.startTime)));
     }
 }
 
@@ -732,14 +1014,14 @@ class WSLBenchmark extends Benchmark {
             return;
         }
 
-        print("    Stdlib:", uiFriendlyNumber(this.stdlib));
-        print("    Tests:", uiFriendlyNumber(this.mainRun));
-        print("    Score:", uiFriendlyNumber(this.score));
+        console.log("    Stdlib:", uiFriendlyNumber(this.stdlib));
+        console.log("    Tests:", uiFriendlyNumber(this.mainRun));
+        console.log("    Score:", uiFriendlyNumber(this.score));
         if (RAMification) {
-            print("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
-            print("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
+            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
+            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        print("    Wall time:", uiFriendlyDuration(new Date(this.endTime - this.startTime)));
+        console.log("    Wall time:", uiFriendlyDuration(new Date(this.endTime - this.startTime)));
     }
 };
 
@@ -888,13 +1170,13 @@ class WasmBenchmark extends Benchmark {
             document.getElementById(this.scoreID).innerHTML = uiFriendlyNumber(this.score);
             return;
         }
-        print("    Startup:", uiFriendlyNumber(this.startupTime));
-        print("    Run time:", uiFriendlyNumber(this.runTime));
+        console.log("    Startup:", uiFriendlyNumber(this.startupTime));
+        console.log("    Run time:", uiFriendlyNumber(this.runTime));
         if (RAMification) {
-            print("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
-            print("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
+            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
+            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        print("    Score:", uiFriendlyNumber(this.score));
+        console.log("    Score:", uiFriendlyNumber(this.score));
     }
 };
 
@@ -1542,6 +1824,8 @@ let runWorkerTests = !!isInBrowser;
 let runSeaMonster = true;
 let runCodeLoad = true;
 let runWasm = true;
+if (typeof WebAssembly === "undefined")
+    runWasm = false;
 
 if (false) {
     runOctane = false;
