@@ -24,12 +24,15 @@
  */
 "use strict";
 
+const defaultIterationCount = 120;
+
 class PlayerExpectation
 {
-    constructor(wins, handTypeCounts)
+    constructor(iterations, wins, handTypeCounts)
     {
-        this._wins = wins;
-        this._handTypeCounts = handTypeCounts;
+        const factor =  iterations / defaultIterationCount;
+        this._wins = wins * factor;
+        this._handTypeCounts = handTypeCounts.map(each => each * factor);
     }
 
     validate(player)
@@ -62,10 +65,13 @@ PlayerExpectation._handTypes = [
     "Straight Flushes",
     "Royal Flushes"
 ];
-    
-var playerExpectations = [];
 
-playerExpectations.push(new PlayerExpectation(60120, [120600, 102000, 10080, 5040, 1440, 360, 480, 0, 0, 0]));
-playerExpectations.push(new PlayerExpectation(60480, [120360, 99600, 11760, 6120, 1200, 360, 480, 120, 0, 0]));
-playerExpectations.push(new PlayerExpectation(61440, [121200, 99720, 11040, 6120, 1080, 480, 360, 0, 0, 0]));
-playerExpectations.push(new PlayerExpectation(57960, [121320, 100440, 11040, 5760, 840, 480, 120, 0, 0, 0]));
+
+function getPlayerExpectations(iterations) {
+    const playerExpectations = [];
+    playerExpectations.push(new PlayerExpectation(iterations, 60120, [120600, 102000, 10080, 5040, 1440, 360, 480, 0, 0, 0]));
+    playerExpectations.push(new PlayerExpectation(iterations, 60480, [120360, 99600, 11760, 6120, 1200, 360, 480, 120, 0, 0]));
+    playerExpectations.push(new PlayerExpectation(iterations, 61440, [121200, 99720, 11040, 6120, 1080, 480, 360, 0, 0, 0]));
+    playerExpectations.push(new PlayerExpectation(iterations, 57960, [121320, 100440, 11040, 5760, 840, 480, 120, 0, 0, 0]));
+    return playerExpectations;
+}

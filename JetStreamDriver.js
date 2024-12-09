@@ -27,28 +27,43 @@
 
 const measureTotalTimeAsSubtest = false; // Once we move to preloading all resources, it would be good to turn this on.
 
+const defaultIterationCount = 120;
+const defaultWorstCaseCount = 4;
+
 globalThis.performance ??= Date;
 globalThis.RAMification ??= false;
 globalThis.testIterationCount ??= undefined;
 globalThis.testIterationCountMap ??= new Map();
+globalThis.testWorstCaseCount ??= undefined;
 globalThis.testWorstCaseCountMap ??= new Map();
 globalThis.dumpJSONResults ??= false;
 globalThis.customTestList ??= [];
-
 let shouldReport = false;
+
+function getIntParam(urlParams, key) {
+    if (!urlParams.has(key))
+        return undefined
+    const rawValue = urlParams.get(key);
+    const value = parseInt(rawValue);
+    if (value <= 0)
+        throw new Error(`Expected positive value for ${key}, but got ${rawValue}`)
+    return value
+}
+
 if (typeof(URLSearchParams) !== "undefined") {
     const urlParameters = new URLSearchParams(window.location.search);
     shouldReport = urlParameters.has('report') && urlParameters.get('report').toLowerCase() == 'true';
     if (urlParameters.has('test'))
         customTestList = urlParameters.getAll("test");
+    globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
+    globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
 }
+
+
 
 // Used for the promise representing the current benchmark run.
 this.currentResolve = null;
 this.currentReject = null;
-
-const defaultIterationCount = 120;
-const defaultWorstCaseCount = 4;
 
 let showScoreDetails = false;
 let categoryScores = null;
@@ -77,6 +92,8 @@ function getIterationCount(plan) {
 function getWorstCaseCount(plan) {
     if (testWorstCaseCountMap.has(plan.name))
         return testWorstCaseCountMap.get(plan.name);
+    if (testWorstCaseCount)
+        return testWorstCaseCount;
     if (plan.worstCaseCount)
         return plan.worstCaseCount;
     return defaultWorstCaseCount;
@@ -214,6 +231,7 @@ const fileLoader = (function() {
 
 class Driver {
     constructor() {
+        this.isReady = false;
         this.benchmarks = [];
         this.blobDataCache = { };
         this.loadCache = { };
@@ -308,6 +326,11 @@ class Driver {
 
         this.reportScoreToRunBenchmarkRunner();
         this.dumpJSONResultsIfNeeded();
+        if (isInBrowser) {
+            globalThis.dispatchEvent(new CustomEvent("JetStreamDone", {
+                detail: this.resultsObject()
+            }));
+        }
     }
 
     runCode(string)
@@ -414,8 +437,12 @@ class Driver {
         await this.prefetchResourcesForBrowser();
         await this.fetchResources();
         this.prepareToRun();
-        if (isInBrowser && shouldReport) {
-            setTimeout(() => this.start(), 4000);
+        this.isReady = true;
+        if (isInBrowser) {
+            globalThis.dispatchEvent(new Event("JetStreamReady"));
+            if (shouldReport) {
+                setTimeout(() => this.start(), 4000);
+            }
         }
     }
 
@@ -467,7 +494,7 @@ class Driver {
         }
     }
 
-    resultsJSON()
+    resultsObject()
     {
         const results = {};
         for (const benchmark of this.benchmarks) {
@@ -486,8 +513,13 @@ class Driver {
         }
 
         results = {"JetStream3.0": {"metrics" : {"Score" : ["Geometric"]}, "tests" : results}};
+        return results;
 
-        return JSON.stringify(results);
+    }
+
+    resultsJSON()
+    {
+        return JSON.stringify(this.resultsObject());
     }
 
     dumpJSONResultsIfNeeded()
@@ -547,11 +579,10 @@ class Benchmark {
                 let start = performance.now();
                 __benchmark.runIteration();
                 let end = performance.now();
-
                 results.push(Math.max(1, end - start));
             }
             if (__benchmark.validate)
-                __benchmark.validate();
+                __benchmark.validate(${this.iterations});
             top.currentResolve(results);`;
     }
 
@@ -979,7 +1010,7 @@ class AsyncBenchmark extends DefaultBenchmark {
                 results.push(Math.max(1, end - start));
             }
             if (__benchmark.validate)
-                __benchmark.validate();
+                __benchmark.validate(${this.iterations});
             top.currentResolve(results);
         }
         doRun().catch((error) => { top.currentReject(error); });`

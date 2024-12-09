@@ -52,7 +52,7 @@ class Benchmark {
         this._decryptedMulIsCorrect &&= decryptedMul === 123456789012345678900n;
     }
 
-    validate() {
+    validate(iterations) {
         if (!this._c1DecryptedIsCorrect)
             throw new Error("Bad value: c1Decrypted!");
 

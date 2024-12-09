@@ -613,7 +613,7 @@ class Benchmark {
     this.totalLength += binaryTree().length;
   }
 
-  validate() {
+  validate(iterations) {
     if (this.totalLength !== 635)
       throw new Error(`this.totalLength of ${this.totalLength} is invalid!`);
   }

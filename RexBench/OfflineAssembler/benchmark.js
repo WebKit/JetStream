@@ -36,7 +36,7 @@ class Benchmark {
         this.ast = parse("LowLevelInterpreter.asm");
     }
 
-    validate()
+    validate(iterations)
     {
         let astDumpedAsLines = this.ast.dump().split("\n");
 

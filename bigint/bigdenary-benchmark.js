@@ -53,7 +53,7 @@ class Benchmark {
             areFirstAndLastResultsEqual(() => bd1.dividedBy(bd2));
     }
 
-    validate() {
+    validate(iterations) {
         if (!this._allFirstAndLastResultsAreEqual)
             throw new Error("Expected all first and last results to be equal, but they aren't.");
     }

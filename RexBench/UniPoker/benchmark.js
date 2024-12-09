@@ -39,8 +39,11 @@ class Benchmark {
         playHands(this._players);
     }
 
-    validate()
+    validate(iterations)
     {
+        if (!iterations)
+            throw "Invalid iterations"
+        const playerExpectations = getPlayerExpectations(iterations)
         if (this._players.length != playerExpectations.length)
             throw "Expect " + playerExpectations.length + ", but actually have " + this._players.length;
         if (isInBrowser) {

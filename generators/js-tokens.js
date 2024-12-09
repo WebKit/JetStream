@@ -451,7 +451,7 @@ class Benchmark {
         }
     }
 
-    validate() {
+    validate(iterations) {
         if (this.tokenCount !== 113975)
             throw new Error(`this.tokenCount of ${this.tokenCount} is invalid!`);
     }

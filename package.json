@@ -1,0 +1,39 @@
+{
+    "name": "jetstream",
+    "version": "3.0.0-alpha",
+    "description": "An open source repository for the JetStream benchmark.",
+    "engines": {
+        "node": ">=18.13.0",
+        "npm": ">=8.19.3"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/WebKit/JetStream.git"
+    },
+    "bugs": {
+        "url": "https://github.com/WebKit/JetStream/issues"
+    },
+    "license": "SEE LICENSE IN LICENSE",
+    "scripts": {
+        "dev": "http-server ./ -c-1 --cors",
+        "server": "http-server ./ --cors",
+        "lint:check": "eslint **/*.{js,mjs,jsx,ts,tsx}",
+        "pretty:check": "prettier --check ./",
+        "format:check": "npm run pretty:check && npm run lint:check",
+        "test:chrome": "node tests/run.mjs --browser chrome",
+        "test:firefox": "node tests/run.mjs --browser firefox",
+        "test:safari": "node tests/run.mjs --browser safari",
+        "test:edge": "node tests/run.mjs --browser edge"
+    },
+    "devDependencies": {
+        "@babel/core": "^7.21.3",
+        "@babel/eslint-parser": "^7.21.3",
+        "@babel/plugin-proposal-decorators": "^7.21.0",
+        "command-line-args": "^5.2.1",
+        "command-line-usage": "^6.1.3",
+        "eslint": "^8.38.0",
+        "http-server": "^14.1.1",
+        "prettier": "^2.8.3",
+        "selenium-webdriver": "^4.8.0"
+    }
+}

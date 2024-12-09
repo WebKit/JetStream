@@ -37,7 +37,7 @@ class Benchmark {
         }
     }
 
-    validate()
+    validate(iterations)
     {
         for (let flightPlan of expectedFlightPlans) {
             flightPlan.calculate();
