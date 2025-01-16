@@ -1,10 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 
 set -euo pipefail
 
 touch build.log
 BUILD_LOG="$(realpath build.log)"
-echo "Built on $(date -u '+%Y-%m-%dT%H:%M:%SZ')\n" | tee "$BUILD_LOG"
+echo "Built on $(date -u '+%Y-%m-%dT%H:%M:%SZ')" | tee "$BUILD_LOG"
 
 echo "Toolchain versions" | tee -a "$BUILD_LOG"
 emcc --version | head -n1 | tee -a "$BUILD_LOG"

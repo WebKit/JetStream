@@ -1036,6 +1036,7 @@ class WasmEMCCBenchmark extends AsyncBenchmark {
             let Module = {
                 preRun: [],
                 postRun: [],
+                noInitialRun: true,
                 print: print,
                 printErr: printErr,
                 setStatus: function(text) {
@@ -1350,11 +1351,12 @@ class WasmLegacyBenchmark extends Benchmark {
 
         console.log("    Startup:", uiFriendlyNumber(this.startupTime));
         console.log("    Run time:", uiFriendlyNumber(this.runTime));
+        console.log("    Score:", uiFriendlyNumber(this.score));
         if (RAMification) {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        console.log("    Score:", uiFriendlyNumber(this.score));
+        console.log("    Wall time:", uiFriendlyDuration(new Date(this.endTime - this.startTime)));
     }
 };
 
@@ -1913,12 +1915,14 @@ const testPlans = [
     {
         name: "gcc-loops-wasm",
         files: [
-            "./wasm/gcc-loops.js"
+            "./wasm/gcc-loops/build/gcc-loops.js",
+            "./wasm/gcc-loops/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/gcc-loops.wasm"
+            wasmBinary: "./wasm/gcc-loops/build/gcc-loops.wasm"
         },
-        benchmarkClass: WasmLegacyBenchmark,
+        benchmarkClass: WasmEMCCBenchmark,
+        iterations: 50,
         testGroup: WasmGroup
     },
     {
