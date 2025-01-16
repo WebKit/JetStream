@@ -1990,27 +1990,29 @@ const testPlans = [
     {
         name: "argon2-wasm",
         files: [
-            "./wasm/argon2-bundle.js",
-            "./wasm/argon2.js",
-            "./wasm/argon2-benchmark.js"
+            "./wasm/argon2/argon2-bundle.js",
+            "./wasm/argon2/argon2.js",
+            "./wasm/argon2/benchmark.js"
         ],
         preload: {
-            argon2WasmBlob: "./wasm/argon2.wasm",
+            argon2WasmBlob: "./wasm/argon2/argon2.wasm",
         },
-        benchmarkClass: WasmLegacyBenchmark,
+        benchmarkClass: WasmEMCCBenchmark,
+        iterations: 15,
+        worstCaseCount: 2,
         testGroup: WasmGroup
     },
     {
         name: "argon2-wasm-simd",
         files: [
-            "./wasm/argon2-bundle.js",
-            "./wasm/argon2.js",
-            "./wasm/argon2-benchmark.js"
+            "./wasm/argon2/argon2-bundle.js",
+            "./wasm/argon2/argon2.js",
+            "./wasm/argon2/benchmark.js"
         ],
         preload: {
-            argon2WasmSimdBlob: "./wasm/argon2-simd.wasm",
+            argon2WasmSimdBlob: "./wasm/argon2/argon2-simd.wasm",
         },
-        benchmarkClass: WasmLegacyBenchmark,
+        benchmarkClass: WasmEMCCBenchmark,
         testGroup: WasmGroup
     },
     // WorkerTests

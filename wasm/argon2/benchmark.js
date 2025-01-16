@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2023 Apple Inc. All rights reserved.
+ * Copyright (C) 2023-2024 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -23,22 +23,20 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-async function doRun() {
-    let start = benchmarkTime();
 
-    if (!isInBrowser) {
-        globalThis.argon2WasmSimdBlob = Module.argon2WasmSimdBlob;
-        globalThis.argon2WasmBlob = Module.argon2WasmBlob;
+class Benchmark {
+    firstIteration = true;
+    async runIteration() {
+        if (this.firstIteration) {
+            this.firstIteration = false;
+            if (!isInBrowser) {
+                globalThis.argon2WasmSimdBlob = Module.argon2WasmSimdBlob;
+                globalThis.argon2WasmBlob = Module.argon2WasmBlob;
+            }
+
+            await instantiateArgon2WasmInstance();
+        }
+
+        return await testArgon2HashAndVerify();
     }
-
-    await instantiateArgon2WasmInstance();
-    await testArgon2HashAndVerify();
-    reportCompileTime(benchmarkTime() - start);
-
-    start = benchmarkTime();
-
-    for (let i = 0; i < 5; ++i)
-        await testArgon2HashAndVerify();
-
-    reportRunTime(benchmarkTime() - start)
-}
+};
