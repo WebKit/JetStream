@@ -239,6 +239,8 @@ const fileLoader = (function() {
 class Driver {
     constructor() {
         this.isReady = false;
+        this.isDone = false;
+        this.incrementalResults = [];
         this.benchmarks = [];
         this.blobDataCache = { };
         this.loadCache = { };
@@ -279,8 +281,16 @@ class Driver {
             }
 
             benchmark.updateUIAfterRun();
+            console.log(benchmark.name)
 
             if (isInBrowser) {
+                this.incrementalResults.push({
+                    name: benchmark.name,
+                    results: {
+                        Score: benchmark.score,
+                        ...benchmark.subScores(),
+                    }
+                });
                 const cache = JetStream.blobDataCache;
                 for (const file of benchmark.plan.files) {
                     const blobData = cache[file];
@@ -334,11 +344,18 @@ class Driver {
 
         this.reportScoreToRunBenchmarkRunner();
         this.dumpJSONResultsIfNeeded();
+        this.isDone = true;
         if (isInBrowser) {
             globalThis.dispatchEvent(new CustomEvent("JetStreamDone", {
                 detail: this.resultsObject()
             }));
         }
+    }
+
+    drainIncrementalResults() {
+        const currentIncrementalResults = this.incrementalResults;
+        this.incrementalResults = [];
+        return currentIncrementalResults
     }
 
     runCode(string)

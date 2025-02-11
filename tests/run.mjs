@@ -4,7 +4,6 @@ import serve from "./server.mjs";
 import { Builder, Capabilities } from "selenium-webdriver";
 import commandLineArgs from "command-line-args";
 import commandLineUsage from "command-line-usage";
-import assert from "assert";
 
 const optionDefinitions = [
     { name: "browser", type: String, description: "Set the browser to test, choices are [safari, firefox, chrome]. By default the $BROWSER env variable is used." },
@@ -81,24 +80,19 @@ async function testEnd2End() {
     const driver = await new Builder().withCapabilities(capabilities).build();
     let results;
     try {
-        await driver.get(`http://localhost:${PORT}/index.html?worstCaseCount=2&iterationCount=3`);
+        const url = `http://localhost:${PORT}/index.html?worstCaseCount=2&iterationCount=3`;
+        console.log(`JetStream PREPARE ${url}`);
+        await driver.get(url);
         await driver.executeAsyncScript((callback) => {
-            // callback() is explicitly called without the default event
-            // as argument to avoid serialization issues with chromedriver.
             globalThis.addEventListener("JetStreamReady", () => callback());
             // We might not get a chance to install the on-ready listener, thus
             // we also check if the runner is ready synchronously.
             if (globalThis?.JetStream?.isReady)
                 callback()
         });
-        await driver.manage().setTimeouts({ script: 3 * 60_000 });
-        results = await driver.executeAsyncScript((callback) => {
-            globalThis.addEventListener("JetStreamDone", event => callback(event.detail));
-            JetStream.start();
-        });
+        results = await benchmarkResults(driver);
+        // FIXME: validate results;
         console.log("\n✅ Tests completed!");
-        console.log("RESULTS:")
-        console.log(results)
     } catch(e) {
         console.error("\n❌ Tests failed!");
         console.error(e);
@@ -107,6 +101,41 @@ async function testEnd2End() {
         driver.quit();
         server.close();
     }
+}
+
+async function benchmarkResults(driver) {
+    console.log("JetStream START");
+    await driver.manage().setTimeouts({ script: 60_000 });
+    await driver.executeAsyncScript((callback) => {
+        globalThis.JetStream.start();
+        callback();
+    });
+    await new Promise(resolve => pollIncrementalResults(driver, resolve));
+    const resultString = await driver.executeScript(() => {
+        return JSON.stringify(globalThis.JetStream.resultsObject());
+    });
+    return  JSON.parse(resultString);
+}
+
+const UPDATE_INTERVAL = 250;
+async function pollIncrementalResults(driver, resolve) {
+    const intervalId = setInterval(async function logResult()  {
+        const {done, results} = await driver.executeScript(() => {
+            return {
+                done: globalThis.JetStream.isDone,
+                results: JSON.stringify(globalThis.JetStream.drainIncrementalResults()),
+            };
+        });
+        JSON.parse(results).forEach(logIncrementalResult);
+        if (done) {
+            clearInterval(intervalId);
+            resolve()
+        }
+    }, UPDATE_INTERVAL)
+}
+
+function logIncrementalResult(benchmarkResult) {
+    console.log(benchmarkResult.name, benchmarkResult.results)
 }
 
 setImmediate(testEnd2End);
