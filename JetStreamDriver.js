@@ -454,7 +454,7 @@ class Driver {
         this.isReady = true;
         if (isInBrowser) {
             globalThis.dispatchEvent(new Event("JetStreamReady"));
-            if (shouldReport) {
+            if (typeof(globalThis.startDelay) !== "undefined") {
                 setTimeout(() => this.start(), globalThis.startDelay);
             }
         }
@@ -2054,29 +2054,18 @@ const BENCHMARKS = [
         deterministicRandom: true,
         testGroup: WasmGroup
     }),
-    new WasmLegacyBenchmark({
+    new WasmEMCCBenchmark({
         name: "argon2-wasm",
         files: [
-            "./wasm/argon2-bundle.js",
-            "./wasm/argon2.js",
-            "./wasm/argon2-benchmark.js"
+            "./wasm/argon2/build/argon2.js",
+            "./wasm/argon2/benchmark.js",
         ],
         preload: {
-            argon2WasmBlob: "./wasm/argon2.wasm",
+            wasmBinary: "./wasm/argon2/build/argon2.wasm"
         },
-        testGroup: WasmGroup
-    }),
-    new WasmLegacyBenchmark({
-        name: "argon2-wasm-simd",
-        files: [
-            "./wasm/argon2-bundle.js",
-            "./wasm/argon2.js",
-            "./wasm/argon2-benchmark.js"
-        ],
-        preload: {
-            argon2WasmSimdBlob: "./wasm/argon2-simd.wasm",
-        },
-        testGroup: WasmGroup
+        iterations: 50,
+        testGroup: WasmGroup,
+        deterministicRandom: true,
     }),
     // WorkerTests
     new AsyncBenchmark({
