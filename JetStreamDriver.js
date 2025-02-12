@@ -1063,6 +1063,8 @@ class AsyncBenchmark extends DefaultBenchmark {
         return `
         async function doRun() {
             let __benchmark = new Benchmark();
+            if (__benchmark.init)
+                await __benchmark.init();
             let results = [];
             let benchmarkName = "${this.name}";
 
@@ -1129,6 +1131,7 @@ class WasmEMCCBenchmark extends AsyncBenchmark {
         return str;
     }
 
+    // FIXME: Why is this part of the runnerCode and not prerunCode?
     get runnerCode() {
         let str = `function loadBlob(key, path, andThen) {`;
 
@@ -2013,6 +2016,18 @@ const BENCHMARKS = [
         iterations: 30,
         worstCaseCount: 2,
         testGroup: WasmGroup
+    }),
+    new WasmEMCCBenchmark({
+        name: "Dart-flute-wasm",
+        files: [
+            "./Dart/benchmark.js",
+        ],
+        preload: {
+            wasmBinary: "./Dart/build/flute.dart2wasm.wasm"
+        },
+        iterations: 15,
+        worstCaseCount: 2,
+        testGroup: WasmGroup,
     }),
     new WasmLegacyBenchmark({
         name: "tfjs-wasm",
