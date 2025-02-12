@@ -2134,18 +2134,19 @@ const BENCHMARKS = [
         testGroup: WSLGroup
     }),
     // 8bitbench
-    new WasmLegacyBenchmark({
+    new WasmEMCCBenchmark({
         name: "8bitbench-wasm",
         files: [
-            "./8bitbench/lib/fast-text-encoding-1.0.3/text.js",
-            "./8bitbench/rust/pkg/emu_bench.js",
-            "./8bitbench/js3harness.js"
+            "./8bitbench/build/lib/fast-text-encoding-1.0.3/text.js",
+            "./8bitbench/build/rust/pkg/emu_bench.js",
+            "./8bitbench/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./8bitbench/rust/pkg/emu_bench_bg.wasm.release",
-            romBinary: "./8bitbench/assets/program.bin"
+            wasmBinary: "./8bitbench/build/rust/pkg/emu_bench_bg.wasm",
+            romBinary: "./8bitbench/build/assets/program.bin"
         },
-        async: true,
+        iterations: 15,
+        worstCaseCount: 2,
         testGroup: WasmGroup
     }),
     // zlib-wasm

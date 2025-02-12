@@ -1,9 +1,11 @@
+let wasm_bindgen;
+(function() {
+    const __exports = {};
+    let wasm;
 
-let wasm;
+    const heap = new Array(32).fill(undefined);
 
-const heap = new Array(32).fill(undefined);
-
-heap.push(undefined, null, true, false);
+    heap.push(undefined, null, true, false);
 
 function getObject(idx) { return heap[idx]; }
 
@@ -36,22 +38,6 @@ function getUint8Memory0() {
 
 function getStringFromWasm0(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
-}
-
-function logError(f, args) {
-    try {
-        return f.apply(this, args);
-    } catch (e) {
-        let error = (function () {
-            try {
-                return e instanceof Error ? `${e.message}\n\nStack:\n${e.stack}` : e.toString();
-            } catch(_) {
-                return "<failed to stringify thrown value>";
-            }
-        }());
-        console.error("wasm-bindgen: imported JS function that was not marked as `catch` threw an error:", error);
-        throw e;
-    }
 }
 
 function addHeapObject(obj) {
@@ -132,9 +118,9 @@ function getArrayU8FromWasm0(ptr, len) {
 }
 /**
 */
-function main() {
+__exports.main = function() {
     wasm.main();
-}
+};
 
 function passArray8ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 1);
@@ -145,17 +131,17 @@ function passArray8ToWasm0(arg, malloc) {
 /**
 * @param {Uint8Array} file
 */
-function loadRom(file) {
+__exports.loadRom = function(file) {
     const ptr0 = passArray8ToWasm0(file, wasm.__wbindgen_malloc);
     const len0 = WASM_VECTOR_LEN;
     wasm.loadRom(ptr0, len0);
-}
+};
 
 /**
 */
-function js_tick() {
+__exports.js_tick = function() {
     wasm.js_tick();
-}
+};
 
 async function load(module, imports) {
     if (typeof Response === 'function' && module instanceof Response) {
@@ -228,14 +214,12 @@ function getImports() {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_rethrow = function(arg0) {
-        throw takeObject(arg0);
-    };
 
     return imports;
 }
 
 function initMemory(imports, maybe_memory) {
+
 }
 
 function finalizeInit(instance, module) {
@@ -263,6 +247,15 @@ function initSync(module) {
 }
 
 async function init(input) {
+    if (typeof input === 'undefined') {
+        let src;
+        if (typeof document === 'undefined') {
+            src = location.href;
+        } else {
+            src = document.currentScript.src;
+        }
+        input = src.replace(/\.js$/, '_bg.wasm');
+    }
     const imports = getImports();
 
     if (typeof input === 'string' || (typeof Request === 'function' && input instanceof Request) || (typeof URL === 'function' && input instanceof URL)) {
@@ -275,3 +268,7 @@ async function init(input) {
 
     return finalizeInit(instance, module);
 }
+
+wasm_bindgen = Object.assign(init, { initSync }, __exports);
+
+})();
