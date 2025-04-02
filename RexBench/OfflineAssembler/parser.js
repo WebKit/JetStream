@@ -309,7 +309,7 @@ function isInteger(token)
 
 function isString(token)
 {
-    return /^".*"/.test(token);
+    return /^".*"/.test(token.string);
 }
 
 
@@ -426,7 +426,7 @@ class Parser
     {
         let result;
         if (isRegister(this.tokens[this.idx])) {
-            if (fprPattern.test(this.tokens[this.idx]))
+            if (fprPattern.test(this.tokens[this.idx].string))
                 result = FPRegisterID.forName(this.tokens[this.idx].codeOrigin, this.tokens[this.idx].string);
             else
                 result = RegisterID.forName(this.tokens[this.idx].codeOrigin, this.tokens[this.idx].string);
@@ -813,7 +813,7 @@ class Parser
                 let codeOrigin = this.tokens[this.idx].codeOrigin;
                 let name = this.tokens[this.idx].string;
                 this.idx++;
-                if ((!final && this.idx == this.tokens.size) || (final && final.test(this.tokens[this.idx]))) {
+                if ((!final && this.idx == this.tokens.size) || (final && final.test(this.tokens[this.idx].string))) {
                     // Zero operand instruction, and it's the last one.
                     list.push(new Instruction(codeOrigin, name, [], this.annotation));
                     this.annotation = null;
@@ -935,7 +935,7 @@ class Parser
         let fileList = [];
         fileList.push(this.tokens[this.idx].codeOrigin.fileName);
         while (true) {
-            if ((this.idx == this.tokens.length && !final) || (final && final.test(this.tokens[this.idx])))
+            if ((this.idx == this.tokens.length && !final) || (final && final.test(this.tokens[this.idx].string)))
                 break;
             else if (this.tokens[this.idx].isEqualTo("include")) {
                 this.idx++;
