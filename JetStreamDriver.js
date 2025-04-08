@@ -1276,17 +1276,29 @@ class WSLBenchmark extends Benchmark {
     get runnerCode() {
         return `
             let benchmark = new Benchmark();
+            const benchmarkName = "${this.name}";
+
             let results = [];
             {
+                const markLabel = benchmarkName + "-stdlib";
+                const startMark = performance.mark(markLabel);
+
                 let start = performance.now();
                 benchmark.buildStdlib();
                 results.push(performance.now() - start);
+
+                performanceMeasure(markLabel, startMark);
             }
 
             {
+                const markLabel = benchmarkName + "-mainRun";
+                const startMark = performance.mark(markLabel);
+
                 let start = performance.now();
                 benchmark.run();
                 results.push(performance.now() - start);
+
+                performanceMeasure(markLabel, startMark);
             }
 
             top.currentResolve(results);
