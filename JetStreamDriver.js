@@ -39,6 +39,7 @@ globalThis.testWorstCaseCountMap ??= new Map();
 globalThis.dumpJSONResults ??= false;
 globalThis.customTestList ??= [];
 globalThis.startDelay ??= undefined;
+globalThis.prefetchResources ??= true;
 
 let shouldReport = false;
 
@@ -52,6 +53,13 @@ function getIntParam(urlParams, key) {
     return value
 }
 
+function getBoolParam(urlParams, key, defaultValue=false) {
+    if (!urlParams.has(key))
+        return defaultValue;
+    const rawValue = urlParams.get(key).toLowerCase()
+    return (rawValue !== "false" && rawValue !== "0")
+ }
+
 if (typeof(URLSearchParams) !== "undefined") {
     const urlParameters = new URLSearchParams(window.location.search);
     shouldReport = urlParameters.has('report') && urlParameters.get('report').toLowerCase() == 'true';
@@ -62,6 +70,7 @@ if (typeof(URLSearchParams) !== "undefined") {
         customTestList = urlParameters.getAll("test");
     globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
     globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
+    globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources", true)
 }
 
 // Used for the promise representing the current benchmark run.
@@ -197,8 +206,11 @@ const fileLoader = (function() {
         }
 
         async _loadInternal(url) {
-            if (!isInBrowser)
+            if (!isInBrowser) {
+                if (!globalThis.prefetchResources)
+                    return Promise.resolve(`load("${url}");`);
                 return Promise.resolve(readFile(url));
+            }
 
             let response;
             const tries = 3;

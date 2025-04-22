@@ -23,6 +23,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+globalThis.prefetchResources = true;
 const isInBrowser = false;
 console = {
     log: globalThis?.console?.log ?? print,
@@ -33,15 +34,35 @@ const isD8 = typeof Realm !== "undefined";
 if (isD8)
     globalThis.readFile = read;
 const isSpiderMonkey = typeof newGlobal !== "undefined";
-if (isSpiderMonkey) {
+if (isSpiderMonkey)
     globalThis.readFile = readRelativeToScript;
-    globalThis.arguments = scriptArgs;
+
+
+let cliFlags = {};
+let cliArgs = [];
+
+if (typeof arguments != "undefined" && arguments.length > 0) {
+    for (const arg of arguments) {
+        if (arg.startsWith("--")) {
+            const parts = arg.split("=");
+            cliFlags[parts[0]] = parts.slice(1).join("=");
+        } else {
+            cliArgs.push(arg);
+        }
+    }
 }
 
-if (typeof arguments !== "undefined" && arguments.length > 0)
-    testList = arguments.slice();
-if (typeof testList === "undefined")
-    testList = undefined;
+if (typeof testList === "undefined") {
+    if (cliArgs.length > 0) {
+        testList = cliArgs;
+    } else {
+        testList = undefined;
+    }
+}
+
+if ("--no-prefetch" in cliFlags || "--noprefetch" in cliFlags)
+   globalThis.prefetchResources = false
+
 
 if (typeof testIterationCount === "undefined")
     testIterationCount = undefined;
@@ -53,6 +74,20 @@ else
 
 load("./JetStreamDriver.js");
 
+if ("--help" in cliFlags) {
+    print("JetStream Driver Help")
+    print("")
+    print("Options:")
+    print("   --no-prefetch: directly use load('...') for benchmark resources.")
+    print("")
+    print("Available tests:")
+    for (const test of testPlans)
+        print("  ", test.name)
+} else {
+    print("Running tests: " + testList)
+    runJetStream();
+}
+
 async function runJetStream() {
     try {
         await JetStream.initialize();
@@ -63,4 +98,3 @@ async function runJetStream() {
         throw e;
     }
 }
-runJetStream();
