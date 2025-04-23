@@ -57,7 +57,7 @@ function getBoolParam(urlParams, key, defaultValue=false) {
     if (!urlParams.has(key))
         return defaultValue;
     const rawValue = urlParams.get(key).toLowerCase()
-    return (rawValue !== "false" && rawValue !== "0")
+    return !(rawValue === "false" || rawValue === "0")
  }
 
 if (typeof(URLSearchParams) !== "undefined") {
@@ -70,8 +70,11 @@ if (typeof(URLSearchParams) !== "undefined") {
         customTestList = urlParameters.getAll("test");
     globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
     globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
-    globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources", true)
+    globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources", true);
 }
+
+if (!globalThis.prefetchResources)
+    console.warn("Disabling resource prefetching!", globalThis.prefetchResources)
 
 // Used for the promise representing the current benchmark run.
 this.currentResolve = null;
@@ -199,54 +202,56 @@ function uiFriendlyDuration(time)
     return result;
 }
 
-const fileLoader = (function() {
-    class Loader {
-        constructor() {
-            this.requests = new Map;
-        }
-
-        async _loadInternal(url) {
-            if (!isInBrowser) {
-                if (!globalThis.prefetchResources)
-                    return Promise.resolve(`load("${url}");`);
-                return Promise.resolve(readFile(url));
-            }
-
-            let response;
-            const tries = 3;
-            while (tries--) {
-                let hasError = false;
-                try {
-                    response = await fetch(url);
-                } catch (e) {
-                    hasError = true;
-                }
-                if (!hasError && response.ok)
-                    break;
-                if (tries)
-                    continue;
-                globalThis.allIsGood = false;
-                throw new Error("Fetch failed");
-            }
-            if (url.indexOf(".js") !== -1)
-                return response.text();
-            else if (url.indexOf(".wasm") !== -1)
-                return response.arrayBuffer();
-
-            throw new Error("should not be reached!");
-        }
-
-        async load(url) {
-            if (this.requests.has(url))
-                return this.requests.get(url);
-
-            const promise = this._loadInternal(url);
-            this.requests.set(url, promise);
-            return promise;
-        }
+class FileLoader {
+    constructor() {
+        this.requests = new Map;
     }
-    return new Loader;
-})();
+
+    async _loadInternal(url) {
+        if (!isInBrowser) {
+            if (!globalThis.prefetchResources)
+                return Promise.resolve(`load("${url}");`);
+            return Promise.resolve(readFile(url));
+        }
+
+        if (!globalThis.prefetchResources)
+            return Promise.resolve(`<script src="${url}"></script>"`);
+
+        let response;
+        const tries = 3;
+        while (tries--) {
+            let hasError = false;
+            try {
+                response = await fetch(url);
+            } catch (e) {
+                hasError = true;
+            }
+            if (!hasError && response.ok)
+                break;
+            if (tries)
+                continue;
+            globalThis.allIsGood = false;
+            throw new Error("Fetch failed");
+        }
+        if (url.indexOf(".js") !== -1)
+            return response.text();
+        else if (url.indexOf(".wasm") !== -1)
+            return response.arrayBuffer();
+
+        throw new Error("should not be reached!");
+    }
+
+    async load(url) {
+        if (this.requests.has(url))
+            return this.requests.get(url);
+
+        const promise = this._loadInternal(url);
+        this.requests.set(url, promise);
+        return promise;
+    }
+}
+
+const fileLoader = new FileLoader();
 
 class Driver {
     constructor() {
@@ -295,7 +300,7 @@ class Driver {
             benchmark.updateUIAfterRun();
             console.log(benchmark.name)
 
-            if (isInBrowser) {
+            if (isInBrowser && globalThis.prefetchResources) {
                 const cache = JetStream.blobDataCache;
                 for (const file of benchmark.plan.files) {
                     const blobData = cache[file];
@@ -803,8 +808,12 @@ class Benchmark {
                 addScript(text);
         } else {
             const cache = JetStream.blobDataCache;
-            for (const file of this.plan.files)
-                addScriptWithURL(cache[file].blobURL);
+            for (const file of this.plan.files) {
+                if (globalThis.prefetchResources)
+                    addScriptWithURL(cache[file].blobURL);
+                else
+                    addScriptWithURL(file);
+            }
         }
 
         const promise = new Promise((resolve, reject) => {
@@ -857,6 +866,11 @@ class Benchmark {
     }
 
     async doLoadBlob(resource) {
+        const blobData = JetStream.blobDataCache[resource];
+        if (!globalThis.prefetchResources) {
+            blobData.blobURL = resource; 
+            return blobData;
+        }
         let response;
         let tries = 3;
         while (tries--) {
@@ -873,7 +887,6 @@ class Benchmark {
             throw new Error("Fetch failed");
         }
         const blob = await response.blob();
-        const blobData = JetStream.blobDataCache[resource];
         blobData.blob = blob;
         blobData.blobURL = URL.createObjectURL(blob);
         return blobData;

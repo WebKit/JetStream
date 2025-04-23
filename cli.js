@@ -27,6 +27,7 @@ globalThis.prefetchResources = true;
 const isInBrowser = false;
 console = {
     log: globalThis?.console?.log ?? print,
+    warn: globalThis?.console?.warn ?? print,
     error: globalThis?.console?.error ?? print,
 }
 
