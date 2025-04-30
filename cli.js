@@ -75,6 +75,17 @@ else
 
 load("./JetStreamDriver.js");
 
+async function runJetStream() {
+    try {
+        await JetStream.initialize();
+        await JetStream.start();
+    } catch (e) {
+        console.error("JetStream3 failed: " + e);
+        console.error(e.stack);
+        throw e;
+    }
+}
+
 if ("--help" in cliFlags) {
     print("JetStream Driver Help")
     print("")
@@ -87,15 +98,4 @@ if ("--help" in cliFlags) {
 } else {
     print("Running tests: " + testList)
     runJetStream();
-}
-
-async function runJetStream() {
-    try {
-        await JetStream.initialize();
-        await JetStream.start();
-    } catch (e) {
-        console.error("JetStream3 failed: " + e);
-        console.error(e.stack);
-        throw e;
-    }
 }
