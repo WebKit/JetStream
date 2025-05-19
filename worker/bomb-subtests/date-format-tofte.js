@@ -69,7 +69,7 @@ Date.prototype.formatDate = function (input,time) {
     
     function d() {
         // Day of the month, 2 digits with leading zeros
-        return new String(self.getDate()).length == 1?
+        return String(self.getDate()).length == 1?
         "0"+self.getDate() : self.getDate();
     }
     function D() {
@@ -91,23 +91,23 @@ Date.prototype.formatDate = function (input,time) {
     function h() {
         // 12-hour format of an hour with leading zeros
         if (self.getHours() > 12) {
-          var s = new String(self.getHours()-12);
+          var s = String(self.getHours()-12);
           return s.length == 1?
           "0"+ (self.getHours()-12) : self.getHours()-12;
         } else { 
-          var s = new String(self.getHours());
+          var s = String(self.getHours());
           return s.length == 1?
           "0"+self.getHours() : self.getHours();
         }  
     }
     function H() {
         // 24-hour format of an hour with leading zeros
-        return new String(self.getHours()).length == 1?
+        return String(self.getHours()).length == 1?
         "0"+self.getHours() : self.getHours();
     }
     function i() {
         // Minutes with leading zeros
-        return new String(self.getMinutes()).length == 1? 
+        return String(self.getMinutes()).length == 1?
         "0"+self.getMinutes() : self.getMinutes(); 
     }
     function j() {
@@ -169,7 +169,7 @@ Date.prototype.formatDate = function (input,time) {
     }
     function s() {
         // Seconds, with leading zeros
-        return new String(self.getSeconds()).length == 1?
+        return String(self.getSeconds()).length == 1?
         "0"+self.getSeconds() : self.getSeconds();
     }
     function t() {
