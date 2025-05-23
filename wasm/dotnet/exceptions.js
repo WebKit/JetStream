@@ -1,0 +1,1 @@
+globalThis.dotnetBenchmarkName = "ExceptionsTask";
