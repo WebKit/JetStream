@@ -1915,7 +1915,7 @@ let BENCHMARKS = [
             "./threejs/benchmark.js",
         ],
         deterministicRandom: true,
-        tags: ["ThreeJs"],
+        tags: ["Default", "ThreeJs"],
     }),
     // Wasm
     new WasmEMCCBenchmark({
