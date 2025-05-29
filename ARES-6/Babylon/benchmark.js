@@ -31,10 +31,10 @@ class Benchmark {
         let sources = [];
 
         const files = [
-              [isInBrowser ? airBlob : "./ARES-6/Babylon/air-blob.js", {}]
-            , [isInBrowser ? basicBlob : "./ARES-6/Babylon/basic-blob.js", {}]
-            , [isInBrowser ? inspectorBlob : "./ARES-6/Babylon/inspector-blob.js", {}]
-            , [isInBrowser ? babylonBlob : "./ARES-6/Babylon/babylon-blob.js", {sourceType: "module"}]
+              [airBlob, {}]
+            , [basicBlob, {}]
+            , [inspectorBlob, {}]
+            , [babylonBlob, {sourceType: "module"}]
         ];
 
         for (let [file, options] of files) {

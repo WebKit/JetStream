@@ -281,7 +281,6 @@ class Driver {
             }
 
             benchmark.updateUIAfterRun();
-            console.log(benchmark.name)
 
             if (isInBrowser) {
                 const cache = JetStream.blobDataCache;
@@ -776,8 +775,8 @@ class Benchmark {
 
         if (this.plan.preload) {
             let str = "";
-            for (let [variableName, blobUrl] of this.preloads)
-                str += `const ${variableName} = "${blobUrl}";\n`;
+            for (let [ variableName, blobUrlOrPath ] of this.preloads)
+                str += `const ${variableName} = "${blobUrlOrPath}";\n`;
             addScript(str);
         }
 
@@ -994,9 +993,16 @@ class Benchmark {
         if (this._resourcesPromise)
             return this._resourcesPromise;
 
-        const filePromises = !isInBrowser ? this.plan.files.map((file) => fileLoader.load(file)) : [];
+        this.preloads = [];
+        this.blobs = [];
 
-        const promise = Promise.all(filePromises).then((texts) => {
+        if (isInBrowser) {
+            this._resourcesPromise = Promise.resolve();
+            return this._resourcesPromise;
+        }
+
+        const filePromises = this.plan.files.map((file) => fileLoader.load(file));
+        this._resourcesPromise = Promise.all(filePromises).then((texts) => {
             if (isInBrowser)
                 return;
             this.scripts = [];
@@ -1005,10 +1011,11 @@ class Benchmark {
                 this.scripts.push(text);
         });
 
-        this.preloads = [];
-        this.blobs = [];
+        if (this.plan.preload) {
+            for (const prop of Object.getOwnPropertyNames(this.plan.preload))
+                this.preloads.push([ prop, this.plan.preload[prop] ]);
+        }
 
-        this._resourcesPromise = promise;
         return this._resourcesPromise;
     }
 
@@ -1199,57 +1206,30 @@ class WasmEMCCBenchmark extends AsyncBenchmark {
             };
             globalObject.Module = Module;
             `;
-        return str;
-    }
 
-    // FIXME: Why is this part of the runnerCode and not prerunCode?
-    get runnerCode() {
-        let str = `function loadBlob(key, path, andThen) {`;
+            if (isInBrowser) {
+                str += `
+                    function getBinary(key, blobUrl) {
+                        var xhr = new XMLHttpRequest();
+                        xhr.open('GET', blobUrl, false);
+                        xhr.responseType = 'arraybuffer';
+                        xhr.send(null);
+                        Module[key] = new Int8Array(xhr.response);
+                    }
+                `;
+            } else
+                str += `
+                    Module.setStatus = null;
+                    Module.monitorRunDependencies = null;
+                    function getBinary(key, path) {
+                        Module[key] = new Int8Array(read(path, "binary"));
+                    }
+                `;
 
-        if (isInBrowser) {
-            str += `
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', path, true);
-                xhr.responseType = 'arraybuffer';
-                xhr.onload = function() {
-                    Module[key] = new Int8Array(xhr.response);
-                    andThen();
-                };
-                xhr.send(null);
-            `;
-        } else {
-            str += `
-            Module[key] = new Int8Array(read(path, "binary"));
+            for (let [ preloadKey, blobUrlOrPath ] of this.preloads)
+                str += `getBinary("${preloadKey}", "${blobUrlOrPath}");\n`
 
-            Module.setStatus = null;
-            Module.monitorRunDependencies = null;
-
-            Promise.resolve(42).then(() => {
-                try {
-                    andThen();
-                } catch(e) {
-                    console.log("error running wasm:", e);
-                    console.log(e.stack);
-                    throw e;
-                }
-            })
-            `;
-        }
-
-        str += "}";
-
-        let keys = Object.keys(this.plan.preload);
-        for (let i = 0; i < keys.length; ++i) {
-            str += `loadBlob("${keys[i]}", "${this.plan.preload[keys[i]]}", async () => {\n`;
-        }
-
-        str += super.runnerCode;
-        for (let i = 0; i < keys.length; ++i) {
-            str += `})`;
-        }
-        str += `;`;
-
-        return str;
+            return str;
     }
 };
 
