@@ -4,7 +4,7 @@
 
 class Benchmark {
   async runIteration() {
-    if (!Module._main)
+    if (!Module._compressFile)
       await setupModule(Module);
 
     Module.FS.writeFile('input', Module.wasmBinary);
