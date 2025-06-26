@@ -37,7 +37,7 @@ class Benchmark {
 
             inspectorText = request.responseText;
         } else
-            inspectorText = readFile("./code-load/inspector-payload-minified.js");
+            inspectorText = readFile(inspectorPayloadBlob);
 
         this.inspectorText = `let _____top_level_____ = ${Math.random()}; ${inspectorText}`;
 
