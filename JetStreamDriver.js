@@ -1228,8 +1228,12 @@ class WasmEMCCBenchmark extends AsyncBenchmark {
                 }
             `;
 
-        for (let [ preloadKey, blobURLOrPath ] of this.preloads)
-            str += `await getBinary("${preloadKey}", "${blobURLOrPath}");\n`
+        for (let [ preloadKey, blobURLOrPath ] of this.preloads) {
+            if (preloadKey == "wasmBinary") {
+                str += `await getBinary("${preloadKey}", "${blobURLOrPath}");\n`
+                break;
+            }
+        }
 
         str += super.runnerCode;
 
@@ -2078,7 +2082,8 @@ let BENCHMARKS = [
             "./Dart/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./Dart/build/flute.dart2wasm.wasm"
+            jsModule: "./Dart/build/flute.dart2wasm.mjs",
+            wasmBinary: "./Dart/build/flute.dart2wasm.wasm",
         },
         iterations: 15,
         worstCaseCount: 2,
