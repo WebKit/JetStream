@@ -775,8 +775,8 @@ class Benchmark {
 
         if (this.plan.preload) {
             let str = "";
-            for (let [ variableName, blobUrlOrPath ] of this.preloads)
-                str += `const ${variableName} = "${blobUrlOrPath}";\n`;
+            for (let [ variableName, blobURLOrPath ] of this.preloads)
+                str += `const ${variableName} = "${blobURLOrPath}";\n`;
             addScript(str);
         }
 
@@ -1174,7 +1174,7 @@ class AsyncBenchmark extends DefaultBenchmark {
 // part of a larger project's build system or a wasm benchmark compiled from a language that doesn't compile with emcc.
 class WasmEMCCBenchmark extends AsyncBenchmark {
     get prerunCode() {
-        let str = `
+        return `
             let verbose = false;
 
             let globalObject = this;
@@ -1205,31 +1205,38 @@ class WasmEMCCBenchmark extends AsyncBenchmark {
                 },
             };
             globalObject.Module = Module;
+        `;
+    }
+
+    // This is in runnerCode rather than prerunCode because prerunCode isn't currently structured to be async by default.
+    get runnerCode() {
+        let str = `(async function doRunWrapper() {`
+        if (isInBrowser) {
+            str += `
+                async function getBinary(key, blobURL) {
+                    const response = await fetch(blobURL);
+                    Module[key] = new Int8Array(await response.arrayBuffer());
+                }
+            `;
+        } else
+            str += `
+                // Needed because SpiderMonkey shell doesn't have a setTimeout.
+                Module.setStatus = null;
+                Module.monitorRunDependencies = null;
+                function getBinary(key, path) {
+                    Module[key] = new Int8Array(read(path, "binary"));
+                }
             `;
 
-            if (isInBrowser) {
-                str += `
-                    function getBinary(key, blobUrl) {
-                        var xhr = new XMLHttpRequest();
-                        xhr.open('GET', blobUrl, false);
-                        xhr.responseType = 'arraybuffer';
-                        xhr.send(null);
-                        Module[key] = new Int8Array(xhr.response);
-                    }
-                `;
-            } else
-                str += `
-                    Module.setStatus = null;
-                    Module.monitorRunDependencies = null;
-                    function getBinary(key, path) {
-                        Module[key] = new Int8Array(read(path, "binary"));
-                    }
-                `;
+        for (let [ preloadKey, blobURLOrPath ] of this.preloads)
+            str += `await getBinary("${preloadKey}", "${blobURLOrPath}");\n`
 
-            for (let [ preloadKey, blobUrlOrPath ] of this.preloads)
-                str += `getBinary("${preloadKey}", "${blobUrlOrPath}");\n`
+        str += super.runnerCode;
 
-            return str;
+        str += "\n})().catch((error) => { top.currentReject(error); });"
+
+        return str;
+
     }
 };
 
