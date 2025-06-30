@@ -34,6 +34,16 @@ function dumpFrame(vec) {
 
 class Benchmark {
   isInstantiated = false;
+  romBinary;
+
+  async init() {
+    if (isInBrowser) {
+      let response = await fetch(romBinary);
+      this.romBinary = new Int8Array(await response.arrayBuffer());
+    } else {
+      this.romBinary = new Int8Array(read(romBinary, "binary"));
+    }
+  }
 
   async runIteration() {
     if (!this.isInstantiated) {
@@ -41,7 +51,7 @@ class Benchmark {
       this.isInstantiated = true;
     }
 
-    wasm_bindgen.loadRom(Module.romBinary);
+    wasm_bindgen.loadRom(this.romBinary);
 
     const frameCount = 2 * 60;
     for (let i = 0; i < frameCount; ++i) {
