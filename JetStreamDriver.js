@@ -605,7 +605,7 @@ class Driver {
         const content = this.resultsJSON();
         await fetch("/report", {
             method: "POST",
-            heeaders: {
+            headers: {
                 "Content-Type": "application/json",
                 "Content-Length": content.length,
                 "Connection": "close",
