@@ -643,6 +643,14 @@ class Benchmark {
     }
     get isSuccess() { return this._state = BenchmarkState.DONE; }
 
+    hasTag(...tags) {
+        for (tag of tags) {
+            if (this.tags.has(tag))
+                return true;
+        }
+        return false;
+    }
+
     get runnerCode() {
         return `
             let __benchmark = new Benchmark(${this.iterations});
@@ -2334,7 +2342,7 @@ function enableBenchmarksByName(name)
     JetStream.addBenchmark(benchmark);
 }
 
-function enableBenchmarksByTag(tag)
+function enableBenchmarksByTag(tag, excludeTags) 
 {
     const benchmarks = benchmarksByTag.get(tag);
 
@@ -2343,9 +2351,13 @@ function enableBenchmarksByTag(tag)
         throw new Error(`Couldn't find tag named: ${tag}.\n Choices are ${validTags}`);
     }
 
-    for (const benchmark of benchmarks)
+    for (const benchmark of benchmarks) {
+        if (excludeTags && benchmark.hasTag(...excludeTags))
+            continue
         JetStream.addBenchmark(benchmark);
+    }
 }
+
 
 function processTestList(testList)
 {
@@ -2364,10 +2376,14 @@ function processTestList(testList)
     }
 }
 
+const defaultDisabledTags = [];
+if (!!isInBrowser)
+    defaultDisabledTags = ["WorkerTests"];
+
 if (typeof testList !== "undefined") {
     processTestList(testList);
 } else if (customTestList.length) {
     processTestList(customTestList);
 } else {
-    enableBenchmarksByTag("default")
+    enableBenchmarksByTag("default", defaultDisabledTags)
 }
