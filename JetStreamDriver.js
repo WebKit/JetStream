@@ -2364,7 +2364,6 @@ function processTestList(testList)
     }
 }
 
-
 if (typeof testList !== "undefined") {
     processTestList(testList);
 } else if (customTestList.length) {
