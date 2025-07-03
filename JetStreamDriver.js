@@ -404,8 +404,8 @@ class Driver {
         let text = "";
         let newBenchmarks = [];
         for (const benchmark of this.benchmarks) {
-            const description = Array.from(Object.keys(benchmark.subScores())) 
-            description.push("Score")
+            const id = JSON.stringify(benchmark.constructor.scoreDescription());
+            const description = JSON.parse(id);
 
             newBenchmarks.push(benchmark);
             const scoreIds = benchmark.scoreIdentifiers()
@@ -1093,6 +1093,10 @@ class DefaultBenchmark extends Benchmark {
         };
     }
 
+    static scoreDescription() {
+        return ["First", "Worst", "Average", "Score"];
+    }
+
     scoreIdentifiers() {
         return [firstID(this), worst4ID(this), avgID(this), scoreID(this)];
     }
@@ -1307,6 +1311,10 @@ class WSLBenchmark extends Benchmark {
         };
     }
 
+    static scoreDescription() {
+        return ["Stdlib", "MainRun", "Score"];
+    }
+
     scoreIdentifiers() {
         return ["wsl-stdlib-score", "wsl-tests-score", "wsl-score-score"];
     }
@@ -1477,6 +1485,10 @@ class WasmLegacyBenchmark extends Benchmark {
             "Startup": this.startupScore,
             "Runtime": this.runScore,
         };
+    }
+
+    static scoreDescription() {
+        return ["Startup", "Runtime", "Score"];
     }
 
     get startupID() {
