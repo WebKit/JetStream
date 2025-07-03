@@ -631,7 +631,6 @@ class Benchmark {
         this.tags = new Set(plan.tags);
         this.iterations = getIterationCount(plan);
         this.isAsync = !!plan.isAsync;
-        this.disabledByDefault = !!plan.disabledByDefault;
         this.scripts = null;
         this._resourcesPromise = null;
         this._state = BenchmarkState.READY;
@@ -1878,8 +1877,7 @@ let BENCHMARKS = [
         iterations: 4,
         worstCaseCount: 1,
         deterministicRandom: true,
-        tags: ["default", "BigIntNoble"],
-        disabledByDefault: true,
+        tags: ["BigIntNoble"],
     }),
     new AsyncBenchmark({
         name: "bigint-noble-secp256k1",
@@ -1889,8 +1887,7 @@ let BENCHMARKS = [
             "./bigint/noble-benchmark.js",
         ],
         deterministicRandom: true,
-        tags: ["default", "BigIntNoble"],
-        disabledByDefault: true,
+        tags: ["BigIntNoble"],
     }),
     new AsyncBenchmark({
         name: "bigint-noble-ed25519",
@@ -1913,8 +1910,7 @@ let BENCHMARKS = [
         iterations: 10,
         worstCaseCount: 2,
         deterministicRandom: true,
-        tags: ["default", "BigIntMisc"],
-        disabledByDefault: true,
+        tags: ["BigIntMisc"],
     }),
     new DefaultBenchmark({
         name: "bigint-bigdenary",
@@ -1924,8 +1920,7 @@ let BENCHMARKS = [
         ],
         iterations: 160,
         worstCaseCount: 16,
-        tags: ["default", "BigIntMisc"],
-        disabledByDefault: true,
+        tags: ["BigIntMisc"],
     }),
     // Proxy
     new AsyncBenchmark({
@@ -2315,16 +2310,6 @@ for (const benchmark of BENCHMARKS) {
 
 this.JetStream = new Driver();
 
-function enableBenchmarks(benchmarks, forceEnable = false)
-{
-    for (let benchmark of benchmarks) {
-        if (!forceEnable && benchmark.disabledByDefault)
-            return;
-
-        JetStream.addBenchmark(benchmark);
-    }
-}
-
 function enableBenchmarksByName(name)
 {
     const benchmark = benchmarksByName.get(name);
@@ -2336,7 +2321,7 @@ function enableBenchmarksByName(name)
     JetStream.addBenchmark(benchmark);
 }
 
-function enableBenchmarksByTag(tag, forceEnable = false)
+function enableBenchmarksByTag(tag)
 {
     const benchmarks = benchmarksByTag.get(tag);
 
@@ -2345,12 +2330,8 @@ function enableBenchmarksByTag(tag, forceEnable = false)
         throw new Error(`Couldn't find tag named: ${tag}.\n Choices are ${validTags}`);
     }
 
-    for (const benchmark of benchmarks) {
-        if (!forceEnable && benchmark.disabledByDefault)
-            continue;
-
+    for (const benchmark of benchmarks)
         JetStream.addBenchmark(benchmark);
-    }
 }
 
 function processTestList(testList)
@@ -2362,10 +2343,9 @@ function processTestList(testList)
     else
         benchmarkNames = testList.split(/[\s,]/);
 
-    const forceEnable = true;
     for (const name of benchmarkNames) {
         if (benchmarksByTag.has(name))
-            enableBenchmarksByTag(name, forceEnable);
+            enableBenchmarksByTag(name);
         else
             enableBenchmarksByName(name);
     }
