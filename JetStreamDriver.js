@@ -644,7 +644,7 @@ class Benchmark {
     get isSuccess() { return this._state = BenchmarkState.DONE; }
 
     hasTag(...tags) {
-        for (tag of tags) {
+        for (const tag of tags) {
             if (this.tags.has(tag))
                 return true;
         }
@@ -2378,7 +2378,7 @@ function processTestList(testList)
 
 const defaultDisabledTags = [];
 if (!!isInBrowser)
-    defaultDisabledTags = ["WorkerTests"];
+    defaultDisabledTags.push("WorkerTests");
 
 if (typeof testList !== "undefined") {
     processTestList(testList);
