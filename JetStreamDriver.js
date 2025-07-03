@@ -1011,6 +1011,7 @@ class Benchmark {
         return this._resourcesPromise;
     }
 
+    static scoreDescription() { throw new Error("Must be implemented by subclasses."); }
     scoreIdentifiers() { throw new Error("Must be implemented by subclasses"); }
 
     updateUIBeforeRun() {
