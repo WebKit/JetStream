@@ -115,7 +115,7 @@ if (isInBrowser) {
 
 function assert(b, m = "") {
     if (!b)
-        throw new Error("Bad assertion: " + m);
+        throw new Error(`Bad assertion: ${m}`);
 }
 
 function firstID(benchmark) {
@@ -177,17 +177,8 @@ function uiFriendlyScore(num) {
     return uiFriendlyNumber(num);
 }
 
-function uiFriendlyDuration(time)
-{
-    const minutes = time.getMinutes();
-    const seconds = time.getSeconds();
-    const milliSeconds = time.getMilliseconds();
-    let result = "" + minutes + ":";
-
-    result = result + (seconds < 10 ? "0" : "") + seconds + ".";
-    result = result + (milliSeconds < 10 ? "00" : (milliSeconds < 100 ? "0" : "")) + milliSeconds;
-
-    return result;
+function uiFriendlyDuration(time) {
+    return `${time.toFixed(3)} ms`;
 }
 
 const fileLoader = (function() {
@@ -322,7 +313,7 @@ class Driver {
 
         if (isInBrowser) {
             summaryElement.classList.add('done');
-            summaryElement.innerHTML = "<div class=\"score\">" + uiFriendlyScore(geomean(allScores)) + "</div><label>Score</label>";
+            summaryElement.innerHTML = `<div class="score">${uiFriendlyScore(geomean(allScores))}</div><label>Score</label>`;
             summaryElement.onclick = displayCategoryScores;
             if (showScoreDetails)
                 displayCategoryScores();
@@ -392,7 +383,7 @@ class Driver {
 
         const magicFrame = magic.contentDocument.getElementById("magicframe");
         magicFrame.contentDocument.open();
-        magicFrame.contentDocument.write("<!DOCTYPE html><head><title>benchmark payload</title></head><body>\n" + string + "</body></html>");
+        magicFrame.contentDocument.write(`<!DOCTYPE html><head><title>benchmark payload</title></head><body>\n${string}</body></html>`);
 
         return magicFrame;
     }
@@ -1125,7 +1116,7 @@ class DefaultBenchmark extends Benchmark {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        console.log("    Wall time:", uiFriendlyDuration(new Date(this.endTime - this.startTime)));
+        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 }
 
@@ -1341,7 +1332,7 @@ class WSLBenchmark extends Benchmark {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        console.log("    Wall time:", uiFriendlyDuration(new Date(this.endTime - this.startTime)));
+        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 };
 
@@ -1527,7 +1518,7 @@ class WasmLegacyBenchmark extends Benchmark {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        console.log("    Wall time:", uiFriendlyDuration(new Date(this.endTime - this.startTime)));
+        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 };
 
