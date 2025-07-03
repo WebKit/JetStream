@@ -663,7 +663,7 @@ class Benchmark {
                 __benchmark.runIteration();
                 let end = performance.now();
 
-                performanceMeasure(iterationMarkLabel, iterationStartMark);
+                performance.measure(iterationMarkLabel, iterationMarkLabel);
 
                 ${this.postIterationCode}
 
@@ -732,18 +732,10 @@ class Benchmark {
             const isInBrowser = ${isInBrowser};
             const isD8 = ${isD8};
             if (typeof performance.mark === 'undefined') {
-                performance.mark = function() {};
+                performance.mark = function(name) { return { name }};
             }
             if (typeof performance.measure === 'undefined') {
                 performance.measure = function() {};
-            }
-            function performanceMeasure(name, mark) {
-                // D8 does not implement the official web API.
-                // Also the performance.mark polyfill returns an undefined mark.
-                if (isD8 || typeof mark === "undefined")
-                    performance.measure(name, mark);
-                else
-                    performance.measure(name, mark.name);
             }
         `);
 
@@ -1149,7 +1141,7 @@ class AsyncBenchmark extends DefaultBenchmark {
                 await __benchmark.runIteration();
                 let end = performance.now();
 
-                performanceMeasure(iterationMarkLabel, iterationStartMark);
+                performance.measure(iterationMarkLabel, iterationMarkLabel);
 
                 ${this.postIterationCode}
 
@@ -1288,7 +1280,7 @@ class WSLBenchmark extends Benchmark {
                 benchmark.buildStdlib();
                 results.push(performance.now() - start);
 
-                performanceMeasure(markLabel, startMark);
+                performance.measure(markLabel, markLabel);
             }
 
             {
@@ -1299,7 +1291,7 @@ class WSLBenchmark extends Benchmark {
                 benchmark.run();
                 results.push(performance.now() - start);
 
-                performanceMeasure(markLabel, startMark);
+                performance.measure(markLabel, markLabel);
             }
 
             top.currentResolve(results);
