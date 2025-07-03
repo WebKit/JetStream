@@ -2245,7 +2245,7 @@ for (const test of luaJSFightTests) {
         files: [
             `./LuaJSFight/${test}.js`
         ],
-        tags: ["default", "LuaJSFight"],
+        tags: ["LuaJSFight"],
     }));
 }
 
