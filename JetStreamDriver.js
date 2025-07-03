@@ -643,7 +643,7 @@ class Benchmark {
     }
     get isSuccess() { return this._state = BenchmarkState.DONE; }
 
-    hasTag(...tags) {
+    hasAnyTag(...tags) {
         for (const tag of tags) {
             if (this.tags.has(tag))
                 return true;
@@ -2352,7 +2352,7 @@ function enableBenchmarksByTag(tag, excludeTags)
     }
 
     for (const benchmark of benchmarks) {
-        if (excludeTags && benchmark.hasTag(...excludeTags))
+        if (excludeTags && benchmark.hasAnyTag(...excludeTags))
             continue
         JetStream.addBenchmark(benchmark);
     }
@@ -2377,7 +2377,7 @@ function processTestList(testList)
 }
 
 const defaultDisabledTags = [];
-if (!!isInBrowser)
+if (!isInBrowser)
     defaultDisabledTags.push("WorkerTests");
 
 if (typeof testList !== "undefined") {
