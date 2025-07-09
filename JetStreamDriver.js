@@ -471,7 +471,7 @@ class Driver {
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
         await this.prefetchResourcesForBrowser();
         await this.fetchResources();
-        this.prepareToRun();
+        //this.prepareToRun();
         this.isReady = true;
         if (isInBrowser) {
             globalThis.dispatchEvent(new Event("JetStreamReady"));
@@ -516,7 +516,7 @@ class Driver {
             promises.push(benchmark.fetchResources());
         await Promise.all(promises);
 
-        if (!isInBrowser)
+        if (true)
             return;
 
         const statusElement = document.getElementById("status");
