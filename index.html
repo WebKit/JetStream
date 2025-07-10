@@ -36,7 +36,9 @@
     const isInBrowser = true;
     const isD8 = false;
     const isSpiderMonkey = false;
+    globalThis.prefetchResources = true;
     globalThis.allIsGood = true;
+
     window.onerror = function(e) {
         if (e == "Script error.") {
             // This is a workaround for Firefox on iOS which has an uncaught exception from
