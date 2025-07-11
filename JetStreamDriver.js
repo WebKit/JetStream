@@ -2248,6 +2248,21 @@ let BENCHMARKS = [
         iterations: 40,
         tags: ["Wasm"],
     }),
+    // nutrient
+    new WasmEMCCBenchmark({
+        name: "nutrient-wasm",
+        files: [
+            "./wasm/nutrient/helper.js",
+            "./wasm/nutrient/build/nutrient-viewer.wasm.js",
+            "./wasm/nutrient/benchmark.js",
+        ],
+        preload: {
+            pdfDocument: "./wasm/nutrient/assets/example.pdf",
+            wasmBinary: "./wasm/nutrient/build/nutrient-viewer.wasm",
+        },
+        iterations: 10,
+        tags: ["Wasm"],
+    }),
 ];
 
 // LuaJSFight tests
