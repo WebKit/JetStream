@@ -1,0 +1,43 @@
+{
+  "mainAssemblyName": "dotnet",
+  "resources": {
+    "hash": "sha256-1ZTKAyaVTXosThcFUI9QZiluBFEbjQZOa2jPvSc3SDI=",
+    "jsModuleNative": {
+      "dotnet.native.js": "sha256-byX+R2fU4k/BCE4uzI+3ZqDM4tUu50nBCUwWUwhAdWQ="
+    },
+    "jsModuleRuntime": {
+      "dotnet.runtime.js": "sha256-x+PnWU47EIr/zL3xxqIUMDJi/dy5904TVGunDqCvjIY="
+    },
+    "wasmNative": {
+      "dotnet.native.wasm": "sha256-uBRLWpUaAGVhz8dbOmE2KtB1/qEh4RNxWhK7CLD4ZPk="
+    },
+    "icu": {
+      "icudt_CJK.dat": "sha256-SZLtQnRc0JkwqHab0VUVP7T3uBPSeYzxzDnpxPpUnHk=",
+      "icudt_EFIGS.dat": "sha256-8fItetYY8kQ0ww6oxwTLiT3oXlBwHKumbeP2pRF4yTc=",
+      "icudt_no_CJK.dat": "sha256-L7sV7NEYP37/Qr2FPCePo5cJqRgTXRwGHuwF5Q+0Nfs="
+    },
+    "coreAssembly": {
+      "System.Private.CoreLib.wasm": "sha256-VeHFDCz0ZLJHaMF1WXBO1dq32aqOtAxQBY7UtOYHFV4=",
+      "System.Runtime.InteropServices.JavaScript.wasm": "sha256-korzY+8y6mDCphxjpRx32qfUE1gK6/6D9W3cnrkRvjo="
+    },
+    "assembly": {
+      "dotnet.wasm": "sha256-0OrjlYRuf2YAx3j36GSRfe7GI1HqhxZuTh1a165o+ZA=",
+      "System.Collections.Concurrent.wasm": "sha256-t0RfwdTUubHqJjICCaVLtSx90sFWPoVRYIBQnpqEfMQ=",
+      "System.Collections.wasm": "sha256-74tIaxlz1VKy1ZJ4df4oWr0Qg+02hNMZMg8sM0uJR2s=",
+      "System.ComponentModel.Primitives.wasm": "sha256-9KlsDyYr/L+BwPCVQ2tA0tK0UoOCyGIHfd97P1s0oBE=",
+      "System.ComponentModel.TypeConverter.wasm": "sha256-H//PcPvC16VhrKNkarNofnzwn5WAo68J3Z340mRhrh4=",
+      "System.Drawing.Primitives.wasm": "sha256-bGcvJFPgMqxUOkp9q8/fhHawpRFta6Ar7ySsFIpZ9qk=",
+      "System.Drawing.wasm": "sha256-nb2jLiw4KDtlI4RomxyIiWcM/skfDq5jTLTqlJbXbwg=",
+      "System.IO.Pipelines.wasm": "sha256-LHmn3NZ0cYl/sD4s/EA26iSAYqDCycxgYdwt6suIKLM=",
+      "System.Linq.wasm": "sha256-eRQ2yKv3JP64KBRLvwtLwSlbppQjb762xQNooQGJHAE=",
+      "System.Memory.wasm": "sha256-r8Kxq0g7VCrnXJ56At7Do+nd5C+iMx+5hehlmndZ6rM=",
+      "System.ObjectModel.wasm": "sha256-3cKLFYajKINLJVByXBP5/Acx77qAT7PSgLMjEbwJT/Y=",
+      "System.Text.Encodings.Web.wasm": "sha256-FQmyjTLY+V+DwY398iWiXOOSDmS7cQtLg/Tc6hw2MGQ=",
+      "System.Text.Json.wasm": "sha256-DIIG/xiMdrqVxsRrAgOchWbwxu3ftjBvEwUqHNHpWgs="
+    }
+  },
+  "cacheBootResources": true,
+  "debugLevel": 0,
+  "linkerEnabled": true,
+  "globalizationMode": "sharded"
+}
