@@ -398,7 +398,7 @@ class Driver {
     prepareToRun()
     {
         const newBenchmarks = Array.from(this.benchmarks);
-        newBenchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+        newBenchmarks.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? 1 : -1);
 
         let text = "";
         for (const benchmark of newBenchmarks) {
