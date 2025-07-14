@@ -2319,7 +2319,7 @@ const benchmarksByName = new Map();
 const benchmarksByTag = new Map();
 
 for (const benchmark of BENCHMARKS) {
-    const name = benchmark.name;
+    const name = benchmark.name.toLowerCase();
 
     if (benchmarksByName.has(name))
         throw new Error(`Duplicate benchmark with name "${name}}"`);
@@ -2340,7 +2340,7 @@ this.JetStream = new Driver();
 
 function enableBenchmarksByName(name)
 {
-    const benchmark = benchmarksByName.get(name);
+    const benchmark = benchmarksByName.get(name.toLowerCase());
 
     if (!benchmark)
         throw new Error(`Couldn't find benchmark named "${name}"`);
@@ -2374,7 +2374,8 @@ function processTestList(testList)
     else
         benchmarkNames = testList.split(/[\s,]/);
 
-    for (const name of benchmarkNames) {
+    for (let name of benchmarkNames) {
+        name = name.toLowerCase();
         if (benchmarksByTag.has(name))
             enableBenchmarksByTag(name);
         else
