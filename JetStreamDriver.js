@@ -2329,9 +2329,9 @@ for (const benchmark of BENCHMARKS) {
     benchmark.tags.add("all");
 
     for (const tag of benchmark.tags) {
-        if (benchmarksByTag.has(tag)) {
+        if (benchmarksByTag.has(tag))
             benchmarksByTag.get(tag).push(benchmark);
-        } else
+        else
             benchmarksByTag.set(tag, [benchmark]);
     }
 }
