@@ -2384,7 +2384,7 @@ function processTestList(testList)
 }
 
 const defaultDisabledTags = [];
-if (!isInBrowser)
+if (globalThis.Worker)
     defaultDisabledTags.push("WorkerTests");
 
 if (typeof testList !== "undefined") {
