@@ -2384,7 +2384,7 @@ function processTestList(testList)
 }
 
 const defaultDisabledTags = [];
-if (globalThis.Worker)
+if (!globalThis.Worker)
     defaultDisabledTags.push("WorkerTests");
 
 if (typeof testList !== "undefined") {
