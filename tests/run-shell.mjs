@@ -133,7 +133,7 @@ function sh(binary, args) {
 async function runTests() {
     const shellBinary = logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
     let success = true;
-    success &&= runTest("Run Unittests", () => sh(shellBinary, ["tests/unittests.js"]));
+    success &&= runTest("Run UnitTests", () => sh(shellBinary, ["tests/unittests.js"]));
     success &&= runTest("Run Complete Suite", () => sh(shellBinary, [CLI_PATH]));
     success &&= runTest("Run Single Suite", () => {
       const singleTestArgs = [...BASE_CLI_ARGS_WITH_OPTIONS, "proxy-mobx"];
