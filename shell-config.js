@@ -23,17 +23,30 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-load("./shell-config.js")
-load("./JetStreamDriver.js");
-
-async function runJetStream() {
-    try {
-        await JetStream.initialize();
-        await JetStream.start();
-    } catch (e) {
-        console.error("JetStream3 failed: " + e);
-        console.error(e.stack);
-        throw e;
-    }
+const isInBrowser = false;
+console = {
+    log: globalThis?.console?.log ?? print,
+    error: globalThis?.console?.error ?? print,
 }
-runJetStream();
+
+const isD8 = typeof Realm !== "undefined";
+if (isD8)
+    globalThis.readFile = read;
+const isSpiderMonkey = typeof newGlobal !== "undefined";
+if (isSpiderMonkey) {
+    globalThis.readFile = readRelativeToScript;
+    globalThis.arguments = scriptArgs;
+}
+
+if (typeof arguments !== "undefined" && arguments.length > 0)
+    testList = arguments.slice();
+if (typeof testList === "undefined")
+    testList = undefined;
+
+if (typeof testIterationCount === "undefined")
+    testIterationCount = undefined;
+
+if (typeof runMode !== "undefined" && runMode == "RAMification")
+    RAMification = true;
+else
+    RAMification = false;
