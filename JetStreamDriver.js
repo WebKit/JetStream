@@ -52,14 +52,22 @@ function getIntParam(urlParams, key) {
     return value
 }
 
+function getTestListParam(urlParams, key) {
+    if (globalThis.customTestList.length)
+        throw new Error(`Overriding previous customTestList=${globalThis.customTestList.join()} with ${key} url-parameter.`);
+    return urlParams.getAll(key);
+}
+
 if (typeof(URLSearchParams) !== "undefined") {
     const urlParameters = new URLSearchParams(window.location.search);
     shouldReport = urlParameters.has('report') && urlParameters.get('report').toLowerCase() == 'true';
     globalThis.startDelay = getIntParam(urlParameters, "startDelay");
     if (shouldReport && !globalThis.startDelay)
         globalThis.startDelay = 4000;
-    if (urlParameters.has('test'))
-        customTestList = urlParameters.getAll("test");
+    if (urlParameters.has("tag"))
+        customTestList = getTestListParam(urlParameters, "tag");
+    if (urlParameters.has("test"))
+        customTestList = getTestListParam(urlParameters, "test");
     globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
     globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
 }
@@ -232,7 +240,7 @@ class Driver {
         this.isReady = false;
         this.isDone = false;
         this.errors = [];
-        this.benchmarks = [];
+        this.benchmarks = new Set();
         this.blobDataCache = { };
         this.loadCache = { };
         this.counter = { };
@@ -241,8 +249,8 @@ class Driver {
         this.counter.failedPreloadResources = 0;
     }
 
-    addBenchmark(benchmark) {
-        this.benchmarks.push(benchmark);
+    enableBenchmark(benchmark) {
+        this.benchmarks.add(benchmark);
         benchmark.fetchResources();
     }
 
@@ -389,15 +397,14 @@ class Driver {
 
     prepareToRun()
     {
-        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+        const newBenchmarks = Array.from(this.benchmarks);
+        newBenchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
 
         let text = "";
-        let newBenchmarks = [];
-        for (const benchmark of this.benchmarks) {
+        for (const benchmark of newBenchmarks) {
             const id = JSON.stringify(benchmark.constructor.scoreDescription());
             const description = JSON.parse(id);
 
-            newBenchmarks.push(benchmark);
             const scoreIds = benchmark.scoreIdentifiers()
             const overallScoreId = scoreIds.pop();
 
@@ -618,7 +625,9 @@ class Benchmark {
     constructor(plan)
     {
         this.plan = plan;
-        this.tags = new Set(plan.tags);
+        this.tags = new Set(plan.tags.map(each => each.toLowerCase()));
+        if (this.tags.size != plan.tags.length)
+            throw new Error(`${this.name} got duplicate tags: ${plan.tags.join()}`);
         this.iterations = getIterationCount(plan);
         this.isAsync = !!plan.isAsync;
         this.scripts = null;
@@ -635,7 +644,7 @@ class Benchmark {
 
     hasAnyTag(...tags) {
         for (const tag of tags) {
-            if (this.tags.has(tag))
+            if (this.tags.has(tag.toLowerCase()))
                 return true;
         }
         return false;
@@ -1562,7 +1571,7 @@ let BENCHMARKS = [
             , "./ARES-6/Air/payload-typescript-scanIdentifier.js"
             , "./ARES-6/Air/benchmark.js"
         ],
-        tags: ["default", "ARES"],
+        tags: ["Default", "ARES"],
     }),
     new DefaultBenchmark({
         name: "Basic",
@@ -1578,7 +1587,7 @@ let BENCHMARKS = [
             , "./ARES-6/Basic/util.js"
             , "./ARES-6/Basic/benchmark.js"
         ],
-        tags: ["default", "ARES"],
+        tags: ["Default", "ARES"],
     }),
     new DefaultBenchmark({
         name: "ML",
@@ -1587,7 +1596,7 @@ let BENCHMARKS = [
             , "./ARES-6/ml/benchmark.js"
         ],
         iterations: 60,
-        tags: ["default", "ARES"],
+        tags: ["Default", "ARES"],
     }),
     new AsyncBenchmark({
         name: "Babylon",
@@ -1601,7 +1610,7 @@ let BENCHMARKS = [
             inspectorBlob: "./ARES-6/Babylon/inspector-blob.js",
             babylonBlob: "./ARES-6/Babylon/babylon-blob.js"
         },
-        tags: ["default", "ARES"],
+        tags: ["Default", "ARES"],
     }),
     // CDJS
     new DefaultBenchmark({
@@ -1622,7 +1631,7 @@ let BENCHMARKS = [
         ],
         iterations: 60,
         worstCaseCount: 3,
-        tags: ["default", "CDJS"],
+        tags: ["Default", "CDJS"],
     }),
     // CodeLoad
     new AsyncBenchmark({
@@ -1633,7 +1642,7 @@ let BENCHMARKS = [
         preload: {
             inspectorPayloadBlob: "./code-load/inspector-payload-minified.js"
         },
-        tags: ["default", "CodeLoad"],
+        tags: ["Default", "CodeLoad"],
     }),
     new AsyncBenchmark({
         name: "multi-inspector-code-load",
@@ -1643,7 +1652,7 @@ let BENCHMARKS = [
         preload: {
             inspectorPayloadBlob: "./code-load/inspector-payload-minified.js"
         },
-        tags: ["default", "CodeLoad"],
+        tags: ["Default", "CodeLoad"],
     }),
     // Octane
     new DefaultBenchmark({
@@ -1652,7 +1661,7 @@ let BENCHMARKS = [
             "./Octane/box2d.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "octane-code-load",
@@ -1660,7 +1669,7 @@ let BENCHMARKS = [
             "./Octane/code-first-load.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "crypto",
@@ -1668,7 +1677,7 @@ let BENCHMARKS = [
             "./Octane/crypto.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "delta-blue",
@@ -1676,7 +1685,7 @@ let BENCHMARKS = [
             "./Octane/deltablue.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "earley-boyer",
@@ -1684,7 +1693,7 @@ let BENCHMARKS = [
             "./Octane/earley-boyer.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "gbemu",
@@ -1693,7 +1702,7 @@ let BENCHMARKS = [
             , "./Octane/gbemu-part2.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "mandreel",
@@ -1702,7 +1711,7 @@ let BENCHMARKS = [
         ],
         iterations: 80,
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "navier-stokes",
@@ -1710,7 +1719,7 @@ let BENCHMARKS = [
             "./Octane/navier-stokes.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "pdfjs",
@@ -1718,14 +1727,14 @@ let BENCHMARKS = [
             "./Octane/pdfjs.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "raytrace",
         files: [
             "./Octane/raytrace.js"
         ],
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "regexp",
@@ -1733,7 +1742,7 @@ let BENCHMARKS = [
             "./Octane/regexp.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "richards",
@@ -1741,7 +1750,7 @@ let BENCHMARKS = [
             "./Octane/richards.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "splay",
@@ -1749,7 +1758,7 @@ let BENCHMARKS = [
             "./Octane/splay.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "typescript",
@@ -1761,7 +1770,7 @@ let BENCHMARKS = [
         iterations: 15,
         worstCaseCount: 2,
         deterministicRandom: true,
-        tags: ["default", "Octane"],
+        tags: ["Default", "Octane"],
     }),
     // RexBench
     new DefaultBenchmark({
@@ -1773,7 +1782,7 @@ let BENCHMARKS = [
             , "./RexBench/FlightPlanner/expectations.js"
             , "./RexBench/FlightPlanner/benchmark.js"
         ],
-        tags: ["default", "RexBench"],
+        tags: ["Default", "RexBench"],
     }),
     new DefaultBenchmark({
         name: "OfflineAssembler",
@@ -1791,7 +1800,7 @@ let BENCHMARKS = [
             , "./RexBench/OfflineAssembler/benchmark.js"
         ],
         iterations: 80,
-        tags: ["default", "RexBench"],
+        tags: ["Default", "RexBench"],
     }),
     new DefaultBenchmark({
         name: "UniPoker",
@@ -1801,7 +1810,7 @@ let BENCHMARKS = [
             , "./RexBench/UniPoker/benchmark.js"
         ],
         deterministicRandom: true,
-        tags: ["default", "RexBench"],
+        tags: ["Default", "RexBench"],
     }),
     // Simple
     new DefaultBenchmark({
@@ -1809,21 +1818,21 @@ let BENCHMARKS = [
         files: [
             "./simple/hash-map.js"
         ],
-        tags: ["default", "Simple"],
+        tags: ["Default", "Simple"],
     }),
     new AsyncBenchmark({
         name: "doxbee-promise",
         files: [
             "./simple/doxbee-promise.js",
         ],
-        tags: ["default", "Simple"],
+        tags: ["Default", "Simple"],
     }),
     new AsyncBenchmark({
         name: "doxbee-async",
         files: [
             "./simple/doxbee-async.js",
         ],
-        tags: ["default", "Simple"],
+        tags: ["Default", "Simple"],
     }),
     // SeaMonster
     new DefaultBenchmark({
@@ -1831,14 +1840,14 @@ let BENCHMARKS = [
         files: [
             "./SeaMonster/ai-astar.js"
         ],
-        tags: ["default", "SeaMonster"],
+        tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "gaussian-blur",
         files: [
             "./SeaMonster/gaussian-blur.js"
         ],
-        tags: ["default", "SeaMonster"],
+        tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "stanford-crypto-aes",
@@ -1846,7 +1855,7 @@ let BENCHMARKS = [
             "./SeaMonster/sjlc.js"
             , "./SeaMonster/stanford-crypto-aes.js"
         ],
-        tags: ["default", "SeaMonster"],
+        tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "stanford-crypto-pbkdf2",
@@ -1854,7 +1863,7 @@ let BENCHMARKS = [
             "./SeaMonster/sjlc.js"
             , "./SeaMonster/stanford-crypto-pbkdf2.js"
         ],
-        tags: ["default", "SeaMonster"],
+        tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "stanford-crypto-sha256",
@@ -1862,7 +1871,7 @@ let BENCHMARKS = [
             "./SeaMonster/sjlc.js"
             , "./SeaMonster/stanford-crypto-sha256.js"
         ],
-        tags: ["default", "SeaMonster"],
+        tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "json-stringify-inspector",
@@ -1872,7 +1881,7 @@ let BENCHMARKS = [
         ],
         iterations: 20,
         worstCaseCount: 2,
-        tags: ["default", "SeaMonster"],
+        tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "json-parse-inspector",
@@ -1882,7 +1891,7 @@ let BENCHMARKS = [
         ],
         iterations: 20,
         worstCaseCount: 2,
-        tags: ["default", "SeaMonster"],
+        tags: ["Default", "SeaMonster"],
     }),
     // BigInt
     new AsyncBenchmark({
@@ -1916,7 +1925,7 @@ let BENCHMARKS = [
         ],
         iterations: 30,
         deterministicRandom: true,
-        tags: ["default", "BigIntNoble"],
+        tags: ["Default", "BigIntNoble"],
     }),
     new DefaultBenchmark({
         name: "bigint-paillier",
@@ -1950,7 +1959,7 @@ let BENCHMARKS = [
         ],
         iterations: defaultIterationCount * 3,
         worstCaseCount: defaultWorstCaseCount * 3,
-        tags: ["default", "Proxy"],
+        tags: ["Default", "Proxy"],
     }),
     new AsyncBenchmark({
         name: "proxy-vue",
@@ -1959,7 +1968,7 @@ let BENCHMARKS = [
             "./proxy/vue-bundle.js",
             "./proxy/vue-benchmark.js",
         ],
-        tags: ["default", "Proxy"]
+        tags: ["Default", "Proxy"]
     }),
     // Class fields
     new DefaultBenchmark({
@@ -1967,14 +1976,14 @@ let BENCHMARKS = [
         files: [
             "./class-fields/raytrace-public-class-fields.js",
         ],
-        tags: ["default", "ClassFields"]
+        tags: ["Default", "ClassFields"]
     }),
     new DefaultBenchmark({
         name: "raytrace-private-class-fields",
         files: [
             "./class-fields/raytrace-private-class-fields.js",
         ],
-        tags: ["default", "ClassFields"]
+        tags: ["Default", "ClassFields"]
     }),
     // Generators
     new AsyncBenchmark({
@@ -1985,7 +1994,7 @@ let BENCHMARKS = [
         iterations: 80,
         worstCaseCount: 6,
         deterministicRandom: true,
-        tags: ["default", "Generators"]
+        tags: ["Default", "Generators"]
     }),
     new DefaultBenchmark({
         name: "sync-fs",
@@ -1995,21 +2004,21 @@ let BENCHMARKS = [
         iterations: 80,
         worstCaseCount: 6,
         deterministicRandom: true,
-        tags: ["default", "Generators"]
+        tags: ["Default", "Generators"]
     }),
     new DefaultBenchmark({
         name: "lazy-collections",
         files: [
             "./generators/lazy-collections.js",
         ],
-        tags: ["default", "Generators"]
+        tags: ["Default", "Generators"]
     }),
     new DefaultBenchmark({
         name: "js-tokens",
         files: [
             "./generators/js-tokens.js",
         ],
-        tags: ["default", "Generators"]
+        tags: ["Default", "Generators"]
     }),
     // Wasm
     new WasmEMCCBenchmark({
@@ -2022,7 +2031,7 @@ let BENCHMARKS = [
             wasmBinary: "./wasm/HashSet/build/HashSet.wasm"
         },
         iterations: 50,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "tsf-wasm",
@@ -2034,7 +2043,7 @@ let BENCHMARKS = [
             wasmBinary: "./wasm/TSF/build/tsf.wasm"
         },
         iterations: 50,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "quicksort-wasm",
@@ -2046,7 +2055,7 @@ let BENCHMARKS = [
             wasmBinary: "./wasm/quicksort/build/quicksort.wasm"
         },
         iterations: 50,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "gcc-loops-wasm",
@@ -2058,7 +2067,7 @@ let BENCHMARKS = [
             wasmBinary: "./wasm/gcc-loops/build/gcc-loops.wasm"
         },
         iterations: 50,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "richards-wasm",
@@ -2070,7 +2079,7 @@ let BENCHMARKS = [
             wasmBinary: "./wasm/richards/build/richards.wasm"
         },
         iterations: 50,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "sqlite3-wasm",
@@ -2083,7 +2092,7 @@ let BENCHMARKS = [
         },
         iterations: 30,
         worstCaseCount: 2,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "Dart-flute-wasm",
@@ -2096,7 +2105,7 @@ let BENCHMARKS = [
         },
         iterations: 15,
         worstCaseCount: 2,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     new WasmLegacyBenchmark({
         name: "tfjs-wasm",
@@ -2116,7 +2125,7 @@ let BENCHMARKS = [
         },
         async: true,
         deterministicRandom: true,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     new WasmLegacyBenchmark({
         name: "tfjs-wasm-simd",
@@ -2136,7 +2145,7 @@ let BENCHMARKS = [
         },
         async: true,
         deterministicRandom: true,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "argon2-wasm",
@@ -2150,7 +2159,7 @@ let BENCHMARKS = [
         iterations: 30,
         worstCaseCount: 3,
         deterministicRandom: true,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     // WorkerTests
     new AsyncBenchmark({
@@ -2187,7 +2196,7 @@ let BENCHMARKS = [
             , stringUnpackCode: "./worker/bomb-subtests/string-unpack-code.js"
             , regexpDNA: "./worker/bomb-subtests/regexp-dna.js"
         },
-        tags: ["default", "WorkerTests"],
+        tags: ["Default", "WorkerTests"],
     }),
     new AsyncBenchmark({
         name: "segmentation",
@@ -2199,13 +2208,13 @@ let BENCHMARKS = [
         },
         iterations: 36,
         worstCaseCount: 3,
-        tags: ["default", "WorkerTests"],
+        tags: ["Default", "WorkerTests"],
     }),
     // WSL
     new WSLBenchmark({
         name: "WSL",
         files: ["./WSL/Node.js" ,"./WSL/Type.js" ,"./WSL/ReferenceType.js" ,"./WSL/Value.js" ,"./WSL/Expression.js" ,"./WSL/Rewriter.js" ,"./WSL/Visitor.js" ,"./WSL/CreateLiteral.js" ,"./WSL/CreateLiteralType.js" ,"./WSL/PropertyAccessExpression.js" ,"./WSL/AddressSpace.js" ,"./WSL/AnonymousVariable.js" ,"./WSL/ArrayRefType.js" ,"./WSL/ArrayType.js" ,"./WSL/Assignment.js" ,"./WSL/AutoWrapper.js" ,"./WSL/Block.js" ,"./WSL/BoolLiteral.js" ,"./WSL/Break.js" ,"./WSL/CallExpression.js" ,"./WSL/CallFunction.js" ,"./WSL/Check.js" ,"./WSL/CheckLiteralTypes.js" ,"./WSL/CheckLoops.js" ,"./WSL/CheckRecursiveTypes.js" ,"./WSL/CheckRecursion.js" ,"./WSL/CheckReturns.js" ,"./WSL/CheckUnreachableCode.js" ,"./WSL/CheckWrapped.js" ,"./WSL/Checker.js" ,"./WSL/CloneProgram.js" ,"./WSL/CommaExpression.js" ,"./WSL/ConstexprFolder.js" ,"./WSL/ConstexprTypeParameter.js" ,"./WSL/Continue.js" ,"./WSL/ConvertPtrToArrayRefExpression.js" ,"./WSL/DereferenceExpression.js" ,"./WSL/DoWhileLoop.js" ,"./WSL/DotExpression.js" ,"./WSL/DoubleLiteral.js" ,"./WSL/DoubleLiteralType.js" ,"./WSL/EArrayRef.js" ,"./WSL/EBuffer.js" ,"./WSL/EBufferBuilder.js" ,"./WSL/EPtr.js" ,"./WSL/EnumLiteral.js" ,"./WSL/EnumMember.js" ,"./WSL/EnumType.js" ,"./WSL/EvaluationCommon.js" ,"./WSL/Evaluator.js" ,"./WSL/ExpressionFinder.js" ,"./WSL/ExternalOrigin.js" ,"./WSL/Field.js" ,"./WSL/FindHighZombies.js" ,"./WSL/FlattenProtocolExtends.js" ,"./WSL/FlattenedStructOffsetGatherer.js" ,"./WSL/FloatLiteral.js" ,"./WSL/FloatLiteralType.js" ,"./WSL/FoldConstexprs.js" ,"./WSL/ForLoop.js" ,"./WSL/Func.js" ,"./WSL/FuncDef.js" ,"./WSL/FuncInstantiator.js" ,"./WSL/FuncParameter.js" ,"./WSL/FunctionLikeBlock.js" ,"./WSL/HighZombieFinder.js" ,"./WSL/IdentityExpression.js" ,"./WSL/IfStatement.js" ,"./WSL/IndexExpression.js" ,"./WSL/InferTypesForCall.js" ,"./WSL/Inline.js" ,"./WSL/Inliner.js" ,"./WSL/InstantiateImmediates.js" ,"./WSL/IntLiteral.js" ,"./WSL/IntLiteralType.js" ,"./WSL/Intrinsics.js" ,"./WSL/LateChecker.js" ,"./WSL/Lexer.js" ,"./WSL/LexerToken.js" ,"./WSL/LiteralTypeChecker.js" ,"./WSL/LogicalExpression.js" ,"./WSL/LogicalNot.js" ,"./WSL/LoopChecker.js" ,"./WSL/MakeArrayRefExpression.js" ,"./WSL/MakePtrExpression.js" ,"./WSL/NameContext.js" ,"./WSL/NameFinder.js" ,"./WSL/NameResolver.js" ,"./WSL/NativeFunc.js" ,"./WSL/NativeFuncInstance.js" ,"./WSL/NativeType.js" ,"./WSL/NativeTypeInstance.js" ,"./WSL/NormalUsePropertyResolver.js" ,"./WSL/NullLiteral.js" ,"./WSL/NullType.js" ,"./WSL/OriginKind.js" ,"./WSL/OverloadResolutionFailure.js" ,"./WSL/Parse.js" ,"./WSL/Prepare.js" ,"./WSL/Program.js" ,"./WSL/ProgramWithUnnecessaryThingsRemoved.js" ,"./WSL/PropertyResolver.js" ,"./WSL/Protocol.js" ,"./WSL/ProtocolDecl.js" ,"./WSL/ProtocolFuncDecl.js" ,"./WSL/ProtocolRef.js" ,"./WSL/PtrType.js" ,"./WSL/ReadModifyWriteExpression.js" ,"./WSL/RecursionChecker.js" ,"./WSL/RecursiveTypeChecker.js" ,"./WSL/ResolveNames.js" ,"./WSL/ResolveOverloadImpl.js" ,"./WSL/ResolveProperties.js" ,"./WSL/ResolveTypeDefs.js" ,"./WSL/Return.js" ,"./WSL/ReturnChecker.js" ,"./WSL/ReturnException.js" ,"./WSL/StandardLibrary.js" ,"./WSL/StatementCloner.js" ,"./WSL/StructLayoutBuilder.js" ,"./WSL/StructType.js" ,"./WSL/Substitution.js" ,"./WSL/SwitchCase.js" ,"./WSL/SwitchStatement.js" ,"./WSL/SynthesizeEnumFunctions.js" ,"./WSL/SynthesizeStructAccessors.js" ,"./WSL/TrapStatement.js" ,"./WSL/TypeDef.js" ,"./WSL/TypeDefResolver.js" ,"./WSL/TypeOrVariableRef.js" ,"./WSL/TypeParameterRewriter.js" ,"./WSL/TypeRef.js" ,"./WSL/TypeVariable.js" ,"./WSL/TypeVariableTracker.js" ,"./WSL/TypedValue.js" ,"./WSL/UintLiteral.js" ,"./WSL/UintLiteralType.js" ,"./WSL/UnificationContext.js" ,"./WSL/UnreachableCodeChecker.js" ,"./WSL/VariableDecl.js" ,"./WSL/VariableRef.js" ,"./WSL/VisitingSet.js" ,"./WSL/WSyntaxError.js" ,"./WSL/WTrapError.js" ,"./WSL/WTypeError.js" ,"./WSL/WhileLoop.js" ,"./WSL/WrapChecker.js", "./WSL/Test.js"],
-        tags: ["default", "WSL"],
+        tags: ["Default", "WSL"],
     }),
     // 8bitbench
     new WasmEMCCBenchmark({
@@ -2221,7 +2230,7 @@ let BENCHMARKS = [
         },
         iterations: 15,
         worstCaseCount: 2,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
     // zlib-wasm
     new WasmEMCCBenchmark({
@@ -2234,7 +2243,7 @@ let BENCHMARKS = [
             wasmBinary: "./wasm/zlib/build/zlib.wasm",
         },
         iterations: 40,
-        tags: ["default", "Wasm"],
+        tags: ["Default", "Wasm"],
     }),
 ];
 
@@ -2276,7 +2285,7 @@ for (const test of SUNSPIDER_TESTS) {
         files: [
             `./SunSpider/${test}.js`
         ],
-        tags: ["default", "SunSpider"],
+        tags: ["Default", "SunSpider"],
     }));
 }
 
@@ -2301,7 +2310,7 @@ for (const name of WTB_TESTS) {
         ],
         iterations: 5,
         worstCaseCount: 1,
-        tags: ["default", "WTB"],
+        tags: ["Default", "WTB"],
     }));
 }
 
@@ -2320,9 +2329,9 @@ for (const benchmark of BENCHMARKS) {
     benchmark.tags.add("all");
 
     for (const tag of benchmark.tags) {
-        if (benchmarksByTag.has(tag))
+        if (benchmarksByTag.has(tag)) {
             benchmarksByTag.get(tag).push(benchmark);
-        else
+        } else
             benchmarksByTag.set(tag, [benchmark]);
     }
 }
@@ -2336,13 +2345,12 @@ function enableBenchmarksByName(name)
     if (!benchmark)
         throw new Error(`Couldn't find benchmark named "${name}"`);
 
-    // We only use this for test lists.
-    JetStream.addBenchmark(benchmark);
+    JetStream.enableBenchmark(benchmark);
 }
 
 function enableBenchmarksByTag(tag, excludeTags) 
 {
-    const benchmarks = benchmarksByTag.get(tag);
+    const benchmarks = benchmarksByTag.get(tag.toLowerCase());
 
     if (!benchmarks) {
         const validTags = Array.from(benchmarksByTag.keys()).join(", ");
@@ -2352,7 +2360,7 @@ function enableBenchmarksByTag(tag, excludeTags)
     for (const benchmark of benchmarks) {
         if (excludeTags && benchmark.hasAnyTag(...excludeTags))
             continue
-        JetStream.addBenchmark(benchmark);
+        JetStream.enableBenchmark(benchmark);
     }
 }
 
@@ -2383,5 +2391,5 @@ if (typeof testList !== "undefined") {
 } else if (customTestList.length) {
     processTestList(customTestList);
 } else {
-    enableBenchmarksByTag("default", defaultDisabledTags)
+    enableBenchmarksByTag("Default", defaultDisabledTags)
 }
