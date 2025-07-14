@@ -1,4 +1,5 @@
 // Copyright 2025 the V8 project authors. All rights reserved.
+// Copyright 2025 Apple Inc. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
@@ -34,6 +35,12 @@ function dumpFrame(vec) {
 
 class Benchmark {
   isInstantiated = false;
+  romBinary;
+
+  async init() {
+    Module.wasmBinary = await getBinary(wasmBinary);
+    this.romBinary = await getBinary(romBinary);
+  }
 
   async runIteration() {
     if (!this.isInstantiated) {
@@ -41,7 +48,7 @@ class Benchmark {
       this.isInstantiated = true;
     }
 
-    wasm_bindgen.loadRom(Module.romBinary);
+    wasm_bindgen.loadRom(this.romBinary);
 
     const frameCount = 2 * 60;
     for (let i = 0; i < frameCount; ++i) {

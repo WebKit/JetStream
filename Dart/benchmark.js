@@ -261,25 +261,9 @@ class Benchmark {
   async init() {
     // The generated JavaScript code from dart2wasm is an ES module, which we
     // can only load with a dynamic import (since this file is not a module.)
-    // TODO: Support ES6 modules in the driver instead of this one-off solution.
-    // This probably requires a new `Benchmark` field called `modules` that
-    // is a map from module variable name (which will hold the resulting module
-    // namespace object) to relative module URL, which is resolved in the
-    // `preRunnerCode`, similar to this code here.
-    if (isInBrowser) {
-      // In browsers, relative imports don't work since we are not in a module.
-      // (`import.meta.url` is not defined.)
-      const pathname = location.pathname.match(/^(.*\/)(?:[^.]+(?:\.(?:[^\/]+))+)?$/)[1];
-      this.dart2wasmJsModule = await import(location.origin + pathname + "./Dart/build/flute.dart2wasm.mjs");
-    } else {
-      // In shells, relative imports require different paths, so try with and
-      // without the "./" prefix (e.g., JSC requires it).
-      try {
-        this.dart2wasmJsModule = await import("Dart/build/flute.dart2wasm.mjs");
-      } catch {
-        this.dart2wasmJsModule = await import("./Dart/build/flute.dart2wasm.mjs");
-      }
-    }
+
+    Module.wasmBinary = await getBinary(wasmBinary);
+    this.dart2wasmJsModule = await dynamicImport(jsModule);
   }
 
   async runIteration() {

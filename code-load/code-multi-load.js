@@ -25,20 +25,8 @@
 
 let indirectEval = eval;
 class Benchmark {
-    constructor(iterations) {
-
-        let inspectorText;
-        if (isInBrowser) {
-            let request = new XMLHttpRequest();
-            request.open('GET', inspectorPayloadBlob, false);
-            request.send(null);
-            if (!request.responseText.length)
-                throw new Error("Expect non-empty sources");
-            inspectorText = request.responseText;
-        } else
-            inspectorText = readFile("./code-load/inspector-payload-minified.js");
-
-        this.inspectorText = `let _____top_level_____ = ${Math.random()}; ${inspectorText}`;
+    async init() {
+        this.inspectorText = `let _____top_level_____ = ${Math.random()}; ${await getString(inspectorPayloadBlob)}`;
         this.index = 0;
     }
 
