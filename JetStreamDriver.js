@@ -2384,7 +2384,8 @@ function processTestList(testList)
 }
 
 const defaultDisabledTags = [];
-if (!globalThis.Worker)
+// FIXME: add better support to run Worker tests in shells.
+if (!isInBrowser)
     defaultDisabledTags.push("WorkerTests");
 
 if (typeof testList !== "undefined") {
