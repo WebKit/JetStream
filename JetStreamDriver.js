@@ -181,47 +181,27 @@ function uiFriendlyDuration(time) {
     return `${time.toFixed(3)} ms`;
 }
 
+// TODO: Cleanup / remove / merge. This is only used for caching loads in the
+// non-browser setting. In the browser we use exclusively `loadCache`, 
+// `loadBlob`, `doLoadBlob`, `prefetchResourcesForBrowser` etc., see below.
 const fileLoader = (function() {
     class Loader {
         constructor() {
             this.requests = new Map;
         }
 
-        async _loadInternal(url) {
-            if (!isInBrowser)
-                return Promise.resolve(readFile(url));
+        // Cache / memoize previously read files, because some workloads
+        // share common code.
+        load(url) {
+            assert(!isInBrowser);
 
-            let response;
-            const tries = 3;
-            while (tries--) {
-                let hasError = false;
-                try {
-                    response = await fetch(url);
-                } catch (e) {
-                    hasError = true;
-                }
-                if (!hasError && response.ok)
-                    break;
-                if (tries)
-                    continue;
-                globalThis.allIsGood = false;
-                throw new Error("Fetch failed");
-            }
-            if (url.indexOf(".js") !== -1)
-                return response.text();
-            else if (url.indexOf(".wasm") !== -1)
-                return response.arrayBuffer();
-
-            throw new Error("should not be reached!");
-        }
-
-        async load(url) {
-            if (this.requests.has(url))
+            if (this.requests.has(url)) {
                 return this.requests.get(url);
+            }
 
-            const promise = this._loadInternal(url);
-            this.requests.set(url, promise);
-            return promise;
+            const contents = readFile(url);
+            this.requests.set(url, contents);
+            return contents;
         }
     }
     return new Loader;
@@ -233,6 +213,8 @@ class Driver {
         this.isDone = false;
         this.errors = [];
         this.benchmarks = [];
+        // TODO: Cleanup / remove / merge `blobDataCache` and `loadCache` vs.
+        // the global `fileLoader` cache.
         this.blobDataCache = { };
         this.loadCache = { };
         this.counter = { };
@@ -241,9 +223,10 @@ class Driver {
         this.counter.failedPreloadResources = 0;
     }
 
+    // TODO: Remove, make `this.benchmarks` immutable and set it once in the
+    // ctor instead of this and the global `addBenchmarksBy*` functions.
     addBenchmark(benchmark) {
         this.benchmarks.push(benchmark);
-        benchmark.fetchResources();
     }
 
     async start() {
@@ -336,8 +319,7 @@ class Driver {
         }
     }
 
-    runCode(string)
-    {
+    runCode(string) {
         if (!isInBrowser) {
             const scripts = string;
             let globalObject;
@@ -387,8 +369,7 @@ class Driver {
         return magicFrame;
     }
 
-    prepareToRun()
-    {
+    prepareToRun() {
         this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
 
         let text = "";
@@ -433,8 +414,7 @@ class Driver {
         });
     }
 
-    reportError(benchmark, error)
-    {
+    reportError(benchmark, error) {
         this.pushError(benchmark.name, error);
 
         if (!isInBrowser)
@@ -459,8 +439,7 @@ class Driver {
     async initialize() {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
-        await this.prefetchResourcesForBrowser();
-        await this.fetchResources();
+        await this.prefetchResources();
         this.prepareToRun();
         this.isReady = true;
         if (isInBrowser) {
@@ -471,14 +450,18 @@ class Driver {
         }
     }
 
-    async prefetchResourcesForBrowser() {
-        if (!isInBrowser)
+    async prefetchResources() {
+        if (!isInBrowser) {
+            for (const benchmark of this.benchmarks)
+                benchmark.prefetchResourcesForShell();
             return;
+        }
 
+        // TODO: Cleanup the browser path of the preloading below and in
+        // `prefetchResourcesForBrowser` / `retryPrefetchResourcesForBrowser`.
         const promises = [];
         for (const benchmark of this.benchmarks)
             promises.push(benchmark.prefetchResourcesForBrowser());
-
         await Promise.all(promises);
 
         const counter = JetStream.counter;
@@ -498,16 +481,6 @@ class Driver {
         }
 
         JetStream.loadCache = { }; // Done preloading all the files.
-    }
-
-    async fetchResources() {
-        const promises = [];
-        for (const benchmark of this.benchmarks)
-            promises.push(benchmark.fetchResources());
-        await Promise.all(promises);
-
-        if (!isInBrowser)
-            return;
 
         const statusElement = document.getElementById("status");
         statusElement.classList.remove('loading');
@@ -623,7 +596,7 @@ class Benchmark {
         this.isAsync = !!plan.isAsync;
         this.disabledByDefault = !!plan.disabledByDefault;
         this.scripts = null;
-        this._resourcesPromise = null;
+        this.preloads = null;
         this._state = BenchmarkState.READY;
     }
 
@@ -880,8 +853,8 @@ class Benchmark {
     }
 
     prefetchResourcesForBrowser() {
-        if (!isInBrowser)
-            return;
+        assert(isInBrowser);
+
         const promises = this.plan.files.map((file) => this.loadBlob("file", null, file).then((blobData) => {
                 if (!globalThis.allIsGood)
                     return;
@@ -913,6 +886,8 @@ class Benchmark {
     }
 
     async retryPrefetchResource(type, prop, file) {
+        assert(isInBrowser);
+
         const counter = JetStream.counter;
         const blobData = JetStream.blobDataCache[file];
         if (blobData.blob) {
@@ -947,8 +922,7 @@ class Benchmark {
     }
 
     async retryPrefetchResourcesForBrowser() {
-        if (!isInBrowser)
-            return;
+        assert(isInBrowser);
 
         const counter = JetStream.counter;
         for (const resource of this.plan.files) {
@@ -968,33 +942,14 @@ class Benchmark {
         return !counter.failedPreloadResources && counter.loadedResources == counter.totalResources;
     }
 
-    fetchResources() {
-        if (this._resourcesPromise)
-            return this._resourcesPromise;
+    prefetchResourcesForShell() {
+        assert(!isInBrowser);
 
-        this.preloads = [];
+        assert(this.scripts === null, "This initialization should be called only once.");
+        this.scripts = this.plan.files.map(file => fileLoader.load(file));
 
-        if (isInBrowser) {
-            this._resourcesPromise = Promise.resolve();
-            return this._resourcesPromise;
-        }
-
-        const filePromises = this.plan.files.map((file) => fileLoader.load(file));
-        this._resourcesPromise = Promise.all(filePromises).then((texts) => {
-            if (isInBrowser)
-                return;
-            this.scripts = [];
-            assert(texts.length === this.plan.files.length);
-            for (const text of texts)
-                this.scripts.push(text);
-        });
-
-        if (this.plan.preload) {
-            for (const prop of Object.getOwnPropertyNames(this.plan.preload))
-                this.preloads.push([ prop, this.plan.preload[prop] ]);
-        }
-
-        return this._resourcesPromise;
+        assert(this.preloads === null, "This initialization should be called only once.");
+        this.preloads = Object.entries(this.plan.preload ?? {});
     }
 
     scoreIdentifiers() { throw new Error("Must be implemented by subclasses"); }
