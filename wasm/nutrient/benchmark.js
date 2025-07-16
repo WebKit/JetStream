@@ -173,6 +173,7 @@ function renderAnnotation(annotationId) {
   }
 }
 
+// `getContentTree` retrieves the page text and accessibility tree for a given page index.
 function getContentTree(pageIndex) {
   const result = Module.dispatchCommand(
     JSON.stringify({
@@ -184,6 +185,41 @@ function getContentTree(pageIndex) {
   if (result && result.hasError()) {
     throw new Error("Failed to get content tree: " + result.getErrorMessage());
   }
+
+  return getSingleJsonReplyFromResult(result);
+}
+
+function verifyContentTree(contentTree) {
+  if (
+    !contentTree ||
+    !Array.isArray(contentTree.nodes) ||
+    contentTree.nodes.length === 0
+  ) {
+    throw new Error("Content tree is empty or not an array");
+  }
+}
+
+function getAnnotations() {
+  const result = Module.dispatchCommand(
+    JSON.stringify({
+      type: "get_annotations",
+      skip_attachments: true,
+    })
+  );
+
+  if (result && result.hasError()) {
+    throw new Error("Failed to get annotations: " + result.getErrorMessage());
+  }
+
+  const annotations = [];
+  for (let i = 0; i < result.getRepliesCount(); i++) {
+    if (result.hasJSONReply(i)) {
+      annotations.push(JSON.parse(result.getJSONReply(i)));
+    } else {
+      throw new Error(`Expected JSON reply for annotation ${i}`);
+    }
+  }
+  return annotations;
 }
 
 // Page width and height for the assets/example.pdf document.
@@ -209,12 +245,18 @@ class Benchmark {
     openDocument("/document.pdf");
 
     importInstantJSON(Module.annotations);
+    const annotations = getAnnotations();
+    if (annotations.length !== 9) {
+      throw new Error(`Expected 9 annotations, but got ${annotations.length}`);
+    }
 
     var renderScale = 0.3;
     renderPage(0, PAGE_WIDTH * renderScale, PAGE_HEIGHT * renderScale);
     renderPage(1, PAGE_WIDTH * renderScale, PAGE_HEIGHT * renderScale);
 
-    getContentTree(0);
-    getContentTree(1);
+    const contentTree0 = getContentTree(0);
+    verifyContentTree(contentTree0);
+    const contentTree1 = getContentTree(1);
+    verifyContentTree(contentTree1);
   }
 }
