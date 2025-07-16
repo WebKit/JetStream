@@ -1507,6 +1507,32 @@ class WasmLegacyBenchmark extends Benchmark {
     }
 };
 
+function dotnetPreloads(type)
+{
+    return {
+        dotnetUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.js`,
+        dotnetNativeUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.native.js`,
+        dotnetRuntimeUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.runtime.js`,
+        wasmBinaryUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.native.wasm`,
+        icuCustomUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/icudt_CJK.dat`,
+        dllCollectionsConcurrentUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Collections.Concurrent.wasm`,
+        dllCollectionsUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Collections.wasm`,
+        dllComponentModelPrimitivesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ComponentModel.Primitives.wasm`,
+        dllComponentModelTypeConverterUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ComponentModel.TypeConverter.wasm`,
+        dllDrawingPrimitivesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Drawing.Primitives.wasm`,
+        dllDrawingUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Drawing.wasm`,
+        dllIOPipelinesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.IO.Pipelines.wasm`,
+        dllLinqUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Linq.wasm`,
+        dllMemoryUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Memory.wasm`,
+        dllObjectModelUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ObjectModel.wasm`,
+        dllPrivateCorelibUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Private.CoreLib.wasm`,
+        dllRuntimeInteropServicesJavaScriptUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Runtime.InteropServices.JavaScript.wasm`,
+        dllTextEncodingsWebUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Text.Encodings.Web.wasm`,
+        dllTextJsonUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Text.Json.wasm`,
+        dllAppUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.wasm`,
+    }
+}
+
 let BENCHMARKS = [
     // ARES
     new DefaultBenchmark({
@@ -2212,6 +2238,29 @@ let BENCHMARKS = [
         iterations: 40,
         tags: ["Wasm"],
     }),
+    // .NET
+    new AsyncBenchmark({
+        name: "dotnet-interp",
+        files: [
+            "./wasm/dotnet/interp.js",
+            "./wasm/dotnet/benchmark.js",
+        ],
+        preload: dotnetPreloads("interp"),
+        iterations: 10,
+        worstCaseCount: 2,
+        tags: ["Wasm", "dotnet"]
+    }),
+    new AsyncBenchmark({
+        name: "dotnet-aot",
+        files: [
+            "./wasm/dotnet/aot.js",
+            "./wasm/dotnet/benchmark.js",
+        ],
+        preload: dotnetPreloads("aot"),
+        iterations: 15,
+        worstCaseCount: 2,
+        tags: ["Wasm", "dotnet"]
+    })
 ];
 
 // LuaJSFight tests
