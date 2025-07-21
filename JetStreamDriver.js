@@ -254,6 +254,7 @@ class Driver {
         benchmark.fetchResources();
     }
 
+
     async start() {
         let statusElement = false;
         let summaryElement = false;
@@ -397,9 +398,6 @@ class Driver {
 
     prepareToRun()
     {
-        const newBenchmarks = Array.from(this.benchmarks);
-        newBenchmarks.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? 1 : -1);
-
         let text = "";
         for (const benchmark of this.benchmarks) {
             const description = Object.keys(benchmark.subScores());
@@ -466,6 +464,8 @@ class Driver {
     async initialize() {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
+        this.benchmarks = Array.from(this.benchmarks);
+        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
         await this.prefetchResourcesForBrowser();
         await this.fetchResources();
         this.prepareToRun();
