@@ -401,11 +401,11 @@ class Driver {
         newBenchmarks.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? 1 : -1);
 
         let text = "";
-        for (const benchmark of newBenchmarks) {
-            const id = JSON.stringify(benchmark.constructor.scoreDescription());
-            const description = JSON.parse(id);
+        for (const benchmark of this.benchmarks) {
+            const description = Object.keys(benchmark.subScores());
+            description.push("Score");
 
-            const scoreIds = benchmark.scoreIdentifiers()
+            const scoreIds = benchmark.scoreIdentifiers();
             const overallScoreId = scoreIds.pop();
 
             if (isInBrowser) {
@@ -602,7 +602,7 @@ class Driver {
         const content = this.resultsJSON();
         await fetch("/report", {
             method: "POST",
-            heeaders: {
+            headers: {
                 "Content-Type": "application/json",
                 "Content-Length": content.length,
                 "Connection": "close",
@@ -666,7 +666,7 @@ class Benchmark {
                 __benchmark.runIteration();
                 let end = performance.now();
 
-                performanceMeasure(iterationMarkLabel, iterationStartMark);
+                performance.measure(iterationMarkLabel, iterationMarkLabel);
 
                 ${this.postIterationCode}
 
@@ -734,18 +734,10 @@ class Benchmark {
             const isInBrowser = ${isInBrowser};
             const isD8 = ${isD8};
             if (typeof performance.mark === 'undefined') {
-                performance.mark = function() {};
+                performance.mark = function(name) { return { name }};
             }
             if (typeof performance.measure === 'undefined') {
                 performance.measure = function() {};
-            }
-            function performanceMeasure(name, mark) {
-                // D8 does not implement the official web API.
-                // Also the performance.mark polyfill returns an undefined mark.
-                if (isD8 || typeof mark === "undefined")
-                    performance.measure(name, mark);
-                else
-                    performance.measure(name, mark.name);
             }
         `);
 
@@ -1021,7 +1013,6 @@ class Benchmark {
         return this._resourcesPromise;
     }
 
-    static scoreDescription() { throw new Error("Must be implemented by subclasses."); }
     scoreIdentifiers() { throw new Error("Must be implemented by subclasses"); }
 
     updateUIBeforeRun() {
@@ -1102,10 +1093,6 @@ class DefaultBenchmark extends Benchmark {
             "Worst": this.worst4Score,
             "Average": this.averageScore,
         };
-    }
-
-    static scoreDescription() {
-        return ["First", "Worst", "Average", "Score"];
     }
 
     scoreIdentifiers() {
@@ -1202,7 +1189,7 @@ class AsyncBenchmark extends DefaultBenchmark {
                 await __benchmark.runIteration();
                 let end = performance.now();
 
-                performanceMeasure(iterationMarkLabel, iterationStartMark);
+                performance.measure(iterationMarkLabel, iterationMarkLabel);
 
                 ${this.postIterationCode}
 
@@ -1301,7 +1288,7 @@ class WSLBenchmark extends Benchmark {
                 benchmark.buildStdlib();
                 results.push(performance.now() - start);
 
-                performanceMeasure(markLabel, startMark);
+                performance.measure(markLabel, markLabel);
             }
 
             {
@@ -1312,7 +1299,7 @@ class WSLBenchmark extends Benchmark {
                 benchmark.run();
                 results.push(performance.now() - start);
 
-                performanceMeasure(markLabel, startMark);
+                performance.measure(markLabel, markLabel);
             }
 
             top.currentResolve(results);
@@ -1324,10 +1311,6 @@ class WSLBenchmark extends Benchmark {
             "Stdlib": this.stdlibScore,
             "MainRun": this.mainRunScore,
         };
-    }
-
-    static scoreDescription() {
-        return ["Stdlib", "MainRun", "Score"];
     }
 
     scoreIdentifiers() {
@@ -1500,10 +1483,6 @@ class WasmLegacyBenchmark extends Benchmark {
             "Startup": this.startupScore,
             "Runtime": this.runScore,
         };
-    }
-
-    static scoreDescription() {
-        return ["Startup", "Runtime", "Score"];
     }
 
     get startupID() {

@@ -224,7 +224,6 @@ a.button {
     color: transparent;
     background-image: linear-gradient(132deg, #96E5FF 0%, #96E5FF 2%, #86D9FF 42%, #8BDAFF 84%, #96E5FF 98%, #96E5FF 100%);
     -webkit-background-clip: text;
-    background-size: 1200px 100%;
     background-repeat: no-repeat;
     -webkit-touch-callout: none;
     -webkit-user-select: none;
