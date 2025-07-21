@@ -254,6 +254,29 @@ class Driver {
         benchmark.fetchResources();
     }
 
+    enableBenchmarksByName(name) {
+        const benchmark = benchmarksByName.get(name.toLowerCase());
+
+        if (!benchmark)
+            throw new Error(`Couldn't find benchmark named "${name}"`);
+
+        this.enableBenchmark(benchmark);
+    }
+
+    enableBenchmarksByTag(tag, excludeTags) {
+        const benchmarks = benchmarksByTag.get(tag.toLowerCase());
+
+        if (!benchmarks) {
+            const validTags = Array.from(benchmarksByTag.keys()).join(", ");
+            throw new Error(`Couldn't find tag named: ${tag}.\n Choices are ${validTags}`);
+        }
+
+        for (const benchmark of benchmarks) {
+            if (excludeTags && benchmark.hasAnyTag(...excludeTags))
+                continue
+            this.enableBenchmark(benchmark);
+        }
+    }
 
     async start() {
         let statusElement = false;
@@ -461,11 +484,15 @@ class Driver {
         });
     }
 
+    initializeBenchmarks() {
+        this.benchmarks = Array.from(this.benchmarks);
+        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+    }
+
     async initialize() {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
-        this.benchmarks = Array.from(this.benchmarks);
-        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+        this.initializeBenchmarks();
         await this.prefetchResourcesForBrowser();
         await this.fetchResources();
         this.prepareToRun();
@@ -2317,32 +2344,6 @@ for (const benchmark of BENCHMARKS) {
 
 this.JetStream = new Driver();
 
-function enableBenchmarksByName(name)
-{
-    const benchmark = benchmarksByName.get(name.toLowerCase());
-
-    if (!benchmark)
-        throw new Error(`Couldn't find benchmark named "${name}"`);
-
-    JetStream.enableBenchmark(benchmark);
-}
-
-function enableBenchmarksByTag(tag, excludeTags) 
-{
-    const benchmarks = benchmarksByTag.get(tag.toLowerCase());
-
-    if (!benchmarks) {
-        const validTags = Array.from(benchmarksByTag.keys()).join(", ");
-        throw new Error(`Couldn't find tag named: ${tag}.\n Choices are ${validTags}`);
-    }
-
-    for (const benchmark of benchmarks) {
-        if (excludeTags && benchmark.hasAnyTag(...excludeTags))
-            continue
-        JetStream.enableBenchmark(benchmark);
-    }
-}
-
 
 function processTestList(testList)
 {
@@ -2356,9 +2357,9 @@ function processTestList(testList)
     for (let name of benchmarkNames) {
         name = name.toLowerCase();
         if (benchmarksByTag.has(name))
-            enableBenchmarksByTag(name);
+            this.JetStream.enableBenchmarksByTag(name);
         else
-            enableBenchmarksByName(name);
+            this.JetStream.enableBenchmarksByName(name);
     }
 }
 
@@ -2372,5 +2373,5 @@ if (typeof testList !== "undefined") {
 } else if (customTestList.length) {
     processTestList(customTestList);
 } else {
-    enableBenchmarksByTag("Default", defaultDisabledTags)
+    this.JetStream.enableBenchmarksByTag("Default", defaultDisabledTags)
 }
