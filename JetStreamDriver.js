@@ -2357,9 +2357,9 @@ function processTestList(testList)
     for (let name of benchmarkNames) {
         name = name.toLowerCase();
         if (benchmarksByTag.has(name))
-            this.JetStream.enableBenchmarksByTag(name);
+            globalThis.JetStream.enableBenchmarksByTag(name);
         else
-            this.JetStream.enableBenchmarksByName(name);
+            globalThis.JetStream.enableBenchmarksByName(name);
     }
 }
 
@@ -2373,5 +2373,5 @@ if (typeof testList !== "undefined") {
 } else if (customTestList.length) {
     processTestList(customTestList);
 } else {
-    this.JetStream.enableBenchmarksByTag("Default", defaultDisabledTags)
+    globalThis.JetStream.enableBenchmarksByTag("Default", defaultDisabledTags)
 }
