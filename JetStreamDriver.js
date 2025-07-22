@@ -650,7 +650,7 @@ class Benchmark {
                 __benchmark.runIteration();
                 let end = performance.now();
 
-                performance.measure(iterationMarkLabel, iterationMarkLabel);
+                // performance.measure(iterationMarkLabel, iterationMarkLabel);
 
                 ${this.postIterationCode}
 
@@ -1173,7 +1173,7 @@ class AsyncBenchmark extends DefaultBenchmark {
                 await __benchmark.runIteration();
                 let end = performance.now();
 
-                performance.measure(iterationMarkLabel, iterationMarkLabel);
+                // performance.measure(iterationMarkLabel, iterationMarkLabel);
 
                 ${this.postIterationCode}
 
@@ -1272,7 +1272,7 @@ class WSLBenchmark extends Benchmark {
                 benchmark.buildStdlib();
                 results.push(performance.now() - start);
 
-                performance.measure(markLabel, markLabel);
+                // performance.measure(markLabel, markLabel);
             }
 
             {
@@ -1283,7 +1283,7 @@ class WSLBenchmark extends Benchmark {
                 benchmark.run();
                 results.push(performance.now() - start);
 
-                performance.measure(markLabel, markLabel);
+                // performance.measure(markLabel, markLabel);
             }
 
             top.currentResolve(results);
@@ -2062,13 +2062,26 @@ let BENCHMARKS = [
         tags: ["Wasm"],
     }),
     new WasmEMCCBenchmark({
-        name: "Dart-flute-wasm",
+        name: "Dart-flute-complex-wasm",
         files: [
             "./Dart/benchmark.js",
         ],
         preload: {
-            jsModule: "./Dart/build/flute.dart2wasm.mjs",
-            wasmBinary: "./Dart/build/flute.dart2wasm.wasm",
+            jsModule: "./Dart/build/flute.complex.dart2wasm.mjs",
+            wasmBinary: "./Dart/build/flute.complex.dart2wasm.wasm",
+        },
+        iterations: 15,
+        worstCaseCount: 2,
+        tags: ["Wasm"],
+    }),
+    new WasmEMCCBenchmark({
+        name: "Dart-flute-todomvc-wasm",
+        files: [
+            "./Dart/benchmark.js",
+        ],
+        preload: {
+            jsModule: "./Dart/build/flute.todomvc.dart2wasm.mjs",
+            wasmBinary: "./Dart/build/flute.todomvc.dart2wasm.wasm",
         },
         iterations: 15,
         worstCaseCount: 2,
