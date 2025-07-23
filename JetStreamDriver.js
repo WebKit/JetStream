@@ -1987,6 +1987,15 @@ let BENCHMARKS = [
         ],
         tags: ["Generators"]
     }),
+    new DefaultBenchmark({
+        name: "threejs",
+        files: [
+            "./threejs/three.js",
+            "./threejs/benchmark.js",
+        ],
+        deterministicRandom: true,
+        tags: ["ThreeJs"],
+    }),
     // Wasm
     new WasmEMCCBenchmark({
         name: "HashSet-wasm",
