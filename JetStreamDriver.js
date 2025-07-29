@@ -216,11 +216,13 @@ const fileLoader = (function() {
 })();
 
 class Driver {
-    constructor() {
+    constructor(benchmarks) {
         this.isReady = false;
         this.isDone = false;
         this.errors = [];
-        this.benchmarks = new Set();
+        // Make benchmark list unique and sort it.
+        this.benchmarks = Array.from(new Set(benchmarks));
+        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
         // TODO: Cleanup / remove / merge `blobDataCache` and `loadCache` vs.
         // the global `fileLoader` cache.
         this.blobDataCache = { };
@@ -229,36 +231,6 @@ class Driver {
         this.counter.loadedResources = 0;
         this.counter.totalResources = 0;
         this.counter.failedPreloadResources = 0;
-    }
-
-    enableBenchmark(benchmark) {
-        // TODO: Remove, make `this.benchmarks` immutable and set it once in the
-        // ctor instead of this and the global `addBenchmarksBy*` functions.
-        this.benchmarks.add(benchmark);
-    }
-
-    enableBenchmarksByName(name) {
-        const benchmark = benchmarksByName.get(name.toLowerCase());
-
-        if (!benchmark)
-            throw new Error(`Couldn't find benchmark named "${name}"`);
-
-        this.enableBenchmark(benchmark);
-    }
-
-    enableBenchmarksByTag(tag, excludeTags) {
-        const benchmarks = benchmarksByTag.get(tag.toLowerCase());
-
-        if (!benchmarks) {
-            const validTags = Array.from(benchmarksByTag.keys()).join(", ");
-            throw new Error(`Couldn't find tag named: ${tag}.\n Choices are ${validTags}`);
-        }
-
-        for (const benchmark of benchmarks) {
-            if (excludeTags && benchmark.hasAnyTag(...excludeTags))
-                continue
-            this.enableBenchmark(benchmark);
-        }
     }
 
     async start() {
@@ -466,15 +438,9 @@ class Driver {
         });
     }
 
-    initializeBenchmarks() {
-        this.benchmarks = Array.from(this.benchmarks);
-        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
-    }
-
     async initialize() {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
-        this.initializeBenchmarks();
         await this.prefetchResources();
         this.prepareToRun();
         this.isReady = true;
@@ -2344,12 +2310,12 @@ for (const benchmark of BENCHMARKS) {
     }
 }
 
-this.JetStream = new Driver();
 
 
 function processTestList(testList)
 {
     let benchmarkNames = [];
+    let benchmarks = [];
 
     if (testList instanceof Array)
         benchmarkNames = testList;
@@ -2359,21 +2325,49 @@ function processTestList(testList)
     for (let name of benchmarkNames) {
         name = name.toLowerCase();
         if (benchmarksByTag.has(name))
-            globalThis.JetStream.enableBenchmarksByTag(name);
+            benchmarks.push(...enableBenchmarksByTag(name));
         else
-            globalThis.JetStream.enableBenchmarksByName(name);
+            benchmarks.push(enableBenchmarkByName(name));
     }
+    return benchmarks;
 }
 
+
+function enableBenchmarkByName(name) {
+    const benchmark = benchmarksByName.get(name.toLowerCase());
+
+    if (!benchmark)
+        throw new Error(`Couldn't find benchmark named "${name}"`);
+
+    return benchmark;
+}
+
+function enableBenchmarksByTag(tag, excludeTags) {
+    let benchmarks = benchmarksByTag.get(tag.toLowerCase());
+    if (!benchmarks) {
+        const validTags = Array.from(benchmarksByTag.keys()).join(", ");
+        throw new Error(`Couldn't find tag named: ${tag}.\n Choices are ${validTags}`);
+    }
+    if (excludeTags) {
+        benchmarks = benchmarks.filter(benchmark => {
+            return !benchmark.hasAnyTag(...excludeTags);
+        });
+    }
+    return benchmarks;
+}
+
+let benchmarks = [];
 const defaultDisabledTags = [];
 // FIXME: add better support to run Worker tests in shells.
 if (!isInBrowser)
     defaultDisabledTags.push("WorkerTests");
 
 if (typeof testList !== "undefined") {
-    processTestList(testList);
+    benchmarks = processTestList(testList);
 } else if (customTestList.length) {
-    processTestList(customTestList);
+    benchmarks = processTestList(customTestList);
 } else {
-    globalThis.JetStream.enableBenchmarksByTag("Default", defaultDisabledTags)
+    benchmarks = enableBenchmarksByTag("Default", defaultDisabledTags)
 }
+
+this.JetStream = new Driver(benchmarks);
