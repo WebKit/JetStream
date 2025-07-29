@@ -674,7 +674,7 @@ class Benchmark {
 
     allScores() {
         const allScores = this.subScores();
-        allScores["Score"] =  this.score;
+        allScores["Score"] = this.score;
         return allScores;
     }
 
@@ -994,8 +994,8 @@ class Benchmark {
         return ids;
     }
 
-    scoreIdentifier(name) {
-        return `results-cell-${this.name}-${name}`;
+    scoreIdentifier(scoreName) {
+        return `results-cell-${this.name}-${scoreName}`;
     }
 
     updateUIBeforeRun() {
@@ -1032,10 +1032,18 @@ class Benchmark {
             return;
 
         console.log(this.name);
+        // FIXME: consider removing this mapping.
+        // Rename for backwards compatibility.
+        const legacyScoreNameMap = {
+            __proto__: null,
+            "First": "Startup",
+            "Worst": "Worst Case",
+            "MainRun": "Tests",
+            "Runtime": "Run time",
+        };
         for (let [name, value] of scoreEntries) {
-            // Rename for backwards compatibility.
-            if (name == "Worst")
-                name = "Worst Case"
+            if (name in legacyScoreNameMap)
+                name = legacyScoreNameMap[name];
              console.log(`    ${name}:`, uiFriendlyScore(value));
         }
         if (RAMification) {
