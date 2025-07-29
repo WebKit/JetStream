@@ -126,21 +126,6 @@ function assert(b, m = "") {
         throw new Error(`Bad assertion: ${m}`);
 }
 
-function firstID(benchmark) {
-    return `results-cell-${benchmark.name}-first`;
-}
-
-function worst4ID(benchmark) {
-    return `results-cell-${benchmark.name}-worst4`;
-}
-
-function avgID(benchmark) {
-    return `results-cell-${benchmark.name}-avg`;
-}
-
-function scoreID(benchmark) {
-    return `results-cell-${benchmark.name}-score`;
-}
 
 function mean(values) {
     assert(values instanceof Array);
@@ -679,7 +664,18 @@ class Benchmark {
     }
 
     get score() {
+        const subScores = Object.values(this.subScores());
+        return geomean(subScores);
+    }
+
+    subScores() {
         throw new Error("Subclasses need to implement this");
+    }
+
+    allScores() {
+        const allScores = this.subScores();
+        allScores["score"] =  this.score;
+        return allScores;
     }
 
     get prerunCode() { return null; }
@@ -993,7 +989,14 @@ class Benchmark {
         this.preloads = Object.entries(this.plan.preload ?? {});
     }
 
-    scoreIdentifiers() { throw new Error("Must be implemented by subclasses"); }
+    scoreIdentifiers() { 
+        const ids = Object.keys(this.allScores()).map(name => this.scoreIdentifier(name));
+        return ids;
+    }
+
+    scoreIdentifier(name) {
+        return `results-cell-${this.name}-${name}`;
+    }
 
     updateUIBeforeRun() {
         if (!isInBrowser) {
@@ -1019,6 +1022,23 @@ class Benchmark {
         benchmarkResultsUI.classList.remove("benchmark-running");
         benchmarkResultsUI.classList.add("benchmark-done");
 
+        const scoreEntries = Object.entries(this.allScores());
+        if (isInBrowser) {
+            for (const [name, value] of scoreEntries)
+                document.getElementById(this.scoreIdentifier(name)).innerHTML = uiFriendlyScore(value);
+        }
+
+        if (dumpJSONResults)
+            return;
+
+        console.log(this.name);
+        for (const [name, value] of scoreEntries)
+             console.log(`    ${name}:`, uiFriendlyScore(value));
+        if (RAMification) {
+            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
+            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
+        }
+        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 };
 
@@ -1063,45 +1083,12 @@ class DefaultBenchmark extends Benchmark {
         this.averageScore = toScore(this.averageTime);
     }
 
-    get score() {
-        return geomean([this.firstIterationScore, this.worst4Score, this.averageScore]);
-    }
-
     subScores() {
         return {
             "First": this.firstIterationScore,
             "Worst": this.worst4Score,
             "Average": this.averageScore,
         };
-    }
-
-    scoreIdentifiers() {
-        return [firstID(this), worst4ID(this), avgID(this), scoreID(this)];
-    }
-
-    updateUIAfterRun() {
-        super.updateUIAfterRun();
-
-        if (isInBrowser) {
-            document.getElementById(firstID(this)).innerHTML = uiFriendlyScore(this.firstIterationScore);
-            document.getElementById(worst4ID(this)).innerHTML = uiFriendlyScore(this.worst4Score);
-            document.getElementById(avgID(this)).innerHTML = uiFriendlyScore(this.averageScore);
-            document.getElementById(scoreID(this)).innerHTML = uiFriendlyScore(this.score);
-            return;
-        }
-
-        if (dumpJSONResults)
-            return;
-
-        console.log("    Startup:", uiFriendlyScore(this.firstIterationScore));
-        console.log("    Worst Case:", uiFriendlyScore(this.worst4Score));
-        console.log("    Average:", uiFriendlyScore(this.averageScore));
-        console.log("    Score:", uiFriendlyScore(this.score));
-        if (RAMification) {
-            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
-            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
-        }
-        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 }
 
@@ -1250,10 +1237,6 @@ class WSLBenchmark extends Benchmark {
         this.mainRunScore = toScore(results[1]);
     }
 
-    get score() {
-        return geomean([this.stdlibScore, this.mainRunScore]);
-    }
-
     get runnerCode() {
         return `
             let benchmark = new Benchmark();
@@ -1292,33 +1275,6 @@ class WSLBenchmark extends Benchmark {
             "MainRun": this.mainRunScore,
         };
     }
-
-    scoreIdentifiers() {
-        return ["wsl-stdlib-score", "wsl-tests-score", "wsl-score-score"];
-    }
-
-    updateUIAfterRun() {
-        super.updateUIAfterRun();
-
-        if (isInBrowser) {
-            document.getElementById("wsl-stdlib-score").innerHTML = uiFriendlyScore(this.stdlibScore);
-            document.getElementById("wsl-tests-score").innerHTML = uiFriendlyScore(this.mainRunScore);
-            document.getElementById("wsl-score-score").innerHTML = uiFriendlyScore(this.score);
-            return;
-        }
-
-        if (dumpJSONResults)
-            return;
-
-        console.log("    Stdlib:", uiFriendlyScore(this.stdlibScore));
-        console.log("    Tests:", uiFriendlyScore(this.mainRunScore));
-        console.log("    Score:", uiFriendlyScore(this.score));
-        if (RAMification) {
-            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
-            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
-        }
-        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
-    }
 };
 
 class WasmLegacyBenchmark extends Benchmark {
@@ -1336,10 +1292,6 @@ class WasmLegacyBenchmark extends Benchmark {
         this.startupScore= toScore(results[0]);
         this.runTime = results[1];
         this.runScore = toScore(results[1]);
-    }
-
-    get score() {
-        return geomean([this.startupScore, this.runScore]);
     }
 
     get prerunCode() {
@@ -1463,43 +1415,6 @@ class WasmLegacyBenchmark extends Benchmark {
             "Startup": this.startupScore,
             "Runtime": this.runScore,
         };
-    }
-
-    get startupID() {
-        return `wasm-startup-id${this.name}`;
-    }
-    get runID() {
-        return `wasm-run-id${this.name}`;
-    }
-    get scoreID() {
-        return `wasm-score-id${this.name}`;
-    }
-
-    scoreIdentifiers() {
-        return [this.startupID, this.runID, this.scoreID];
-    }
-
-    updateUIAfterRun() {
-        super.updateUIAfterRun();
-
-        if (isInBrowser) {
-            document.getElementById(this.startupID).innerHTML = uiFriendlyScore(this.startupScore);
-            document.getElementById(this.runID).innerHTML = uiFriendlyScore(this.runScore);
-            document.getElementById(this.scoreID).innerHTML = uiFriendlyScore(this.score);
-            return;
-        }
-
-        if (dumpJSONResults)
-            return;
-
-        console.log("    Startup:", uiFriendlyScore(this.startupScore));
-        console.log("    Run time:", uiFriendlyScore(this.runScore));
-        console.log("    Score:", uiFriendlyScore(this.score));
-        if (RAMification) {
-            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
-            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
-        }
-        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 };
 
