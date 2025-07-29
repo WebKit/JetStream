@@ -76,17 +76,25 @@ async function runJetStream() {
 load("./JetStreamDriver.js");
 
 if ("--help" in cliFlags) {
-    console.log("JetStream Driver Help")
-    console.log("")
-    console.log("Options:")
-    console.log("   --iteration-count:  Set the default iteration count.")
-    console.log("   ---worst-case-count: Set the default worst-case count")
-    console.log("   --dump-json-results: Print summary json to the console.")
-    console.log("")
-    console.log("Available tests:")
-    const benchmarkNames = BENCHMARKS.map(b => b.name).sort()
+    console.log("JetStream Driver Help");
+    console.log("");
+
+    console.log("Options:");
+    console.log("   --iteration-count:  Set the default iteration count.");
+    console.log("   ---worst-case-count: Set the default worst-case count");
+    console.log("   --dump-json-results: Print summary json to the console.");
+    console.log("");
+
+    console.log("Available tags:");
+    const tagNames = Array.from(benchmarksByTag.keys()).sort();
+    for (const tagName of tagNames)
+        console.log("  ", tagName);
+    console.log("");
+
+    console.log("Available tests:");
+    const benchmarkNames = BENCHMARKS.map(b => b.name).sort();
     for (const benchmark of benchmarkNames)
-        console.log("  ", benchmark)
+        console.log("  ", benchmark);
 } else {
     runJetStream();
 }
