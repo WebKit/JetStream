@@ -37,7 +37,7 @@ globalThis.testIterationCountMap ??= new Map();
 globalThis.testWorstCaseCount ??= undefined;
 globalThis.testWorstCaseCountMap ??= new Map();
 globalThis.dumpJSONResults ??= false;
-globalThis.customTestList ??= [];
+globalThis.testList ??= undefined;
 globalThis.startDelay ??= undefined;
 
 let shouldReport = false;
@@ -53,8 +53,8 @@ function getIntParam(urlParams, key) {
 }
 
 function getTestListParam(urlParams, key) {
-    if (globalThis.customTestList.length)
-        throw new Error(`Overriding previous customTestList=${globalThis.customTestList.join()} with ${key} url-parameter.`);
+    if (globalThis.testList?.length)
+        throw new Error(`Overriding previous testList=${globalThis.testList.join()} with ${key} url-parameter.`);
     return urlParams.getAll(key);
 }
 
@@ -65,9 +65,9 @@ if (typeof(URLSearchParams) !== "undefined") {
     if (shouldReport && !globalThis.startDelay)
         globalThis.startDelay = 4000;
     if (urlParameters.has("tag"))
-        customTestList = getTestListParam(urlParameters, "tag");
+        globalThis.testList = getTestListParam(urlParameters, "tag");
     if (urlParameters.has("test"))
-        customTestList = getTestListParam(urlParameters, "test");
+        globalThis.testList = getTestListParam(urlParameters, "test");
     globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
     globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
 }
@@ -93,8 +93,8 @@ function displayCategoryScores() {
 function getIterationCount(plan) {
     if (testIterationCountMap.has(plan.name))
         return testIterationCountMap.get(plan.name);
-    if (testIterationCount)
-        return testIterationCount;
+    if (globalThis.testIterationCount)
+        return globalThis.testIterationCount;
     if (plan.iterations)
         return plan.iterations;
     return defaultIterationCount;
@@ -103,8 +103,8 @@ function getIterationCount(plan) {
 function getWorstCaseCount(plan) {
     if (testWorstCaseCountMap.has(plan.name))
         return testWorstCaseCountMap.get(plan.name);
-    if (testWorstCaseCount)
-        return testWorstCaseCount;
+    if (globalThis.testWorstCaseCount)
+        return globalThis.testWorstCaseCount;
     if (plan.worstCaseCount)
         return plan.worstCaseCount;
     return defaultWorstCaseCount;
@@ -2370,10 +2370,8 @@ const defaultDisabledTags = [];
 if (!isInBrowser)
     defaultDisabledTags.push("WorkerTests");
 
-if (typeof testList !== "undefined") {
-    processTestList(testList);
-} else if (customTestList.length) {
-    processTestList(customTestList);
+if (globalThis.testList?.length) {
+    processTestList(globalThis.testList);
 } else {
     globalThis.JetStream.enableBenchmarksByTag("Default", defaultDisabledTags)
 }
