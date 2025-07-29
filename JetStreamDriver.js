@@ -2311,7 +2311,6 @@ for (const benchmark of BENCHMARKS) {
 }
 
 
-
 function processTestList(testList)
 {
     let benchmarkNames = [];
@@ -2331,7 +2330,6 @@ function processTestList(testList)
     }
     return benchmarks;
 }
-
 
 function enableBenchmarkByName(name) {
     const benchmark = benchmarksByName.get(name.toLowerCase());
