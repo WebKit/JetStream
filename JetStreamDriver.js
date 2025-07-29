@@ -2331,6 +2331,7 @@ function processTestList(testList)
     return benchmarks;
 }
 
+
 function enableBenchmarkByName(name) {
     const benchmark = benchmarksByName.get(name.toLowerCase());
 
@@ -2339,6 +2340,7 @@ function enableBenchmarkByName(name) {
 
     return benchmark;
 }
+
 
 function enableBenchmarksByTag(tag, excludeTags) {
     let benchmarks = benchmarksByTag.get(tag.toLowerCase());
@@ -2353,6 +2355,7 @@ function enableBenchmarksByTag(tag, excludeTags) {
     }
     return benchmarks;
 }
+
 
 let benchmarks = [];
 const defaultDisabledTags = [];
