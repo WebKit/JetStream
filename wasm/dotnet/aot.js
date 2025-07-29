@@ -1,0 +1,1 @@
+globalThis.dotnetFlavor = "aot";

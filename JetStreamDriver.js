@@ -189,47 +189,27 @@ function uiFriendlyDuration(time) {
     return `${time.toFixed(3)} ms`;
 }
 
+// TODO: Cleanup / remove / merge. This is only used for caching loads in the
+// non-browser setting. In the browser we use exclusively `loadCache`, 
+// `loadBlob`, `doLoadBlob`, `prefetchResourcesForBrowser` etc., see below.
 const fileLoader = (function() {
     class Loader {
         constructor() {
             this.requests = new Map;
         }
 
-        async _loadInternal(url) {
-            if (!isInBrowser)
-                return Promise.resolve(readFile(url));
+        // Cache / memoize previously read files, because some workloads
+        // share common code.
+        load(url) {
+            assert(!isInBrowser);
 
-            let response;
-            const tries = 3;
-            while (tries--) {
-                let hasError = false;
-                try {
-                    response = await fetch(url);
-                } catch (e) {
-                    hasError = true;
-                }
-                if (!hasError && response.ok)
-                    break;
-                if (tries)
-                    continue;
-                globalThis.allIsGood = false;
-                throw new Error("Fetch failed");
-            }
-            if (url.indexOf(".js") !== -1)
-                return response.text();
-            else if (url.indexOf(".wasm") !== -1)
-                return response.arrayBuffer();
-
-            throw new Error("should not be reached!");
-        }
-
-        async load(url) {
-            if (this.requests.has(url))
+            if (this.requests.has(url)) {
                 return this.requests.get(url);
+            }
 
-            const promise = this._loadInternal(url);
-            this.requests.set(url, promise);
-            return promise;
+            const contents = readFile(url);
+            this.requests.set(url, contents);
+            return contents;
         }
     }
     return new Loader;
@@ -240,7 +220,15 @@ class Driver {
         this.isReady = false;
         this.isDone = false;
         this.errors = [];
+<<<<<<< HEAD
         this.benchmarks = new Set();
+||||||| 8c28a5f
+        this.benchmarks = [];
+=======
+        this.benchmarks = [];
+        // TODO: Cleanup / remove / merge `blobDataCache` and `loadCache` vs.
+        // the global `fileLoader` cache.
+>>>>>>> df197ef3b188771bcfb28b7b32565b281d337950
         this.blobDataCache = { };
         this.loadCache = { };
         this.counter = { };
@@ -249,9 +237,20 @@ class Driver {
         this.counter.failedPreloadResources = 0;
     }
 
+<<<<<<< HEAD
     enableBenchmark(benchmark) {
         this.benchmarks.add(benchmark);
         benchmark.fetchResources();
+||||||| 8c28a5f
+    addBenchmark(benchmark) {
+        this.benchmarks.push(benchmark);
+        benchmark.fetchResources();
+=======
+    // TODO: Remove, make `this.benchmarks` immutable and set it once in the
+    // ctor instead of this and the global `addBenchmarksBy*` functions.
+    addBenchmark(benchmark) {
+        this.benchmarks.push(benchmark);
+>>>>>>> df197ef3b188771bcfb28b7b32565b281d337950
     }
 
     enableBenchmarksByName(name) {
@@ -368,8 +367,7 @@ class Driver {
         }
     }
 
-    runCode(string)
-    {
+    runCode(string) {
         if (!isInBrowser) {
             const scripts = string;
             let globalObject;
@@ -419,8 +417,19 @@ class Driver {
         return magicFrame;
     }
 
+<<<<<<< HEAD
     prepareToRun()
     {
+||||||| 8c28a5f
+    prepareToRun()
+    {
+        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+
+=======
+    prepareToRun() {
+        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+
+>>>>>>> df197ef3b188771bcfb28b7b32565b281d337950
         let text = "";
         for (const benchmark of this.benchmarks) {
             const description = Object.keys(benchmark.subScores());
@@ -461,8 +470,7 @@ class Driver {
         });
     }
 
-    reportError(benchmark, error)
-    {
+    reportError(benchmark, error) {
         this.pushError(benchmark.name, error);
 
         if (!isInBrowser)
@@ -492,9 +500,16 @@ class Driver {
     async initialize() {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
+<<<<<<< HEAD
         this.initializeBenchmarks();
         await this.prefetchResourcesForBrowser();
         await this.fetchResources();
+||||||| 8c28a5f
+        await this.prefetchResourcesForBrowser();
+        await this.fetchResources();
+=======
+        await this.prefetchResources();
+>>>>>>> df197ef3b188771bcfb28b7b32565b281d337950
         this.prepareToRun();
         this.isReady = true;
         if (isInBrowser) {
@@ -505,14 +520,18 @@ class Driver {
         }
     }
 
-    async prefetchResourcesForBrowser() {
-        if (!isInBrowser)
+    async prefetchResources() {
+        if (!isInBrowser) {
+            for (const benchmark of this.benchmarks)
+                benchmark.prefetchResourcesForShell();
             return;
+        }
 
+        // TODO: Cleanup the browser path of the preloading below and in
+        // `prefetchResourcesForBrowser` / `retryPrefetchResourcesForBrowser`.
         const promises = [];
         for (const benchmark of this.benchmarks)
             promises.push(benchmark.prefetchResourcesForBrowser());
-
         await Promise.all(promises);
 
         const counter = JetStream.counter;
@@ -532,16 +551,6 @@ class Driver {
         }
 
         JetStream.loadCache = { }; // Done preloading all the files.
-    }
-
-    async fetchResources() {
-        const promises = [];
-        for (const benchmark of this.benchmarks)
-            promises.push(benchmark.fetchResources());
-        await Promise.all(promises);
-
-        if (!isInBrowser)
-            return;
 
         const statusElement = document.getElementById("status");
         statusElement.classList.remove('loading');
@@ -658,7 +667,7 @@ class Benchmark {
         this.iterations = getIterationCount(plan);
         this.isAsync = !!plan.isAsync;
         this.scripts = null;
-        this._resourcesPromise = null;
+        this.preloads = null;
         this._state = BenchmarkState.READY;
     }
 
@@ -670,11 +679,7 @@ class Benchmark {
     get isSuccess() { return this._state = BenchmarkState.DONE; }
 
     hasAnyTag(...tags) {
-        for (const tag of tags) {
-            if (this.tags.has(tag.toLowerCase()))
-                return true;
-        }
-        return false;
+        return tags.some((tag) => this.tags.has(tag.toLowerCase()));
     }
 
     get runnerCode() {
@@ -923,8 +928,8 @@ class Benchmark {
     }
 
     prefetchResourcesForBrowser() {
-        if (!isInBrowser)
-            return;
+        assert(isInBrowser);
+
         const promises = this.plan.files.map((file) => this.loadBlob("file", null, file).then((blobData) => {
                 if (!globalThis.allIsGood)
                     return;
@@ -956,6 +961,8 @@ class Benchmark {
     }
 
     async retryPrefetchResource(type, prop, file) {
+        assert(isInBrowser);
+
         const counter = JetStream.counter;
         const blobData = JetStream.blobDataCache[file];
         if (blobData.blob) {
@@ -990,8 +997,7 @@ class Benchmark {
     }
 
     async retryPrefetchResourcesForBrowser() {
-        if (!isInBrowser)
-            return;
+        assert(isInBrowser);
 
         const counter = JetStream.counter;
         for (const resource of this.plan.files) {
@@ -1011,33 +1017,14 @@ class Benchmark {
         return !counter.failedPreloadResources && counter.loadedResources == counter.totalResources;
     }
 
-    fetchResources() {
-        if (this._resourcesPromise)
-            return this._resourcesPromise;
+    prefetchResourcesForShell() {
+        assert(!isInBrowser);
 
-        this.preloads = [];
+        assert(this.scripts === null, "This initialization should be called only once.");
+        this.scripts = this.plan.files.map(file => fileLoader.load(file));
 
-        if (isInBrowser) {
-            this._resourcesPromise = Promise.resolve();
-            return this._resourcesPromise;
-        }
-
-        const filePromises = this.plan.files.map((file) => fileLoader.load(file));
-        this._resourcesPromise = Promise.all(filePromises).then((texts) => {
-            if (isInBrowser)
-                return;
-            this.scripts = [];
-            assert(texts.length === this.plan.files.length);
-            for (const text of texts)
-                this.scripts.push(text);
-        });
-
-        if (this.plan.preload) {
-            for (const prop of Object.getOwnPropertyNames(this.plan.preload))
-                this.preloads.push([ prop, this.plan.preload[prop] ]);
-        }
-
-        return this._resourcesPromise;
+        assert(this.preloads === null, "This initialization should be called only once.");
+        this.preloads = Object.entries(this.plan.preload ?? {});
     }
 
     scoreIdentifiers() { throw new Error("Must be implemented by subclasses"); }
@@ -1549,6 +1536,32 @@ class WasmLegacyBenchmark extends Benchmark {
         console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 };
+
+function dotnetPreloads(type)
+{
+    return {
+        dotnetUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.js`,
+        dotnetNativeUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.native.js`,
+        dotnetRuntimeUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.runtime.js`,
+        wasmBinaryUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.native.wasm`,
+        icuCustomUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/icudt_CJK.dat`,
+        dllCollectionsConcurrentUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Collections.Concurrent.wasm`,
+        dllCollectionsUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Collections.wasm`,
+        dllComponentModelPrimitivesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ComponentModel.Primitives.wasm`,
+        dllComponentModelTypeConverterUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ComponentModel.TypeConverter.wasm`,
+        dllDrawingPrimitivesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Drawing.Primitives.wasm`,
+        dllDrawingUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Drawing.wasm`,
+        dllIOPipelinesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.IO.Pipelines.wasm`,
+        dllLinqUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Linq.wasm`,
+        dllMemoryUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Memory.wasm`,
+        dllObjectModelUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ObjectModel.wasm`,
+        dllPrivateCorelibUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Private.CoreLib.wasm`,
+        dllRuntimeInteropServicesJavaScriptUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Runtime.InteropServices.JavaScript.wasm`,
+        dllTextEncodingsWebUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Text.Encodings.Web.wasm`,
+        dllTextJsonUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Text.Json.wasm`,
+        dllAppUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.wasm`,
+    }
+}
 
 let BENCHMARKS = [
     // ARES
@@ -2251,6 +2264,29 @@ let BENCHMARKS = [
         iterations: 40,
         tags: ["Default", "Wasm"],
     }),
+    // .NET
+    new AsyncBenchmark({
+        name: "dotnet-interp",
+        files: [
+            "./wasm/dotnet/interp.js",
+            "./wasm/dotnet/benchmark.js",
+        ],
+        preload: dotnetPreloads("interp"),
+        iterations: 10,
+        worstCaseCount: 2,
+        tags: ["Wasm", "dotnet"]
+    }),
+    new AsyncBenchmark({
+        name: "dotnet-aot",
+        files: [
+            "./wasm/dotnet/aot.js",
+            "./wasm/dotnet/benchmark.js",
+        ],
+        preload: dotnetPreloads("aot"),
+        iterations: 15,
+        worstCaseCount: 2,
+        tags: ["Wasm", "dotnet"]
+    })
 ];
 
 // LuaJSFight tests
