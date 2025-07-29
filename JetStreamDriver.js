@@ -2324,15 +2324,15 @@ function processTestList(testList)
     for (let name of benchmarkNames) {
         name = name.toLowerCase();
         if (benchmarksByTag.has(name))
-            benchmarks.push(...enableBenchmarksByTag(name));
+            benchmarks.push(...findBenchmarksByTag(name));
         else
-            benchmarks.push(enableBenchmarkByName(name));
+            benchmarks.push(findBenchmarkByName(name));
     }
     return benchmarks;
 }
 
 
-function enableBenchmarkByName(name) {
+function findBenchmarkByName(name) {
     const benchmark = benchmarksByName.get(name.toLowerCase());
 
     if (!benchmark)
@@ -2342,7 +2342,7 @@ function enableBenchmarkByName(name) {
 }
 
 
-function enableBenchmarksByTag(tag, excludeTags) {
+function findBenchmarksByTag(tag, excludeTags) {
     let benchmarks = benchmarksByTag.get(tag.toLowerCase());
     if (!benchmarks) {
         const validTags = Array.from(benchmarksByTag.keys()).join(", ");
@@ -2368,7 +2368,7 @@ if (typeof testList !== "undefined") {
 } else if (customTestList.length) {
     benchmarks = processTestList(customTestList);
 } else {
-    benchmarks = enableBenchmarksByTag("Default", defaultDisabledTags)
+    benchmarks = findBenchmarksByTag("Default", defaultDisabledTags)
 }
 
 this.JetStream = new Driver(benchmarks);
