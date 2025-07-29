@@ -999,12 +999,13 @@ class Benchmark {
     }
 
     updateUIBeforeRun() {
-        if (!isInBrowser) {
-            if (!dumpJSONResults)
-                console.log(`Running ${this.name}:`);
-            return;
-        }
+        if (!dumpJSONResults)
+            console.log(`Running ${this.name}:`);
+        if (isInBrowser)
+            this.updateUIBeforeRunInBrowser();
+    }
 
+    updateUIBeforeRunInBrowser() {
         const containerUI = document.getElementById("results");
         const resultsBenchmarkUI = document.getElementById(`benchmark-${this.name}`);
         containerUI.insertBefore(resultsBenchmarkUI, containerUI.firstChild);
@@ -1015,23 +1016,24 @@ class Benchmark {
     }
 
     updateUIAfterRun() {
-        if (!isInBrowser)
+        const scoreEntries = Object.entries(this.allScores());
+        if (isInBrowser)
+            this.updateUIAfterRunInBrowser(scoreEntries);
+        if (dumpJSONResults)
             return;
+        this.updateConsoleAfterRun(scoreEntries);
+    }
 
+    updateUIAfterRunInBrowser(scoreEntries) {
         const benchmarkResultsUI = document.getElementById(`benchmark-${this.name}`);
         benchmarkResultsUI.classList.remove("benchmark-running");
         benchmarkResultsUI.classList.add("benchmark-done");
 
-        const scoreEntries = Object.entries(this.allScores());
-        if (isInBrowser) {
-            for (const [name, value] of scoreEntries)
-                document.getElementById(this.scoreIdentifier(name)).innerHTML = uiFriendlyScore(value);
-        }
+        for (const [name, value] of scoreEntries)
+            document.getElementById(this.scoreIdentifier(name)).innerHTML = uiFriendlyScore(value);
+    }
 
-        if (dumpJSONResults)
-            return;
-
-        console.log(this.name);
+    updateConsoleAfterRun(scoreEntries) {
         // FIXME: consider removing this mapping.
         // Rename for backwards compatibility.
         const legacyScoreNameMap = {
