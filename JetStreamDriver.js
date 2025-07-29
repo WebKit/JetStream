@@ -220,15 +220,9 @@ class Driver {
         this.isReady = false;
         this.isDone = false;
         this.errors = [];
-<<<<<<< HEAD
         this.benchmarks = new Set();
-||||||| 8c28a5f
-        this.benchmarks = [];
-=======
-        this.benchmarks = [];
         // TODO: Cleanup / remove / merge `blobDataCache` and `loadCache` vs.
         // the global `fileLoader` cache.
->>>>>>> df197ef3b188771bcfb28b7b32565b281d337950
         this.blobDataCache = { };
         this.loadCache = { };
         this.counter = { };
@@ -237,20 +231,10 @@ class Driver {
         this.counter.failedPreloadResources = 0;
     }
 
-<<<<<<< HEAD
     enableBenchmark(benchmark) {
+        // TODO: Remove, make `this.benchmarks` immutable and set it once in the
+        // ctor instead of this and the global `addBenchmarksBy*` functions.
         this.benchmarks.add(benchmark);
-        benchmark.fetchResources();
-||||||| 8c28a5f
-    addBenchmark(benchmark) {
-        this.benchmarks.push(benchmark);
-        benchmark.fetchResources();
-=======
-    // TODO: Remove, make `this.benchmarks` immutable and set it once in the
-    // ctor instead of this and the global `addBenchmarksBy*` functions.
-    addBenchmark(benchmark) {
-        this.benchmarks.push(benchmark);
->>>>>>> df197ef3b188771bcfb28b7b32565b281d337950
     }
 
     enableBenchmarksByName(name) {
@@ -417,19 +401,9 @@ class Driver {
         return magicFrame;
     }
 
-<<<<<<< HEAD
-    prepareToRun()
-    {
-||||||| 8c28a5f
-    prepareToRun()
-    {
-        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
-
-=======
     prepareToRun() {
         this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
 
->>>>>>> df197ef3b188771bcfb28b7b32565b281d337950
         let text = "";
         for (const benchmark of this.benchmarks) {
             const description = Object.keys(benchmark.subScores());
@@ -500,16 +474,8 @@ class Driver {
     async initialize() {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
-<<<<<<< HEAD
         this.initializeBenchmarks();
-        await this.prefetchResourcesForBrowser();
-        await this.fetchResources();
-||||||| 8c28a5f
-        await this.prefetchResourcesForBrowser();
-        await this.fetchResources();
-=======
         await this.prefetchResources();
->>>>>>> df197ef3b188771bcfb28b7b32565b281d337950
         this.prepareToRun();
         this.isReady = true;
         if (isInBrowser) {
