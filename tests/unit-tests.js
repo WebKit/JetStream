@@ -61,10 +61,39 @@ function assertEquals(actual, expected, message) {
   }
 })();
 
+
 (function testDriverEnableDuplicateAndSort() {
     const benchmarks = [...findBenchmarksByTag("wasm"), ...findBenchmarksByTag("wasm")];
+    assertTrue(benchmarks.length > 0);
     const uniqueBenchmarks = new Set(benchmarks);
-    assertFalse(uniqueBenchmarks.size, benchmarks.length);
+    assertFalse(uniqueBenchmarks.size == benchmarks.length);
     const driver = new Driver(benchmarks);
     assertEquals(driver.benchmarks.length, uniqueBenchmarks.size);
-})
+})();
+
+
+(function testBenchmarkSubScores() {
+  for (const benchmark of BENCHMARKS) {
+    const subScores = benchmark.subScores();
+    assertTrue(subScores instanceof Object);
+    assertTrue(Object.keys(subScores).length > 0);
+    for (const [name, value] of Object.entries(subScores)) {
+      assertTrue(typeof(name) == "string");
+      // "Score" can only be part of allScores().
+      assertFalse(name == "Score");
+      // Without running all values should be null.
+      assertEquals(value, null);
+    }
+  }
+})();
+
+(function testBenchmarkAllScores() {
+  for (const benchmark of BENCHMARKS) {
+    const subScores = benchmark.subScores();
+    const allScores = benchmark.allScores();
+    assertTrue("Score" in allScores);
+    // All subScore items are part of allScores.
+    for (const name of Object.keys(subScores))
+      assertTrue(name in allScores);
+  }
+})();
