@@ -674,7 +674,7 @@ class Benchmark {
 
     allScores() {
         const allScores = this.subScores();
-        allScores["score"] =  this.score;
+        allScores["Score"] =  this.score;
         return allScores;
     }
 
@@ -1032,8 +1032,12 @@ class Benchmark {
             return;
 
         console.log(this.name);
-        for (const [name, value] of scoreEntries)
+        for (let [name, value] of scoreEntries) {
+            // Rename for backwards compatibility.
+            if (name == "Worst")
+                name = "Worst Case"
              console.log(`    ${name}:`, uiFriendlyScore(value));
+        }
         if (RAMification) {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
