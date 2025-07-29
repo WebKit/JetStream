@@ -2345,6 +2345,8 @@ for (const benchmark of BENCHMARKS) {
 this.JetStream = new Driver();
 
 
+%DebugPrint(this.JetStream);
+
 function processTestList(testList)
 {
     let benchmarkNames = [];
