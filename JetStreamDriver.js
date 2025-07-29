@@ -48,8 +48,8 @@ function getIntParam(urlParams, key) {
     const rawValue = urlParams.get(key);
     const value = parseInt(rawValue);
     if (value <= 0)
-        throw new Error(`Expected positive value for ${key}, but got ${rawValue}`)
-    return value
+        throw new Error(`Expected positive value for ${key}, but got ${rawValue}`);
+    return value;
 }
 
 function getTestListParam(urlParams, key) {

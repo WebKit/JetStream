@@ -25,7 +25,7 @@
 
 load("./shell-config.js")
 
-const cliFlags = {__proto__:null};
+const cliFlags = { __proto__: null };
 const cliArgs = [];
 if (globalThis.arguments?.length) {
     for (const argument of globalThis.arguments)
@@ -38,19 +38,19 @@ if (globalThis.arguments?.length) {
 
 function getIntFlag(flags, flag) {
     if (!(flag in flags))
-        return undefined
+        return undefined;
     const rawValue = flags[flag];
     const value = parseInt(rawValue);
     if (value <= 0)
-        throw new Error(`Expected positive value for ${flag}, but got ${rawValue}`)
-    return value
+        throw new Error(`Expected positive value for ${flag}, but got ${rawValue}`);
+    return value;
 }
 
 if ("--iteration-count" in cliFlags)
-    globalThis.testIterationCount = getIntFlag(cliFlags, "--iteration-count")
+    globalThis.testIterationCount = getIntFlag(cliFlags, "--iteration-count");
 
 if ("--worst-case-count" in cliFlags)
-    globalThis.testWorstCaseCount = getIntFlag(cliFlags, "--worst-case-count")
+    globalThis.testWorstCaseCount = getIntFlag(cliFlags, "--worst-case-count");
 
 if ("--dump-json-results" in cliFlags)
     globalThis.dumpJSONResults = true;
