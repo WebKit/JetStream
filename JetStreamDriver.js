@@ -1463,51 +1463,51 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "Air",
         files: [
-            "./ARES-6/Air/symbols.js"
-            , "./ARES-6/Air/tmp_base.js"
-            , "./ARES-6/Air/arg.js"
-            , "./ARES-6/Air/basic_block.js"
-            , "./ARES-6/Air/code.js"
-            , "./ARES-6/Air/frequented_block.js"
-            , "./ARES-6/Air/inst.js"
-            , "./ARES-6/Air/opcode.js"
-            , "./ARES-6/Air/reg.js"
-            , "./ARES-6/Air/stack_slot.js"
-            , "./ARES-6/Air/tmp.js"
-            , "./ARES-6/Air/util.js"
-            , "./ARES-6/Air/custom.js"
-            , "./ARES-6/Air/liveness.js"
-            , "./ARES-6/Air/insertion_set.js"
-            , "./ARES-6/Air/allocate_stack.js"
-            , "./ARES-6/Air/payload-gbemu-executeIteration.js"
-            , "./ARES-6/Air/payload-imaging-gaussian-blur-gaussianBlur.js"
-            , "./ARES-6/Air/payload-airjs-ACLj8C.js"
-            , "./ARES-6/Air/payload-typescript-scanIdentifier.js"
-            , "./ARES-6/Air/benchmark.js"
+            "./ARES-6/Air/symbols.js",
+            "./ARES-6/Air/tmp_base.js",
+            "./ARES-6/Air/arg.js",
+            "./ARES-6/Air/basic_block.js",
+            "./ARES-6/Air/code.js",
+            "./ARES-6/Air/frequented_block.js",
+            "./ARES-6/Air/inst.js",
+            "./ARES-6/Air/opcode.js",
+            "./ARES-6/Air/reg.js",
+            "./ARES-6/Air/stack_slot.js",
+            "./ARES-6/Air/tmp.js",
+            "./ARES-6/Air/util.js",
+            "./ARES-6/Air/custom.js",
+            "./ARES-6/Air/liveness.js",
+            "./ARES-6/Air/insertion_set.js",
+            "./ARES-6/Air/allocate_stack.js",
+            "./ARES-6/Air/payload-gbemu-executeIteration.js",
+            "./ARES-6/Air/payload-imaging-gaussian-blur-gaussianBlur.js",
+            "./ARES-6/Air/payload-airjs-ACLj8C.js",
+            "./ARES-6/Air/payload-typescript-scanIdentifier.js",
+            "./ARES-6/Air/benchmark.js",
         ],
         tags: ["Default", "ARES"],
     }),
     new DefaultBenchmark({
         name: "Basic",
         files: [
-            "./ARES-6/Basic/ast.js"
-            , "./ARES-6/Basic/basic.js"
-            , "./ARES-6/Basic/caseless_map.js"
-            , "./ARES-6/Basic/lexer.js"
-            , "./ARES-6/Basic/number.js"
-            , "./ARES-6/Basic/parser.js"
-            , "./ARES-6/Basic/random.js"
-            , "./ARES-6/Basic/state.js"
-            , "./ARES-6/Basic/util.js"
-            , "./ARES-6/Basic/benchmark.js"
+            "./ARES-6/Basic/ast.js",
+            "./ARES-6/Basic/basic.js",
+            "./ARES-6/Basic/caseless_map.js",
+            "./ARES-6/Basic/lexer.js",
+            "./ARES-6/Basic/number.js",
+            "./ARES-6/Basic/parser.js",
+            "./ARES-6/Basic/random.js",
+            "./ARES-6/Basic/state.js",
+            "./ARES-6/Basic/util.js",
+            "./ARES-6/Basic/benchmark.js",
         ],
         tags: ["Default", "ARES"],
     }),
     new DefaultBenchmark({
         name: "ML",
         files: [
-            "./ARES-6/ml/index.js"
-            , "./ARES-6/ml/benchmark.js"
+            "./ARES-6/ml/index.js",
+            "./ARES-6/ml/benchmark.js"
         ],
         iterations: 60,
         tags: ["Default", "ARES"],
@@ -1515,14 +1515,14 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "Babylon",
         files: [
-            "./ARES-6/Babylon/index.js"
-            , "./ARES-6/Babylon/benchmark.js"
+            "./ARES-6/Babylon/index.js",
+            "./ARES-6/Babylon/benchmark.js",
         ],
         preload: {
             airBlob: "./ARES-6/Babylon/air-blob.js",
             basicBlob: "./ARES-6/Babylon/basic-blob.js",
             inspectorBlob: "./ARES-6/Babylon/inspector-blob.js",
-            babylonBlob: "./ARES-6/Babylon/babylon-blob.js"
+            babylonBlob: "./ARES-6/Babylon/babylon-blob.js",
         },
         tags: ["Default", "ARES"],
     }),
@@ -1530,18 +1530,18 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "cdjs",
         files: [
-            "./cdjs/constants.js"
-            , "./cdjs/util.js"
-            , "./cdjs/red_black_tree.js"
-            , "./cdjs/call_sign.js"
-            , "./cdjs/vector_2d.js"
-            , "./cdjs/vector_3d.js"
-            , "./cdjs/motion.js"
-            , "./cdjs/reduce_collision_set.js"
-            , "./cdjs/simulator.js"
-            , "./cdjs/collision.js"
-            , "./cdjs/collision_detector.js"
-            , "./cdjs/benchmark.js"
+            "./cdjs/constants.js",
+            "./cdjs/util.js",
+            "./cdjs/red_black_tree.js",
+            "./cdjs/call_sign.js",
+            "./cdjs/vector_2d.js",
+            "./cdjs/vector_3d.js",
+            "./cdjs/motion.js",
+            "./cdjs/reduce_collision_set.js",
+            "./cdjs/simulator.js",
+            "./cdjs/collision.js",
+            "./cdjs/collision_detector.js",
+            "./cdjs/benchmark.js",
         ],
         iterations: 60,
         worstCaseCount: 3,
@@ -1551,20 +1551,20 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "first-inspector-code-load",
         files: [
-            "./code-load/code-first-load.js"
+            "./code-load/code-first-load.js",
         ],
         preload: {
-            inspectorPayloadBlob: "./code-load/inspector-payload-minified.js"
+            inspectorPayloadBlob: "./code-load/inspector-payload-minified.js",
         },
         tags: ["Default", "CodeLoad"],
     }),
     new AsyncBenchmark({
         name: "multi-inspector-code-load",
         files: [
-            "./code-load/code-multi-load.js"
+            "./code-load/code-multi-load.js",
         ],
         preload: {
-            inspectorPayloadBlob: "./code-load/inspector-payload-minified.js"
+            inspectorPayloadBlob: "./code-load/inspector-payload-minified.js",
         },
         tags: ["Default", "CodeLoad"],
     }),
@@ -1572,7 +1572,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "Box2D",
         files: [
-            "./Octane/box2d.js"
+            "./Octane/box2d.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "Octane"],
@@ -1580,7 +1580,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "octane-code-load",
         files: [
-            "./Octane/code-first-load.js"
+            "./Octane/code-first-load.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "Octane"],
@@ -1588,7 +1588,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "crypto",
         files: [
-            "./Octane/crypto.js"
+            "./Octane/crypto.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "Octane"],
@@ -1612,8 +1612,8 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "gbemu",
         files: [
-            "./Octane/gbemu-part1.js"
-            , "./Octane/gbemu-part2.js"
+            "./Octane/gbemu-part1.js",
+            "./Octane/gbemu-part2.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "Octane"],
@@ -1630,7 +1630,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "navier-stokes",
         files: [
-            "./Octane/navier-stokes.js"
+            "./Octane/navier-stokes.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "Octane"],
@@ -1638,7 +1638,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "pdfjs",
         files: [
-            "./Octane/pdfjs.js"
+            "./Octane/pdfjs.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "Octane"],
@@ -1646,14 +1646,14 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "raytrace",
         files: [
-            "./Octane/raytrace.js"
+            "./Octane/raytrace.js",
         ],
         tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
         name: "regexp",
         files: [
-            "./Octane/regexp.js"
+            "./Octane/regexp.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "Octane"],
@@ -1661,7 +1661,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "richards",
         files: [
-            "./Octane/richards.js"
+            "./Octane/richards.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "Octane"],
@@ -1669,7 +1669,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "splay",
         files: [
-            "./Octane/splay.js"
+            "./Octane/splay.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "Octane"],
@@ -1677,9 +1677,9 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "typescript",
         files: [
-            "./Octane/typescript-compiler.js"
-            , "./Octane/typescript-input.js"
-            , "./Octane/typescript.js"
+            "./Octane/typescript-compiler.js",
+            "./Octane/typescript-input.js",
+            "./Octane/typescript.js",
         ],
         iterations: 15,
         worstCaseCount: 2,
@@ -1690,28 +1690,28 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "FlightPlanner",
         files: [
-            "./RexBench/FlightPlanner/airways.js"
-            , "./RexBench/FlightPlanner/waypoints.js"
-            , "./RexBench/FlightPlanner/flight_planner.js"
-            , "./RexBench/FlightPlanner/expectations.js"
-            , "./RexBench/FlightPlanner/benchmark.js"
+            "./RexBench/FlightPlanner/airways.js",
+            "./RexBench/FlightPlanner/waypoints.js",
+            "./RexBench/FlightPlanner/flight_planner.js",
+            "./RexBench/FlightPlanner/expectations.js",
+            "./RexBench/FlightPlanner/benchmark.js",
         ],
         tags: ["Default", "RexBench"],
     }),
     new DefaultBenchmark({
         name: "OfflineAssembler",
         files: [
-            "./RexBench/OfflineAssembler/registers.js"
-            , "./RexBench/OfflineAssembler/instructions.js"
-            , "./RexBench/OfflineAssembler/ast.js"
-            , "./RexBench/OfflineAssembler/parser.js"
-            , "./RexBench/OfflineAssembler/file.js"
-            , "./RexBench/OfflineAssembler/LowLevelInterpreter.js"
-            , "./RexBench/OfflineAssembler/LowLevelInterpreter32_64.js"
-            , "./RexBench/OfflineAssembler/LowLevelInterpreter64.js"
-            , "./RexBench/OfflineAssembler/InitBytecodes.js"
-            , "./RexBench/OfflineAssembler/expected.js"
-            , "./RexBench/OfflineAssembler/benchmark.js"
+            "./RexBench/OfflineAssembler/registers.js",
+            "./RexBench/OfflineAssembler/instructions.js",
+            "./RexBench/OfflineAssembler/ast.js",
+            "./RexBench/OfflineAssembler/parser.js",
+            "./RexBench/OfflineAssembler/file.js",
+            "./RexBench/OfflineAssembler/LowLevelInterpreter.js",
+            "./RexBench/OfflineAssembler/LowLevelInterpreter32_64.js",
+            "./RexBench/OfflineAssembler/LowLevelInterpreter64.js",
+            "./RexBench/OfflineAssembler/InitBytecodes.js",
+            "./RexBench/OfflineAssembler/expected.js",
+            "./RexBench/OfflineAssembler/benchmark.js",
         ],
         iterations: 80,
         tags: ["Default", "RexBench"],
@@ -1719,9 +1719,9 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "UniPoker",
         files: [
-            "./RexBench/UniPoker/poker.js"
-            , "./RexBench/UniPoker/expected.js"
-            , "./RexBench/UniPoker/benchmark.js"
+            "./RexBench/UniPoker/poker.js",
+            "./RexBench/UniPoker/expected.js",
+            "./RexBench/UniPoker/benchmark.js",
         ],
         deterministicRandom: true,
         tags: ["Default", "RexBench"],
@@ -1730,7 +1730,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "hash-map",
         files: [
-            "./simple/hash-map.js"
+            "./simple/hash-map.js",
         ],
         tags: ["Default", "Simple"],
     }),
@@ -1759,39 +1759,39 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "gaussian-blur",
         files: [
-            "./SeaMonster/gaussian-blur.js"
+            "./SeaMonster/gaussian-blur.js",
         ],
         tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "stanford-crypto-aes",
         files: [
-            "./SeaMonster/sjlc.js"
-            , "./SeaMonster/stanford-crypto-aes.js"
+            "./SeaMonster/sjlc.js",
+            "./SeaMonster/stanford-crypto-aes.js",
         ],
         tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "stanford-crypto-pbkdf2",
         files: [
-            "./SeaMonster/sjlc.js"
-            , "./SeaMonster/stanford-crypto-pbkdf2.js"
+            "./SeaMonster/sjlc.js",
+            "./SeaMonster/stanford-crypto-pbkdf2.js"
         ],
         tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "stanford-crypto-sha256",
         files: [
-            "./SeaMonster/sjlc.js"
-            , "./SeaMonster/stanford-crypto-sha256.js"
+            "./SeaMonster/sjlc.js",
+            "./SeaMonster/stanford-crypto-sha256.js",
         ],
         tags: ["Default", "SeaMonster"],
     }),
     new DefaultBenchmark({
         name: "json-stringify-inspector",
         files: [
-            "./SeaMonster/inspector-json-payload.js"
-            , "./SeaMonster/json-stringify-inspector.js"
+            "./SeaMonster/inspector-json-payload.js",
+            "./SeaMonster/json-stringify-inspector.js",
         ],
         iterations: 20,
         worstCaseCount: 2,
@@ -1800,8 +1800,8 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "json-parse-inspector",
         files: [
-            "./SeaMonster/inspector-json-payload.js"
-            , "./SeaMonster/json-parse-inspector.js"
+            "./SeaMonster/inspector-json-payload.js",
+            "./SeaMonster/json-parse-inspector.js",
         ],
         iterations: 20,
         worstCaseCount: 2,
@@ -1939,10 +1939,10 @@ let BENCHMARKS = [
         name: "HashSet-wasm",
         files: [
             "./wasm/HashSet/build/HashSet.js",
-            "./wasm/HashSet/benchmark.js"
+            "./wasm/HashSet/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/HashSet/build/HashSet.wasm"
+            wasmBinary: "./wasm/HashSet/build/HashSet.wasm",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -1954,7 +1954,7 @@ let BENCHMARKS = [
             "./wasm/TSF/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/TSF/build/tsf.wasm"
+            wasmBinary: "./wasm/TSF/build/tsf.wasm",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -1966,7 +1966,7 @@ let BENCHMARKS = [
             "./wasm/quicksort/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/quicksort/build/quicksort.wasm"
+            wasmBinary: "./wasm/quicksort/build/quicksort.wasm",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -1978,7 +1978,7 @@ let BENCHMARKS = [
             "./wasm/gcc-loops/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/gcc-loops/build/gcc-loops.wasm"
+            wasmBinary: "./wasm/gcc-loops/build/gcc-loops.wasm",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -1987,10 +1987,10 @@ let BENCHMARKS = [
         name: "richards-wasm",
         files: [
             "./wasm/richards/build/richards.js",
-            "./wasm/richards/benchmark.js"
+            "./wasm/richards/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/richards/build/richards.wasm"
+            wasmBinary: "./wasm/richards/build/richards.wasm",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -2002,7 +2002,7 @@ let BENCHMARKS = [
             "./sqlite3/build/jswasm/speedtest1.js",
         ],
         preload: {
-            wasmBinary: "./sqlite3/build/jswasm/speedtest1.wasm"
+            wasmBinary: "./sqlite3/build/jswasm/speedtest1.wasm",
         },
         iterations: 30,
         worstCaseCount: 2,
@@ -2032,7 +2032,7 @@ let BENCHMARKS = [
             "./wasm/tfjs-model-use-vocab.js",
             "./wasm/tfjs-bundle.js",
             "./wasm/tfjs.js",
-            "./wasm/tfjs-benchmark.js"
+            "./wasm/tfjs-benchmark.js",
         ],
         preload: {
             tfjsBackendWasmBlob: "./wasm/tfjs-backend-wasm.wasm",
@@ -2052,7 +2052,7 @@ let BENCHMARKS = [
             "./wasm/tfjs-model-use-vocab.js",
             "./wasm/tfjs-bundle.js",
             "./wasm/tfjs.js",
-            "./wasm/tfjs-benchmark.js"
+            "./wasm/tfjs-benchmark.js",
         ],
         preload: {
             tfjsBackendWasmSimdBlob: "./wasm/tfjs-backend-wasm-simd.wasm",
@@ -2068,7 +2068,7 @@ let BENCHMARKS = [
             "./wasm/argon2/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/argon2/build/argon2.wasm"
+            wasmBinary: "./wasm/argon2/build/argon2.wasm",
         },
         iterations: 30,
         worstCaseCount: 3,
@@ -2083,42 +2083,42 @@ let BENCHMARKS = [
         ],
         iterations: 80,
         preload: {
-            rayTrace3D: "./worker/bomb-subtests/3d-raytrace.js"
-            , accessNbody: "./worker/bomb-subtests/access-nbody.js"
-            , morph3D: "./worker/bomb-subtests/3d-morph.js"
-            , cube3D: "./worker/bomb-subtests/3d-cube.js"
-            , accessFunnkuch: "./worker/bomb-subtests/access-fannkuch.js"
-            , accessBinaryTrees: "./worker/bomb-subtests/access-binary-trees.js"
-            , accessNsieve: "./worker/bomb-subtests/access-nsieve.js"
-            , bitopsBitwiseAnd: "./worker/bomb-subtests/bitops-bitwise-and.js"
-            , bitopsNsieveBits: "./worker/bomb-subtests/bitops-nsieve-bits.js"
-            , controlflowRecursive: "./worker/bomb-subtests/controlflow-recursive.js"
-            , bitops3BitBitsInByte: "./worker/bomb-subtests/bitops-3bit-bits-in-byte.js"
-            , botopsBitsInByte: "./worker/bomb-subtests/bitops-bits-in-byte.js"
-            , cryptoAES: "./worker/bomb-subtests/crypto-aes.js"
-            , cryptoMD5: "./worker/bomb-subtests/crypto-md5.js"
-            , cryptoSHA1: "./worker/bomb-subtests/crypto-sha1.js"
-            , dateFormatTofte: "./worker/bomb-subtests/date-format-tofte.js"
-            , dateFormatXparb: "./worker/bomb-subtests/date-format-xparb.js"
-            , mathCordic: "./worker/bomb-subtests/math-cordic.js"
-            , mathPartialSums: "./worker/bomb-subtests/math-partial-sums.js"
-            , mathSpectralNorm: "./worker/bomb-subtests/math-spectral-norm.js"
-            , stringBase64: "./worker/bomb-subtests/string-base64.js"
-            , stringFasta: "./worker/bomb-subtests/string-fasta.js"
-            , stringValidateInput: "./worker/bomb-subtests/string-validate-input.js"
-            , stringTagcloud: "./worker/bomb-subtests/string-tagcloud.js"
-            , stringUnpackCode: "./worker/bomb-subtests/string-unpack-code.js"
-            , regexpDNA: "./worker/bomb-subtests/regexp-dna.js"
+            rayTrace3D: "./worker/bomb-subtests/3d-raytrace.js",
+            accessNbody: "./worker/bomb-subtests/access-nbody.js",
+            morph3D: "./worker/bomb-subtests/3d-morph.js",
+            cube3D: "./worker/bomb-subtests/3d-cube.js",
+            accessFunnkuch: "./worker/bomb-subtests/access-fannkuch.js",
+            accessBinaryTrees: "./worker/bomb-subtests/access-binary-trees.js",
+            accessNsieve: "./worker/bomb-subtests/access-nsieve.js",
+            bitopsBitwiseAnd: "./worker/bomb-subtests/bitops-bitwise-and.js",
+            bitopsNsieveBits: "./worker/bomb-subtests/bitops-nsieve-bits.js",
+            controlflowRecursive: "./worker/bomb-subtests/controlflow-recursive.js",
+            bitops3BitBitsInByte: "./worker/bomb-subtests/bitops-3bit-bits-in-byte.js",
+            botopsBitsInByte: "./worker/bomb-subtests/bitops-bits-in-byte.js",
+            cryptoAES: "./worker/bomb-subtests/crypto-aes.js",
+            cryptoMD5: "./worker/bomb-subtests/crypto-md5.js",
+            cryptoSHA1: "./worker/bomb-subtests/crypto-sha1.js",
+            dateFormatTofte: "./worker/bomb-subtests/date-format-tofte.js",
+            dateFormatXparb: "./worker/bomb-subtests/date-format-xparb.js",
+            mathCordic: "./worker/bomb-subtests/math-cordic.js",
+            mathPartialSums: "./worker/bomb-subtests/math-partial-sums.js",
+            mathSpectralNorm: "./worker/bomb-subtests/math-spectral-norm.js",
+            stringBase64: "./worker/bomb-subtests/string-base64.js",
+            stringFasta: "./worker/bomb-subtests/string-fasta.js",
+            stringValidateInput: "./worker/bomb-subtests/string-validate-input.js",
+            stringTagcloud: "./worker/bomb-subtests/string-tagcloud.js",
+            stringUnpackCode: "./worker/bomb-subtests/string-unpack-code.js",
+            regexpDNA: "./worker/bomb-subtests/regexp-dna.js",
         },
         tags: ["Default", "WorkerTests"],
     }),
     new AsyncBenchmark({
         name: "segmentation",
         files: [
-            "./worker/segmentation.js"
+            "./worker/segmentation.js",
         ],
         preload: {
-            asyncTaskBlob: "./worker/async-task.js"
+            asyncTaskBlob: "./worker/async-task.js",
         },
         iterations: 36,
         worstCaseCount: 3,
@@ -2127,7 +2127,156 @@ let BENCHMARKS = [
     // WSL
     new WSLBenchmark({
         name: "WSL",
-        files: ["./WSL/Node.js" ,"./WSL/Type.js" ,"./WSL/ReferenceType.js" ,"./WSL/Value.js" ,"./WSL/Expression.js" ,"./WSL/Rewriter.js" ,"./WSL/Visitor.js" ,"./WSL/CreateLiteral.js" ,"./WSL/CreateLiteralType.js" ,"./WSL/PropertyAccessExpression.js" ,"./WSL/AddressSpace.js" ,"./WSL/AnonymousVariable.js" ,"./WSL/ArrayRefType.js" ,"./WSL/ArrayType.js" ,"./WSL/Assignment.js" ,"./WSL/AutoWrapper.js" ,"./WSL/Block.js" ,"./WSL/BoolLiteral.js" ,"./WSL/Break.js" ,"./WSL/CallExpression.js" ,"./WSL/CallFunction.js" ,"./WSL/Check.js" ,"./WSL/CheckLiteralTypes.js" ,"./WSL/CheckLoops.js" ,"./WSL/CheckRecursiveTypes.js" ,"./WSL/CheckRecursion.js" ,"./WSL/CheckReturns.js" ,"./WSL/CheckUnreachableCode.js" ,"./WSL/CheckWrapped.js" ,"./WSL/Checker.js" ,"./WSL/CloneProgram.js" ,"./WSL/CommaExpression.js" ,"./WSL/ConstexprFolder.js" ,"./WSL/ConstexprTypeParameter.js" ,"./WSL/Continue.js" ,"./WSL/ConvertPtrToArrayRefExpression.js" ,"./WSL/DereferenceExpression.js" ,"./WSL/DoWhileLoop.js" ,"./WSL/DotExpression.js" ,"./WSL/DoubleLiteral.js" ,"./WSL/DoubleLiteralType.js" ,"./WSL/EArrayRef.js" ,"./WSL/EBuffer.js" ,"./WSL/EBufferBuilder.js" ,"./WSL/EPtr.js" ,"./WSL/EnumLiteral.js" ,"./WSL/EnumMember.js" ,"./WSL/EnumType.js" ,"./WSL/EvaluationCommon.js" ,"./WSL/Evaluator.js" ,"./WSL/ExpressionFinder.js" ,"./WSL/ExternalOrigin.js" ,"./WSL/Field.js" ,"./WSL/FindHighZombies.js" ,"./WSL/FlattenProtocolExtends.js" ,"./WSL/FlattenedStructOffsetGatherer.js" ,"./WSL/FloatLiteral.js" ,"./WSL/FloatLiteralType.js" ,"./WSL/FoldConstexprs.js" ,"./WSL/ForLoop.js" ,"./WSL/Func.js" ,"./WSL/FuncDef.js" ,"./WSL/FuncInstantiator.js" ,"./WSL/FuncParameter.js" ,"./WSL/FunctionLikeBlock.js" ,"./WSL/HighZombieFinder.js" ,"./WSL/IdentityExpression.js" ,"./WSL/IfStatement.js" ,"./WSL/IndexExpression.js" ,"./WSL/InferTypesForCall.js" ,"./WSL/Inline.js" ,"./WSL/Inliner.js" ,"./WSL/InstantiateImmediates.js" ,"./WSL/IntLiteral.js" ,"./WSL/IntLiteralType.js" ,"./WSL/Intrinsics.js" ,"./WSL/LateChecker.js" ,"./WSL/Lexer.js" ,"./WSL/LexerToken.js" ,"./WSL/LiteralTypeChecker.js" ,"./WSL/LogicalExpression.js" ,"./WSL/LogicalNot.js" ,"./WSL/LoopChecker.js" ,"./WSL/MakeArrayRefExpression.js" ,"./WSL/MakePtrExpression.js" ,"./WSL/NameContext.js" ,"./WSL/NameFinder.js" ,"./WSL/NameResolver.js" ,"./WSL/NativeFunc.js" ,"./WSL/NativeFuncInstance.js" ,"./WSL/NativeType.js" ,"./WSL/NativeTypeInstance.js" ,"./WSL/NormalUsePropertyResolver.js" ,"./WSL/NullLiteral.js" ,"./WSL/NullType.js" ,"./WSL/OriginKind.js" ,"./WSL/OverloadResolutionFailure.js" ,"./WSL/Parse.js" ,"./WSL/Prepare.js" ,"./WSL/Program.js" ,"./WSL/ProgramWithUnnecessaryThingsRemoved.js" ,"./WSL/PropertyResolver.js" ,"./WSL/Protocol.js" ,"./WSL/ProtocolDecl.js" ,"./WSL/ProtocolFuncDecl.js" ,"./WSL/ProtocolRef.js" ,"./WSL/PtrType.js" ,"./WSL/ReadModifyWriteExpression.js" ,"./WSL/RecursionChecker.js" ,"./WSL/RecursiveTypeChecker.js" ,"./WSL/ResolveNames.js" ,"./WSL/ResolveOverloadImpl.js" ,"./WSL/ResolveProperties.js" ,"./WSL/ResolveTypeDefs.js" ,"./WSL/Return.js" ,"./WSL/ReturnChecker.js" ,"./WSL/ReturnException.js" ,"./WSL/StandardLibrary.js" ,"./WSL/StatementCloner.js" ,"./WSL/StructLayoutBuilder.js" ,"./WSL/StructType.js" ,"./WSL/Substitution.js" ,"./WSL/SwitchCase.js" ,"./WSL/SwitchStatement.js" ,"./WSL/SynthesizeEnumFunctions.js" ,"./WSL/SynthesizeStructAccessors.js" ,"./WSL/TrapStatement.js" ,"./WSL/TypeDef.js" ,"./WSL/TypeDefResolver.js" ,"./WSL/TypeOrVariableRef.js" ,"./WSL/TypeParameterRewriter.js" ,"./WSL/TypeRef.js" ,"./WSL/TypeVariable.js" ,"./WSL/TypeVariableTracker.js" ,"./WSL/TypedValue.js" ,"./WSL/UintLiteral.js" ,"./WSL/UintLiteralType.js" ,"./WSL/UnificationContext.js" ,"./WSL/UnreachableCodeChecker.js" ,"./WSL/VariableDecl.js" ,"./WSL/VariableRef.js" ,"./WSL/VisitingSet.js" ,"./WSL/WSyntaxError.js" ,"./WSL/WTrapError.js" ,"./WSL/WTypeError.js" ,"./WSL/WhileLoop.js" ,"./WSL/WrapChecker.js", "./WSL/Test.js"],
+        files: [
+            "./WSL/Node.js",
+            "./WSL/Type.js",
+            "./WSL/ReferenceType.js",
+            "./WSL/Value.js",
+            "./WSL/Expression.js",
+            "./WSL/Rewriter.js",
+            "./WSL/Visitor.js",
+            "./WSL/CreateLiteral.js",
+            "./WSL/CreateLiteralType.js",
+            "./WSL/PropertyAccessExpression.js",
+            "./WSL/AddressSpace.js",
+            "./WSL/AnonymousVariable.js",
+            "./WSL/ArrayRefType.js",
+            "./WSL/ArrayType.js",
+            "./WSL/Assignment.js",
+            "./WSL/AutoWrapper.js",
+            "./WSL/Block.js",
+            "./WSL/BoolLiteral.js",
+            "./WSL/Break.js",
+            "./WSL/CallExpression.js",
+            "./WSL/CallFunction.js",
+            "./WSL/Check.js",
+            "./WSL/CheckLiteralTypes.js",
+            "./WSL/CheckLoops.js",
+            "./WSL/CheckRecursiveTypes.js",
+            "./WSL/CheckRecursion.js",
+            "./WSL/CheckReturns.js",
+            "./WSL/CheckUnreachableCode.js",
+            "./WSL/CheckWrapped.js",
+            "./WSL/Checker.js",
+            "./WSL/CloneProgram.js",
+            "./WSL/CommaExpression.js",
+            "./WSL/ConstexprFolder.js",
+            "./WSL/ConstexprTypeParameter.js",
+            "./WSL/Continue.js",
+            "./WSL/ConvertPtrToArrayRefExpression.js",
+            "./WSL/DereferenceExpression.js",
+            "./WSL/DoWhileLoop.js",
+            "./WSL/DotExpression.js",
+            "./WSL/DoubleLiteral.js",
+            "./WSL/DoubleLiteralType.js",
+            "./WSL/EArrayRef.js",
+            "./WSL/EBuffer.js",
+            "./WSL/EBufferBuilder.js",
+            "./WSL/EPtr.js",
+            "./WSL/EnumLiteral.js",
+            "./WSL/EnumMember.js",
+            "./WSL/EnumType.js",
+            "./WSL/EvaluationCommon.js",
+            "./WSL/Evaluator.js",
+            "./WSL/ExpressionFinder.js",
+            "./WSL/ExternalOrigin.js",
+            "./WSL/Field.js",
+            "./WSL/FindHighZombies.js",
+            "./WSL/FlattenProtocolExtends.js",
+            "./WSL/FlattenedStructOffsetGatherer.js",
+            "./WSL/FloatLiteral.js",
+            "./WSL/FloatLiteralType.js",
+            "./WSL/FoldConstexprs.js",
+            "./WSL/ForLoop.js",
+            "./WSL/Func.js",
+            "./WSL/FuncDef.js",
+            "./WSL/FuncInstantiator.js",
+            "./WSL/FuncParameter.js",
+            "./WSL/FunctionLikeBlock.js",
+            "./WSL/HighZombieFinder.js",
+            "./WSL/IdentityExpression.js",
+            "./WSL/IfStatement.js",
+            "./WSL/IndexExpression.js",
+            "./WSL/InferTypesForCall.js",
+            "./WSL/Inline.js",
+            "./WSL/Inliner.js",
+            "./WSL/InstantiateImmediates.js",
+            "./WSL/IntLiteral.js",
+            "./WSL/IntLiteralType.js",
+            "./WSL/Intrinsics.js",
+            "./WSL/LateChecker.js",
+            "./WSL/Lexer.js",
+            "./WSL/LexerToken.js",
+            "./WSL/LiteralTypeChecker.js",
+            "./WSL/LogicalExpression.js",
+            "./WSL/LogicalNot.js",
+            "./WSL/LoopChecker.js",
+            "./WSL/MakeArrayRefExpression.js",
+            "./WSL/MakePtrExpression.js",
+            "./WSL/NameContext.js",
+            "./WSL/NameFinder.js",
+            "./WSL/NameResolver.js",
+            "./WSL/NativeFunc.js",
+            "./WSL/NativeFuncInstance.js",
+            "./WSL/NativeType.js",
+            "./WSL/NativeTypeInstance.js",
+            "./WSL/NormalUsePropertyResolver.js",
+            "./WSL/NullLiteral.js",
+            "./WSL/NullType.js",
+            "./WSL/OriginKind.js",
+            "./WSL/OverloadResolutionFailure.js",
+            "./WSL/Parse.js",
+            "./WSL/Prepare.js",
+            "./WSL/Program.js",
+            "./WSL/ProgramWithUnnecessaryThingsRemoved.js",
+            "./WSL/PropertyResolver.js",
+            "./WSL/Protocol.js",
+            "./WSL/ProtocolDecl.js",
+            "./WSL/ProtocolFuncDecl.js",
+            "./WSL/ProtocolRef.js",
+            "./WSL/PtrType.js",
+            "./WSL/ReadModifyWriteExpression.js",
+            "./WSL/RecursionChecker.js",
+            "./WSL/RecursiveTypeChecker.js",
+            "./WSL/ResolveNames.js",
+            "./WSL/ResolveOverloadImpl.js",
+            "./WSL/ResolveProperties.js",
+            "./WSL/ResolveTypeDefs.js",
+            "./WSL/Return.js",
+            "./WSL/ReturnChecker.js",
+            "./WSL/ReturnException.js",
+            "./WSL/StandardLibrary.js",
+            "./WSL/StatementCloner.js",
+            "./WSL/StructLayoutBuilder.js",
+            "./WSL/StructType.js",
+            "./WSL/Substitution.js",
+            "./WSL/SwitchCase.js",
+            "./WSL/SwitchStatement.js",
+            "./WSL/SynthesizeEnumFunctions.js",
+            "./WSL/SynthesizeStructAccessors.js",
+            "./WSL/TrapStatement.js",
+            "./WSL/TypeDef.js",
+            "./WSL/TypeDefResolver.js",
+            "./WSL/TypeOrVariableRef.js",
+            "./WSL/TypeParameterRewriter.js",
+            "./WSL/TypeRef.js",
+            "./WSL/TypeVariable.js",
+            "./WSL/TypeVariableTracker.js",
+            "./WSL/TypedValue.js",
+            "./WSL/UintLiteral.js",
+            "./WSL/UintLiteralType.js",
+            "./WSL/UnificationContext.js",
+            "./WSL/UnreachableCodeChecker.js",
+            "./WSL/VariableDecl.js",
+            "./WSL/VariableRef.js",
+            "./WSL/VisitingSet.js",
+            "./WSL/WSyntaxError.js",
+            "./WSL/WTrapError.js",
+            "./WSL/WTypeError.js",
+            "./WSL/WhileLoop.js",
+            "./WSL/WrapChecker.js", 
+            "./WSL/Test.js",
+        ],
         tags: ["Default", "WSL"],
     }),
     // 8bitbench
@@ -2140,7 +2289,7 @@ let BENCHMARKS = [
         ],
         preload: {
             wasmBinary: "./8bitbench/build/rust/pkg/emu_bench_bg.wasm",
-            romBinary: "./8bitbench/build/assets/program.bin"
+            romBinary: "./8bitbench/build/assets/program.bin",
         },
         iterations: 15,
         worstCaseCount: 2,
@@ -2203,18 +2352,18 @@ for (const test of luaJSFightTests) {
 
 // SunSpider tests
 const SUNSPIDER_TESTS = [
-    "3d-cube"
-    , "3d-raytrace"
-    , "base64"
-    , "crypto-aes"
-    , "crypto-md5"
-    , "crypto-sha1"
-    , "date-format-tofte"
-    , "date-format-xparb"
-    , "n-body"
-    , "regex-dna"
-    , "string-unpack-code"
-    , "tagcloud"
+    "3d-cube",
+    "3d-raytrace",
+    "base64",
+    "crypto-aes",
+    "crypto-md5",
+    "crypto-sha1",
+    "date-format-tofte",
+    "date-format-xparb",
+    "n-body",
+    "regex-dna",
+    "string-unpack-code",
+    "tagcloud",
 ];
 for (const test of SUNSPIDER_TESTS) {
     BENCHMARKS.push(new DefaultBenchmark({
@@ -2228,22 +2377,22 @@ for (const test of SUNSPIDER_TESTS) {
 
 // WTB (Web Tooling Benchmark) tests
 const WTB_TESTS = [
-    "acorn"
-    , "babylon"
-    , "chai"
-    , "coffeescript"
-    , "espree"
-    , "jshint"
-    , "lebab"
-    , "prepack"
-    , "uglify-js"
+    "acorn",
+    "babylon",
+    "chai",
+    "coffeescript",
+    "espree",
+    "jshint",
+    "lebab",
+    "prepack",
+    "uglify-js",
 ];
 for (const name of WTB_TESTS) {
     BENCHMARKS.push(new DefaultBenchmark({
         name: `${name}-wtb`,
         files: [
-            isInBrowser ? "./web-tooling-benchmark/browser.js" : "./web-tooling-benchmark/cli.js"
-            , `./web-tooling-benchmark/${name}.js`
+            (isInBrowser ? "./web-tooling-benchmark/browser.js" : "./web-tooling-benchmark/cli.js"),
+            `./web-tooling-benchmark/${name}.js`,
         ],
         iterations: 5,
         worstCaseCount: 1,
