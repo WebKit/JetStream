@@ -4,7 +4,7 @@ import serve from "./server.mjs";
 import { Builder, Capabilities } from "selenium-webdriver";
 import commandLineArgs from "command-line-args";
 
-import {log, logError, printHelp, runTest} from "helper.mjs"
+import {log, logInfo, logError, printHelp, runTest} from "./helper.mjs";
 
 const optionDefinitions = [
     { name: "browser", type: String, description: "Set the browser to test, choices are [safari, firefox, chrome, edge]. By default the $BROWSER env variable is used." },
@@ -59,21 +59,30 @@ const server = await serve(PORT);
 
 async function runTests() {
     let success = true;
-    success &&= await runTest("Run Single Suite", testEnd2End({ test: "proxy-mbox" }));
-    success &&= await runTest("Run Disabled Suite", testEnd2End({ tags: "disabled" }));
-    success &&= await runTest("Run Default Suite", testEnd2End());
+    try {
+        success &&= await runTest("Run Single Suite", () => testEnd2End({ test: "proxy-mobx" }));
+        success &&= await runTest("Run Disabled Suite", () => testEnd2End({ tag: "disabled" }));
+        success &&= await runTest("Run Default Suite", () => testEnd2End());
+    } finally {
+        server.close();
+    }
     if (!success)
-      process.exit(1)
+      process.exit(1);
 }
 
 
-async function testEnd2End(params) {
+async function testEnd2End(params ) {
     const driver = await new Builder().withCapabilities(capabilities).build();
+    const urlParams = Object.assign({
+            worstCaseCount: 2,
+            iterationCount: 3 
+        }, params);
     let results;
     try {
-        const url = `http://localhost:${PORT}/index.html?worstCaseCount=2&iterationCount=3`;
-        log(`JetStream PREPARE ${url}`);
-        await driver.get(url);
+        const url = new URL(`http://localhost:${PORT}/index.html`);
+        url.search = new URLSearchParams(urlParams).toString();
+        logInfo(`JetStream PREPARE ${url}`);
+        await driver.get(url.toString());
         await driver.executeAsyncScript((callback) => {
             // callback() is explicitly called without the default event
             // as argument to avoid serialization issues with chromedriver.
@@ -81,23 +90,19 @@ async function testEnd2End(params) {
             // We might not get a chance to install the on-ready listener, thus
             // we also check if the runner is ready synchronously.
             if (globalThis?.JetStream?.isReady)
-                callback()
+                callback();
         });
         results = await benchmarkResults(driver);
         // FIXME: validate results;
-        log("\n✅ Tests completed!");
     } catch(e) {
-        logError("\n❌ Tests failed!");
-        logError(e);
         throw e;
     } finally {
         driver.quit();
-        server.close();
     }
 }
 
 async function benchmarkResults(driver) {
-    log("JetStream START");
+    logInfo("JetStream START");
     await driver.manage().setTimeouts({ script: 60_000 });
     await driver.executeAsyncScript((callback) => {
         globalThis.JetStream.start();

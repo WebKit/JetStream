@@ -7,9 +7,9 @@ import { styleText } from "node:util";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
-import core from "@actions/core"
+import core from "@actions/core";
 
-import {log, logError, logGroup, printHelp, runTest, GITHUB_ACTIONS_OUTPUT} from "./helper.mjs"
+import {logInfo, logError, logGroup, printHelp, runTest, GITHUB_ACTIONS_OUTPUT} from "./helper.mjs";
 
 const optionDefinitions = [
   { name: "shell", type: String, description: "Set the shell to test, choices are [jsc, v8, spidermonkey]." },
@@ -50,7 +50,7 @@ const UNIT_TEST_PATH = path.join(SRC_DIR, "tests", "unit-tests.js");
 
 function convertCliArgs(cli, ...cliArgs) {
   if (SHELL_NAME == "spidermonkey")
-    return [cli, ...cliArgs]
+    return [cli, ...cliArgs];
   return [cli, "--", ...cliArgs];
 }
 
@@ -75,19 +75,19 @@ function sh(binary, ...args) {
     }
   } finally {
     if (GITHUB_ACTIONS_OUTPUT)
-      core.endGroup()
+      core.endGroup();
   }
 }
 
 async function runTests() {
-    const shellBinary = logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
+    const shellBinary = await logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
     let success = true;
     success &&= await runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
     success &&= await runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
     success &&= await runCLITest("Run Disabled Suite", shellBinary, "disabled");
     success &&= await runCLITest("Run Default Suite",  shellBinary);
     if (!success)
-      process.exit(1)
+      process.exit(1);
 }
 
 function jsvuOSName() {
@@ -106,7 +106,7 @@ function jsvuOSName() {
           default: throw new Error("Unsupported architecture");
       }
   };
-  return `${osName()}${osArch()}`
+  return `${osName()}${osArch()}`;
 }
 
 const DEFAULT_JSC_LOCATION = "/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc"
@@ -115,11 +115,11 @@ function testSetup() {
     sh("jsvu", `--engines=${SHELL_NAME}`, `--os=${jsvuOSName()}`);
     let shellBinary = path.join(os.homedir(), ".jsvu/bin", SHELL_NAME);
     if (!fs.existsSync(shellBinary) && SHELL_NAME == "javascriptcore")
-      shellBinary = DEFAULT_JSC_LOCATION
+      shellBinary = DEFAULT_JSC_LOCATION;
     if (!fs.existsSync(shellBinary))
       throw new Error(`Could not find shell binary: ${shellBinary}`);
-    log(`Installed JavaScript Shell: ${shellBinary}`);
-    return shellBinary
+    logInfo(`Installed JavaScript Shell: ${shellBinary}`);
+    return shellBinary;
 }
 
 function runCLITest(name, shellBinary, ...args) {
