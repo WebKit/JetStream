@@ -39,8 +39,7 @@ globalThis.testWorstCaseCountMap ??= new Map();
 globalThis.dumpJSONResults ??= false;
 globalThis.testList ??= undefined;
 globalThis.startDelay ??= undefined;
-
-let shouldReport = false;
+globalThis.shouldReport ??= false;
 
 function getIntParam(urlParams, key) {
     if (!urlParams.has(key))
@@ -60,10 +59,11 @@ function getTestListParam(urlParams, key) {
 
 if (typeof(URLSearchParams) !== "undefined") {
     const urlParameters = new URLSearchParams(window.location.search);
-    shouldReport = urlParameters.has('report') && urlParameters.get('report').toLowerCase() == 'true';
+    if (urlParameters.has("report"))
+        globalThis.shouldReport = urlParameters.get("report").toLowerCase() == "true";
     if (urlParameters.has("startDelay"))
         globalThis.startDelay = getIntParam(urlParameters, "startDelay");
-    if (shouldReport && !globalThis.startDelay)
+    if (globalThis.shouldReport && !globalThis.startDelay)
         globalThis.startDelay = 4000;
     if (urlParameters.has("tag"))
         globalThis.testList = getTestListParam(urlParameters, "tag");
@@ -601,7 +601,7 @@ class Driver {
         if (!isInBrowser)
             return;
 
-        if (!shouldReport)
+        if (!globalThis.shouldReport)
             return;
 
         const content = this.resultsJSON();
