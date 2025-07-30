@@ -19,9 +19,12 @@ function assertEquals(actual, expected, message) {
   }
 }
 
-(function testTagsAreStrings() {
+(function testTagsAreLowerCaseStrings() {
   for (const benchmark of BENCHMARKS) {
-    benchmark.tags.forEach(tag => assertTrue(typeof(tag) == "string"))
+    benchmark.tags.forEach(tag => {
+        assertTrue(typeof(tag) == "string");
+        assertTrue(tag == tag.toLowerCase());
+    })
   }
 })();
 
@@ -29,10 +32,12 @@ function assertEquals(actual, expected, message) {
 
 (function testTagsAll() {
   for (const benchmark of BENCHMARKS) {
-    assertTrue(benchmark.tags instanceof Set);
-    assertTrue(benchmark.tags.size > 0);
-    assertTrue(benchmark.tags.has("all"));
-    assertFalse(benchmark.tags.has("All"));
+    const tags = benchmark.tags;
+    assertTrue(tags instanceof Set);
+    assertTrue(tags.size > 0);
+    assertTrue(tags.has("all"));
+    assertFalse(tags.has("All"));
+    assertTrue(tags.has("default") || tags.has("disabled"));
   }
 })();
 

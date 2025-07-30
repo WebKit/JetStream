@@ -612,14 +612,22 @@ class Benchmark {
     constructor(plan)
     {
         this.plan = plan;
-        this.tags = new Set(plan.tags.map(each => each.toLowerCase()));
-        if (this.tags.size != plan.tags.length)
-            throw new Error(`${this.name} got duplicate tags: ${plan.tags.join()}`);
+        this.tags = this.processTags(plan.tags)
         this.iterations = getIterationCount(plan);
         this.isAsync = !!plan.isAsync;
         this.scripts = null;
         this.preloads = null;
         this._state = BenchmarkState.READY;
+    }
+
+    processTags(rawTags) {
+        const tags = new Set(rawTags.map(each => each.toLowerCase()));
+        if (tags.size != rawTags.length)
+            throw new Error(`${this.name} got duplicate tags: ${rawTags.join()}`);
+        tags.add("all");
+        if (!tags.has("default"))
+            tags.add("disabled");
+        return tags;
     }
 
     get name() { return this.plan.name; }
@@ -2184,22 +2192,23 @@ let BENCHMARKS = [
     })
 ];
 
-// LuaJSFight tests
-const luaJSFightTests = [
-    "hello_world"
-    , "list_search"
-    , "lists"
-    , "string_lists"
-];
-for (const test of luaJSFightTests) {
-    BENCHMARKS.push(new DefaultBenchmark({
-        name: `${test}-LJF`,
-        files: [
-            `./LuaJSFight/${test}.js`
-        ],
-        tags: ["LuaJSFight"],
-    }));
-}
+// FIXME: figure out what to do this these benchmarks.
+// // LuaJSFight tests
+// const luaJSFightTests = [
+//     "hello_world"
+//     , "list_search"
+//     , "lists"
+//     , "string_lists"
+// ];
+// for (const test of luaJSFightTests) {
+//     BENCHMARKS.push(new DefaultBenchmark({
+//         name: `${test}-LJF`,
+//         files: [
+//             `./LuaJSFight/${test}.js`
+//         ],
+//         tags: ["LuaJSFight"],
+//     }));
+// }
 
 // SunSpider tests
 const SUNSPIDER_TESTS = [
@@ -2263,8 +2272,6 @@ for (const benchmark of BENCHMARKS) {
     else
         benchmarksByName.set(name, benchmark);
     
-    benchmark.tags.add("all");
-
     for (const tag of benchmark.tags) {
         if (benchmarksByTag.has(tag))
             benchmarksByTag.get(tag).push(benchmark);

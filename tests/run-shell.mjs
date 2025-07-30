@@ -112,7 +112,7 @@ const SPAWN_OPTIONS =  {
   stdio: ["inherit", "inherit", "inherit"]
 };
 
-function sh(binary, args) {
+function sh(binary, ...args) {
   const cmd = `${binary} ${args.join(" ")}`;
   if (GITHUB_ACTIONS_OUTPUT) {
     core.startGroup(binary);
@@ -135,11 +135,10 @@ function sh(binary, args) {
 async function runTests() {
     const shellBinary = logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
     let success = true;
-    success &&= runTest("Run UnitTests", () => sh(shellBinary, [UNIT_TEST_PATH]));
-    success &&= runTest("Run Complete Suite", () => sh(shellBinary, convertCliArgs(CLI_PATH)));
-    success &&= runTest("Run Single Suite", () => {
-      sh(shellBinary, convertCliArgs(CLI_PATH, "proxy-mobx"));
-    });
+    success &&= runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
+    success &&= runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
+    success &&= runCLITest("Run Disabled Suite", shellBinary, "disabled");
+    success &&= runCLITest("Run Default Suite",  shellBinary);
     if (!success) {
       process.exit(1)
     }
@@ -167,7 +166,7 @@ function jsvuOSName() {
 const DEFAULT_JSC_LOCATION = "/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc"
 
 function testSetup() {
-    sh("jsvu", [`--engines=${SHELL_NAME}`, `--os=${jsvuOSName()}`]);
+    sh("jsvu", `--engines=${SHELL_NAME}`, `--os=${jsvuOSName()}`);
     let shellBinary = path.join(os.homedir(), ".jsvu/bin", SHELL_NAME);
     if (!fs.existsSync(shellBinary) && SHELL_NAME == "javascriptcore")
       shellBinary = DEFAULT_JSC_LOCATION
@@ -175,6 +174,10 @@ function testSetup() {
       throw new Error(`Could not find shell binary: ${shellBinary}`);
     log(`Installed JavaScript Shell: ${shellBinary}`);
     return shellBinary
+}
+
+function runCLITest(name, shellBinary, ...args) {
+  return runTest(name, () => sh(shellBinary, ...convertCliArgs(CLI_PATH, ...args)));
 }
 
 function runTest(testName, test) {
