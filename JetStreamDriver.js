@@ -809,7 +809,7 @@ class Benchmark {
         } catch(e) {
             this._state = BenchmarkState.ERROR;
             console.log("Error in runCode: ", e);
-            console.log(e.stack)
+            console.log(e.stack);
             throw e;
         } finally {
             this._state = BenchmarkState.FINALIZE;
@@ -1507,7 +1507,7 @@ let BENCHMARKS = [
         name: "ML",
         files: [
             "./ARES-6/ml/index.js",
-            "./ARES-6/ml/benchmark.js"
+            "./ARES-6/ml/benchmark.js",
         ],
         iterations: 60,
         tags: ["Default", "ARES"],
@@ -1882,7 +1882,7 @@ let BENCHMARKS = [
             "./proxy/vue-bundle.js",
             "./proxy/vue-benchmark.js",
         ],
-        tags: ["Default", "Proxy"]
+        tags: ["Default", "Proxy"],
     }),
     // Class fields
     new DefaultBenchmark({
@@ -1890,14 +1890,14 @@ let BENCHMARKS = [
         files: [
             "./class-fields/raytrace-public-class-fields.js",
         ],
-        tags: ["Default", "ClassFields"]
+        tags: ["Default", "ClassFields"],
     }),
     new DefaultBenchmark({
         name: "raytrace-private-class-fields",
         files: [
             "./class-fields/raytrace-private-class-fields.js",
         ],
-        tags: ["Default", "ClassFields"]
+        tags: ["Default", "ClassFields"],
     }),
     // Generators
     new AsyncBenchmark({
@@ -1908,7 +1908,7 @@ let BENCHMARKS = [
         iterations: 80,
         worstCaseCount: 6,
         deterministicRandom: true,
-        tags: ["Default", "Generators"]
+        tags: ["Default", "Generators"],
     }),
     new DefaultBenchmark({
         name: "sync-fs",
@@ -1918,21 +1918,21 @@ let BENCHMARKS = [
         iterations: 80,
         worstCaseCount: 6,
         deterministicRandom: true,
-        tags: ["Default", "Generators"]
+        tags: ["Default", "Generators"],
     }),
     new DefaultBenchmark({
         name: "lazy-collections",
         files: [
             "./generators/lazy-collections.js",
         ],
-        tags: ["Default", "Generators"]
+        tags: ["Default", "Generators"],
     }),
     new DefaultBenchmark({
         name: "js-tokens",
         files: [
             "./generators/js-tokens.js",
         ],
-        tags: ["Default", "Generators"]
+        tags: ["Default", "Generators"],
     }),
     // Wasm
     new WasmEMCCBenchmark({
@@ -2079,7 +2079,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "bomb-workers",
         files: [
-            "./worker/bomb.js"
+            "./worker/bomb.js",
         ],
         iterations: 80,
         preload: {
@@ -2318,7 +2318,7 @@ let BENCHMARKS = [
         preload: dotnetPreloads("interp"),
         iterations: 10,
         worstCaseCount: 2,
-        tags: ["Default", "Wasm", "dotnet"]
+        tags: ["Default", "Wasm", "dotnet"],
     }),
     new AsyncBenchmark({
         name: "dotnet-aot",
@@ -2329,7 +2329,7 @@ let BENCHMARKS = [
         preload: dotnetPreloads("aot"),
         iterations: 15,
         worstCaseCount: 2,
-        tags: ["Default", "Wasm", "dotnet"]
+        tags: ["Default", "Wasm", "dotnet"],
     })
 ];
 
