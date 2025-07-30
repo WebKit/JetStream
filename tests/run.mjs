@@ -4,7 +4,7 @@ import serve from "./server.mjs";
 import { Builder, Capabilities } from "selenium-webdriver";
 import commandLineArgs from "command-line-args";
 
-import {log, logInfo, logError, printHelp, runTest} from "./helper.mjs";
+import {logInfo, logError, printHelp, runTest} from "./helper.mjs";
 
 const optionDefinitions = [
     { name: "browser", type: String, description: "Set the browser to test, choices are [safari, firefox, chrome, edge]. By default the $BROWSER env variable is used." },
@@ -151,7 +151,7 @@ function logIncrementalResult(previousResults, benchmarkResults) {
     for (const [testName, testResults] of Object.entries(benchmarkResults)) {
         if (previousResults.has(testName))
             continue;
-        log(testName, testResults);
+        console.log(testName, testResults);
         previousResults.add(testName);
     }
 }

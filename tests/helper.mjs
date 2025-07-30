@@ -4,13 +4,6 @@ import commandLineUsage from "command-line-usage";
 
 export const GITHUB_ACTIONS_OUTPUT = "GITHUB_ACTIONS_OUTPUT" in process.env;
 
-export function log(...args) {
-  if (GITHUB_ACTIONS_OUTPUT)
-    core.info(args.join(" "));
-  else
-    console.log(...args);
-}
-
 export function logInfo(...args) {
   const text = args.join(" ")
   if (GITHUB_ACTIONS_OUTPUT)
