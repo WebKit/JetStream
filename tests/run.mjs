@@ -6,7 +6,7 @@ import commandLineArgs from "command-line-args";
 import commandLineUsage from "command-line-usage";
 
 const optionDefinitions = [
-    { name: "browser", type: String, description: "Set the browser to test, choices are [safari, firefox, chrome]. By default the $BROWSER env variable is used." },
+    { name: "browser", type: String, description: "Set the browser to test, choices are [safari, firefox, chrome, edge]. By default the $BROWSER env variable is used." },
     { name: "port", type: Number, defaultValue: 8010, description: "Set the test-server port, The default value is 8010." },
     { name: "help", alias: "h", description: "Print this help text." },
 ];

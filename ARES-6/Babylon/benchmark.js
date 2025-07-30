@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2017 Apple Inc. All rights reserved.
+ * Copyright (C) 2017-2025 Apple Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
@@ -26,34 +26,18 @@
 "use strict";
 
 class Benchmark {
-    constructor(verbose = 0)
-    {
+    async init(verbose = 0) {
         let sources = [];
 
         const files = [
-              [isInBrowser ? airBlob : "./ARES-6/Babylon/air-blob.js", {}]
-            , [isInBrowser ? basicBlob : "./ARES-6/Babylon/basic-blob.js", {}]
-            , [isInBrowser ? inspectorBlob : "./ARES-6/Babylon/inspector-blob.js", {}]
-            , [isInBrowser ? babylonBlob : "./ARES-6/Babylon/babylon-blob.js", {sourceType: "module"}]
+              [airBlob, {}]
+            , [basicBlob, {}]
+            , [inspectorBlob, {}]
+            , [babylonBlob, {sourceType: "module"}]
         ];
 
-        for (let [file, options] of files) {
-            function appendSource(s) {
-                sources.push([file, s, options]);
-            }
-
-            let s;
-            if (isInBrowser) {
-                let request = new XMLHttpRequest();
-                request.open('GET', file, false);
-                request.send(null);
-                if (!request.responseText.length)
-                    throw new Error("Expect non-empty sources");
-                appendSource(request.responseText);
-            } else {
-                appendSource(read(file));
-            }
-        }
+        for (let [file, options] of files)
+            sources.push([file, await getString(file), options]);
 
         this.sources = sources;
     }

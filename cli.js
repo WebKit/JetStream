@@ -23,56 +23,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-globalThis.prefetchResources = true;
-const isInBrowser = false;
-console = {
-    log: globalThis?.console?.log ?? print,
-    warn: globalThis?.console?.warn ?? print,
-    error: globalThis?.console?.error ?? print,
-}
-
-const isD8 = typeof Realm !== "undefined";
-if (isD8)
-    globalThis.readFile = read;
-const isSpiderMonkey = typeof newGlobal !== "undefined";
-if (isSpiderMonkey)
-    globalThis.readFile = readRelativeToScript;
-
-
-let cliFlags = {};
-let cliArgs = [];
-
-if (typeof arguments != "undefined" && arguments.length > 0) {
-    for (const arg of arguments) {
-        if (arg.startsWith("--")) {
-            const parts = arg.split("=");
-            cliFlags[parts[0]] = parts.slice(1).join("=");
-        } else {
-            cliArgs.push(arg);
-        }
-    }
-}
-
-if (typeof testList === "undefined") {
-    if (cliArgs.length > 0) {
-        testList = cliArgs;
-    } else {
-        testList = undefined;
-    }
-}
-
-if ("--no-prefetch" in cliFlags || "--noprefetch" in cliFlags)
-   globalThis.prefetchResources = false
-
-
-if (typeof testIterationCount === "undefined")
-    testIterationCount = undefined;
-
-if (typeof runMode !== "undefined" && runMode == "RAMification")
-    RAMification = true;
-else
-    RAMification = false;
-
+load("./shell-config.js")
 load("./JetStreamDriver.js");
 
 async function runJetStream() {
@@ -96,6 +47,5 @@ if ("--help" in cliFlags) {
     for (const test of testPlans)
         print("  ", test.name)
 } else {
-    print("Running tests: " + testList)
     runJetStream();
 }

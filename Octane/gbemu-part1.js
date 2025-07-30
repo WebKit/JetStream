@@ -39,7 +39,11 @@ function runGameboy() {
     GameBoyAudioNode.run();
   }
 
+  var resultHash = gameboy.canvas.resultHash;
+
   resetGlobalVariables();
+
+  return resultHash;
 }
 
 function tearDownGameboy() {
@@ -56,7 +60,7 @@ var expectedGameboyStateStr =
 
 var GameBoyWindow = { };
 
-function GameBoyContext() {
+function GameBoyContext(canvas) {
   this.createBuffer = function() {
     return new Buffer();
   }
@@ -69,20 +73,21 @@ function GameBoyContext() {
   this.putImageData = function (buffer, x, y) {
     var sum = 0;
     for (var i = 0; i < buffer.data.length; i++) {
-      sum += i * buffer.data[i];
-      sum = sum % 1000;
+      sum ^= (i * buffer.data[i]) | 0;
     }
+    canvas.resultHash ^= sum;
   }
   this.drawImage = function () { }
 };
 
 function GameBoyCanvas() {
   this.getContext = function() {
-    return new GameBoyContext();
+    return new GameBoyContext(this);
   }
   this.width = 160;
   this.height = 144;
   this.style = { visibility: "visibile" };
+  this.resultHash = 0x1a2b3c4f;
 }
 
 function cout(message, colorIndex) {

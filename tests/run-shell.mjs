@@ -66,11 +66,13 @@ const SHELL_NAME = (function() {
 const FILE_PATH = fileURLToPath(import.meta.url);
 const SRC_DIR = path.dirname(path.dirname(FILE_PATH));
 const CLI_PATH = path.join(SRC_DIR, "cli.js");
+const UNIT_TEST_PATH = path.join(SRC_DIR, "tests", "unit-tests.js");
 
-const BASE_CLI_ARGS_WITH_OPTIONS = [CLI_PATH];
-if (SHELL_NAME != "spidermonkey")
-  BASE_CLI_ARGS_WITH_OPTIONS.push("--");
-Object.freeze(BASE_CLI_ARGS_WITH_OPTIONS);
+function convertCliArgs(cli, ...cliArgs) {
+  if (SHELL_NAME == "spidermonkey")
+    return [cli, ...cliArgs]
+  return [cli, "--", ...cliArgs];
+}
 
 const GITHUB_ACTIONS_OUTPUT = "GITHUB_ACTIONS_OUTPUT" in process.env;
 
@@ -133,10 +135,10 @@ function sh(binary, args) {
 async function runTests() {
     const shellBinary = logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
     let success = true;
-    success &&= runTest("Run Complete Suite", () => sh(shellBinary, [CLI_PATH]));
+    success &&= runTest("Run UnitTests", () => sh(shellBinary, [UNIT_TEST_PATH]));
+    success &&= runTest("Run Complete Suite", () => sh(shellBinary, convertCliArgs(CLI_PATH)));
     success &&= runTest("Run Single Suite", () => {
-      const singleTestArgs = [...BASE_CLI_ARGS_WITH_OPTIONS, "proxy-mobx"];
-      sh(shellBinary, singleTestArgs);
+      sh(shellBinary, convertCliArgs(CLI_PATH, "proxy-mobx"));
     });
     if (!success) {
       process.exit(1)

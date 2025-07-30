@@ -76,6 +76,10 @@ const version = 0x13;
 const saltLength = 12;
 
 class Benchmark {
+    async init() {
+        Module.wasmBinary = await getBinary(wasmBinary);
+    }
+
     async runIteration() {
         // Instantiate the Wasm module before the first run.
         if (!Module._argon2_hash) {
