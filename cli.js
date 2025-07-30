@@ -46,17 +46,16 @@ function getIntFlag(flags, flag) {
     return value;
 }
 
-globalThis.testIterationCount = getIntFlag(cliFlags, "--iteration-count");
-globalThis.testWorstCaseCount = getIntFlag(cliFlags, "--worst-case-count");
-
+if ("--iteration-count" in cliFlags)
+    globalThis.testIterationCount = getIntFlag(cliFlags, "--iteration-count");
+if ("--worst-case-count" in cliFlags)
+    globalThis.testWorstCaseCount = getIntFlag(cliFlags, "--worst-case-count");
 if ("--dump-json-results" in cliFlags)
     globalThis.dumpJSONResults = true;
-
 if (typeof runMode !== "undefined" && runMode == "RAMification")
     globalThis.RAMification = true;
 if ("--ramification" in cliFlags)
     globalThis.RAMification = true;
-
 if (cliArgs.length)
     globalThis.testList = cliArgs;
 

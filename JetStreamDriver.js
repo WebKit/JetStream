@@ -61,15 +61,18 @@ function getTestListParam(urlParams, key) {
 if (typeof(URLSearchParams) !== "undefined") {
     const urlParameters = new URLSearchParams(window.location.search);
     shouldReport = urlParameters.has('report') && urlParameters.get('report').toLowerCase() == 'true';
-    globalThis.startDelay = getIntParam(urlParameters, "startDelay");
+    if (urlParameters.has("startDelay"))
+        globalThis.startDelay = getIntParam(urlParameters, "startDelay");
     if (shouldReport && !globalThis.startDelay)
         globalThis.startDelay = 4000;
     if (urlParameters.has("tag"))
         globalThis.testList = getTestListParam(urlParameters, "tag");
     if (urlParameters.has("test"))
         globalThis.testList = getTestListParam(urlParameters, "test");
-    globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
-    globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
+    if (urlParameters.has("iterationCount"))
+        globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
+    if (urlParameters.has("worstCaseCount"))
+        globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
 }
 
 // Used for the promise representing the current benchmark run.
