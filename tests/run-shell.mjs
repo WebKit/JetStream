@@ -1,7 +1,6 @@
 #! /usr/bin/env node
 
 import commandLineArgs from "command-line-args";
-import commandLineUsage from "command-line-usage";
 import { spawnSync } from  "child_process";
 import { fileURLToPath } from "url";
 import { styleText } from "node:util";
@@ -10,40 +9,21 @@ import * as fs from "fs";
 import * as os from "os";
 import core from "@actions/core"
 
+import {log, logError, logGroup, printHelp, runTest, GITHUB_ACTIONS_OUTPUT} from "./helper.mjs"
+
 const optionDefinitions = [
   { name: "shell", type: String, description: "Set the shell to test, choices are [jsc, v8, spidermonkey]." },
   { name: "help", alias: "h", description: "Print this help text." },
 ];
 
-function printHelp(message = "") {
-  const usage = commandLineUsage([
-      {
-          header: "Run all tests",
-      },
-      {
-          header: "Options",
-          optionList: optionDefinitions,
-      },
-  ]);
-  if (!message) {
-      console.log(usage);
-      process.exit(0);
-  } else {
-      console.error(message);
-      console.error();
-      console.error(usage);
-      process.exit(1);
-  }
-}
-
 const options = commandLineArgs(optionDefinitions);
 
 if ("help" in options)
-  printHelp();
+  printHelp(optionDefinitions);
 
 const JS_SHELL= options?.shell;
 if (!JS_SHELL)
-  printHelp("No javascript shell specified, use --shell");
+  printHelp("No javascript shell specified, use --shell", optionDefinitions);
 
 const SHELL_NAME = (function() {
   switch (JS_SHELL) {
@@ -74,39 +54,6 @@ function convertCliArgs(cli, ...cliArgs) {
   return [cli, "--", ...cliArgs];
 }
 
-const GITHUB_ACTIONS_OUTPUT = "GITHUB_ACTIONS_OUTPUT" in process.env;
-
-function log(...args) {
-  const text = args.join(" ")
-  if (GITHUB_ACTIONS_OUTPUT)
-    core.info(styleText("yellow", text))
-  else
-    console.log(styleText("yellow", text))
-}
-
-function logError(...args) {
-  const text = args.join(" ")
-  if (GITHUB_ACTIONS_OUTPUT)
-    core.error(styleText("red", text))
-  else
-    console.error(styleText("red", text))
-}
-
-function logGroup(name, body) {
-  if (GITHUB_ACTIONS_OUTPUT) {
-    core.startGroup(name);
-  } else {
-    log("=".repeat(80))
-    log(name);
-    log(".".repeat(80))
-  }
-  try {
-    return body();
-  } finally {
-    if (GITHUB_ACTIONS_OUTPUT)
-      core.endGroup();
-  } 
-}
 
 const SPAWN_OPTIONS =  { 
   stdio: ["inherit", "inherit", "inherit"]
@@ -135,13 +82,12 @@ function sh(binary, ...args) {
 async function runTests() {
     const shellBinary = logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
     let success = true;
-    success &&= runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
-    success &&= runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
-    success &&= runCLITest("Run Disabled Suite", shellBinary, "disabled");
-    success &&= runCLITest("Run Default Suite",  shellBinary);
-    if (!success) {
+    success &&= await runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
+    success &&= await runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
+    success &&= await runCLITest("Run Disabled Suite", shellBinary, "disabled");
+    success &&= await runCLITest("Run Default Suite",  shellBinary);
+    if (!success)
       process.exit(1)
-    }
 }
 
 function jsvuOSName() {
@@ -178,16 +124,6 @@ function testSetup() {
 
 function runCLITest(name, shellBinary, ...args) {
   return runTest(name, () => sh(shellBinary, ...convertCliArgs(CLI_PATH, ...args)));
-}
-
-function runTest(testName, test) {
-    try {
-      logGroup(testName, test)
-    } catch(e) {
-      logError("TEST FAILED")
-      return false
-    }
-    return true
 }
 
 setImmediate(runTests);
