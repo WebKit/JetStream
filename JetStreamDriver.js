@@ -82,7 +82,7 @@ if (typeof(URLSearchParams) !== "undefined") {
 }
 
 if (!globalThis.prefetchResources)
-    console.warn("Disabling resource prefetching!", globalThis.prefetchResources)
+    console.warn("Disabling resource prefetching!");
 
 // Used for the promise representing the current benchmark run.
 this.currentResolve = null;
