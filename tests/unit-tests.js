@@ -37,7 +37,7 @@ function assertEquals(actual, expected, message) {
     assertTrue(tags.size > 0);
     assertTrue(tags.has("all"));
     assertFalse(tags.has("All"));
-    assertTrue(tags.has("default") || tags.has("disabled"));
+    assertTrue(tags.has("default") ^ tags.has("disabled"));
   }
 })();
 
