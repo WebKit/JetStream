@@ -37,15 +37,5 @@ async function runJetStream() {
     }
 }
 
-if ("--help" in cliFlags) {
-    print("JetStream Driver Help")
-    print("")
-    print("Options:")
-    print("   --no-prefetch: directly use load('...') for benchmark resources.")
-    print("")
-    print("Available tests:")
-    for (const test of testPlans)
-        print("  ", test.name)
-} else {
-    runJetStream();
-}
+// FIXME: Add flag for setting prefetch resources
+runJetStream();

@@ -78,7 +78,7 @@ if (typeof(URLSearchParams) !== "undefined") {
         globalThis.testList = getTestListParam(urlParameters, "test");
     globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
     globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
-    globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources", true);
+    globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources", globalThis.prefetchResources);
 }
 
 if (!globalThis.prefetchResources)
@@ -189,7 +189,7 @@ function uiFriendlyDuration(time) {
 // TODO: Cleanup / remove / merge. This is only used for caching loads in the
 // non-browser setting. In the browser we use exclusively `loadCache`, 
 // `loadBlob`, `doLoadBlob`, `prefetchResourcesForBrowser` etc., see below.
-class FileLoader {
+class ShellFileLoader {
     constructor() {
         this.requests = new Map;
     }
@@ -198,6 +198,8 @@ class FileLoader {
     // share common code.
     load(url) {
         assert(!isInBrowser);
+        if (!globalThis.prefetchResources)
+            return `load("${url}");`
 
         if (this.requests.has(url)) {
             return this.requests.get(url);
@@ -207,52 +209,9 @@ class FileLoader {
         this.requests.set(url, contents);
         return contents;
     }
+};
 
-    async _loadInternal(url) {
-        if (!isInBrowser) {
-            if (!globalThis.prefetchResources)
-                return Promise.resolve(`load("${url}");`);
-            return Promise.resolve(readFile(url));
-        }
-
-        if (!globalThis.prefetchResources)
-            return Promise.resolve(`<script src="${url}"></script>"`);
-
-        let response;
-        const tries = 3;
-        while (tries--) {
-            let hasError = false;
-            try {
-                response = await fetch(url);
-            } catch (e) {
-                hasError = true;
-            }
-            if (!hasError && response.ok)
-                break;
-            if (tries)
-                continue;
-            globalThis.allIsGood = false;
-            throw new Error("Fetch failed");
-        }
-        if (url.indexOf(".js") !== -1)
-            return response.text();
-        else if (url.indexOf(".wasm") !== -1)
-            return response.arrayBuffer();
-
-        throw new Error("should not be reached!");
-    }
-
-    async load(url) {
-        if (this.requests.has(url))
-            return this.requests.get(url);
-
-        const promise = this._loadInternal(url);
-        this.requests.set(url, promise);
-        return promise;
-    }
-}
-
-const fileLoader = new FileLoader();
+const fileLoader = new ShellFileLoader();
 
 class Driver {
     constructor() {
@@ -835,10 +794,7 @@ class Benchmark {
         } else {
             const cache = JetStream.blobDataCache;
             for (const file of this.plan.files) {
-                if (globalThis.prefetchResources)
-                    addScriptWithURL(cache[file].blobURL);
-                else
-                    addScriptWithURL(file);
+                addScriptWithURL(globalThis.prefetchResources ? cache[file].blobURL : file);
             }
         }
 
@@ -894,7 +850,7 @@ class Benchmark {
     async doLoadBlob(resource) {
         const blobData = JetStream.blobDataCache[resource];
         if (!globalThis.prefetchResources) {
-            blobData.blobURL = resource; 
+            blobData.blobURL = resource;
             return blobData;
         }
         let response;
