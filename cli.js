@@ -46,16 +46,15 @@ function getIntFlag(flags, flag) {
     return value;
 }
 
-if ("--iteration-count" in cliFlags)
-    globalThis.testIterationCount = getIntFlag(cliFlags, "--iteration-count");
-
-if ("--worst-case-count" in cliFlags)
-    globalThis.testWorstCaseCount = getIntFlag(cliFlags, "--worst-case-count");
+globalThis.testIterationCount = getIntFlag(cliFlags, "--iteration-count");
+globalThis.testWorstCaseCount = getIntFlag(cliFlags, "--worst-case-count");
 
 if ("--dump-json-results" in cliFlags)
     globalThis.dumpJSONResults = true;
 
 if (typeof runMode !== "undefined" && runMode == "RAMification")
+    globalThis.RAMification = true;
+if ("--ramification" in cliFlags)
     globalThis.RAMification = true;
 
 if (cliArgs.length)
@@ -81,7 +80,7 @@ if ("--help" in cliFlags) {
 
     console.log("Options:");
     console.log("   --iteration-count:  Set the default iteration count.");
-    console.log("   ---worst-case-count: Set the default worst-case count");
+    console.log("   --worst-case-count: Set the default worst-case count");
     console.log("   --dump-json-results: Print summary json to the console.");
     console.log("");
 
