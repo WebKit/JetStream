@@ -71,7 +71,7 @@ async function runTests() {
 }
 
 
-async function testEnd2End(params ) {
+async function testEnd2End(params) {
     const driver = await new Builder().withCapabilities(capabilities).build();
     const urlParams = Object.assign({
             worstCaseCount: 2,
