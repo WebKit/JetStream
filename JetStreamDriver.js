@@ -966,7 +966,7 @@ class Benchmark {
         this.preloads = Object.entries(this.plan.preload ?? {});
     }
 
-    scoreIdentifiers() { 
+    scoreIdentifiers() {
         const ids = Object.keys(this.allScores()).map(name => this.scoreIdentifier(name));
         return ids;
     }
@@ -1910,6 +1910,15 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "Generators"],
     }),
+    new DefaultBenchmark({
+        name: "threejs",
+        files: [
+            "./threejs/three.js",
+            "./threejs/benchmark.js",
+        ],
+        deterministicRandom: true,
+        tags: ["Default", "ThreeJs"],
+    }),
     // Wasm
     new WasmEMCCBenchmark({
         name: "HashSet-wasm",
@@ -2250,7 +2259,7 @@ let BENCHMARKS = [
             "./WSL/WTrapError.js",
             "./WSL/WTypeError.js",
             "./WSL/WhileLoop.js",
-            "./WSL/WrapChecker.js", 
+            "./WSL/WrapChecker.js",
             "./WSL/Test.js",
         ],
         tags: ["Default", "WSL"],
@@ -2371,7 +2380,7 @@ for (const benchmark of BENCHMARKS) {
         throw new Error(`Duplicate benchmark with name "${name}}"`);
     else
         benchmarksByName.set(name, benchmark);
-    
+
     for (const tag of benchmark.tags) {
         if (benchmarksByTag.has(tag))
             benchmarksByTag.get(tag).push(benchmark);
