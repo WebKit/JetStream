@@ -53,9 +53,13 @@ class File {
     set data(dataView) { this._data = dataView; }
 
     swapByteOrder() {
+        let hash = 0x1a2b3c4d;
         for (let i = 0; i < Math.floor(this.data.byteLength / 8) * 8; i += 8) {
-            this.data.setFloat64(i, this.data.getFloat64(i, isLittleEndian), !isLittleEndian);
+            const data = this.data.getFloat64(i, isLittleEndian);
+            this.data.setFloat64(i, data, !isLittleEndian);
+            hash ^= data | 0;
         }
+        return hash;
     }
 }
 
@@ -161,11 +165,17 @@ function setupDirectory() {
 }
 
 class Benchmark {
+    EXPECTED_FILE_COUNT = 411;
+    EXPECTED_LAST_FILE_HASH = 1042364057;
+
+    totalFileCount = 0;
+    lastFileHash = 0;
+
     runIteration() {
         const fs = setupDirectory();
 
         for (let { entry: file } of fs.forEachFileRecursively()) {
-            file.swapByteOrder();
+            this.lastFileHash = file.swapByteOrder();
         }
 
         for (let { name, entry: dir } of fs.forEachDirectoryRecursively()) {
@@ -178,5 +188,16 @@ class Benchmark {
                 }
             }
         }
+
+        for (let _ of fs.forEachFileRecursively()) {
+            this.totalFileCount++;
+        }
+    }
+
+    validate(iterations) {
+        if (this.totalFileCount != this.EXPECTED_FILE_COUNT * iterations)
+            throw new Error(`Invalid total file count ${this.totalFileCount}`); 
+        if (this.lastFileHash != this.EXPECTED_LAST_FILE_HASH)
+            throw new Error(`Invalid file hash: ${this.lastFileHash}`);
     }
 }
