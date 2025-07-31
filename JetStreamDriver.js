@@ -159,7 +159,7 @@ function updateUI() {
         if (isInBrowser)
             requestAnimationFrame(() => setTimeout(resolve, 0));
         else
-            return resolve();
+            resolve();
     });
 }
 
