@@ -2391,7 +2391,8 @@ function processTestList(testList)
     else
         benchmarkNames = testList.split(/[\s,]/);
 
-    for (const name of benchmarkNames) {
+    for (let name of benchmarkNames) {
+        name = name.toLowerCase();
         if (benchmarksByTag.has(name))
             benchmarks.push(...findBenchmarksByTag(name));
         else
