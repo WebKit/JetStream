@@ -40,16 +40,20 @@ globalThis.dumpJSONResults ??= false;
 globalThis.testList ??= undefined;
 globalThis.startDelay ??= undefined;
 globalThis.shouldReport ??= false;
+globalThis.prefetchResources ??= true;
 
 function getIntParam(urlParams, key) {
-    if (!urlParams.has(key))
-        return undefined
     const rawValue = urlParams.get(key);
     const value = parseInt(rawValue);
     if (value <= 0)
         throw new Error(`Expected positive value for ${key}, but got ${rawValue}`);
     return value;
 }
+
+function getBoolParam(urlParams, key) {
+    const rawValue = urlParams.get(key).toLowerCase()
+    return !(rawValue === "false" || rawValue === "0")
+ }
 
 function getTestListParam(urlParams, key) {
     if (globalThis.testList?.length)
@@ -73,7 +77,12 @@ if (typeof(URLSearchParams) !== "undefined") {
         globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
     if (urlParameters.has("worstCaseCount"))
         globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
+    if (urlParameters.has("prefetchResources"))
+        globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources");
 }
+
+if (!globalThis.prefetchResources)
+    console.warn("Disabling resource prefetching!");
 
 // Used for the promise representing the current benchmark run.
 this.currentResolve = null;
@@ -180,28 +189,29 @@ function uiFriendlyDuration(time) {
 // TODO: Cleanup / remove / merge. This is only used for caching loads in the
 // non-browser setting. In the browser we use exclusively `loadCache`, 
 // `loadBlob`, `doLoadBlob`, `prefetchResourcesForBrowser` etc., see below.
-const fileLoader = (function() {
-    class Loader {
-        constructor() {
-            this.requests = new Map;
-        }
-
-        // Cache / memoize previously read files, because some workloads
-        // share common code.
-        load(url) {
-            assert(!isInBrowser);
-
-            if (this.requests.has(url)) {
-                return this.requests.get(url);
-            }
-
-            const contents = readFile(url);
-            this.requests.set(url, contents);
-            return contents;
-        }
+class ShellFileLoader {
+    constructor() {
+        this.requests = new Map;
     }
-    return new Loader;
-})();
+
+    // Cache / memoize previously read files, because some workloads
+    // share common code.
+    load(url) {
+        assert(!isInBrowser);
+        if (!globalThis.prefetchResources)
+            return `load("${url}");`
+
+        if (this.requests.has(url)) {
+            return this.requests.get(url);
+        }
+
+        const contents = readFile(url);
+        this.requests.set(url, contents);
+        return contents;
+    }
+};
+
+const fileLoader = new ShellFileLoader();
 
 class Driver {
     constructor(benchmarks) {
@@ -248,7 +258,7 @@ class Driver {
 
             benchmark.updateUIAfterRun();
 
-            if (isInBrowser) {
+            if (isInBrowser && globalThis.prefetchResources) {
                 const cache = JetStream.blobDataCache;
                 for (const file of benchmark.plan.files) {
                     const blobData = cache[file];
@@ -757,8 +767,9 @@ class Benchmark {
                 addScript(text);
         } else {
             const cache = JetStream.blobDataCache;
-            for (const file of this.plan.files)
-                addScriptWithURL(cache[file].blobURL);
+            for (const file of this.plan.files) {
+                addScriptWithURL(globalThis.prefetchResources ? cache[file].blobURL : file);
+            }
         }
 
         const promise = new Promise((resolve, reject) => {
@@ -811,6 +822,11 @@ class Benchmark {
     }
 
     async doLoadBlob(resource) {
+        const blobData = JetStream.blobDataCache[resource];
+        if (!globalThis.prefetchResources) {
+            blobData.blobURL = resource;
+            return blobData;
+        }
         let response;
         let tries = 3;
         while (tries--) {
@@ -827,7 +843,6 @@ class Benchmark {
             throw new Error("Fetch failed");
         }
         const blob = await response.blob();
-        const blobData = JetStream.blobDataCache[resource];
         blobData.blob = blob;
         blobData.blobURL = URL.createObjectURL(blob);
         return blobData;
