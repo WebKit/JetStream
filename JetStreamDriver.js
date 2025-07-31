@@ -564,30 +564,28 @@ class Scripts {
 
 
     addDeterministicRandom() {
-        this.add(`
-          (() => {
-                const initialSeed = 49734321;
-                let seed = initialSeed;
+        this.add(`(() => {
+            const initialSeed = 49734321;
+            let seed = initialSeed;
 
-                Math.random = () => {
-                    // Robert Jenkins' 32 bit integer hash function.
-                    seed = ((seed + 0x7ed55d16) + (seed << 12))  & 0xffff_ffff;
-                    seed = ((seed ^ 0xc761c23c) ^ (seed >>> 19)) & 0xffff_ffff;
-                    seed = ((seed + 0x165667b1) + (seed << 5))   & 0xffff_ffff;
-                    seed = ((seed + 0xd3a2646c) ^ (seed << 9))   & 0xffff_ffff;
-                    seed = ((seed + 0xfd7046c5) + (seed << 3))   & 0xffff_ffff;
-                    seed = ((seed ^ 0xb55a4f09) ^ (seed >>> 16)) & 0xffff_ffff;
-                    // Note that Math.random should return a value that is
-                    // greater than or equal to 0 and less than 1. Here, we
-                    // cast to uint32 first then divided by 2^32 for double.
-                    return (seed >>> 0) / 0x1_0000_0000;
-                };
+            Math.random = () => {
+                // Robert Jenkins' 32 bit integer hash function.
+                seed = ((seed + 0x7ed55d16) + (seed << 12))  & 0xffff_ffff;
+                seed = ((seed ^ 0xc761c23c) ^ (seed >>> 19)) & 0xffff_ffff;
+                seed = ((seed + 0x165667b1) + (seed << 5))   & 0xffff_ffff;
+                seed = ((seed + 0xd3a2646c) ^ (seed << 9))   & 0xffff_ffff;
+                seed = ((seed + 0xfd7046c5) + (seed << 3))   & 0xffff_ffff;
+                seed = ((seed ^ 0xb55a4f09) ^ (seed >>> 16)) & 0xffff_ffff;
+                // Note that Math.random should return a value that is
+                // greater than or equal to 0 and less than 1. Here, we
+                // cast to uint32 first then divided by 2^32 for double.
+                return (seed >>> 0) / 0x1_0000_0000;
+            };
 
-                Math.random.__resetSeed = () => {
-                    seed = initialSeed;
-                };
-            })();
-        `);
+            Math.random.__resetSeed = () => {
+                seed = initialSeed;
+            };
+        })();`);
     }
 }
 
