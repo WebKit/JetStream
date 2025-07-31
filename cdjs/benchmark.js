@@ -32,7 +32,7 @@ function benchmarkImpl(configuration) {
 
     var simulator = new Simulator(numAircraft);
     var detector = new CollisionDetector();
-    var lastTime = currentTime();
+    var lastTime = performance.now();
     var results = [];
     for (var i = 0; i < numFrames; ++i) {
         var time = i / 10;
@@ -40,7 +40,7 @@ function benchmarkImpl(configuration) {
         var collisions = detector.handleNewFrame(simulator.simulate(time));
         
         var before = lastTime;
-        var after = currentTime();
+        var after = performance.now();
         lastTime = after;
         var result = {
             time: after - before,

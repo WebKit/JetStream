@@ -701,12 +701,6 @@ class Benchmark {
         addScript(`
             const isInBrowser = ${isInBrowser};
             const isD8 = ${isD8};
-            if (typeof performance.mark === 'undefined') {
-                performance.mark = function(name) { return { name }};
-            }
-            if (typeof performance.measure === 'undefined') {
-                performance.measure = function() {};
-            }
         `);
 
         if (!!this.plan.deterministicRandom) {
@@ -1472,7 +1466,6 @@ let BENCHMARKS = [
             "./ARES-6/Basic/parser.js",
             "./ARES-6/Basic/random.js",
             "./ARES-6/Basic/state.js",
-            "./ARES-6/Basic/util.js",
             "./ARES-6/Basic/benchmark.js",
         ],
         tags: ["Default", "ARES"],
