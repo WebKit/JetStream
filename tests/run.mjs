@@ -3,7 +3,8 @@
 import serve from "./server.mjs";
 import { Builder, Capabilities } from "selenium-webdriver";
 import commandLineArgs from "command-line-args";
-import commandLineUsage from "command-line-usage";
+
+import {logInfo, logError, printHelp, runTest} from "./helper.mjs";
 
 const optionDefinitions = [
     { name: "browser", type: String, description: "Set the browser to test, choices are [safari, firefox, chrome, edge]. By default the $BROWSER env variable is used." },
@@ -11,35 +12,15 @@ const optionDefinitions = [
     { name: "help", alias: "h", description: "Print this help text." },
 ];
 
-function printHelp(message = "") {
-    const usage = commandLineUsage([
-        {
-            header: "Run all tests",
-        },
-        {
-            header: "Options",
-            optionList: optionDefinitions,
-        },
-    ]);
-    if (!message) {
-        console.log(usage);
-        process.exit(0);
-    } else {
-        console.error(message);
-        console.error();
-        console.error(usage);
-        process.exit(1);
-    }
-}
 
 const options = commandLineArgs(optionDefinitions);
 
 if ("help" in options)
-    printHelp();
+    printHelp(optionDefinitions);
 
 const BROWSER = options?.browser;
 if (!BROWSER)
-    printHelp("No browser specified, use $BROWSER or --browser");
+    printHelp("No browser specified, use $BROWSER or --browser", optionDefinitions);
 
 let capabilities;
 switch (BROWSER) {
@@ -65,24 +46,43 @@ switch (BROWSER) {
 }
 
 process.on("unhandledRejection", (err) => {
-    console.error(err);
+    logError(err);
     process.exit(1);
 });
 process.once("uncaughtException", (err) => {
-    console.error(err);
+    logError(err);
     process.exit(1);
 });
 
 const PORT = options.port;
 const server = await serve(PORT);
 
-async function testEnd2End() {
+async function runTests() {
+    let success = true;
+    try {
+        success &&= await runTest("Run Single Suite", () => testEnd2End({ test: "proxy-mobx" }));
+        success &&= await runTest("Run Disabled Suite", () => testEnd2End({ tag: "disabled" }));
+        success &&= await runTest("Run Default Suite", () => testEnd2End());
+    } finally {
+        server.close();
+    }
+    if (!success)
+      process.exit(1);
+}
+
+
+async function testEnd2End(params) {
     const driver = await new Builder().withCapabilities(capabilities).build();
+    const urlParams = Object.assign({
+            worstCaseCount: 2,
+            iterationCount: 3 
+        }, params);
     let results;
     try {
-        const url = `http://localhost:${PORT}/index.html?worstCaseCount=2&iterationCount=3`;
-        console.log(`JetStream PREPARE ${url}`);
-        await driver.get(url);
+        const url = new URL(`http://localhost:${PORT}/index.html`);
+        url.search = new URLSearchParams(urlParams).toString();
+        logInfo(`JetStream PREPARE ${url}`);
+        await driver.get(url.toString());
         await driver.executeAsyncScript((callback) => {
             // callback() is explicitly called without the default event
             // as argument to avoid serialization issues with chromedriver.
@@ -90,23 +90,19 @@ async function testEnd2End() {
             // We might not get a chance to install the on-ready listener, thus
             // we also check if the runner is ready synchronously.
             if (globalThis?.JetStream?.isReady)
-                callback()
+                callback();
         });
         results = await benchmarkResults(driver);
         // FIXME: validate results;
-        console.log("\n✅ Tests completed!");
     } catch(e) {
-        console.error("\n❌ Tests failed!");
-        console.error(e);
         throw e;
     } finally {
         driver.quit();
-        server.close();
     }
 }
 
 async function benchmarkResults(driver) {
-    console.log("JetStream START");
+    logInfo("JetStream START");
     await driver.manage().setTimeouts({ script: 60_000 });
     await driver.executeAsyncScript((callback) => {
         globalThis.JetStream.start();
@@ -160,4 +156,4 @@ function logIncrementalResult(previousResults, benchmarkResults) {
     }
 }
 
-setImmediate(testEnd2End);
+setImmediate(runTests);

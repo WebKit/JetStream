@@ -73,10 +73,3 @@ function averageAbovePercentile(numbers, percentile) {
     return result;
 }
 
-var currentTime;
-if (this.performance && performance.now)
-    currentTime = function() { return performance.now() };
-else if (preciseTime)
-    currentTime = function() { return preciseTime() * 1000; };
-else
-    currentTime = function() { return 0 + new Date(); };

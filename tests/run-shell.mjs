@@ -1,49 +1,29 @@
 #! /usr/bin/env node
 
 import commandLineArgs from "command-line-args";
-import commandLineUsage from "command-line-usage";
 import { spawnSync } from  "child_process";
 import { fileURLToPath } from "url";
 import { styleText } from "node:util";
 import * as path from "path";
 import * as fs from "fs";
 import * as os from "os";
-import core from "@actions/core"
+import core from "@actions/core";
+
+import {logInfo, logError, logGroup, printHelp, runTest, GITHUB_ACTIONS_OUTPUT} from "./helper.mjs";
 
 const optionDefinitions = [
   { name: "shell", type: String, description: "Set the shell to test, choices are [jsc, v8, spidermonkey]." },
   { name: "help", alias: "h", description: "Print this help text." },
 ];
 
-function printHelp(message = "") {
-  const usage = commandLineUsage([
-      {
-          header: "Run all tests",
-      },
-      {
-          header: "Options",
-          optionList: optionDefinitions,
-      },
-  ]);
-  if (!message) {
-      console.log(usage);
-      process.exit(0);
-  } else {
-      console.error(message);
-      console.error();
-      console.error(usage);
-      process.exit(1);
-  }
-}
-
 const options = commandLineArgs(optionDefinitions);
 
 if ("help" in options)
-  printHelp();
+  printHelp(optionDefinitions);
 
 const JS_SHELL= options?.shell;
 if (!JS_SHELL)
-  printHelp("No javascript shell specified, use --shell");
+  printHelp("No javascript shell specified, use --shell", optionDefinitions);
 
 const SHELL_NAME = (function() {
   switch (JS_SHELL) {
@@ -70,49 +50,16 @@ const UNIT_TEST_PATH = path.join(SRC_DIR, "tests", "unit-tests.js");
 
 function convertCliArgs(cli, ...cliArgs) {
   if (SHELL_NAME == "spidermonkey")
-    return [cli, ...cliArgs]
+    return [cli, ...cliArgs];
   return [cli, "--", ...cliArgs];
 }
 
-const GITHUB_ACTIONS_OUTPUT = "GITHUB_ACTIONS_OUTPUT" in process.env;
-
-function log(...args) {
-  const text = args.join(" ")
-  if (GITHUB_ACTIONS_OUTPUT)
-    core.info(styleText("yellow", text))
-  else
-    console.log(styleText("yellow", text))
-}
-
-function logError(...args) {
-  const text = args.join(" ")
-  if (GITHUB_ACTIONS_OUTPUT)
-    core.error(styleText("red", text))
-  else
-    console.error(styleText("red", text))
-}
-
-function logGroup(name, body) {
-  if (GITHUB_ACTIONS_OUTPUT) {
-    core.startGroup(name);
-  } else {
-    log("=".repeat(80))
-    log(name);
-    log(".".repeat(80))
-  }
-  try {
-    return body();
-  } finally {
-    if (GITHUB_ACTIONS_OUTPUT)
-      core.endGroup();
-  } 
-}
 
 const SPAWN_OPTIONS =  { 
   stdio: ["inherit", "inherit", "inherit"]
 };
 
-function sh(binary, args) {
+function sh(binary, ...args) {
   const cmd = `${binary} ${args.join(" ")}`;
   if (GITHUB_ACTIONS_OUTPUT) {
     core.startGroup(binary);
@@ -128,21 +75,19 @@ function sh(binary, args) {
     }
   } finally {
     if (GITHUB_ACTIONS_OUTPUT)
-      core.endGroup()
+      core.endGroup();
   }
 }
 
 async function runTests() {
-    const shellBinary = logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
+    const shellBinary = await logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
     let success = true;
-    success &&= runTest("Run UnitTests", () => sh(shellBinary, [UNIT_TEST_PATH]));
-    success &&= runTest("Run Complete Suite", () => sh(shellBinary, convertCliArgs(CLI_PATH)));
-    success &&= runTest("Run Single Suite", () => {
-      sh(shellBinary, convertCliArgs(CLI_PATH, "proxy-mobx"));
-    });
-    if (!success) {
-      process.exit(1)
-    }
+    success &&= await runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
+    success &&= await runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
+    success &&= await runCLITest("Run Disabled Suite", shellBinary, "disabled");
+    success &&= await runCLITest("Run Default Suite",  shellBinary);
+    if (!success)
+      process.exit(1);
 }
 
 function jsvuOSName() {
@@ -161,30 +106,24 @@ function jsvuOSName() {
           default: throw new Error("Unsupported architecture");
       }
   };
-  return `${osName()}${osArch()}`
+  return `${osName()}${osArch()}`;
 }
 
 const DEFAULT_JSC_LOCATION = "/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc"
 
 function testSetup() {
-    sh("jsvu", [`--engines=${SHELL_NAME}`, `--os=${jsvuOSName()}`]);
+    sh("jsvu", `--engines=${SHELL_NAME}`, `--os=${jsvuOSName()}`);
     let shellBinary = path.join(os.homedir(), ".jsvu/bin", SHELL_NAME);
     if (!fs.existsSync(shellBinary) && SHELL_NAME == "javascriptcore")
-      shellBinary = DEFAULT_JSC_LOCATION
+      shellBinary = DEFAULT_JSC_LOCATION;
     if (!fs.existsSync(shellBinary))
       throw new Error(`Could not find shell binary: ${shellBinary}`);
-    log(`Installed JavaScript Shell: ${shellBinary}`);
-    return shellBinary
+    logInfo(`Installed JavaScript Shell: ${shellBinary}`);
+    return shellBinary;
 }
 
-function runTest(testName, test) {
-    try {
-      logGroup(testName, test)
-    } catch(e) {
-      logError("TEST FAILED")
-      return false
-    }
-    return true
+function runCLITest(name, shellBinary, ...args) {
+  return runTest(name, () => sh(shellBinary, ...convertCliArgs(CLI_PATH, ...args)));
 }
 
 setImmediate(runTests);

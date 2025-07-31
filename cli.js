@@ -24,7 +24,43 @@
 */
 
 load("./shell-config.js")
-load("./JetStreamDriver.js");
+
+const cliFlags = { __proto__: null };
+const cliArgs = [];
+if (globalThis.arguments?.length) {
+    for (const argument of globalThis.arguments)
+        if (argument.startsWith("--")) {
+            const parts = argument.split("=");
+            cliFlags[parts[0].toLowerCase()] = parts.slice(1).join("=");
+        } else
+            cliArgs.push(argument);
+}
+
+function getIntFlag(flags, flag) {
+    if (!(flag in flags))
+        return undefined;
+    const rawValue = flags[flag];
+    const value = parseInt(rawValue);
+    if (value <= 0)
+        throw new Error(`Expected positive value for ${flag}, but got ${rawValue}`);
+    return value;
+}
+
+if ("--iteration-count" in cliFlags)
+    globalThis.testIterationCount = getIntFlag(cliFlags, "--iteration-count");
+if ("--worst-case-count" in cliFlags)
+    globalThis.testWorstCaseCount = getIntFlag(cliFlags, "--worst-case-count");
+if ("--dump-json-results" in cliFlags)
+    globalThis.dumpJSONResults = true;
+if (typeof runMode !== "undefined" && runMode == "RAMification")
+    globalThis.RAMification = true;
+if ("--ramification" in cliFlags)
+    globalThis.RAMification = true;
+if ("--no-prefetch:" in cliFlags)
+    globalThis.prefetchResources = false;
+if (cliArgs.length)
+    globalThis.testList = cliArgs;
+
 
 async function runJetStream() {
     try {
@@ -37,5 +73,30 @@ async function runJetStream() {
     }
 }
 
-// FIXME: Add flag for setting prefetch resources
-runJetStream();
+load("./JetStreamDriver.js");
+
+if ("--help" in cliFlags) {
+    console.log("JetStream Driver Help");
+    console.log("");
+
+    console.log("Options:");
+    console.log("   --iteration-count:   Set the default iteration count.");
+    console.log("   --worst-case-count:  Set the default worst-case count");
+    console.log("   --dump-json-results: Print summary json to the console.");
+    console.log("   --ramification:      Enable ramification support. See RAMification.py for more details.");
+    console.log("   --no-prefetch:       Do not prefetch resources. Will add network overhead to measurements!");
+    console.log("");
+
+    console.log("Available tags:");
+    const tagNames = Array.from(benchmarksByTag.keys()).sort();
+    for (const tagName of tagNames)
+        console.log("  ", tagName);
+    console.log("");
+
+    console.log("Available tests:");
+    const benchmarkNames = BENCHMARKS.map(b => b.name).sort();
+    for (const benchmark of benchmarkNames)
+        console.log("  ", benchmark);
+} else {
+    runJetStream();
+}
