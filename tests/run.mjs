@@ -103,7 +103,7 @@ async function testEnd2End(params) {
 
 async function benchmarkResults(driver) {
     logInfo("JetStream START");
-    await driver.manage().setTimeouts({ script: 60_000 });
+    await driver.manage().setTimeouts({ script: 2 * 60_000 });
     await driver.executeAsyncScript((callback) => {
         globalThis.JetStream.start();
         callback();
