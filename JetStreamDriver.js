@@ -537,12 +537,16 @@ class Scripts {
         this.scripts = [];
     }
 
+    run() {
+        throw new Error("Subclasses need to implement this");
+    }
+
     add(text) {
-        assert(false, "Not implemented");
+        throw new Error("Subclasses need to implement this");
     }
 
     addWithURL(url) {
-        assert(false, "Not implemented");
+        throw new Error("Subclasses need to implement this");
     }
 
     addUtils() {
