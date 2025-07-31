@@ -701,6 +701,12 @@ class Benchmark {
         addScript(`
             const isInBrowser = ${isInBrowser};
             const isD8 = ${isD8};
+            if (typeof performance.mark === 'undefined') {
+                performance.mark = function(name) { return { name }};
+            }
+            if (typeof performance.measure === 'undefined') {
+                performance.measure = function() {};
+            }
         `);
 
         if (!!this.plan.deterministicRandom) {
