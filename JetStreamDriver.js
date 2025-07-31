@@ -231,13 +231,12 @@ class Driver {
         } else if (!dumpJSONResults)
             console.log("Starting JetStream3");
 
-        await updateUI();
-
+        performance.mark("update-ui-start");
         const start = performance.now();
         for (const benchmark of this.benchmarks) {
-            benchmark.updateUIBeforeRun();
-
+            await benchmark.updateUIBeforeRun();
             await updateUI();
+            performance.measure("runner update-ui", "update-ui-start");
 
             try {
                 await benchmark.run();
@@ -246,6 +245,7 @@ class Driver {
                 throw e;
             }
 
+            performance.mark("update-ui");
             benchmark.updateUIAfterRun();
 
             if (isInBrowser) {
@@ -258,6 +258,7 @@ class Driver {
                 }
             }
         }
+        performance.measure("runner update-ui", "update-ui-start");
 
         const totalTime = performance.now() - start;
         if (measureTotalTimeAsSubtest) {
@@ -774,6 +775,7 @@ class Benchmark {
         }
         addScript(this.runnerCode);
 
+        performance.mark(this.name);
         this.startTime = performance.now();
 
         if (RAMification)
@@ -794,6 +796,7 @@ class Benchmark {
         const results = await promise;
 
         this.endTime = performance.now();
+        performance.measure(this.name, this.name);
 
         if (RAMification) {
             const memoryFootprint = MemoryFootprint();

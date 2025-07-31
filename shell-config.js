@@ -37,3 +37,9 @@ if (isSpiderMonkey) {
     globalThis.readFile = readRelativeToScript;
     globalThis.arguments = scriptArgs;
 }
+
+if (typeof performance == "undefined")
+    performance = {};
+
+performance.mark ??= function(){};
+performance.measure ??= function(){};
