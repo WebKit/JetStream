@@ -546,7 +546,7 @@ class Scripts {
     }
 
     addWithURL(url) {
-        throw new Error("Subclasses need to implement this");
+        throw new Error("addWithURL not supported");
     }
 
     addUtils() {
