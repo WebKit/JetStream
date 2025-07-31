@@ -118,7 +118,7 @@ async function benchmarkResults(driver) {
 
 class JetStreamTestError extends Error {
     constructor(errors) {
-        super(`Tests failed: ${errors.map(e => e.name).join(", ")}`);
+        super(`Tests failed: ${errors.map(e => e.stack).join(", ")}`);
         this.errors = errors;
     }
 

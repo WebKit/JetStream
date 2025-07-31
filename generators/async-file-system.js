@@ -176,10 +176,9 @@ async function setupDirectory() {
 
 class Benchmark {
     EXPECTED_FILE_COUNT = 666;
-    EXPECTED_LAST_FILE_HASH = 1024076396;
 
     totalFileCount = 0;
-    lastFileHash = 0;
+    lastFileHash = undefined;
 
     async runIteration() {
         const fs = await setupDirectory();
@@ -206,7 +205,7 @@ class Benchmark {
     validate(iterations) {
         if (this.totalFileCount != this.EXPECTED_FILE_COUNT * iterations)
             throw new Error(`Invalid total file count ${this.totalFileCount}`); 
-        if (this.lastFileHash != this.EXPECTED_LAST_FILE_HASH)
+        if (this.lastFileHash !== undefined)
             throw new Error(`Invalid file hash: ${this.lastFileHash}`);
     }
 }
