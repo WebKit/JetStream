@@ -308,13 +308,6 @@ class Driver {
         }
     }
 
-    runCode(string) {
-        if (!isInBrowser) {
-
-        }
-        return magicFrame;
-    }
-
     prepareToRun() {
         this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
 
