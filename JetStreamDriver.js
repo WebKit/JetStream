@@ -555,7 +555,6 @@ class Scripts {
         `);
     }
 
-
     addDeterministicRandom() {
         this.add(`(() => {
             const initialSeed = 49734321;
