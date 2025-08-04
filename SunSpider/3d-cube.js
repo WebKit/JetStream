@@ -2,6 +2,124 @@
 // http://www.speich.net/computer/moztesting/3d.htm
 // Created by Simon Speich
 
+
+function CalcCross(V0, V1) {
+  var Cross = new Array();
+  Cross[0] = V0[1]*V1[2] - V0[2]*V1[1];
+  Cross[1] = V0[2]*V1[0] - V0[0]*V1[2];
+  Cross[2] = V0[0]*V1[1] - V0[1]*V1[0];
+  return Cross;
+}
+
+function CalcNormal(V0, V1, V2) {
+  var A = new Array();
+  var B = new Array();
+  for (var i = 0; i < 3; i++) {
+    A[i] = V0[i] - V1[i];
+    B[i] = V2[i] - V1[i];
+  }
+  A = CalcCross(A, B);
+  var Length = Math.sqrt(A[0]*A[0] + A[1]*A[1] + A[2]*A[2]);
+  for (var i = 0; i < 3; i++) A[i] = A[i] / Length;
+  A[3] = 1;
+  return A;
+}
+
+function CreateP(X,Y,Z) {
+  this.V = [X,Y,Z,1];
+}
+
+// multiplies two matrices
+function MMulti(M1, M2) {
+  var M = [[],[],[],[]];
+  var i = 0;
+  var j = 0;
+  for (; i < 4; i++) {
+    j = 0;
+    for (; j < 4; j++) M[i][j] = M1[i][0] * M2[0][j] + M1[i][1] * M2[1][j] + M1[i][2] * M2[2][j] + M1[i][3] * M2[3][j];
+  }
+  return M;
+}
+
+//multiplies matrix with vector
+function VMulti(M, V) {
+  var Vect = new Array();
+  var i = 0;
+  for (;i < 4; i++) Vect[i] = M[i][0] * V[0] + M[i][1] * V[1] + M[i][2] * V[2] + M[i][3] * V[3];
+  return Vect;
+}
+
+function VMulti2(M, V) {
+  var Vect = new Array();
+  var i = 0;
+  for (;i < 3; i++) Vect[i] = M[i][0] * V[0] + M[i][1] * V[1] + M[i][2] * V[2];
+  return Vect;
+}
+
+// add to matrices
+function MAdd(M1, M2) {
+  var M = [[],[],[],[]];
+  var i = 0;
+  var j = 0;
+  for (; i < 4; i++) {
+    j = 0;
+    for (; j < 4; j++) M[i][j] = M1[i][j] + M2[i][j];
+  }
+  return M;
+}
+
+function Translate(M, Dx, Dy, Dz) {
+  var T = [
+    [1,0,0,Dx],
+    [0,1,0,Dy],
+    [0,0,1,Dz],
+    [0,0,0,1]
+  ];
+  return MMulti(T, M);
+}
+
+function RotateX(M, Phi) {
+  var a = Phi;
+  a *= Math.PI / 180;
+  var Cos = Math.cos(a);
+  var Sin = Math.sin(a);
+  var R = [
+    [1,0,0,0],
+    [0,Cos,-Sin,0],
+    [0,Sin,Cos,0],
+    [0,0,0,1]
+  ];
+  return MMulti(R, M);
+}
+
+function RotateY(M, Phi) {
+  var a = Phi;
+  a *= Math.PI / 180;
+  var Cos = Math.cos(a);
+  var Sin = Math.sin(a);
+  var R = [
+    [Cos,0,Sin,0],
+    [0,1,0,0],
+    [-Sin,0,Cos,0],
+    [0,0,0,1]
+  ];
+  return MMulti(R, M);
+}
+
+function RotateZ(M, Phi) {
+  var a = Phi;
+  a *= Math.PI / 180;
+  var Cos = Math.cos(a);
+  var Sin = Math.sin(a);
+  var R = [
+    [Cos,-Sin,0,0],
+    [Sin,Cos,0,0],
+    [0,0,1,0],
+    [0,0,0,1]
+  ];
+  return MMulti(R, M);
+}
+
 function run() {
     var Q = new Array();
     var MTrans = new Array();  // transformation matrix
@@ -72,123 +190,6 @@ function run() {
         y += IncY2;
       }
       Q.LastPx = NumPix;
-    }
-
-    function CalcCross(V0, V1) {
-      var Cross = new Array();
-      Cross[0] = V0[1]*V1[2] - V0[2]*V1[1];
-      Cross[1] = V0[2]*V1[0] - V0[0]*V1[2];
-      Cross[2] = V0[0]*V1[1] - V0[1]*V1[0];
-      return Cross;
-    }
-
-    function CalcNormal(V0, V1, V2) {
-      var A = new Array();
-      var B = new Array();
-      for (var i = 0; i < 3; i++) {
-        A[i] = V0[i] - V1[i];
-        B[i] = V2[i] - V1[i];
-      }
-      A = CalcCross(A, B);
-      var Length = Math.sqrt(A[0]*A[0] + A[1]*A[1] + A[2]*A[2]);
-      for (var i = 0; i < 3; i++) A[i] = A[i] / Length;
-      A[3] = 1;
-      return A;
-    }
-
-    function CreateP(X,Y,Z) {
-      this.V = [X,Y,Z,1];
-    }
-
-    // multiplies two matrices
-    function MMulti(M1, M2) {
-      var M = [[],[],[],[]];
-      var i = 0;
-      var j = 0;
-      for (; i < 4; i++) {
-        j = 0;
-        for (; j < 4; j++) M[i][j] = M1[i][0] * M2[0][j] + M1[i][1] * M2[1][j] + M1[i][2] * M2[2][j] + M1[i][3] * M2[3][j];
-      }
-      return M;
-    }
-
-    //multiplies matrix with vector
-    function VMulti(M, V) {
-      var Vect = new Array();
-      var i = 0;
-      for (;i < 4; i++) Vect[i] = M[i][0] * V[0] + M[i][1] * V[1] + M[i][2] * V[2] + M[i][3] * V[3];
-      return Vect;
-    }
-
-    function VMulti2(M, V) {
-      var Vect = new Array();
-      var i = 0;
-      for (;i < 3; i++) Vect[i] = M[i][0] * V[0] + M[i][1] * V[1] + M[i][2] * V[2];
-      return Vect;
-    }
-
-    // add to matrices
-    function MAdd(M1, M2) {
-      var M = [[],[],[],[]];
-      var i = 0;
-      var j = 0;
-      for (; i < 4; i++) {
-        j = 0;
-        for (; j < 4; j++) M[i][j] = M1[i][j] + M2[i][j];
-      }
-      return M;
-    }
-
-    function Translate(M, Dx, Dy, Dz) {
-      var T = [
-        [1,0,0,Dx],
-        [0,1,0,Dy],
-        [0,0,1,Dz],
-        [0,0,0,1]
-      ];
-      return MMulti(T, M);
-    }
-
-    function RotateX(M, Phi) {
-      var a = Phi;
-      a *= Math.PI / 180;
-      var Cos = Math.cos(a);
-      var Sin = Math.sin(a);
-      var R = [
-        [1,0,0,0],
-        [0,Cos,-Sin,0],
-        [0,Sin,Cos,0],
-        [0,0,0,1]
-      ];
-      return MMulti(R, M);
-    }
-
-    function RotateY(M, Phi) {
-      var a = Phi;
-      a *= Math.PI / 180;
-      var Cos = Math.cos(a);
-      var Sin = Math.sin(a);
-      var R = [
-        [Cos,0,Sin,0],
-        [0,1,0,0],
-        [-Sin,0,Cos,0],
-        [0,0,0,1]
-      ];
-      return MMulti(R, M);
-    }
-
-    function RotateZ(M, Phi) {
-      var a = Phi;
-      a *= Math.PI / 180;
-      var Cos = Math.cos(a);
-      var Sin = Math.sin(a);
-      var R = [
-        [Cos,-Sin,0,0],
-        [Sin,Cos,0,0],
-        [0,0,1,0],
-        [0,0,0,1]
-      ];
-      return MMulti(R, M);
     }
 
     function DrawQube() {
