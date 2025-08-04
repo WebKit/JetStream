@@ -203,8 +203,9 @@ class Benchmark {
     }
 
     validate(iterations) {
-        if (this.totalFileCount != this.EXPECTED_FILE_COUNT * iterations)
-            throw new Error(`Invalid total file count ${this.totalFileCount}`); 
+        const expectedFileCount = this.EXPECTED_FILE_COUNT * iterations;
+        if (this.totalFileCount != expectedFileCount)
+            throw new Error(`Invalid total file count ${this.totalFileCount}, expected ${expectedFileCount}.`);
         if (this.lastFileHash === undefined)
             throw new Error(`Invalid file hash: ${this.lastFileHash}`);
     }

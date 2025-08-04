@@ -2394,7 +2394,7 @@ function processTestList(testList)
     for (let name of benchmarkNames) {
         name = name.toLowerCase();
         if (benchmarksByTag.has(name))
-            benchmarks.push(...findBenchmarksByTag(name));
+            benchmarks.concat(findBenchmarksByTag(name));
         else
             benchmarks.push(findBenchmarkByName(name));
     }
