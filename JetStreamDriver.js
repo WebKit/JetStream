@@ -153,6 +153,7 @@ function geomeanScore(values) {
     for (let x of values)
         product *= x;
     const score = product ** (1 / values.length);
+    // Allow 0 for uninitialized subScores().
     assert(score >= 0, `Got invalid score: ${score}`)
     return score;
 }
@@ -303,6 +304,7 @@ class Driver {
         }
 
         const totalScore = geomeanScore(allScores);
+        assert(totalScore > 0, `Invalid total score: ${totalScore}`);
 
         if (isInBrowser) {
             summaryElement.classList.add("done");
