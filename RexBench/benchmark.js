@@ -24,14 +24,6 @@
  */
 "use strict";
 
-let currentTime;
-if (this.performance && performance.now)
-    currentTime = function() { return performance.now() };
-else if (this.preciseTime)
-    currentTime = function() { return preciseTime() * 1000; };
-else
-    currentTime = function() { return +new Date(); };
-
 class Benchmark {
     constructor(verbose = 0)
     {
@@ -43,9 +35,9 @@ class Benchmark {
         this.setup();
 
         for (let iteration = 0; iteration < numIterations; ++iteration) {
-            let before = currentTime();
+            let before = performance.now();
             this.runOnce();
-            let after = currentTime();
+            let after = performance.now();
             results.push(after - before);
         }
 

@@ -168,12 +168,3 @@ function bubbleSort(array, lessThan)
         end--;
     }
 }
-
-let currentTime;
-if (this.performance && performance.now)
-    currentTime = function() { return performance.now() };
-else if (this.preciseTime)
-    currentTime = function() { return preciseTime() * 1000; };
-else
-    currentTime = function() { return +new Date(); };
-

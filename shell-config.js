@@ -37,8 +37,9 @@ if (isSpiderMonkey) {
     globalThis.readFile = readRelativeToScript;
     globalThis.arguments = scriptArgs;
 }
-if (globalThis.arguments?.length)
-    globalThis.testList = globalThis.arguments.slice();
 
-if (typeof runMode !== "undefined" && runMode == "RAMification")
-    globalThis.RAMification = true;
+if (typeof performance == "undefined")
+    performance = {};
+
+performance.mark ??= function(){};
+performance.measure ??= function(){};

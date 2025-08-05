@@ -39,8 +39,7 @@ globalThis.testWorstCaseCountMap ??= new Map();
 globalThis.dumpJSONResults ??= false;
 globalThis.testList ??= undefined;
 globalThis.startDelay ??= undefined;
-
-let shouldReport = false;
+globalThis.shouldReport ??= false;
 
 function getIntParam(urlParams, key) {
     if (!urlParams.has(key))
@@ -48,8 +47,8 @@ function getIntParam(urlParams, key) {
     const rawValue = urlParams.get(key);
     const value = parseInt(rawValue);
     if (value <= 0)
-        throw new Error(`Expected positive value for ${key}, but got ${rawValue}`)
-    return value
+        throw new Error(`Expected positive value for ${key}, but got ${rawValue}`);
+    return value;
 }
 
 function getTestListParam(urlParams, key) {
@@ -60,16 +59,20 @@ function getTestListParam(urlParams, key) {
 
 if (typeof(URLSearchParams) !== "undefined") {
     const urlParameters = new URLSearchParams(window.location.search);
-    shouldReport = urlParameters.has('report') && urlParameters.get('report').toLowerCase() == 'true';
-    globalThis.startDelay = getIntParam(urlParameters, "startDelay");
-    if (shouldReport && !globalThis.startDelay)
+    if (urlParameters.has("report"))
+        globalThis.shouldReport = urlParameters.get("report").toLowerCase() == "true";
+    if (urlParameters.has("startDelay"))
+        globalThis.startDelay = getIntParam(urlParameters, "startDelay");
+    if (globalThis.shouldReport && !globalThis.startDelay)
         globalThis.startDelay = 4000;
     if (urlParameters.has("tag"))
         globalThis.testList = getTestListParam(urlParameters, "tag");
     if (urlParameters.has("test"))
         globalThis.testList = getTestListParam(urlParameters, "test");
-    globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
-    globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
+    if (urlParameters.has("iterationCount"))
+        globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
+    if (urlParameters.has("worstCaseCount"))
+        globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
 }
 
 // Used for the promise representing the current benchmark run.
@@ -228,13 +231,12 @@ class Driver {
         } else if (!dumpJSONResults)
             console.log("Starting JetStream3");
 
-        await updateUI();
-
+        performance.mark("update-ui-start");
         const start = performance.now();
         for (const benchmark of this.benchmarks) {
-            benchmark.updateUIBeforeRun();
-
+            await benchmark.updateUIBeforeRun();
             await updateUI();
+            performance.measure("runner update-ui", "update-ui-start");
 
             try {
                 await benchmark.run();
@@ -243,6 +245,7 @@ class Driver {
                 throw e;
             }
 
+            performance.mark("update-ui");
             benchmark.updateUIAfterRun();
 
             if (isInBrowser) {
@@ -255,6 +258,7 @@ class Driver {
                 }
             }
         }
+        performance.measure("runner update-ui", "update-ui-start");
 
         const totalTime = performance.now() - start;
         if (measureTotalTimeAsSubtest) {
@@ -499,7 +503,7 @@ class Driver {
         if (!isInBrowser)
             return;
 
-        if (!shouldReport)
+        if (!globalThis.shouldReport)
             return;
 
         const content = this.resultsJSON();
@@ -799,6 +803,7 @@ class Benchmark {
 
         scripts.add(this.runnerCode);
 
+        performance.mark(this.name);
         this.startTime = performance.now();
 
         if (RAMification)
@@ -819,6 +824,7 @@ class Benchmark {
         const results = await promise;
 
         this.endTime = performance.now();
+        performance.measure(this.name, this.name);
 
         if (RAMification) {
             const memoryFootprint = MemoryFootprint();
@@ -1500,7 +1506,6 @@ let BENCHMARKS = [
             "./ARES-6/Basic/parser.js",
             "./ARES-6/Basic/random.js",
             "./ARES-6/Basic/state.js",
-            "./ARES-6/Basic/util.js",
             "./ARES-6/Basic/benchmark.js",
         ],
         tags: ["Default", "ARES"],
@@ -2335,23 +2340,6 @@ let BENCHMARKS = [
     })
 ];
 
-// FIXME: figure out what to do this these benchmarks.
-// // LuaJSFight tests
-// const luaJSFightTests = [
-//     "hello_world"
-//     , "list_search"
-//     , "lists"
-//     , "string_lists"
-// ];
-// for (const test of luaJSFightTests) {
-//     BENCHMARKS.push(new DefaultBenchmark({
-//         name: `${test}-LJF`,
-//         files: [
-//             `./LuaJSFight/${test}.js`
-//         ],
-//         tags: ["LuaJSFight"],
-//     }));
-// }
 
 // SunSpider tests
 const SUNSPIDER_TESTS = [
@@ -2434,9 +2422,10 @@ function processTestList(testList)
     else
         benchmarkNames = testList.split(/[\s,]/);
 
-    for (const name of benchmarkNames) {
+    for (let name of benchmarkNames) {
+        name = name.toLowerCase();
         if (benchmarksByTag.has(name))
-            benchmarks.push(...findBenchmarksByTag(name));
+            benchmarks.concat(findBenchmarksByTag(name));
         else
             benchmarks.push(findBenchmarkByName(name));
     }
