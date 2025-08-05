@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 import commandLineArgs from "command-line-args";
-import { spawnSync, spawn } from  "child_process";
+import { spawn } from  "child_process";
 import { fileURLToPath } from "url";
 import { styleText } from "node:util";
 import * as path from "path";
