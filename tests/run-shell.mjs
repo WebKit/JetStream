@@ -68,7 +68,7 @@ async function sh(binary, ...args) {
     console.log(styleText("blue", cmd));
   }
   try {
-    const result = await sp(binary, args, SPAWN_OPTIONS);
+    const result = await spawnCaptureStdout(binary, args, SPAWN_OPTIONS);
     if (result.status || result.error) {
       logError(result.error);
       throw new Error(`Shell CMD failed: ${binary} ${args.join(" ")}`);
@@ -80,7 +80,7 @@ async function sh(binary, ...args) {
   }
 }
 
-async function sp(binary, args) {
+async function spawnCaptureStdout(binary, args) {
   const childProcess = spawn(binary, args);
   childProcess.stdout.pipe(process.stdout);
   return new Promise((resolve, reject) => {
