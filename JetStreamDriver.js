@@ -532,6 +532,16 @@ const BenchmarkState = Object.freeze({
 class Scripts {
     constructor() {
         this.scripts = [];
+        this.add(`
+            const isInBrowser = ${isInBrowser};
+            const isD8 = ${isD8};
+            if (typeof performance.mark === 'undefined') {
+                performance.mark = function(name) { return { name }};
+            }
+            if (typeof performance.measure === 'undefined') {
+                performance.measure = function() {};
+            }
+        `);
     }
 
     run() {
@@ -544,19 +554,6 @@ class Scripts {
 
     addWithURL(url) {
         throw new Error("addWithURL not supported");
-    }
-
-    addUtils() {
-        this.add(`
-            const isInBrowser = ${isInBrowser};
-            const isD8 = ${isD8};
-            if (typeof performance.mark === 'undefined') {
-                performance.mark = function(name) { return { name }};
-            }
-            if (typeof performance.measure === 'undefined') {
-                performance.measure = function() {};
-            }
-        `);
     }
 
     addDeterministicRandom() {
@@ -771,7 +768,6 @@ class Benchmark {
         this._state = BenchmarkState.PREPARE;
         const scripts = isInBrowser ? new BrowserScripts() : new ShellScripts();
 
-        scripts.addUtils();
         if (!!this.plan.deterministicRandom)
             scripts.addDeterministicRandom()
 
