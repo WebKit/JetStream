@@ -56,7 +56,7 @@ if (typeof runMode !== "undefined" && runMode == "RAMification")
     globalThis.RAMification = true;
 if ("--ramification" in cliFlags)
     globalThis.RAMification = true;
-if ("--no-prefetch:" in cliFlags)
+if ("--no-prefetch" in cliFlags)
     globalThis.prefetchResources = false;
 if (cliArgs.length)
     globalThis.testList = cliArgs;
