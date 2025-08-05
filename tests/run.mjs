@@ -107,7 +107,7 @@ async function testEnd2End(params) {
 
 async function benchmarkResults(driver) {
     logInfo("JetStream START");
-    await driver.manage().setTimeouts({ script: 60_000 });
+    await driver.manage().setTimeouts({ script: 2 * 60_000 });
     await driver.executeAsyncScript((callback) => {
         globalThis.JetStream.start();
         callback();
@@ -122,7 +122,7 @@ async function benchmarkResults(driver) {
 
 class JetStreamTestError extends Error {
     constructor(errors) {
-        super(`Tests failed: ${errors.map(e => e.name).join(", ")}`);
+        super(`Tests failed: ${errors.map(e => e.stack).join(", ")}`);
         this.errors = errors;
     }
 

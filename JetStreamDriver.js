@@ -241,13 +241,12 @@ class Driver {
         } else if (!dumpJSONResults)
             console.log("Starting JetStream3");
 
-        await updateUI();
-
+        performance.mark("update-ui-start");
         const start = performance.now();
         for (const benchmark of this.benchmarks) {
-            benchmark.updateUIBeforeRun();
-
+            await benchmark.updateUIBeforeRun();
             await updateUI();
+            performance.measure("runner update-ui", "update-ui-start");
 
             try {
                 await benchmark.run();
@@ -256,6 +255,7 @@ class Driver {
                 throw e;
             }
 
+            performance.mark("update-ui");
             benchmark.updateUIAfterRun();
 
             if (isInBrowser && globalThis.prefetchResources) {
@@ -268,6 +268,7 @@ class Driver {
                 }
             }
         }
+        performance.measure("runner update-ui", "update-ui-start");
 
         const totalTime = performance.now() - start;
         if (measureTotalTimeAsSubtest) {
@@ -785,6 +786,7 @@ class Benchmark {
         }
         addScript(this.runnerCode);
 
+        performance.mark(this.name);
         this.startTime = performance.now();
 
         if (RAMification)
@@ -805,6 +807,7 @@ class Benchmark {
         const results = await promise;
 
         this.endTime = performance.now();
+        performance.measure(this.name, this.name);
 
         if (RAMification) {
             const memoryFootprint = MemoryFootprint();
@@ -2324,23 +2327,6 @@ let BENCHMARKS = [
     })
 ];
 
-// FIXME: figure out what to do this these benchmarks.
-// // LuaJSFight tests
-// const luaJSFightTests = [
-//     "hello_world"
-//     , "list_search"
-//     , "lists"
-//     , "string_lists"
-// ];
-// for (const test of luaJSFightTests) {
-//     BENCHMARKS.push(new DefaultBenchmark({
-//         name: `${test}-LJF`,
-//         files: [
-//             `./LuaJSFight/${test}.js`
-//         ],
-//         tags: ["LuaJSFight"],
-//     }));
-// }
 
 // SunSpider tests
 const SUNSPIDER_TESTS = [
@@ -2423,9 +2409,10 @@ function processTestList(testList)
     else
         benchmarkNames = testList.split(/[\s,]/);
 
-    for (const name of benchmarkNames) {
+    for (let name of benchmarkNames) {
+        name = name.toLowerCase();
         if (benchmarksByTag.has(name))
-            benchmarks.push(...findBenchmarksByTag(name));
+            benchmarks.concat(findBenchmarksByTag(name));
         else
             benchmarks.push(findBenchmarkByName(name));
     }
