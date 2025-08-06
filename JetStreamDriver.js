@@ -332,56 +332,6 @@ class Driver {
         }
     }
 
-    runCode(string) {
-        if (!isInBrowser) {
-            const scripts = string;
-            let globalObject;
-            let realm;
-            if (isD8) {
-                realm = Realm.createAllowCrossRealmAccess();
-                globalObject = Realm.global(realm);
-                globalObject.loadString = function(s) {
-                    return Realm.eval(realm, s);
-                };
-                globalObject.readFile = read;
-            } else if (isSpiderMonkey) {
-                globalObject = newGlobal();
-                globalObject.loadString = globalObject.evaluate;
-                globalObject.readFile = globalObject.readRelativeToScript;
-            } else
-                globalObject = runString("");
-
-            globalObject.console = {
-                log: globalObject.print,
-                warn: (e) => { print("Warn: " + e); },
-                error: (e) => { print("Error: " + e); },
-                debug: (e) => { print("Debug: " + e); },
-            };
-
-            globalObject.self = globalObject;
-            globalObject.top = {
-                currentResolve,
-                currentReject
-            };
-
-            globalObject.performance ??= performance;
-            for (const script of scripts)
-                globalObject.loadString(script);
-
-            return isD8 ? realm : globalObject;
-        }
-
-        const magic = document.getElementById("magic");
-        magic.contentDocument.body.textContent = "";
-        magic.contentDocument.body.innerHTML = "<iframe id=\"magicframe\" frameborder=\"0\">";
-
-        const magicFrame = magic.contentDocument.getElementById("magicframe");
-        magicFrame.contentDocument.open();
-        magicFrame.contentDocument.write(`<!DOCTYPE html><head><title>benchmark payload</title></head><body>\n${string}</body></html>`);
-
-        return magicFrame;
-    }
-
     prepareToRun() {
         this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
 
@@ -598,6 +548,140 @@ const BenchmarkState = Object.freeze({
     DONE: "DONE"
 })
 
+
+class Scripts {
+    constructor() {
+        this.scripts = [];
+        this.add(`
+            const isInBrowser = ${isInBrowser};
+            const isD8 = ${isD8};
+            if (typeof performance.mark === 'undefined') {
+                performance.mark = function(name) { return { name }};
+            }
+            if (typeof performance.measure === 'undefined') {
+                performance.measure = function() {};
+            }
+        `);
+    }
+
+    run() {
+        throw new Error("Subclasses need to implement this");
+    }
+
+    add(text) {
+        throw new Error("Subclasses need to implement this");
+    }
+
+    addWithURL(url) {
+        throw new Error("addWithURL not supported");
+    }
+
+    addDeterministicRandom() {
+        this.add(`(() => {
+            const initialSeed = 49734321;
+            let seed = initialSeed;
+
+            Math.random = () => {
+                // Robert Jenkins' 32 bit integer hash function.
+                seed = ((seed + 0x7ed55d16) + (seed << 12))  & 0xffff_ffff;
+                seed = ((seed ^ 0xc761c23c) ^ (seed >>> 19)) & 0xffff_ffff;
+                seed = ((seed + 0x165667b1) + (seed << 5))   & 0xffff_ffff;
+                seed = ((seed + 0xd3a2646c) ^ (seed << 9))   & 0xffff_ffff;
+                seed = ((seed + 0xfd7046c5) + (seed << 3))   & 0xffff_ffff;
+                seed = ((seed ^ 0xb55a4f09) ^ (seed >>> 16)) & 0xffff_ffff;
+                // Note that Math.random should return a value that is
+                // greater than or equal to 0 and less than 1. Here, we
+                // cast to uint32 first then divided by 2^32 for double.
+                return (seed >>> 0) / 0x1_0000_0000;
+            };
+
+            Math.random.__resetSeed = () => {
+                seed = initialSeed;
+            };
+        })();`);
+    }
+}
+
+class ShellScripts extends Scripts {
+    run() {
+        let globalObject;
+        let realm;
+        if (isD8) {
+            realm = Realm.createAllowCrossRealmAccess();
+            globalObject = Realm.global(realm);
+            globalObject.loadString = function(s) {
+                return Realm.eval(realm, s);
+            };
+            globalObject.readFile = read;
+        } else if (isSpiderMonkey) {
+            globalObject = newGlobal();
+            globalObject.loadString = globalObject.evaluate;
+            globalObject.readFile = globalObject.readRelativeToScript;
+        } else
+            globalObject = runString("");
+
+        globalObject.console = {
+            log: globalObject.print,
+            warn: (e) => { print("Warn: " + e); },
+            error: (e) => { print("Error: " + e); },
+            debug: (e) => { print("Debug: " + e); },
+        };
+
+        globalObject.self = globalObject;
+        globalObject.top = {
+            currentResolve,
+            currentReject
+        };
+
+        globalObject.performance ??= performance;
+        for (const script of this.scripts)
+            globalObject.loadString(script);
+
+        return isD8 ? realm : globalObject;
+    }
+
+    add(text) {
+        this.scripts.push(text);
+    }
+
+    addWithURL(url) {
+        assert(false, "Should not reach here in CLI");
+    }
+}
+
+class BrowserScripts extends Scripts {
+    constructor() {
+        super();
+        this.add("window.onerror = top.currentReject;");
+    }
+
+    run() {
+        const string = this.scripts.join("\n");
+        const magic = document.getElementById("magic");
+        magic.contentDocument.body.textContent = "";
+        magic.contentDocument.body.innerHTML = `<iframe id="magicframe" frameborder="0">`;
+
+        const magicFrame = magic.contentDocument.getElementById("magicframe");
+        magicFrame.contentDocument.open();
+        magicFrame.contentDocument.write(`<!DOCTYPE html>
+            <head>
+               <title>benchmark payload</title>
+            </head>
+            <body>${string}</body>
+        </html>`);
+        return magicFrame;
+    }
+
+
+    add(text) {
+        this.scripts.push(`<script>${text}</script>`);
+    }
+
+    addWithURL(url) {
+        this.scripts.push(`<script src="${url}"></script>`);
+    }
+}
+
 class Benchmark {
     constructor(plan)
     {
@@ -702,84 +786,30 @@ class Benchmark {
         if (this.isDone)
             throw new Error(`Cannot run Benchmark ${this.name} twice`);
         this._state = BenchmarkState.PREPARE;
-        let code;
-        if (isInBrowser)
-            code = "";
-        else
-            code = [];
+        const scripts = isInBrowser ? new BrowserScripts() : new ShellScripts();
 
-        const addScript = (text) => {
-            if (isInBrowser)
-                code += `<script>${text}</script>`;
-            else
-                code.push(text);
-        };
-
-        const addScriptWithURL = (url) => {
-            if (isInBrowser)
-                code += `<script src="${url}"></script>`;
-            else
-                assert(false, "Should not reach here in CLI");
-        };
-
-        addScript(`
-            const isInBrowser = ${isInBrowser};
-            const isD8 = ${isD8};
-            if (typeof performance.mark === 'undefined') {
-                performance.mark = function(name) { return { name }};
-            }
-            if (typeof performance.measure === 'undefined') {
-                performance.measure = function() {};
-            }
-        `);
-
-        if (!!this.plan.deterministicRandom) {
-            addScript(`
-                 (() => {
-                    const initialSeed = 49734321;
-                    let seed = initialSeed;
-
-                    Math.random = () => {
-                        // Robert Jenkins' 32 bit integer hash function.
-                        seed = ((seed + 0x7ed55d16) + (seed << 12))  & 0xffff_ffff;
-                        seed = ((seed ^ 0xc761c23c) ^ (seed >>> 19)) & 0xffff_ffff;
-                        seed = ((seed + 0x165667b1) + (seed << 5))   & 0xffff_ffff;
-                        seed = ((seed + 0xd3a2646c) ^ (seed << 9))   & 0xffff_ffff;
-                        seed = ((seed + 0xfd7046c5) + (seed << 3))   & 0xffff_ffff;
-                        seed = ((seed ^ 0xb55a4f09) ^ (seed >>> 16)) & 0xffff_ffff;
-                        // Note that Math.random should return a value that is
-                        // greater than or equal to 0 and less than 1. Here, we
-                        // cast to uint32 first then divided by 2^32 for double.
-                        return (seed >>> 0) / 0x1_0000_0000;
-                    };
-
-                    Math.random.__resetSeed = () => {
-                        seed = initialSeed;
-                    };
-                })();
-            `);
-        }
+        if (!!this.plan.deterministicRandom)
+            scripts.addDeterministicRandom()
 
         if (this.plan.preload) {
-            let str = "";
+            let preloadCode = "";
             for (let [ variableName, blobURLOrPath ] of this.preloads)
-                str += `const ${variableName} = "${blobURLOrPath}";\n`;
-            addScript(str);
+                preloadCode += `const ${variableName} = "${blobURLOrPath}";\n`;
+            scripts.add(preloadCode);
         }
 
         const prerunCode = this.prerunCode;
         if (prerunCode)
-            addScript(prerunCode);
+            scripts.add(prerunCode);
 
         if (!isInBrowser) {
             assert(this.scripts && this.scripts.length === this.plan.files.length);
-
             for (const text of this.scripts)
-                addScript(text);
+                scripts.add(text);
         } else {
             const cache = JetStream.blobDataCache;
             for (const file of this.plan.files) {
-                addScriptWithURL(globalThis.prefetchResources ? cache[file].blobURL : file);
+                scripts.addWithURL(globalThis.prefetchResources ? cache[file].blobURL : file);
             }
         }
 
@@ -788,13 +818,7 @@ class Benchmark {
             currentReject = reject;
         });
 
-        if (isInBrowser) {
-            code = `
-                <script> window.onerror = top.currentReject; </script>
-                ${code}
-            `;
-        }
-        addScript(this.runnerCode);
+        scripts.add(this.runnerCode);
 
         performance.mark(this.name);
         this.startTime = performance.now();
@@ -805,7 +829,7 @@ class Benchmark {
         let magicFrame;
         try {
             this._state = BenchmarkState.RUNNING;
-            magicFrame = JetStream.runCode(code);
+            magicFrame = scripts.run();
         } catch(e) {
             this._state = BenchmarkState.ERROR;
             console.log("Error in runCode: ", e);
@@ -994,7 +1018,7 @@ class Benchmark {
         this.preloads = Object.entries(this.plan.preload ?? {});
     }
 
-    scoreIdentifiers() { 
+    scoreIdentifiers() {
         const ids = Object.keys(this.allScores()).map(name => this.scoreIdentifier(name));
         return ids;
     }
@@ -1938,6 +1962,15 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "Generators"],
     }),
+    new DefaultBenchmark({
+        name: "threejs",
+        files: [
+            "./threejs/three.js",
+            "./threejs/benchmark.js",
+        ],
+        deterministicRandom: true,
+        tags: ["Default", "ThreeJs"],
+    }),
     // Wasm
     new WasmEMCCBenchmark({
         name: "HashSet-wasm",
@@ -2278,7 +2311,7 @@ let BENCHMARKS = [
             "./WSL/WTrapError.js",
             "./WSL/WTypeError.js",
             "./WSL/WhileLoop.js",
-            "./WSL/WrapChecker.js", 
+            "./WSL/WrapChecker.js",
             "./WSL/Test.js",
         ],
         tags: ["Default", "WSL"],
@@ -2399,7 +2432,7 @@ for (const benchmark of BENCHMARKS) {
         throw new Error(`Duplicate benchmark with name "${name}}"`);
     else
         benchmarksByName.set(name, benchmark);
-    
+
     for (const tag of benchmark.tags) {
         if (benchmarksByTag.has(tag))
             benchmarksByTag.get(tag).push(benchmark);
