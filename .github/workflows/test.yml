@@ -16,6 +16,7 @@ jobs:
         env:
             GITHUB_ACTIONS_OUTPUT: ""
         strategy:
+            fail-fast: false
             matrix:
                 browser: [chrome, firefox, jsc, safari, spidermonkey, v8]
         steps:
