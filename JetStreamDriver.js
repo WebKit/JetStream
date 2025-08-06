@@ -286,6 +286,7 @@ class Driver {
         const allScores = [];
         for (const benchmark of this.benchmarks) {
             const score = benchmark.score;
+            assert(score > 0, `Invalid ${benchmark.name} score: ${score}`);
             allScores.push(score);
         }
 
@@ -298,7 +299,7 @@ class Driver {
         for (const benchmark of this.benchmarks) {
             for (let [category, value] of Object.entries(benchmark.subScores())) {
                 const arr = categoryScores.get(category);
-                assert(value > 0, `Invalid ${benchmark.name} ${category}: ${value}`);
+                assert(value > 0, `Invalid ${benchmark.name} ${category} score: ${value}`);
                 arr.push(value);
             }
         }
