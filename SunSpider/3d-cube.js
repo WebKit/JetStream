@@ -2,7 +2,7 @@
 // http://www.speich.net/computer/moztesting/3d.htm
 // Created by Simon Speich
 
-function run() {
+function run3dCube() {
     var Q = new Array();
     var MTrans = new Array();  // transformation matrix
     var MQube = new Array();  // position information of qube
@@ -340,10 +340,11 @@ function run() {
       }
       if (sum != validation[CubeSize])
         throw "Error: bad vector sum for CubeSize = " + CubeSize + "; expected " + validation[CubeSize] + " but got " + sum;
+      return sum;
     }
-
+    let result = 0xdeadbeef;
     for ( var i = 20; i <= 160; i *= 2 ) {
-      Init(i);
+      result ^= Init(i);
     }
 
     Q = null;
@@ -354,12 +355,5 @@ function run() {
     Testing = null;
     LoopTime = null;
     DisplArea = null;
-}
-
-
-class Benchmark {
-    runIteration() {
-        for (let i = 0; i < 8; ++i)
-            run();
-    }
+    return result;
 }

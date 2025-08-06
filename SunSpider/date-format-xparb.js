@@ -408,7 +408,7 @@ Date.patterns = {
     UniversalSortableDateTimePattern: "Y-m-d H:i:sO",
     YearMonthPattern: "F, Y"};
 
-function run() {
+function runDateFormateXparb() {
     var date = new Date("1/1/2007 1:11:11");
     var resultHash = 0x1a2b3c4d;
 
@@ -424,20 +424,4 @@ function run() {
     // FIXME: Find a way to validate this test.
     // https://bugs.webkit.org/show_bug.cgi?id=114849
     return resultHash;
-}
-
-
-class Benchmark {
-    EXPECTED_RESULT_HASH = 439041101;
-
-    runIteration() {
-        this.resultHash = 0x1a2b3c4d;
-        for (let i = 0; i < 8; ++i)
-            this.resultHash ^= run();
-    }
-
-    validate() {
-        if (this.resultHash != this.EXPECTED_RESULT_HASH)
-            throw new Error(`Got unexpected result hash ${this.resultHash} instead of ${this.EXPECTED_RESULT_HASH}`)
-    }
 }

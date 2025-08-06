@@ -253,7 +253,7 @@ function binl2b64(binarray)
   return str;
 }
 
-function run() {
+function runCryptoMD5() {
     var plainText =
 "Rebellious subjects, enemies to peace,\n\
 Profaners of this neighbour-stained steel,--\n\
@@ -289,13 +289,6 @@ Once more, on pain of death, all men depart.";
 
     if (md5Output != expected)
         throw "ERROR: bad result: expected " + expected + " but got " + md5Output;
-
+    return md5Output;
 }
 
-
-class Benchmark {
-    runIteration() {
-        for (let i = 0; i < 22; ++i)
-            run();
-    }
-}

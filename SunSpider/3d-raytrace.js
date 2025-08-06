@@ -438,18 +438,12 @@ for (var y = 0; y < size; y++) {\n\
     return s;
 }
 
-function run() {
+function run3dRayTrace() {
     var testOutput = arrayToCanvasCommands(raytraceScene());
 
     var expectedLength = 20970;
 
     if (testOutput.length != expectedLength)
         throw "Error: bad result: expected length " + expectedLength + " but got " + testOutput.length;
-}
-
-class Benchmark {
-    runIteration() {
-        for (let i = 0; i < 8; ++i)
-            run();
-    }
+    return testOutput.length;
 }

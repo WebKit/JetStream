@@ -116,7 +116,7 @@ function base64ToString(data) {
     return result;
 }
 
-function run() {
+function runBase64() {
     var str = "";
 
     for ( var i = 0; i < 8192; i++ )
@@ -134,13 +134,6 @@ function run() {
         // Double the string
         str += str;
     }
-}
-
-
-class Benchmark {
-    runIteration() {
-        for (let i = 0; i < 8; ++i)
-            run();
-    }
+    return str.length;
 }
 
