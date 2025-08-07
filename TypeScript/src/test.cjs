@@ -13,15 +13,11 @@ function compileTest() {
     host.getSourceFile = (fileName, languageVersion, onError, shouldCreateNewSourceFile) => {
       const relativePath = path.relative(repoRoot, fileName);
       const fileContent = fileContents[relativePath];
-      if (fileContent) {
-        return ts.createSourceFile(fileName, fileContent, languageVersion);
+      console.log(relativePath)
+      if (fileContent === undefined) {
+        throw new Error(`"${relativePath}" does not exist.`);
       }
-      // Fallback for files not in our in-memory object (like DOM libs, etc.)
-      const fileContentOnDisk = ts.sys.readFile(fileName);
-      if (fileContentOnDisk !== undefined) {
-        return ts.createSourceFile(fileName, fileContentOnDisk, languageVersion);
-      }
-      return ts.createSourceFile(fileName, '', languageVersion);
+      return ts.createSourceFile(fileName, fileContent, languageVersion);
     };
 
     host.resolveModuleNames = (moduleNames, containingFile) => {
