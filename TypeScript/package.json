@@ -1,5 +1,5 @@
 {
-  "name": "typescript-performance-demo",
+  "name": "typescript-compile",
   "version": "1.0.0",
   "description": "A demo project to evaluate TypeScript performance.",
   "main": "index.js",
