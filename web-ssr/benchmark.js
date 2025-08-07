@@ -25,32 +25,37 @@ class Benchmark {
   sources = []
 
   constructor(iterations) {
-    if (iteration > 25)
+    this.originalSource = REACT_RENDER_TEST_SRC;
+    // this.originalSource = readFile("./web-ssr/dist/react-render-test.js")
+    if (iterations > 25)
       throw new Error("Too many iterations");
     for (let i = 0; i < iterations; i++)
       this.sources[i] = this.prepareCode(i)
   }
 
-  prepareCode(i) {
+  prepareCode(iteration) {
     const comment = `// Iteration: ${iteration}`;
     const reactName = `React${String.fromCharCode(97+iteration)}`
-    const sourceCOde = `${comment}\n${BUNDLE_DATA}\n${comment}`;
+    const sourceCOde = `${comment}\n${this.originalSource}\n${comment}`;
     sourceCOde.replaceAll("React", reactName);
     return sourceCOde;
   }
 
   runIteration() {
-    eval(modifiedBundle);
-    this.lastResult = reactRenderTest.renderTest();
+    const sourceCode = this.sources[this.iteration];
+    const res = eval(sourceCode);
+    print(res)
+    this.lastResult = globalThis.ReactRenderTest.renderTest();
     // 4. Print results
     print(`Iteration ${iteration}:`);
     print(`  Load time: ${loadTime.toFixed(2)}ms`);
     print(`  Render time: ${result.duration.toFixed(2)}ms`);
+    this.iteration++;
   }
 
   validate() {
     this.expect("HTML length", result.html.length, 5000);
-    this.expect("HTML hash", hash(result.htmlHash), 123);
+    this.expect("HTML hash", hash(result.html), 123);
     this.expect("Wine cards", result.wineCardCount, 100);
     this.expect("Solid tags", result.solidTagCount, 95);
   }

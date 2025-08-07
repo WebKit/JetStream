@@ -1,10 +1,10 @@
-WINE_DATA = [
+const WINE_DATA = [
   {
-    name: "Château Margaux 2015",
+    name: "Château Maître 2015",
     winemaker: {
-        name: "Château Margaux",
-        url: "https://www.chateau-margaux.com",
-        description: "Château Margaux, a First Growth Bordeaux, is one of the most famous wines in the world.",
+        name: "Château Maître",
+        url: "https://www.chateau-maître.com",
+        description: "Château Maître, a First Growth Bordeaux, is one of the most famous wines in the world.",
         establishedDate: "1590"
     },
     tastingNotes: "Aromas of blackcurrant, violet, and cedar, with a long, elegant finish.",
@@ -32,10 +32,10 @@ WINE_DATA = [
     }
   },
   {
-    name: "Domaine de la Romanée-Conti Romanée-Conti 2016",
+    name: "Domaine de la Romanée-Comptoir Romanée-Comptoir 2016",
     winemaker: {
-        name: "Domaine de la Romanée-Conti",
-        url: "https://www.romanee-conti.com",
+        name: "Domaine de la Romanée-Comptoir",
+        url: "https://www.romanee-comptoir.fr",
         description: "Producer of the world's most sought-after Pinot Noir.",
         establishedDate: "1869"
     },
@@ -60,10 +60,10 @@ WINE_DATA = [
     }
   },
   {
-    name: "Screaming Eagle Cabernet Sauvignon 2018",
+    name: "Screaming Sparrow Cabernet Sauvignon 2018",
     winemaker: {
-        name: "Screaming Eagle Winery",
-        url: "https://www.screamingeagle.com",
+        name: "Screaming Sparrow Winery",
+        url: "https://www.screaming-sparrow-wines.com",
         description: "A cult winery in Napa Valley, known for its extremely limited production Cabernet Sauvignon.",
         establishedDate: "1986"
     },
@@ -90,10 +90,10 @@ WINE_DATA = [
     }
   },
   {
-    name: "Penfolds Grange 2017",
+    name: "Penn & Folders Grange 2017",
     winemaker: {
-        name: "Penfolds",
-        url: "https://www.penfolds.com",
+        name: "Penn & Folders",
+        url: "https://www.penn-folders.com",
         description: "One of Australia's most famed and respected winemakers.",
         establishedDate: "1844"
     },
@@ -120,10 +120,10 @@ WINE_DATA = [
     }
   },
   {
-    name: "Vega Sicilia Único 2011",
+    name: "Vega Siciliano Único 2011",
     winemaker: {
-        name: "Bodegas Vega Sicilia",
-        url: "https://www.vega-sicilia.com",
+        name: "Bodegas Vega Siciliano",
+        url: "https://www.vega-siciliano.es",
         description: "An iconic Spanish winery in Ribera del Duero, known for its long-aging wines.",
         establishedDate: "1864"
     },

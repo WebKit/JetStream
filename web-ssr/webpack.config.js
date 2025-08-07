@@ -1,28 +1,31 @@
-const path = require('path');
-const webpack = require('webpack');
+const path = require("path");
+const webpack = require("webpack");
 
 const commonConfig = {
-  mode: 'production',
-  devtool: 'source-map',
-  target: 'web',
-  entry: path.resolve(__dirname, 'src/react-render-test.cjs'),
+  mode: "production",
+  devtool: "source-map",
+  target: "web",
+  entry: path.resolve(__dirname, "src/react-render-test.cjs"),
   output: {
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'react-render-test.js',
-    library: 'reactRenderTest',
-    libraryTarget: 'var',
+    path: path.resolve(__dirname, "dist"),
+    filename: "react-render-test.js",
+    library: {
+      name: "ReactRenderTest",
+      type: "globalThis",
+    },
+    libraryTarget: "assign",
   },
   plugins: [
     new webpack.ProvidePlugin({
-      TextEncoder: ['text-encoding', 'TextEncoder'],
-      TextDecoder: ['text-encoding', 'TextDecoder'],
-      MessageChannel: [path.resolve(__dirname, 'src/mock/message_channel.cjs'), 'MessageChannel'],
-      process: 'process/browser',
-      Buffer: ['buffer', 'Buffer'],
+      TextEncoder: ["text-encoding", "TextEncoder"],
+      TextDecoder: ["text-encoding", "TextDecoder"],
+      MessageChannel: [path.resolve(__dirname, "src/mock/message_channel.cjs"), "MessageChannel"],
+      process: "process/browser",
+      Buffer: ["buffer", "Buffer"],
     }),
     new webpack.NormalModuleReplacementPlugin(
       /form-data\/lib\/browser\.js/,
-      path.resolve(__dirname, 'src/mock/form-data.cjs')
+      path.resolve(__dirname, "src/mock/form-data.cjs")
     ),
   ],
   module: {
@@ -31,9 +34,9 @@ const commonConfig = {
         test: /\.c?js$/,
         exclude: /node_modules/,
         use: {
-          loader: 'babel-loader',
+          loader: "babel-loader",
           options: {
-            presets: ['@babel/preset-env', '@babel/preset-react'],
+            presets: ["@babel/preset-env", "@babel/preset-react"],
           },
         },
       },

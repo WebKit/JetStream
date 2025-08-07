@@ -4,9 +4,9 @@ const { JSDOM } = require('jsdom');
 const { WineList } = require('./components.cjs');
 const { WINE_DATA } = require("./wine-data.cjs");
 
-function renderTest(wines = WINE_DATA) {
+function renderTest() {
   const start = performance.now();
-  const html = renderToString(<WineList wines={wines} />);
+  const html = renderToString(<WineList wines={WINE_DATA} />);
   const end = performance.now(start);
 
   const duration = end - start;

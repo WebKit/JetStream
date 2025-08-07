@@ -6,8 +6,9 @@
   "scripts": {
     "benchmark:v8": "~/.jsvu/bin/v8 ./benchmark.js",
     "prebuild": "rm -rf dist/*",
-    "build": "npm run prebuild && webpack",
-    "build:dev": "npm run prebuild && webpack --mode development"
+    "build": "npm run prebuild && webpack  && npm run postbuild",
+    "postbuild": "node ./build/postbuild.js",
+    "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild"
   },
   "keywords": [],
   "author": "",

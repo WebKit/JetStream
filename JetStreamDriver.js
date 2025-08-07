@@ -1890,8 +1890,8 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "web-ssr",
         files: [
+            "./web-ssr/dist/react-render-test.src.js",
             "./web-ssr/benchmark.js",
-            "./web-ssr/dist/bundle_data.js",
         ],
         tags: ["Default", "web", "ssr"],
         iterations: 5,
