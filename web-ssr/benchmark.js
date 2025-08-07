@@ -26,7 +26,6 @@ class Benchmark {
 
   constructor(iterations) {
     this.originalSource = REACT_RENDER_TEST_SRC;
-    // this.originalSource = readFile("./web-ssr/dist/react-render-test.js")
     if (iterations > 25)
       throw new Error("Too many iterations");
     for (let i = 0; i < iterations; i++)
@@ -34,6 +33,7 @@ class Benchmark {
   }
 
   prepareCode(iteration) {
+    // Alter the code per iteration to prevent caching.
     const comment = `// Iteration: ${iteration}`;
     const reactName = `React${String.fromCharCode(97+iteration)}`
     const sourceCOde = `${comment}\n${this.originalSource}\n${comment}`;
@@ -43,21 +43,25 @@ class Benchmark {
 
   runIteration() {
     const sourceCode = this.sources[this.iteration];
+    let ReactRenderTest = {};
+    let initStart = performance.now(); 
     const res = eval(sourceCode);
-    print(res)
-    this.lastResult = globalThis.ReactRenderTest.renderTest();
-    // 4. Print results
-    print(`Iteration ${iteration}:`);
-    print(`  Load time: ${loadTime.toFixed(2)}ms`);
-    print(`  Render time: ${result.duration.toFixed(2)}ms`);
+    const runStart = performance.now();
+    this.lastResult = ReactRenderTest.renderTest();
+    const end = performance.now();
+    const loadTime = runStart - initStart;
+    const runTime = end - runStart;
+    // print(`Iteration ${this.iteration}:`);
+    // print(`  Load time: ${loadTime.toFixed(2)}ms`);
+    // print(`  Render time: ${runTime.toFixed(2)}ms`);
     this.iteration++;
   }
 
   validate() {
-    this.expect("HTML length", result.html.length, 5000);
-    this.expect("HTML hash", hash(result.html), 123);
-    this.expect("Wine cards", result.wineCardCount, 100);
-    this.expect("Solid tags", result.solidTagCount, 95);
+    this.expect("HTML length", this.lastResult.html.length, 183795);
+    this.expect("HTML hash", hash(this.lastResult.html), -804755588);
+    this.expect("Wine cards", this.lastResult.wineCardCount, 100);
+    this.expect("Solid tags", this.lastResult.solidTagCount, 95);
   }
 
   expect(name, value, expected) {

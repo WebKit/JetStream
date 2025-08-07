@@ -1,14 +1,13 @@
 {
-  "name": "react_rendering",
+  "name": "web-ssr",
   "version": "1.0.0",
-  "description": "",
+  "description": "React SSR and JSDOM test for a wine collection.",
   "main": "index.js",
   "scripts": {
-    "benchmark:v8": "~/.jsvu/bin/v8 ./benchmark.js",
     "prebuild": "rm -rf dist/*",
     "build": "npm run prebuild && webpack  && npm run postbuild",
-    "postbuild": "node ./build/postbuild.js",
-    "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild"
+    "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild",
+    "postbuild": "node ./build/postbuild.js"
   },
   "keywords": [],
   "author": "",
