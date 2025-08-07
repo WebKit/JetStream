@@ -4,16 +4,20 @@
   "description": "A demo project to evaluate TypeScript performance.",
   "main": "index.js",
   "scripts": {
-    "test": "node src/test.js",
-    "build": "node ./build/import-src-project.js"
+    "test": "node src/test.cjs",
+    "prebuild": "rm -rf dist/* && node ./build/import-src-project.js",
+    "build": "npm run prebuild && webpack && npm run postbuild",
+    "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild",
+    "postbuild": "node ./build/postbuild.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "devDependencies": {
-    "typescript": "^5.9.2"
-  },
   "dependencies": {
-    "glob": "^11.0.3"
+    "glob": "^11.0.3",
+    "path-browserify": "^1.0.1",
+    "typescript": "^5.9.2",
+    "webpack": "^5.101.0",
+    "webpack-cli": "^6.0.1"
   }
 }

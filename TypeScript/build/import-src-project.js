@@ -14,22 +14,16 @@ if (!fs.existsSync(repoDir)) {
   console.log('Jest repository already exists. Skipping clone.');
 }
 
-// 2. Read all files from packages/* into memory
-console.log('Reading files from packages into memory...');
-const fileContents = {};
+// 2. Get a list of all TypeScript files from packages/*
+console.log('Scanning for TypeScript files in packages...');
 const files = glob.sync('packages/**/*.ts', { cwd: repoDir, nodir: true });
 
-files.forEach(file => {
-  const filePath = path.join(repoDir, file);
-  fileContents[file] = fs.readFileSync(filePath, 'utf8');
-});
-
-// 3. Create the jets_src.js module
+// 3. Create the jets_file_list.cjs module
 fs.writeFileSync(
-  'src/jets_src.js',
-  'module.exports = ' + JSON.stringify(fileContents, null, 2) + ';'
+  'src/jets_file_list.cjs',
+  'module.exports = ' + JSON.stringify(files, null, 2) + ';'
 );
-console.log('Created src/jets_src.js');
+console.log('Created src/jets_file_list.cjs');
 
 // 4. Extract and create the jets_tsconfig.js module
 console.log('Extracting tsconfig.json...');

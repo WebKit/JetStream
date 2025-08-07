@@ -5,67 +5,22 @@ const commonConfig = {
   mode: "production",
   devtool: "source-map",
   target: "web",
-  entry: path.resolve(__dirname, "src/react-render-test.cjs"),
+  entry: path.resolve(__dirname, "src/test.cjs"),
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "react-render-test.js",
+    filename: "typescript-compile-test.js",
     library: {
-      name: "ReactRenderTest",
+      name: "TypeScriptCompileTest",
       type: "globalThis",
     },
     libraryTarget: "assign",
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      TextEncoder: ["text-encoding", "TextEncoder"],
-      TextDecoder: ["text-encoding", "TextDecoder"],
-      MessageChannel: [path.resolve(__dirname, "src/mock/message_channel.cjs"), "MessageChannel"],
-      process: "process/browser",
-      Buffer: ["buffer", "Buffer"],
-    }),
-    new webpack.NormalModuleReplacementPlugin(
-      /form-data\/lib\/browser\.js/,
-      path.resolve(__dirname, "src/mock/form-data.cjs")
-    ),
-  ],
-  module: {
-    rules: [
-      {
-        test: /\.c?js$/,
-        exclude: /node_modules/,
-        use: {
-          loader: "babel-loader",
-          options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"],
-          },
-        },
-      },
-    ],
-  },
   resolve: {
     fallback: {
-      "http": require.resolve("stream-http"),
-      "https": require.resolve("https-browserify"),
-      "url": require.resolve("url/"),
-      "assert": require.resolve("assert/"),
-      "string_decoder": require.resolve("string_decoder/"),
-      "path": require.resolve("path-browserify"),
-      "vm": require.resolve("vm-browserify"),
-      "crypto": require.resolve("crypto-browserify"),
-      "stream": require.resolve("stream-browserify"),
-      "zlib": require.resolve("browserify-zlib"),
-      "util": require.resolve("util/"),
-      "os": require.resolve("os-browserify/browser"),
-      "buffer": require.resolve("buffer/"),
-      "fs": false,
-      "child_process": false,
-      "net": false,
-      "tls": false,
-      "canvas": false,
+       "path": require.resolve("path-browserify")
     }
   },
 };
-
 
 
 module.exports = [commonConfig];
