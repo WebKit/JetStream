@@ -1887,6 +1887,16 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "Proxy"],
     }),
+    new DefaultBenchmark({
+        name: "web-ssr",
+        files: [
+            "./web-ssr/benchmark.js",
+            "./web-ssr/dist/bundle_data.js",
+        ],
+        tags: ["Default", "web", "ssr"],
+        iterations: 5,
+        worstCaseCount: 3,
+    }),
     // Class fields
     new DefaultBenchmark({
         name: "raytrace-public-class-fields",
