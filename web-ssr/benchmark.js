@@ -58,8 +58,8 @@ class Benchmark {
   }
 
   validate() {
-    this.expect("HTML length", this.lastResult.html.length, 183795);
-    this.expect("HTML hash", hash(this.lastResult.html), -804755588);
+    this.expect("HTML length", this.lastResult.html.length, 188947);
+    this.expect("HTML hash", hash(this.lastResult.html), 197561020);
     this.expect("Wine cards", this.lastResult.wineCardCount, 100);
     this.expect("Solid tags", this.lastResult.solidTagCount, 95);
   }

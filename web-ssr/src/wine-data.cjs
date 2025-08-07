@@ -32,7 +32,7 @@ const WINE_DATA = [
     }
   },
   {
-    name: "Domaine de la Romanée-Comptoir Romanée-Comptoir 2016",
+    name: "Domaine de la Romanée-Comptoir 2016",
     winemaker: {
         name: "Domaine de la Romanée-Comptoir",
         url: "https://www.romanee-comptoir.fr",
