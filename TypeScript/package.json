@@ -1,0 +1,19 @@
+{
+  "name": "typescript-performance-demo",
+  "version": "1.0.0",
+  "description": "A demo project to evaluate TypeScript performance.",
+  "main": "index.js",
+  "scripts": {
+    "test": "node src/test.js",
+    "build": "node ./build/import-src-project.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.9.2"
+  },
+  "dependencies": {
+    "glob": "^11.0.3"
+  }
+}
