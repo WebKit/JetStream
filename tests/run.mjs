@@ -60,9 +60,10 @@ const server = await serve(PORT);
 async function runTests() {
     let success = true;
     try {
-        success &&= await runTest("Run Single Suite", () => testEnd2End({ test: "proxy-mobx" }));
-        success &&= await runTest("Run Disabled Suite", () => testEnd2End({ tag: "disabled" }));
-        success &&= await runTest("Run Default Suite", () => testEnd2End());
+        success &&= await runEnd2EndTest("Run Single Suite", { test: "proxy-mobx" });
+        success &&= await runEnd2EndTest("Run Tag No Prefetch",  { tag: "proxy", prefetchResources: "false" });
+        success &&= await runEnd2EndTest("Run Disabled Suite", { tag: "disabled" });
+        success &&= await runEnd2EndTest("Run Default Suite");
     } finally {
         server.close();
     }
@@ -70,6 +71,9 @@ async function runTests() {
       process.exit(1);
 }
 
+async function runEnd2EndTest(name, params) {
+    return runTest(name, () => testEnd2End(params));
+}
 
 async function testEnd2End(params) {
     const driver = await new Builder().withCapabilities(capabilities).build();
