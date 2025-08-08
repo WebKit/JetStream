@@ -1,9 +1,9 @@
 const ts = require("typescript");
 const path = require("path");
-const SRC_FILE_DATA = require("./gen/zod-medium/src_file_data.cjs");
-const TS_CONFIG = require("./gen/zod-medium/src_tsconfig.cjs");
+const SRC_FILE_DATA = require("./gen/immer-tiny/src_file_data.cjs");
+const TS_CONFIG = require("./gen/immer-tiny/src_tsconfig.cjs");
 
-const repoRoot = path.resolve(__dirname, "../jest");
+const repoRoot = path.resolve(__dirname);
 
 class CompilerHost {
   constructor(options, srcFileData) {
@@ -55,7 +55,6 @@ function compileTest() {
   options.lib = [...(options.lib || []), "dom"];
 
   const host = new CompilerHost(options, SRC_FILE_DATA);
-
 
   const program = ts.createProgram(Object.keys(SRC_FILE_DATA), options, host);
   const emitResult = program.emit();

@@ -1,7 +1,7 @@
 const {compileTest} = require("./test.cjs");
 
 
-console.log("Starting TypeScript in-memory compilation benchmark with Jest source...");
+console.log("Starting TypeScript in-memory compilation benchmark...");
 const startTime = performance.now();
 
 compileTest();

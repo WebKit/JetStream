@@ -15,6 +15,18 @@ const commonConfig = {
     },
     libraryTarget: "assign",
   },
+  optimization: {
+    minimizer: [
+      (compiler) => {
+        const TerserPlugin = require("terser-webpack-plugin");
+        new TerserPlugin({
+          terserOptions: {
+            keep_fnames: true,
+          },
+        }).apply(compiler);
+      },
+    ],
+  },
   resolve: {
     fallback: {
        "path": require.resolve("path-browserify"),
