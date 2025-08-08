@@ -1902,6 +1902,15 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "ClassFields"],
     }),
+    new DefaultBenchmark({
+        name: "TypeScript-New",
+        files: [
+            "./TypeScript/src/mock/sys.js",
+            "./TypeScript/dist/typescript-compile-test.js",
+            "./TypeScript/benchmark.js",
+        ],
+        tags: ["Default", "TypeScript"],
+    }),
     // Generators
     new AsyncBenchmark({
         name: "async-fs",

@@ -6,7 +6,7 @@ const glob = require("glob");
 const repoUrl = "https://github.com/jestjs/jest.git";
 const baseDir = path.resolve(__dirname);
 const repoDir = path.resolve(__dirname, "../jest.git");
-const outputDir = path.resolve(__dirname, "../src");
+const outputDir = path.resolve(__dirname, "../src/gen");
 
 // 1. Clone the repository
 if (!fs.existsSync(repoDir)) {
@@ -20,6 +20,9 @@ if (!fs.existsSync(repoDir)) {
 console.log("Reading files from packages into memory...");
 const fileContents = {};
 const files = glob.sync("packages/**/*.ts", { cwd: repoDir, nodir: true });
+files.push(...glob.sync("packages/**/*.d.ts", { cwd: repoDir, nodir: true }));
+files.push(...glob.sync("packages/*.d.ts", { cwd: repoDir, nodir: true }));
+files.forEach(f => console.log(f))
 
 files.forEach(file => {
   const filePath = path.join(repoDir, file);
@@ -28,14 +31,17 @@ files.forEach(file => {
   fileContents[relativePath] = fs.readFileSync(filePath, "utf8");
 });
 
-function addExtraFiles(relativeSourceDir) {
+function addExtraFiles(relativeSourceDir, nameOnly = false) {
   const absoluteSourceDir = path.resolve(__dirname, relativeSourceDir);
   let allFiles = glob.sync('**/*.d.ts', { cwd: absoluteSourceDir, nodir: true });
   allFiles = allFiles.concat(glob.sync('**/*.d.mts', { cwd: absoluteSourceDir, nodir: true }));
 
   allFiles.forEach(file => {
     const filePath = path.join(absoluteSourceDir, file);
-    const relativePath = path.join(relativeSourceDir, path.relative(absoluteSourceDir, filePath));
+    let relativePath = path.join(relativeSourceDir, path.relative(absoluteSourceDir, filePath));
+    if (nameOnly)
+      relativePath =path.basename(relativePath);
+
     fileContents[relativePath] = fs.readFileSync(filePath, 'utf8');
   });
 };
@@ -82,23 +88,23 @@ extraFiles.forEach(file => {
 
 
 
-// 3. Create the jest_src.cjs module
-fs.writeFileSync(
-  path.join(outputDir, "jest_src_data.cjs"),
+const filesDataPath = path.join(outputDir, "src_files_data.cjs");
+fs.writeFileSync(filesDataPath,
   "module.exports = " + JSON.stringify(fileContents, null, 2) + ";"
 );
-console.log("Created src/jest_src_data.cjs");
+console.log(`Created ${filesDataPath}`);
 
-// 4. Extract and create the jest_tsconfig.cjs module
+// Extract and create the jest_tsconfig.cjs module
 console.log("Extracting tsconfig.json...");
-const tsconfigPath = path.join(repoDir, "tsconfig.json");
-const tsconfigContent = fs.readFileSync(tsconfigPath, "utf8");
+const tsconfigInputPath = path.join(repoDir, "tsconfig.json");
+const tsconfigContent = fs.readFileSync(tsconfigInputPath, "utf8");
 const tsconfig = JSON.parse(tsconfigContent.replace(/(?:^|\s)\/\/.*$|\/\*[\s\S]*?\*\//gm, ""));
 
+const tsconfigOutputPath = path.join(outputDir, "src_tsconfig.cjs");
 fs.writeFileSync(
-  path.join(outputDir, "jest_tsconfig.cjs"),
+  tsconfigOutputPath,
   "module.exports = " + JSON.stringify(tsconfig, null, 2) + ";"
 );
-console.log("Created src/jest_tsconfig.cjs");
+console.log(`Created ${tsconfigOutputPath}`);
 
 console.log("Build process complete.");

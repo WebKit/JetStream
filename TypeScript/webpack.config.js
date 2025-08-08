@@ -17,7 +17,11 @@ const commonConfig = {
   },
   resolve: {
     fallback: {
-       "path": require.resolve("path-browserify")
+       "path": require.resolve("path-browserify"),
+       "fs": false,
+    },
+    alias: {
+      "sys": path.resolve(__dirname, "src/sys_polyfill.js")
     }
   },
 };
