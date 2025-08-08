@@ -23,6 +23,7 @@
         "test:firefox": "node tests/run.mjs --browser firefox",
         "test:safari": "node tests/run.mjs --browser safari",
         "test:edge": "node tests/run.mjs --browser edge",
+        "test:shell": "npm run test:v8 && npm run test:jsc && npm run test:spidermonkey",
         "test:v8": "node tests/run-shell.mjs --shell v8",
         "test:jsc": "node tests/run-shell.mjs --shell jsc",
         "test:spidermonkey": "node tests/run-shell.mjs --shell spidermonkey"

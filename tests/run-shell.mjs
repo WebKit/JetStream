@@ -1,7 +1,7 @@
 #! /usr/bin/env node
 
 import commandLineArgs from "command-line-args";
-import { spawnSync } from  "child_process";
+import { spawn } from  "child_process";
 import { fileURLToPath } from "url";
 import { styleText } from "node:util";
 import * as path from "path";
@@ -59,7 +59,7 @@ const SPAWN_OPTIONS =  {
   stdio: ["inherit", "inherit", "inherit"]
 };
 
-function sh(binary, ...args) {
+async function sh(binary, ...args) {
   const cmd = `${binary} ${args.join(" ")}`;
   if (GITHUB_ACTIONS_OUTPUT) {
     core.startGroup(binary);
@@ -68,15 +68,40 @@ function sh(binary, ...args) {
     console.log(styleText("blue", cmd));
   }
   try {
-    const result = spawnSync(binary, args, SPAWN_OPTIONS);
+    const result = await spawnCaptureStdout(binary, args, SPAWN_OPTIONS);
     if (result.status || result.error) {
       logError(result.error);
       throw new Error(`Shell CMD failed: ${binary} ${args.join(" ")}`);
     }
+    return result;
   } finally {
     if (GITHUB_ACTIONS_OUTPUT)
       core.endGroup();
   }
+}
+
+async function spawnCaptureStdout(binary, args) {
+  const childProcess = spawn(binary, args);
+  childProcess.stdout.pipe(process.stdout);
+  return new Promise((resolve, reject) => {
+    childProcess.stdoutString = "";
+    childProcess.stdio[1].on("data", (data) => {
+      childProcess.stdoutString += data.toString();
+    });
+    childProcess.on('close', (code) => {
+      if (code === 0) {
+        resolve(childProcess);
+      } else {
+        // Reject the Promise with an Error on failure
+        const error = new Error(`Command failed with exit code ${code}: ${binary} ${args.join(" ")}`);
+        error.process = childProcess;
+        error.stdout = childProcess.stdoutString;
+        error.exitCode = code;
+        reject(error);
+      }
+    });
+    childProcess.on('error', reject);
+  })
 }
 
 async function runTests() {
@@ -84,6 +109,7 @@ async function runTests() {
     let success = true;
     success &&= await runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
     success &&= await runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
+    success &&= await runCLITest("Run Tag No Prefetch", shellBinary, "proxy", "--no-prefetch");
     success &&= await runCLITest("Run Disabled Suite", shellBinary, "disabled");
     success &&= await runCLITest("Run Default Suite",  shellBinary);
     if (!success)
@@ -111,8 +137,8 @@ function jsvuOSName() {
 
 const DEFAULT_JSC_LOCATION = "/System/Library/Frameworks/JavaScriptCore.framework/Versions/Current/Helpers/jsc"
 
-function testSetup() {
-    sh("jsvu", `--engines=${SHELL_NAME}`, `--os=${jsvuOSName()}`);
+async function testSetup() {
+    await sh("jsvu", `--engines=${SHELL_NAME}`, `--os=${jsvuOSName()}`);
     let shellBinary = path.join(os.homedir(), ".jsvu/bin", SHELL_NAME);
     if (!fs.existsSync(shellBinary) && SHELL_NAME == "javascriptcore")
       shellBinary = DEFAULT_JSC_LOCATION;
@@ -123,7 +149,13 @@ function testSetup() {
 }
 
 function runCLITest(name, shellBinary, ...args) {
-  return runTest(name, () => sh(shellBinary, ...convertCliArgs(CLI_PATH, ...args)));
+  return runTest(name, () => runShell(shellBinary, ...convertCliArgs(CLI_PATH, ...args)));
+}
+
+async function runShell(shellBinary, ...args) {
+  const result = await sh(shellBinary, ...args);
+  if (result.stdoutString.includes("JetStream3 failed"))
+    throw new Error("test failed")
 }
 
 setImmediate(runTests);

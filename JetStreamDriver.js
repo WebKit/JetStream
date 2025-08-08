@@ -40,16 +40,20 @@ globalThis.dumpJSONResults ??= false;
 globalThis.testList ??= undefined;
 globalThis.startDelay ??= undefined;
 globalThis.shouldReport ??= false;
+globalThis.prefetchResources ??= true;
 
 function getIntParam(urlParams, key) {
-    if (!urlParams.has(key))
-        return undefined
     const rawValue = urlParams.get(key);
     const value = parseInt(rawValue);
     if (value <= 0)
         throw new Error(`Expected positive value for ${key}, but got ${rawValue}`);
     return value;
 }
+
+function getBoolParam(urlParams, key) {
+    const rawValue = urlParams.get(key).toLowerCase()
+    return !(rawValue === "false" || rawValue === "0")
+ }
 
 function getTestListParam(urlParams, key) {
     if (globalThis.testList?.length)
@@ -73,7 +77,12 @@ if (typeof(URLSearchParams) !== "undefined") {
         globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
     if (urlParameters.has("worstCaseCount"))
         globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
+    if (urlParameters.has("prefetchResources"))
+        globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources");
 }
+
+if (!globalThis.prefetchResources)
+    console.warn("Disabling resource prefetching!");
 
 // Used for the promise representing the current benchmark run.
 this.currentResolve = null;
@@ -88,7 +97,7 @@ function displayCategoryScores() {
 
     let summaryElement = document.getElementById("result-summary");
     for (let [category, scores] of categoryScores)
-        summaryElement.innerHTML += `<p> ${category}: ${uiFriendlyScore(geomean(scores))}</p>`
+        summaryElement.innerHTML += `<p> ${category}: ${uiFriendlyScore(geomeanScore(scores))}</p>`
 
     categoryScores = null;
 }
@@ -138,12 +147,15 @@ function mean(values) {
     return sum / values.length;
 }
 
-function geomean(values) {
+function geomeanScore(values) {
     assert(values instanceof Array);
     let product = 1;
     for (let x of values)
         product *= x;
-    return product ** (1 / values.length);
+    const score = product ** (1 / values.length);
+    // Allow 0 for uninitialized subScores().
+    assert(score >= 0, `Got invalid score: ${score}`)
+    return score;
 }
 
 function toScore(timeValue) {
@@ -180,28 +192,29 @@ function uiFriendlyDuration(time) {
 // TODO: Cleanup / remove / merge. This is only used for caching loads in the
 // non-browser setting. In the browser we use exclusively `loadCache`, 
 // `loadBlob`, `doLoadBlob`, `prefetchResourcesForBrowser` etc., see below.
-const fileLoader = (function() {
-    class Loader {
-        constructor() {
-            this.requests = new Map;
-        }
-
-        // Cache / memoize previously read files, because some workloads
-        // share common code.
-        load(url) {
-            assert(!isInBrowser);
-
-            if (this.requests.has(url)) {
-                return this.requests.get(url);
-            }
-
-            const contents = readFile(url);
-            this.requests.set(url, contents);
-            return contents;
-        }
+class ShellFileLoader {
+    constructor() {
+        this.requests = new Map;
     }
-    return new Loader;
-})();
+
+    // Cache / memoize previously read files, because some workloads
+    // share common code.
+    load(url) {
+        assert(!isInBrowser);
+        if (!globalThis.prefetchResources)
+            return `load("${url}");`
+
+        if (this.requests.has(url)) {
+            return this.requests.get(url);
+        }
+
+        const contents = readFile(url);
+        this.requests.set(url, contents);
+        return contents;
+    }
+};
+
+const shellFileLoader = new ShellFileLoader();
 
 class Driver {
     constructor(benchmarks) {
@@ -211,6 +224,7 @@ class Driver {
         // Make benchmark list unique and sort it.
         this.benchmarks = Array.from(new Set(benchmarks));
         this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+        assert(this.benchmarks.length, "No benchmarks selected");
         // TODO: Cleanup / remove / merge `blobDataCache` and `loadCache` vs.
         // the global `fileLoader` cache.
         this.blobDataCache = { };
@@ -248,7 +262,7 @@ class Driver {
             performance.mark("update-ui");
             benchmark.updateUIAfterRun();
 
-            if (isInBrowser) {
+            if (isInBrowser && globalThis.prefetchResources) {
                 const cache = JetStream.blobDataCache;
                 for (const file of benchmark.plan.files) {
                     const blobData = cache[file];
@@ -270,8 +284,11 @@ class Driver {
         }
 
         const allScores = [];
-        for (const benchmark of this.benchmarks)
-            allScores.push(benchmark.score);
+        for (const benchmark of this.benchmarks) {
+            const score = benchmark.score;
+            assert(score > 0, `Invalid ${benchmark.name} score: ${score}`);
+            allScores.push(score);
+        }
 
         categoryScores = new Map;
         for (const benchmark of this.benchmarks) {
@@ -282,23 +299,27 @@ class Driver {
         for (const benchmark of this.benchmarks) {
             for (let [category, value] of Object.entries(benchmark.subScores())) {
                 const arr = categoryScores.get(category);
+                assert(value > 0, `Invalid ${benchmark.name} ${category} score: ${value}`);
                 arr.push(value);
             }
         }
 
+        const totalScore = geomeanScore(allScores);
+        assert(totalScore > 0, `Invalid total score: ${totalScore}`);
+
         if (isInBrowser) {
-            summaryElement.classList.add('done');
-            summaryElement.innerHTML = `<div class="score">${uiFriendlyScore(geomean(allScores))}</div><label>Score</label>`;
+            summaryElement.classList.add("done");
+            summaryElement.innerHTML = `<div class="score">${uiFriendlyScore(totalScore)}</div><label>Score</label>`;
             summaryElement.onclick = displayCategoryScores;
             if (showScoreDetails)
                 displayCategoryScores();
-            statusElement.innerHTML = '';
+            statusElement.innerHTML = "";
         } else if (!dumpJSONResults) {
             console.log("\n");
             for (let [category, scores] of categoryScores)
-                console.log(`${category}: ${uiFriendlyScore(geomean(scores))}`);
+                console.log(`${category}: ${uiFriendlyScore(geomeanScore(scores))}`);
 
-            console.log("\nTotal Score: ", uiFriendlyScore(geomean(allScores)), "\n");
+            console.log("\nTotal Score: ", uiFriendlyScore(totalScore), "\n");
         }
 
         this.reportScoreToRunBenchmarkRunner();
@@ -727,7 +748,7 @@ class Benchmark {
 
     get score() {
         const subScores = Object.values(this.subScores());
-        return geomean(subScores);
+        return geomeanScore(subScores);
     }
 
     subScores() {
@@ -788,8 +809,9 @@ class Benchmark {
                 scripts.add(text);
         } else {
             const cache = JetStream.blobDataCache;
-            for (const file of this.plan.files)
-                scripts.addWithURL(cache[file].blobURL);
+            for (const file of this.plan.files) {
+                scripts.addWithURL(globalThis.prefetchResources ? cache[file].blobURL : file);
+            }
         }
 
         const promise = new Promise((resolve, reject) => {
@@ -838,6 +860,11 @@ class Benchmark {
     }
 
     async doLoadBlob(resource) {
+        const blobData = JetStream.blobDataCache[resource];
+        if (!globalThis.prefetchResources) {
+            blobData.blobURL = resource;
+            return blobData;
+        }
         let response;
         let tries = 3;
         while (tries--) {
@@ -854,7 +881,6 @@ class Benchmark {
             throw new Error("Fetch failed");
         }
         const blob = await response.blob();
-        const blobData = JetStream.blobDataCache[resource];
         blobData.blob = blob;
         blobData.blobURL = URL.createObjectURL(blob);
         return blobData;
@@ -987,7 +1013,7 @@ class Benchmark {
         assert(!isInBrowser);
 
         assert(this.scripts === null, "This initialization should be called only once.");
-        this.scripts = this.plan.files.map(file => fileLoader.load(file));
+        this.scripts = this.plan.files.map(file => shellFileLoader.load(file));
 
         assert(this.preloads === null, "This initialization should be called only once.");
         this.preloads = Object.entries(this.plan.preload ?? {});
@@ -2428,8 +2454,7 @@ for (const benchmark of BENCHMARKS) {
 }
 
 
-function processTestList(testList)
-{
+function processTestList(testList) {
     let benchmarkNames = [];
     let benchmarks = [];
 
@@ -2441,7 +2466,7 @@ function processTestList(testList)
     for (let name of benchmarkNames) {
         name = name.toLowerCase();
         if (benchmarksByTag.has(name))
-            benchmarks.concat(findBenchmarksByTag(name));
+            benchmarks = benchmarks.concat(findBenchmarksByTag(name));
         else
             benchmarks.push(findBenchmarkByName(name));
     }
