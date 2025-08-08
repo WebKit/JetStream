@@ -8,7 +8,7 @@
     "clean": "rm -rf dist/* && rm -rf src/gen/*",
     "import": "node ./build/import-src-project.js",
     "prebuild": "npm run clean  && npm run import",
-    "build": "npm run prebuild && webpack && npm run postbuild",
+    "build": "webpack && npm run postbuild",
     "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild",
     "postbuild": "node ./build/postbuild.js"
   },
