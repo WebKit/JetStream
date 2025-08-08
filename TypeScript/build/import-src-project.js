@@ -9,7 +9,7 @@ class Importer {
     this.baseDir = path.resolve(__dirname);
     this.repoDir = path.resolve(__dirname, "../jest.git");
     this.outputDir = path.resolve(__dirname, "../src/gen");
-    this.fileContents = {};
+    this.srcFileData = Object.create(null);
   }
 
   cloneRepo() {
@@ -21,24 +21,23 @@ class Importer {
     }
   }
 
-  readPackageFiles() {
-    console.log("Reading files from packages into memory...");
-    const patterns = ["packages/**/*.ts", "packages/**/*.d.ts", "packages/*.d.ts"];
+  readSrcFileData({srcFolder}) {
+    console.log(`Reading files from ${srcFolder} into memory...`);
+    const patterns = [`${srcFolder}/**/*.ts`, `${srcFolder}/**/*.d.ts`, `${srcFolder}/*.d.ts`];
     patterns.forEach(pattern => {
       const files = glob.sync(pattern, { cwd: this.repoDir, nodir: true });
       files.forEach(file => {
         const filePath = path.join(this.repoDir, file);
         const relativePath = path.relative(this.repoDir, filePath);
-        this.fileContents[relativePath] = fs.readFileSync(filePath, "utf8");
-        console.log(file);
+        this.srcFileData[relativePath] = fs.readFileSync(filePath, "utf8");
       });
     });
   }
 
   addExtraFilesFromDirs() {
     const extraDirs = [
-      { dir: '../node_modules/@types/' },
-      { dir: '../node_modules/typescript/lib/' },
+      { dir: "../node_modules/@types/" },
+      { dir: "../node_modules/typescript/lib/", nameOnly:true},
       { dir: "../node_modules/jest-worker/build/" },
       { dir: "../node_modules/@jridgewell/trace-mapping/types/" },
       { dir: "../node_modules/minimatch/dist/esm/" },
@@ -48,8 +47,8 @@ class Importer {
 
     extraDirs.forEach(({ dir, nameOnly = false }) => {
       const absoluteSourceDir = path.resolve(__dirname, dir);
-      let allFiles = glob.sync('**/*.d.ts', { cwd: absoluteSourceDir, nodir: true });
-      allFiles = allFiles.concat(glob.sync('**/*.d.mts', { cwd: absoluteSourceDir, nodir: true }));
+      let allFiles = glob.sync("**/*.d.ts", { cwd: absoluteSourceDir, nodir: true });
+      allFiles = allFiles.concat(glob.sync("**/*.d.mts", { cwd: absoluteSourceDir, nodir: true }));
 
       allFiles.forEach(file => {
         const filePath = path.join(absoluteSourceDir, file);
@@ -57,7 +56,7 @@ class Importer {
         if (nameOnly) {
           relativePath = path.basename(relativePath);
         }
-        this.fileContents[relativePath] = fs.readFileSync(filePath, 'utf8');
+        this.srcFileData[relativePath] = fs.readFileSync(filePath, "utf8");
       });
     });
   }
@@ -89,19 +88,15 @@ class Importer {
 
     extraFiles.forEach(file => {
       const filePath = path.join(this.baseDir, file);
-      if (fs.existsSync(filePath)) {
-        this.fileContents[file] = fs.readFileSync(filePath, "utf8");
-      } else {
-        console.warn(`File not found, skipping: ${filePath}`);
-      }
+        this.srcFileData[file] = fs.readFileSync(filePath, "utf8");
     });
   }
 
-  writeFilesData() {
-    const filesDataPath = path.join(this.outputDir, "src_files_data.cjs");
+  writeSrcFileData() {
+    const filesDataPath = path.join(this.outputDir, "src_file_data.cjs");
     fs.writeFileSync(
       filesDataPath,
-      "module.exports = " + JSON.stringify(this.fileContents, null, 2) + ";"
+      "module.exports = " + JSON.stringify(this.srcFileData, null, 2) + ";"
     );
     console.log(`Created ${filesDataPath}`);
   }
@@ -122,10 +117,10 @@ class Importer {
 
   run() {
     this.cloneRepo();
-    this.readPackageFiles();
+    this.readSrcFileData({srcFolder: "packages"});
     this.addExtraFilesFromDirs();
     this.addSpecificFiles();
-    this.writeFilesData();
+    this.writeSrcFileData();
     this.writeTsConfig();
     console.log("Build process complete.");
   }
