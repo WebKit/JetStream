@@ -44,14 +44,14 @@ class Importer {
       const files = glob.sync(pattern, { cwd: this.repoDir, nodir: true });
       files.forEach(file => {
         const filePath = path.join(this.repoDir, file);
-        const relativePath = path.relative(this.repoDir, filePath);
-        this.srcFileData[relativePath] = fs.readFileSync(filePath, "utf8");
+        const relativePath = path.relative(this.repoDir, filePath).toLowerCase();
+        const fileContents = fs.readFileSync(filePath, "utf8");
+        this.addFileContents(relativePath, fileContents);
       });
     });
   }
 
   addExtraFilesFromDirs() {
-
     this.extraDirs.forEach(({ dir, nameOnly = false }) => {
       const absoluteSourceDir = path.resolve(__dirname, dir);
       let allFiles = glob.sync("**/*.d.ts", { cwd: absoluteSourceDir, nodir: true });
@@ -63,9 +63,19 @@ class Importer {
         if (nameOnly) {
           relativePath = path.basename(relativePath);
         }
-        this.srcFileData[relativePath] = fs.readFileSync(filePath, "utf8");
+        this.addFileContents(relativePath, fs.readFileSync(filePath, "utf8"))
       });
     });
+  }
+
+  addFileContents(relativePath, fileContents) {
+    if (relativePath in this.srcFileData) {
+        if (this.srcFileData[relativePath] !== fileContents) {
+          throw new Error(`${relativePath} was previously added with different contents.`);
+        }
+    } else {
+      this.srcFileData[relativePath] = fileContents;
+    }
   }
 
   addSpecificFiles() {

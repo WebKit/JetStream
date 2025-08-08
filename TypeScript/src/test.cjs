@@ -27,12 +27,13 @@ class CompilerHost {
         resolvedModules.push(undefined);
       }
     }
+    console.log({moduleNames, resolvedModules, containingFile})
     return resolvedModules;
   }
 
   getDefaultLibFileName() { return "lib.d.ts"; }
   getCurrentDirectory() { return ""; }
-  getCanonicalFileName(fileName) { return fileName; }
+  getCanonicalFileName(fileName) { return fileName.toLowerCase(); }
   useCaseSensitiveFileNames() { return true; }
   getNewLine() { return "\n"; }
 
@@ -41,7 +42,8 @@ class CompilerHost {
   }
 
   readFile(filePath) {
-    const fileContent = this.srcFileData[filePath];
+    console.log("readFile", filePath);
+    const fileContent = this.srcFileData[filePath.toLowerCase()];
     if (fileContent === undefined) {
       throw new Error(`"${filePath}" does not exist.`);
     }
