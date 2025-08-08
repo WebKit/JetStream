@@ -1239,26 +1239,14 @@ class WasmEMCCBenchmark extends AsyncBenchmark {
                 noInitialRun: true,
                 print: print,
                 printErr: printErr,
-                setStatus: function(text) {
-                },
+                setStatus: null,
                 totalDependencies: 0,
-                monitorRunDependencies: function(left) {
-                    this.totalDependencies = Math.max(this.totalDependencies, left);
-                    Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-                },
+                monitorRunDependencies: null
             };
 
             globalObject.Module = Module;
             ${super.prerunCode};
         `;
-
-        if (isSpiderMonkey) {
-            str += `
-                // Needed because SpiderMonkey shell doesn't have a setTimeout.
-                Module.setStatus = null;
-                Module.monitorRunDependencies = null;
-            `;
-        }
 
         return str;
     }
@@ -1379,13 +1367,9 @@ class WasmLegacyBenchmark extends Benchmark {
                 postRun: [],
                 print: globalObject.print,
                 printErr: globalObject.print,
-                setStatus: function(text) {
-                },
+                setStatus: null,
                 totalDependencies: 0,
-                monitorRunDependencies: function(left) {
-                    this.totalDependencies = Math.max(this.totalDependencies, left);
-                    Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-                }
+                monitorRunDependencies: null
             };
             globalObject.Module = Module;
             `;
