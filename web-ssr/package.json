@@ -4,8 +4,9 @@
   "description": "React SSR and JSDOM test for a wine collection.",
   "main": "index.js",
   "scripts": {
+    "test": "babel-node benchmark-node.cjs",
     "prebuild": "rm -rf dist/*",
-    "build": "npm run prebuild && webpack  && npm run postbuild",
+    "build": "webpack  && npm run postbuild",
     "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild",
     "postbuild": "node ./build/postbuild.js"
   },
@@ -20,6 +21,7 @@
     "@babel/preset-react": "^7.27.1",
     "assert": "^2.1.0",
     "babel-loader": "^10.0.0",
+    "babel-node": "^0.0.1-security",
     "browserify-zlib": "^0.2.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
