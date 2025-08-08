@@ -36,6 +36,7 @@ testList = [
   "8bitbench-wasm",
   "Dart-flute-wasm",
   "zlib-wasm",
+  "Kotlin-compose-wasm",
 ];
 
 // Reuse the full CLI runner, just with the subset of Wasm line items above.
