@@ -1929,14 +1929,14 @@ let BENCHMARKS = [
         tags: ["Default", "ClassFields"],
     }),
     new DefaultBenchmark({
-        name: "typescript",
+        name: "typescript-lib",
         files: [
             "./TypeScript/src/mock/sys.js",
             "./TypeScript/dist/typescript-compile-test.js",
             "./TypeScript/benchmark.js",
         ],
-        iterations: 5,
-        worstCaseCount: 3,
+        iterations: 3,
+        worstCaseCount: 2,
         tags: ["Default", "typescript"],
     }),
     // Generators
