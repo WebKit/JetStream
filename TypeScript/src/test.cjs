@@ -59,39 +59,35 @@ function compileTest() {
 
   const host = new CompilerHost(options, SRC_FILE_DATA);
 
-  console.log("Starting TypeScript in-memory compilation benchmark with Jest source...");
-  const startTime = performance.now();
 
   const program = ts.createProgram(Object.keys(SRC_FILE_DATA), options, host);
   const emitResult = program.emit();
+  const diagnostics = formatDiagnostics(program, emitResult);
 
-  const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
-
-  if (allDiagnostics.length > 0) {
-    console.log(`Found ${allDiagnostics.length} errors:`);
-  }
-
-  allDiagnostics.slice(0, 20).forEach(diagnostic => { // Limit output for brevity
-    if (diagnostic.file) {
-      const { line, character } = ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start);
-      const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
-      console.log(`${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`);
-    } else {
-      console.log(ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n"));
-    }
-  });
-
-  const endTime = performance.now();
-  const duration = (endTime - startTime) / 1000;
-
-  console.log(`TypeScript compilation finished.`);
-  console.log(`Compilation took ${duration.toFixed(2)} seconds.`);
-
-  if (emitResult.emitSkipped) {
-    console.log("Emit was skipped.");
-  }
+  return { diagnostics,
+    resultFilesCount: Object.keys(host.outFileData).length,
+   };
 }
 
 module.exports = {
   compileTest
 };
+
+function formatDiagnostics(program, emitResult) {
+  const allDiagnostics = ts.getPreEmitDiagnostics(program).concat(emitResult.diagnostics);
+  if (allDiagnostics.length > 0) {
+    console.log(`Found ${allDiagnostics.length} errors:`);
+  }
+
+  const formattedDiagnostics = allDiagnostics.map(diagnostic => {
+    if (diagnostic.file) {
+      const { line, character } = ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start);
+      const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+      return `${diagnostic.file.fileName} (${line + 1},${character + 1}): ${message}`;
+    } else {
+      return ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
+    }
+  });
+  formattedDiagnostics.slice(0, 20).map(each => console.log(each));
+  return formattedDiagnostics;
+}

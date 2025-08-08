@@ -4,8 +4,10 @@
   "description": "A demo project to evaluate TypeScript performance.",
   "main": "index.js",
   "scripts": {
-    "test": "node src/run.cjs",
-    "prebuild": "rm -rf dist/* && rm -rf src/gen/*  && node ./build/import-src-project.js",
+    "test": "node ./src/benchmark-node.cjs",
+    "clean": "rm -rf dist/* && rm -rf src/gen/*",
+    "import": "node ./build/import-src-project.js",
+    "prebuild": "npm run clean  && npm run import",
     "build": "npm run prebuild && webpack && npm run postbuild",
     "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild",
     "postbuild": "node ./build/postbuild.js"
