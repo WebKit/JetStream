@@ -1913,6 +1913,16 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "Proxy"],
     }),
+    new DefaultBenchmark({
+        name: "web-ssr",
+        files: [
+            "./web-ssr/dist/react-render-test.src.js",
+            "./web-ssr/benchmark.js",
+        ],
+        tags: ["Default", "web", "ssr"],
+        iterations: 5,
+        worstCaseCount: 3,
+    }),
     // Class fields
     new DefaultBenchmark({
         name: "raytrace-public-class-fields",

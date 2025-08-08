@@ -1,6 +1,7 @@
 .DS_Store
 .directory
 /node_modules
+web-ssr/node_modules/
 
 # Ignore auto-generated files by VS & VSCode.
 /.vs/
