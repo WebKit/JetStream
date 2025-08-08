@@ -71,7 +71,7 @@ function compileTest() {
     console.log(`Found ${allDiagnostics.length} errors:`);
   }
 
-  allDiagnostics.forEach(diagnostic => { // Limit output for brevity
+  allDiagnostics.slice(0, 20).forEach(diagnostic => { // Limit output for brevity
     if (diagnostic.file) {
       const { line, character } = ts.getLineAndCharacterOfPosition(diagnostic.file, diagnostic.start);
       const message = ts.flattenDiagnosticMessageText(diagnostic.messageText, "\n");
