@@ -1,7 +1,7 @@
 const ts = require("typescript");
 const path = require("path");
-const SRC_FILE_DATA = require("./gen/zod/src_file_data.cjs");
-const tsconfig = require("./gen/zod/src_tsconfig.cjs");
+const SRC_FILE_DATA = require("./gen/immer-tiny/src_file_data.cjs");
+const TS_CONFIG = require("./gen/immer-tiny/src_tsconfig.cjs");
 
 const repoRoot = path.resolve(__dirname, "../jest");
 
@@ -54,7 +54,7 @@ class CompilerHost {
 }
 
 function compileTest() {
-  const options = ts.convertCompilerOptionsFromJson(tsconfig.compilerOptions, repoRoot).options;
+  const options = ts.convertCompilerOptionsFromJson(TS_CONFIG.compilerOptions, repoRoot).options;
   options.lib = [...(options.lib || []), "dom"];
 
   const host = new CompilerHost(options, SRC_FILE_DATA);

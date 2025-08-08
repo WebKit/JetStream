@@ -2,10 +2,13 @@ const fs = require("fs");
 const path = require("path");
 const { spawnSync } = require("child_process");
 const glob = require("glob");
+const assert = require('assert/strict');
+
 
 class Importer {
-  constructor({ projectName, repoUrl, srcFolder, extraFiles, extraDirs }) {
+  constructor({ projectName, size, repoUrl, srcFolder, extraFiles, extraDirs }) {
     this.projectName = projectName;
+    assert(projectName.endsWith(`-${size}`), "missing size annotation in projectName");
     this.repoUrl = repoUrl;
     this.baseDir = path.resolve(__dirname);
     let repoName = path.basename(this.repoUrl);
@@ -27,20 +30,15 @@ class Importer {
     this.addSpecificFiles();
     this.writeSrcFileData();
     this.writeTsConfig();
-    console.info("Build process complete.");
   }
 
   cloneRepo() {
-    if (!fs.existsSync(this.repoDir)) {
-      console.info(`Cloning src data repository to ${this.repoDir}`);
-      spawnSync("git", ["clone", this.repoUrl, this.repoDir]);
-    } else {
-      console.info(`${this.repoDir} already exists. Skipping clone.`);
-    }
+    if (fs.existsSync(this.repoDir)) return;
+    console.info(`Cloning src data repository to ${this.repoDir}`);
+    spawnSync("git", ["clone", this.repoUrl, this.repoDir]);
   }
 
   readSrcFileData() {
-    console.info(`Reading files from ${this.srcFolder} into memory...`);
     const patterns = [`${this.srcFolder}/**/*.ts`, `${this.srcFolder}/**/*.d.ts`, `${this.srcFolder}/*.d.ts`];
     patterns.forEach(pattern => {
       const files = glob.sync(pattern, { cwd: this.repoDir, nodir: true });
@@ -86,11 +84,12 @@ class Importer {
 module.exports = ${JSON.stringify(this.srcFileData, null, 2)};
  `
     );
-    console.info(`Created ${filesDataPath}`);
+    const stats = fs.statSync(filesDataPath);
+    const fileSizeInKiB = (stats.size / 1024) | 0;  
+    console.info(`Exported ${this.projectName} File Contents: ${path.relative(process.cwd(), filesDataPath)} ${fileSizeInKiB} KiB`);
   }
 
   writeTsConfig() {
-    console.info("Extracting tsconfig.json...");
     const tsconfigInputPath = path.join(this.repoDir, "tsconfig.json");
     const tsconfigContent = fs.readFileSync(tsconfigInputPath, "utf8");
     const tsconfig = JSON.parse(tsconfigContent.replace(/(?:^|\s)\/\/.*$|\/\*[\s\S]*?\*\//gm, ""));
@@ -102,15 +101,14 @@ module.exports = ${JSON.stringify(this.srcFileData, null, 2)};
 module.exports = ${JSON.stringify(tsconfig, null, 2)};
 `
     );
-    console.info(`Created ${tsconfigOutputPath}`);
   }
 
 
 }
 
-// Import mid-sized project sources:
 new Importer({
-  projectName: "jestjs",
+  projectName: "jestjs-large",
+  size: "large",
   repoUrl: "https://github.com/jestjs/jest.git",
   srcFolder: "packages",
   extraFiles: [
@@ -147,11 +145,23 @@ new Importer({
   ],
 }).run();
 
-// Import small-sized project sources:
 new Importer({
-  projectName: "zod",
+  projectName: "zod-medium",
+  size: "medium",
   repoUrl: "https://github.com/colinhacks/zod.git",
   srcFolder: "packages",
+  extraFiles: [],
+  extraDirs: [
+    { dir: "../node_modules/typescript/lib/", nameOnly: true },
+  ],
+}).run();
+
+// Import tiny-sized project sources:
+new Importer({
+  projectName: "immer-tiny",
+  size: "tiny",
+  repoUrl: "https://github.com/immerjs/immer.git",
+  srcFolder: "src",
   extraFiles: [],
   extraDirs: [
     { dir: "../node_modules/typescript/lib/", nameOnly: true },

@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node src/run.cjs",
-    "prebuild": "rm -rf dist/* && node ./build/import-src-project.js",
+    "prebuild": "rm -rf dist/* && rm -rf src/gen/*  && node ./build/import-src-project.js",
     "build": "npm run prebuild && webpack && npm run postbuild",
     "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild",
     "postbuild": "node ./build/postbuild.js"
