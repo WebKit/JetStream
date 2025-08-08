@@ -4,16 +4,30 @@ const { spawnSync } = require("child_process");
 const glob = require("glob");
 
 class Importer {
-  constructor() {
-    this.repoUrl = "https://github.com/jestjs/jest.git";
+  constructor({ projectName, repoUrl, srcFolder, extraFiles, extraDirs }) {
+    this.projectName = projectName;
+    this.repoUrl = repoUrl;
     this.baseDir = path.resolve(__dirname);
     let repoName = path.basename(this.repoUrl);
     if (!repoName.endsWith(".git")) {
       repoName = `${repoName}.git`;
     }
     this.repoDir = path.resolve(__dirname, repoName);
-    this.outputDir = path.resolve(__dirname, "../src/gen");
+    this.srcFolder = srcFolder;
+    this.outputDir = path.resolve(__dirname, `../src/gen/${this.projectName}`);
+    fs.mkdirSync(this.outputDir, { recursive: true });
     this.srcFileData = Object.create(null);
+    this.extraFiles = extraFiles;
+    this.extraDirs = extraDirs;
+  }
+  run() {
+    this.cloneRepo();
+    this.readSrcFileData();
+    this.addExtraFilesFromDirs();
+    this.addSpecificFiles();
+    this.writeSrcFileData();
+    this.writeTsConfig();
+    console.info("Build process complete.");
   }
 
   cloneRepo() {
@@ -25,9 +39,9 @@ class Importer {
     }
   }
 
-  readSrcFileData({srcFolder}) {
-    console.info(`Reading files from ${srcFolder} into memory...`);
-    const patterns = [`${srcFolder}/**/*.ts`, `${srcFolder}/**/*.d.ts`, `${srcFolder}/*.d.ts`];
+  readSrcFileData() {
+    console.info(`Reading files from ${this.srcFolder} into memory...`);
+    const patterns = [`${this.srcFolder}/**/*.ts`, `${this.srcFolder}/**/*.d.ts`, `${this.srcFolder}/*.d.ts`];
     patterns.forEach(pattern => {
       const files = glob.sync(pattern, { cwd: this.repoDir, nodir: true });
       files.forEach(file => {
@@ -39,17 +53,8 @@ class Importer {
   }
 
   addExtraFilesFromDirs() {
-    const extraDirs = [
-      { dir: "../node_modules/@types/" },
-      { dir: "../node_modules/typescript/lib/", nameOnly:true},
-      { dir: "../node_modules/jest-worker/build/" },
-      { dir: "../node_modules/@jridgewell/trace-mapping/types/" },
-      { dir: "../node_modules/minimatch/dist/esm/" },
-      { dir: "../node_modules/glob/dist/esm/" },
-      { dir: "../../node_modules/tempy/node_modules/type-fest/source/" }
-    ];
 
-    extraDirs.forEach(({ dir, nameOnly = false }) => {
+    this.extraDirs.forEach(({ dir, nameOnly = false }) => {
       const absoluteSourceDir = path.resolve(__dirname, dir);
       let allFiles = glob.sync("**/*.d.ts", { cwd: absoluteSourceDir, nodir: true });
       allFiles = allFiles.concat(glob.sync("**/*.d.mts", { cwd: absoluteSourceDir, nodir: true }));
@@ -66,41 +71,20 @@ class Importer {
   }
 
   addSpecificFiles() {
-    const extraFiles = [
-      "../../node_modules/@babel/types/lib/index.d.ts",
-      "../../node_modules/callsites/index.d.ts",
-      "../../node_modules/camelcase/index.d.ts",
-      "../../node_modules/chalk/types/index.d.ts",
-      "../../node_modules/execa/index.d.ts",
-      "../../node_modules/fast-json-stable-stringify/index.d.ts",
-      "../../node_modules/get-stream/index.d.ts",
-      "../../node_modules/strip-json-comments/index.d.ts",
-      "../../node_modules/tempy/index.d.ts",
-      "../../node_modules/tempy/node_modules/type-fest/index.d.ts",
-      "../node_modules/@jridgewell/trace-mapping/types/trace-mapping.d.mts",
-      "../node_modules/@types/eslint/index.d.ts",
-      "../node_modules/ansi-regex/index.d.ts",
-      "../node_modules/ansi-styles/index.d.ts",
-      "../node_modules/glob/dist/esm/index.d.ts",
-      "../node_modules/jest-worker/build/index.d.ts",
-      "../node_modules/lru-cache/dist/esm/index.d.ts",
-      "../node_modules/minipass/dist/esm/index.d.ts",
-      "../node_modules/p-limit/index.d.ts",
-      "../node_modules/path-scurry/dist/esm/index.d.ts",
-      "../node_modules/typescript/lib/lib.dom.d.ts",
-    ];
-
-    extraFiles.forEach(file => {
+    this.extraFiles.forEach(file => {
       const filePath = path.join(this.baseDir, file);
-        this.srcFileData[file] = fs.readFileSync(filePath, "utf8");
+      this.srcFileData[file] = fs.readFileSync(filePath, "utf8");
     });
   }
 
   writeSrcFileData() {
     const filesDataPath = path.join(this.outputDir, "src_file_data.cjs");
     fs.writeFileSync(
-      filesDataPath,
-      "module.exports = " + JSON.stringify(this.srcFileData, null, 2) + ";"
+      filesDataPath, `// Generated src file data from existing node modules and
+// ${this.repoUrl}
+// See LICENSEs in the sources.
+module.exports = ${JSON.stringify(this.srcFileData, null, 2)};
+ `
     );
     console.info(`Created ${filesDataPath}`);
   }
@@ -113,22 +97,63 @@ class Importer {
 
     const tsconfigOutputPath = path.join(this.outputDir, "src_tsconfig.cjs");
     fs.writeFileSync(
-      tsconfigOutputPath,
-      "module.exports = " + JSON.stringify(tsconfig, null, 2) + ";"
+      tsconfigOutputPath, `// Exported from ${this.repoUrl}
+// See LICENSEs in the sources.
+module.exports = ${JSON.stringify(tsconfig, null, 2)};
+`
     );
     console.info(`Created ${tsconfigOutputPath}`);
   }
 
-  run() {
-    this.cloneRepo();
-    this.readSrcFileData({srcFolder: "packages"});
-    this.addExtraFilesFromDirs();
-    this.addSpecificFiles();
-    this.writeSrcFileData();
-    this.writeTsConfig();
-    console.info("Build process complete.");
-  }
+
 }
 
-const importer = new Importer();
-importer.run();
+// Import mid-sized project sources:
+new Importer({
+  projectName: "jestjs",
+  repoUrl: "https://github.com/jestjs/jest.git",
+  srcFolder: "packages",
+  extraFiles: [
+    "../../node_modules/@babel/types/lib/index.d.ts",
+    "../../node_modules/callsites/index.d.ts",
+    "../../node_modules/camelcase/index.d.ts",
+    "../../node_modules/chalk/types/index.d.ts",
+    "../../node_modules/execa/index.d.ts",
+    "../../node_modules/fast-json-stable-stringify/index.d.ts",
+    "../../node_modules/get-stream/index.d.ts",
+    "../../node_modules/strip-json-comments/index.d.ts",
+    "../../node_modules/tempy/index.d.ts",
+    "../../node_modules/tempy/node_modules/type-fest/index.d.ts",
+    "../node_modules/@jridgewell/trace-mapping/types/trace-mapping.d.mts",
+    "../node_modules/@types/eslint/index.d.ts",
+    "../node_modules/ansi-regex/index.d.ts",
+    "../node_modules/ansi-styles/index.d.ts",
+    "../node_modules/glob/dist/esm/index.d.ts",
+    "../node_modules/jest-worker/build/index.d.ts",
+    "../node_modules/lru-cache/dist/esm/index.d.ts",
+    "../node_modules/minipass/dist/esm/index.d.ts",
+    "../node_modules/p-limit/index.d.ts",
+    "../node_modules/path-scurry/dist/esm/index.d.ts",
+    "../node_modules/typescript/lib/lib.dom.d.ts",
+  ],
+  extraDirs: [
+    { dir: "../node_modules/@types/" },
+    { dir: "../node_modules/typescript/lib/", nameOnly: true },
+    { dir: "../node_modules/jest-worker/build/" },
+    { dir: "../node_modules/@jridgewell/trace-mapping/types/" },
+    { dir: "../node_modules/minimatch/dist/esm/" },
+    { dir: "../node_modules/glob/dist/esm/" },
+    { dir: "../../node_modules/tempy/node_modules/type-fest/source/" }
+  ],
+}).run();
+
+// Import small-sized project sources:
+new Importer({
+  projectName: "zod",
+  repoUrl: "https://github.com/colinhacks/zod.git",
+  srcFolder: "packages",
+  extraFiles: [],
+  extraDirs: [
+    { dir: "../node_modules/typescript/lib/", nameOnly: true },
+  ],
+}).run();

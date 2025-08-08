@@ -1909,6 +1909,8 @@ let BENCHMARKS = [
             "./TypeScript/dist/typescript-compile-test.js",
             "./TypeScript/benchmark.js",
         ],
+        iterations: 5,
+        worstCaseCount: 3,
         tags: ["Default", "TypeScript"],
     }),
     // Generators

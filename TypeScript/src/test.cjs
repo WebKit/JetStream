@@ -1,7 +1,7 @@
 const ts = require("typescript");
 const path = require("path");
-const SRC_FILE_DATA = require("./gen/src_file_data.cjs");
-const tsconfig = require("./gen/src_tsconfig.cjs");
+const SRC_FILE_DATA = require("./gen/zod/src_file_data.cjs");
+const tsconfig = require("./gen/zod/src_tsconfig.cjs");
 
 const repoRoot = path.resolve(__dirname, "../jest");
 
