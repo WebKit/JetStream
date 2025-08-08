@@ -1678,7 +1678,7 @@ let BENCHMARKS = [
         tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
-        name: "typescript",
+        name: "typescript-octane",
         files: [
             "./Octane/typescript-compiler.js",
             "./Octane/typescript-input.js",
@@ -1687,7 +1687,7 @@ let BENCHMARKS = [
         iterations: 15,
         worstCaseCount: 2,
         deterministicRandom: true,
-        tags: ["Default", "Octane"],
+        tags: ["Default", "Octane", "typescript"],
     }),
     // RexBench
     new DefaultBenchmark({
@@ -1903,7 +1903,7 @@ let BENCHMARKS = [
         tags: ["Default", "ClassFields"],
     }),
     new DefaultBenchmark({
-        name: "TypeScript-New",
+        name: "typescript",
         files: [
             "./TypeScript/src/mock/sys.js",
             "./TypeScript/dist/typescript-compile-test.js",
@@ -1911,7 +1911,7 @@ let BENCHMARKS = [
         ],
         iterations: 5,
         worstCaseCount: 3,
-        tags: ["Default", "TypeScript"],
+        tags: ["Default", "typescript"],
     }),
     // Generators
     new AsyncBenchmark({
