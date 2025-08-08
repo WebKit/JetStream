@@ -7,7 +7,11 @@ class Importer {
   constructor() {
     this.repoUrl = "https://github.com/jestjs/jest.git";
     this.baseDir = path.resolve(__dirname);
-    this.repoDir = path.resolve(__dirname, "../jest.git");
+    let repoName = path.basename(this.repoUrl);
+    if (!repoName.endsWith(".git")) {
+      repoName = `${repoName}.git`;
+    }
+    this.repoDir = path.resolve(__dirname, repoName);
     this.outputDir = path.resolve(__dirname, "../src/gen");
     this.srcFileData = Object.create(null);
   }
