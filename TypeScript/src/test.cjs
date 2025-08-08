@@ -1,7 +1,7 @@
 const ts = require("typescript");
 const path = require("path");
-const SRC_FILE_DATA = require("./gen/immer-tiny/src_file_data.cjs");
-const TS_CONFIG = require("./gen/immer-tiny/src_tsconfig.cjs");
+const SRC_FILE_DATA = require("./gen/zod-medium/src_file_data.cjs");
+const TS_CONFIG = require("./gen/zod-medium/src_tsconfig.cjs");
 
 const repoRoot = path.resolve(__dirname, "../jest");
 
@@ -27,7 +27,6 @@ class CompilerHost {
         resolvedModules.push(undefined);
       }
     }
-    console.log({moduleNames, resolvedModules, containingFile})
     return resolvedModules;
   }
 
@@ -36,13 +35,9 @@ class CompilerHost {
   getCanonicalFileName(fileName) { return fileName.toLowerCase(); }
   useCaseSensitiveFileNames() { return true; }
   getNewLine() { return "\n"; }
-
-  fileExists(filePath) {
-    return filePath in this.srcFileData;
-  }
+  fileExists(filePath) { return filePath in this.srcFileData; }
 
   readFile(filePath) {
-    console.log("readFile", filePath);
     const fileContent = this.srcFileData[filePath.toLowerCase()];
     if (fileContent === undefined) {
       throw new Error(`"${filePath}" does not exist.`);

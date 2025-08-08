@@ -28,8 +28,8 @@ class Importer {
     this.readSrcFileData();
     this.addExtraFilesFromDirs();
     this.addSpecificFiles();
-    this.writeSrcFileData();
     this.writeTsConfig();
+    this.writeSrcFileData();
   }
 
   cloneRepo() {
@@ -96,24 +96,41 @@ module.exports = ${JSON.stringify(this.srcFileData, null, 2)};
     );
     const stats = fs.statSync(filesDataPath);
     const fileSizeInKiB = (stats.size / 1024) | 0;  
-    console.info(`Exported ${this.projectName} File Contents: ${path.relative(process.cwd(), filesDataPath)} ${fileSizeInKiB} KiB`);
+    console.info(`Exported ${this.projectName}`);
+    console.info(`   File Contents: ${path.relative(process.cwd(), filesDataPath)}`);
+    console.info(`   Total Size:    ${fileSizeInKiB} KiB`);
   }
 
   writeTsConfig() {
     const tsconfigInputPath = path.join(this.repoDir, "tsconfig.json");
-    const tsconfigContent = fs.readFileSync(tsconfigInputPath, "utf8");
-    const tsconfig = JSON.parse(tsconfigContent.replace(/(?:^|\s)\/\/.*$|\/\*[\s\S]*?\*\//gm, ""));
-
+    const mergedTsconfig = this.loadAndMergeTsconfig(tsconfigInputPath);
     const tsconfigOutputPath = path.join(this.outputDir, "src_tsconfig.cjs");
     fs.writeFileSync(
       tsconfigOutputPath, `// Exported from ${this.repoUrl}
 // See LICENSEs in the sources.
-module.exports = ${JSON.stringify(tsconfig, null, 2)};
+module.exports = ${JSON.stringify(mergedTsconfig, null, 2)};
 `
     );
   }
 
+  loadAndMergeTsconfig(configPath) {
+    const tsconfigContent = fs.readFileSync(configPath, "utf8");
+    const tsconfigContentWithoutComments = tsconfigContent.replace(/(?:^|\s)\/\/.*$|\/\*[\s\S]*?\*\//gm, "");
+    const tsconfig = JSON.parse(tsconfigContentWithoutComments);
+    let baseConfigPath = tsconfig.extends;
+    if (!baseConfigPath) return tsconfig;
+    if (!baseConfigPath.startsWith('./') && !baseConfigPath.startsWith('../')) return tsconfig;
 
+    baseConfigPath = path.resolve(path.dirname(configPath), baseConfigPath);
+    const baseConfig = this.loadAndMergeTsconfig(baseConfigPath);
+    
+    const mergedConfig = { ...baseConfig, ...tsconfig };
+    if (baseConfig.compilerOptions && tsconfig.compilerOptions) {
+      mergedConfig.compilerOptions = { ...baseConfig.compilerOptions, ...tsconfig.compilerOptions };
+    }
+    delete mergedConfig.extends;
+    return mergedConfig;
+  }
 }
 
 new Importer({

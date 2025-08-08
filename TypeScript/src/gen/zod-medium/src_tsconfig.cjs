@@ -1,22 +1,47 @@
 // Exported from https://github.com/colinhacks/zod.git
 // See LICENSEs in the sources.
 module.exports = {
-  "extends": "./.configs/tsconfig.base.json",
   "compilerOptions": {
+    "target": "es2020",
     "lib": [
       "dom",
       "dom.iterable",
       "esnext"
     ],
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "jsx": "react",
+    "strict": true,
+    "alwaysStrict": true,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "resolveJsonModule": true,
+    "removeComments": false,
+    "esModuleInterop": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "downlevelIteration": true,
+    "isolatedModules": true,
+    "pretty": true,
     "customConditions": [
       "@zod/source"
     ],
-    "module": "nodenext",
-    "moduleResolution": "nodenext",
     "types": [
       "node"
     ]
   },
+  "exclude": [
+    "node_modules"
+  ],
   "include": [
     "***.mts",
     "***.d.ts",
