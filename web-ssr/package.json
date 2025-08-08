@@ -26,7 +26,6 @@
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
     "https-browserify": "^1.0.0",
-    "jsdom": "^24.0.0",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",

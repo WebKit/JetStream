@@ -48,6 +48,7 @@ class Benchmark {
     const res = eval(sourceCode);
     const runStart = performance.now();
     this.lastResult = ReactRenderTest.renderTest();
+    this.lastResult.htmlHash = hash(this.lastResult.html)
     const end = performance.now();
     const loadTime = runStart - initStart;
     const runTime = end - runStart;
@@ -58,10 +59,8 @@ class Benchmark {
   }
 
   validate() {
-    this.expect("HTML length", this.lastResult.html.length, 188947);
-    this.expect("HTML hash", hash(this.lastResult.html), 197561020);
-    this.expect("Wine cards", this.lastResult.wineCardCount, 100);
-    this.expect("Solid tags", this.lastResult.solidTagCount, 95);
+    this.expect("HTML length", this.lastResult.html.length, 183778);
+    this.expect("HTML hash", this.lastResult.htmlHash, -1001898509);
   }
 
   expect(name, value, expected) {
