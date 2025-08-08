@@ -1,6 +1,6 @@
 const fs = require("fs");
 const path = require("path");
-const { execSync } = require("child_process");
+const { spawnSync } = require("child_process");
 const glob = require("glob");
 
 class Importer {
@@ -18,15 +18,15 @@ class Importer {
 
   cloneRepo() {
     if (!fs.existsSync(this.repoDir)) {
-      console.log(`Cloning src data repository to ${this.repoDir}`);
-      execSync(`git clone ${this.repoUrl} ${this.repoDir}`);
+      console.info(`Cloning src data repository to ${this.repoDir}`);
+      spawnSync("git", ["clone", this.repoUrl, this.repoDir]);
     } else {
-      console.log("Jest repository already exists. Skipping clone.");
+      console.info(`${this.repoDir} already exists. Skipping clone.`);
     }
   }
 
   readSrcFileData({srcFolder}) {
-    console.log(`Reading files from ${srcFolder} into memory...`);
+    console.info(`Reading files from ${srcFolder} into memory...`);
     const patterns = [`${srcFolder}/**/*.ts`, `${srcFolder}/**/*.d.ts`, `${srcFolder}/*.d.ts`];
     patterns.forEach(pattern => {
       const files = glob.sync(pattern, { cwd: this.repoDir, nodir: true });
@@ -102,11 +102,11 @@ class Importer {
       filesDataPath,
       "module.exports = " + JSON.stringify(this.srcFileData, null, 2) + ";"
     );
-    console.log(`Created ${filesDataPath}`);
+    console.info(`Created ${filesDataPath}`);
   }
 
   writeTsConfig() {
-    console.log("Extracting tsconfig.json...");
+    console.info("Extracting tsconfig.json...");
     const tsconfigInputPath = path.join(this.repoDir, "tsconfig.json");
     const tsconfigContent = fs.readFileSync(tsconfigInputPath, "utf8");
     const tsconfig = JSON.parse(tsconfigContent.replace(/(?:^|\s)\/\/.*$|\/\*[\s\S]*?\*\//gm, ""));
@@ -116,7 +116,7 @@ class Importer {
       tsconfigOutputPath,
       "module.exports = " + JSON.stringify(tsconfig, null, 2) + ";"
     );
-    console.log(`Created ${tsconfigOutputPath}`);
+    console.info(`Created ${tsconfigOutputPath}`);
   }
 
   run() {
@@ -126,7 +126,7 @@ class Importer {
     this.addSpecificFiles();
     this.writeSrcFileData();
     this.writeTsConfig();
-    console.log("Build process complete.");
+    console.info("Build process complete.");
   }
 }
 
