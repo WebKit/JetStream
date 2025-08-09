@@ -23,11 +23,10 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-let cycleCount = 20;
-
+let maxWorkers = 8;
 let resolve = null;
-
 let numWorkers = 0;
+
 function startWorker(file) {
     numWorkers++;
     let worker = new Worker(file);
@@ -40,52 +39,60 @@ function startWorker(file) {
     };
 }
 
-function startCycle() {
+function startCycle(iteration) {
     if (!isInBrowser)
         throw new Error("Only works in browser");
 
     const tests = [
-        rayTrace3D
-        , accessNbody
-        , morph3D
-        , cube3D
-        , accessFunnkuch
-        , accessBinaryTrees
-        , accessNsieve
-        , bitopsBitwiseAnd
-        , bitopsNsieveBits
-        , controlflowRecursive
-        , bitops3BitBitsInByte
-        , botopsBitsInByte
-        , cryptoAES
-        , cryptoMD5
-        , cryptoSHA1
-        , dateFormatTofte
-        , dateFormatXparb
-        , mathCordic
-        , mathPartialSums
-        , mathSpectralNorm
-        , stringBase64
-        , stringFasta
-        , stringValidateInput
-        , stringTagcloud
-        , stringUnpackCode
-        , regexpDNA
+        rayTrace3D,
+        accessNbody,
+        morph3D,
+        cube3D,
+        accessFunnkuch,
+        accessBinaryTrees,
+        accessNsieve,
+        bitopsBitwiseAnd,
+        bitopsNsieveBits,
+        controlflowRecursive,
+        bitops3BitBitsInByte,
+        botopsBitsInByte,
+        cryptoAES,
+        cryptoMD5,
+        cryptoSHA1,
+        dateFormatTofte,
+        dateFormatXparb,
+        mathCordic,
+        mathPartialSums,
+        mathSpectralNorm,
+        stringBase64,
+        stringFasta,
+        stringValidateInput,
+        stringTagcloud,
+        stringUnpackCode,
+        regexpDNA,
     ];
 
-    for (let test of tests)
+    for (let i = 0; i < maxWorkers; i++) {
+        const testIndex = i + iteration * numWorkers;
+        const test = tests[testIndex % tests.length];
         startWorker(test);
+    }
 
 }
 
 
 class Benchmark {
+    constructor() {
+        this.iteration = 0;
+    }
+
     async runIteration() {
         if (numWorkers !== 0 || resolve)
             throw new Error("Something bad happened.");
+        this.iteration++;
 
         let promise = new Promise((res) => resolve = res);
-        startCycle();
+        startCycle(this.iteration);
         await promise;
         resolve = null;
     }
