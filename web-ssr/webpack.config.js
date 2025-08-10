@@ -1,5 +1,6 @@
 const path = require("path");
 const webpack = require("webpack");
+const TerserPlugin = require("terser-webpack-plugin");
 
 const commonConfig = {
   mode: "production",
@@ -37,9 +38,22 @@ const commonConfig = {
           loader: "babel-loader",
           options: {
             presets: ["@babel/preset-env", "@babel/preset-react"],
+            plugins: [path.resolve(__dirname, "build/jetstream-comment-plugin.js")],
           },
         },
       },
+    ],
+  },
+  optimization: {
+    minimize: true,
+    minimizer: [
+      new TerserPlugin({
+        terserOptions: {
+          format: {
+            comments: /JETSTREAM/,
+          },
+        },
+      }),
     ],
   },
   resolve: {

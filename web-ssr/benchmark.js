@@ -34,11 +34,9 @@ class Benchmark {
 
   prepareCode(iteration) {
     // Alter the code per iteration to prevent caching.
-    const comment = `// Iteration: ${iteration}`;
-    const reactName = `React${String.fromCharCode(97+iteration)}`
-    const sourceCOde = `${comment}\n${this.originalSource}\n${comment}`;
-    sourceCOde.replaceAll("React", reactName);
-    return sourceCOde;
+    const iterationId = `${String.fromCharCode(97+iteration)}`
+    const sourceCode = this.originalSource.replaceAll("/*JETSTREAM*/", `/*${iterationId}*/`);
+    return sourceCode;
   }
 
   runIteration() {
