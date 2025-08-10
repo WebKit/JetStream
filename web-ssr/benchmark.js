@@ -26,21 +26,19 @@ class Benchmark {
 
   constructor(iterations) {
     this.originalSource = REACT_RENDER_TEST_SRC;
-    if (iterations > 25)
-      throw new Error("Too many iterations");
     for (let i = 0; i < iterations; i++)
       this.sources[i] = this.prepareCode(i)
   }
 
   prepareCode(iteration) {
     // Alter the code per iteration to prevent caching.
-    const iterationId = `${String.fromCharCode(97+iteration)}`
-    const sourceCode = this.originalSource.replaceAll("/*JETSTREAM*/", `/*${iterationId}*/`);
+    const iterationId = `${String.fromCharCode(97+(iteration % 25))}${iteration}`
+    const sourceCode = this.originalSource.replaceAll("/*ThouShaltNotCache*/", `/*${iterationId}*/`);
     return sourceCode;
   }
 
   runIteration() {
-    const sourceCode = this.sources[this.iteration];
+    let sourceCode = this.sources[this.iteration];
     let ReactRenderTest = {};
     let initStart = performance.now(); 
     const res = eval(sourceCode);
@@ -50,6 +48,7 @@ class Benchmark {
     const end = performance.now();
     const loadTime = runStart - initStart;
     const runTime = end - runStart;
+    // Debug information
     // print(`Iteration ${this.iteration}:`);
     // print(`  Load time: ${loadTime.toFixed(2)}ms`);
     // print(`  Render time: ${runTime.toFixed(2)}ms`);

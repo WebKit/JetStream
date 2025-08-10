@@ -24,10 +24,6 @@ const commonConfig = {
       process: "process/browser",
       Buffer: ["buffer", "Buffer"],
     }),
-    new webpack.NormalModuleReplacementPlugin(
-      /form-data\/lib\/browser\.js/,
-      path.resolve(__dirname, "src/mock/form-data.cjs")
-    ),
   ],
   module: {
     rules: [
@@ -37,7 +33,13 @@ const commonConfig = {
         use: {
           loader: "babel-loader",
           options: {
-            presets: ["@babel/preset-env", "@babel/preset-react"],
+            presets: [
+              ["@babel/preset-env", {
+                // Keep ES6 classes.
+                exclude: ["@babel/plugin-transform-classes"]
+              }],
+              "@babel/preset-react"
+            ],
             plugins: [path.resolve(__dirname, "build/jetstream-comment-plugin.js")],
           },
         },
@@ -45,12 +47,14 @@ const commonConfig = {
     ],
   },
   optimization: {
-    minimize: true,
     minimizer: [
       new TerserPlugin({
         terserOptions: {
+          // Keep variable names.
+          mangle: false,
           format: {
-            comments: /JETSTREAM/,
+            // Keep this comment for cache-busting.
+            comments: /ThouShaltNotCache/i,
           },
         },
       }),

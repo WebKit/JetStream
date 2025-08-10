@@ -1,100 +1,6 @@
-/*! ./cjs/react-dom-server-legacy.browser.development.js */
-
-/*! ./cjs/react-dom-server.browser.development.js */
-
-/*! ./cjs/react-dom.development.js */
-
-/*! ./cjs/react.development.js */
-
-/*! ./components.cjs */
-
-/*! ./country-flags.cjs */
-
-/*! ./encoding-indexes.js */
-
-/*! ./lib/encoding.js */
-
-/*! ./src/mock/message_channel.cjs */
-
-/*! ./wine-data.cjs */
-
-/*! process/browser */
-
-/*! react */
-
-/*! react-dom */
-
-/*! react-dom/server */
-
-/*! text-encoding */
-
-/*!***************************!*\
-  !*** ./src/wine-data.cjs ***!
-  \***************************/
-
-/*!****************************!*\
-  !*** ./src/components.cjs ***!
-  \****************************/
-
-/*!*******************************!*\
-  !*** ./src/country-flags.cjs ***!
-  \*******************************/
-
-/*!***********************************!*\
-  !*** ./src/react-render-test.cjs ***!
-  \***********************************/
-
-/*!*************************************!*\
-  !*** ./node_modules/react/index.js ***!
-  \*************************************/
-
-/*!**************************************!*\
-  !*** ./src/mock/message_channel.cjs ***!
-  \**************************************/
-
-/*!*****************************************!*\
-  !*** ./node_modules/process/browser.js ***!
-  \*****************************************/
-
-/*!*****************************************!*\
-  !*** ./node_modules/react-dom/index.js ***!
-  \*****************************************/
-
-/*!*********************************************!*\
-  !*** ./node_modules/text-encoding/index.js ***!
-  \*********************************************/
-
-/*!**************************************************!*\
-  !*** ./node_modules/react-dom/server.browser.js ***!
-  \**************************************************/
-
-/*!****************************************************!*\
-  !*** ./node_modules/text-encoding/lib/encoding.js ***!
-  \****************************************************/
-
-/*!*****************************************************!*\
-  !*** ./node_modules/react/cjs/react.development.js ***!
-  \*****************************************************/
-
-/*!************************************************************!*\
-  !*** ./node_modules/text-encoding/lib/encoding-indexes.js ***!
-  \************************************************************/
-
-/*!*************************************************************!*\
-  !*** ./node_modules/react-dom/cjs/react-dom.development.js ***!
-  \*************************************************************/
-
-/*!****************************************************************************!*\
-  !*** ./node_modules/react-dom/cjs/react-dom-server.browser.development.js ***!
-  \****************************************************************************/
-
-/*!***********************************************************************************!*\
-  !*** ./node_modules/react-dom/cjs/react-dom-server-legacy.browser.development.js ***!
-  \***********************************************************************************/
-
 /**
  * @license React
- * react-dom-server-legacy.browser.development.js
+ * react-dom-server-legacy.browser.production.js
  *
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
@@ -104,7 +10,17 @@
 
 /**
  * @license React
- * react-dom.development.js
+ * react-dom.production.js
+ *
+ * Copyright (c) Meta Platforms, Inc. and affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+/**
+ * @license React
+ * react.production.js
  *
  * Copyright (c) Meta Platforms, Inc. and affiliates.
  *
