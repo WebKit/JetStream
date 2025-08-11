@@ -71,8 +71,7 @@ class Benchmark {
   }
 
   validate() {
-    this.expect("Cache Comment Count", REACT_RENDER_TEST_SRC.match(CACHE_BUST_COMMENT_RE).length, 20)
-    this.expect("Source HTML hash", REACT_RENDER_TEST_SRC_HASH, -1771319017);
+    this.expect("Cache Comment Count", REACT_RENDER_TEST_SRC.match(CACHE_BUST_COMMENT_RE).length, 573);
     this.expect("HTML length", this.lastResult.html.length, 183778);
     this.expect("HTML hash", this.lastResult.htmlHash, 1177839858);
   }

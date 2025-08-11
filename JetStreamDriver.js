@@ -1916,7 +1916,9 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "web-ssr",
         files: [
-            "./web-ssr/dist/react-render-test.src.js",
+            // Debug Sources for nicer profiling.
+            // "./web-ssr/dist/react-render-test.src.js",
+            "./web-ssr/dist/react-render-test.minified.src.js",
             "./web-ssr/benchmark.js",
         ],
         tags: ["Default", "web", "ssr"],
