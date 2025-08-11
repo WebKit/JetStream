@@ -1,4 +1,4 @@
-
+// Babel plugin that adds CACHE_BUST_COMMENT to every function body.
 const CACHE_BUST_COMMENT = "ThouShaltNotCache";
 
 
