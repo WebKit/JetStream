@@ -20,7 +20,7 @@ function quickHash(str) {
 }
 
 const CACHE_BUST_COMMENT = "/*ThouShaltNotCache*/";
-const CACHE_BUST_COMMENT_RE = new RegExp(RegExp.escape(CACHE_BUST_COMMENT), "g");
+const CACHE_BUST_COMMENT_RE = new RegExp(`\n${RegExp.escape(CACHE_BUST_COMMENT)}\n`, "g");
 // Warm up the hash function.
 const REACT_RENDER_TEST_SRC_HASH = quickHash(REACT_RENDER_TEST_SRC);
 
@@ -42,7 +42,7 @@ class Benchmark {
       return this.originalSource;
     // Alter the code per iteration to prevent caching.
     const iterationId = `${String.fromCharCode(97 + (iteration % 25))}${iteration}`;
-    const sourceCode = this.originalSource.replaceAll(CACHE_BUST_COMMENT, `/*${iterationId}*/`);
+    const sourceCode = this.originalSource.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iterationId}*/`);
     return sourceCode;
   }
 
@@ -71,7 +71,7 @@ class Benchmark {
   }
 
   validate() {
-    this.expect("Cache Comment Count", REACT_RENDER_TEST_SRC.match(CACHE_BUST_COMMENT_RE).length, 573);
+    this.expect("Cache Comment Count", REACT_RENDER_TEST_SRC.match(CACHE_BUST_COMMENT_RE).length, 597);
     this.expect("HTML length", this.lastResult.html.length, 183778);
     this.expect("HTML hash", this.lastResult.htmlHash, 1177839858);
   }

@@ -1,13 +1,29 @@
 
+const CACHE_BUST_COMMENT = "ThouShaltNotCache";
+
+
 module.exports = function({ types: t }) {
   return {
     visitor: {
       Function(path) {
-        // Add an inner comment to each function that can be replaced
-        // to prevent code caching.
-        const body = path.get("body");
-         body.addComment("leading", "ThouShaltNotCache");
-      },
+          const bodyPath = path.get("body");
+          // Handle arrow functions: () => "value"
+          // Convert them to block statements: () => { return "value"; }
+          if (!bodyPath.isBlockStatement()) {
+            const newBody = t.blockStatement([t.returnStatement(bodyPath.node)]);
+            path.set("body", newBody);
+          }
+
+          // Handle empty function bodies: function foo() {}
+          // Add an empty statement so we have a first node to attach the comment to.
+          if (path.get("body.body").length === 0) {
+            path.get("body").pushContainer("body", t.emptyStatement());
+          }
+
+          const firstNode = path.node.body.body[0];
+          t.addComment(firstNode, "leading", CACHE_BUST_COMMENT);
+
+      }
     },
   };
 };
