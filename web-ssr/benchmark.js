@@ -19,6 +19,7 @@ function quickHash(str) {
   return hash | 0;
 }
 
+const CACHE_BUST_COMMENT = "/*ThouShaltNotCache*/";
 // Warm up the hash function.
 const REACT_RENDER_TEST_SRC_HASH = quickHash(REACT_RENDER_TEST_SRC);
 
@@ -40,7 +41,7 @@ class Benchmark {
       return this.originalSource;
     // Alter the code per iteration to prevent caching.
     const iterationId = `${String.fromCharCode(97 + (iteration % 25))}${iteration}`;
-    const sourceCode = this.originalSource.replaceAll("/*ThouShaltNotCache*/", `/*${iterationId}*/`);
+    const sourceCode = this.originalSource.replaceAll(CACHE_BUST_COMMENT, `/*${iterationId}*/`);
     return sourceCode;
   }
 
@@ -69,6 +70,7 @@ class Benchmark {
   }
 
   validate() {
+    this.expect("Cache busting comment index", REACT_RENDER_TEST_SRC.indexOf(CACHE_BUST_COMMENT), 683548)
     this.expect("Source HTML hash", REACT_RENDER_TEST_SRC_HASH, -1771319017);
     this.expect("HTML length", this.lastResult.html.length, 183778);
     this.expect("HTML hash", this.lastResult.htmlHash, 1177839858);
