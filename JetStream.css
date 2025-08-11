@@ -288,7 +288,7 @@ a.button {
     font-weight: 500;
 }
 
-.benchmaark .plot, .benchmark .plot svg {
+.benchmark .plot svg {
     display: inline-block;
     vertical-align: middle;
 }
