@@ -1,7 +1,7 @@
 {
   "name": "web-ssr",
   "version": "1.0.0",
-  "description": "React SSR and JSDOM test for a wine collection.",
+  "description": "React SSR performance test for rendering a wine collection.",
   "main": "index.js",
   "scripts": {
     "test": "babel-node benchmark-node.cjs",
