@@ -6,7 +6,7 @@
   "scripts": {
     "test": "babel-node benchmark-node.cjs",
     "prebuild": "rm -rf dist/*",
-    "build": "webpack  && npm run postbuild",
+    "build": "webpack",
     "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild",
     "postbuild": "node ./build/postbuild.js"
   },
