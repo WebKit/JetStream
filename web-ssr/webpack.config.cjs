@@ -30,17 +30,9 @@ function createConfig({filename, minify}) {
       rules: [
         {
           test: /\.c?js$/,
-          include: path.resolve(__dirname, "node_modules"),
-          use: {
-            loader: "babel-loader",
-            options: {
-              plugins: [path.resolve(__dirname, "build/jetstream-comment-plugin.js")],
-            },
-          },
-        },
-        {
-          test: /\.c?js$/,
-          exclude: /node_modules/,
+          exclude: [
+            path.resolve(__dirname, "node_modules/text-encoding"),
+          ],
           use: {
             loader: "babel-loader",
             options: {

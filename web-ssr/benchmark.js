@@ -20,6 +20,7 @@ function quickHash(str) {
 }
 
 const CACHE_BUST_COMMENT = "/*ThouShaltNotCache*/";
+const CACHE_BUST_COMMENT_RE = new RegExp(RegExp.escape(CACHE_BUST_COMMENT), "g");
 // Warm up the hash function.
 const REACT_RENDER_TEST_SRC_HASH = quickHash(REACT_RENDER_TEST_SRC);
 
@@ -70,7 +71,7 @@ class Benchmark {
   }
 
   validate() {
-    this.expect("Cache busting comment index", REACT_RENDER_TEST_SRC.indexOf(CACHE_BUST_COMMENT), 683548)
+    this.expect("Cache Comment Count", REACT_RENDER_TEST_SRC.match(CACHE_BUST_COMMENT_RE).length, 20)
     this.expect("Source HTML hash", REACT_RENDER_TEST_SRC_HASH, -1771319017);
     this.expect("HTML length", this.lastResult.html.length, 183778);
     this.expect("HTML hash", this.lastResult.htmlHash, 1177839858);
