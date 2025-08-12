@@ -91,11 +91,27 @@ class Benchmark {
     }
 
     async runSubTests() {
+        const workerGroups = this.splitWorkerRunGroups();
+        if (workerGroups.length != MAX_CONCURRENT_RUNNING)
+            throw new Error(`Invalid workerGroups.length, got ${workerGroups.length} expected ${MAX_CONCURRENT_RUNNING}`);
+        // Run each worker group in parallel.
+        await Promise.all(workerGroups.map(group => this.runGroupWorkloads(group)));
+    }
+    
+    splitWorkerRunGroups() {
         const workers = this.workers.slice();
+        const groups = new Array(MAX_CONCURRENT_RUNNING).fill(null).map(_ => []);
+        let groupIndex = 0;
         while (workers.length > 0) {
-            const workerGroup = workers.splice(workers.length - MAX_CONCURRENT_RUNNING, MAX_CONCURRENT_RUNNING);
-            await Promise.all(workerGroup.map(worker => worker.runWorkload()));
+            groups[groupIndex % groups.length].push(workers.pop());
+            groupIndex++;
         }
+        return groups;
+    }
+
+    async runGroupWorkloads(workers) {
+        for (const worker of workers) 
+            await worker.runWorkload();
     }
 }
 
