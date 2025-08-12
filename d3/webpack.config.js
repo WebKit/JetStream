@@ -21,7 +21,6 @@ function createConfig({ filename, minify }) {
       new webpack.ProvidePlugin({
         TextEncoder: ["text-encoding", "TextEncoder"],
         TextDecoder: ["text-encoding", "TextDecoder"],
-        // MessageChannel: [path.resolve(__dirname, "src/mock/message_channel.cjs"), "MessageChannel"],
         process: "process/browser",
         Buffer: ["buffer", "Buffer"],
       }),
@@ -62,7 +61,7 @@ function createConfig({ filename, minify }) {
         "crypto": false,
         "fs": false,
         "http": require.resolve("stream-http"),
-        "https": false, //require.resolve("https-browserify"),
+        "https": false,
         "net": false,
         "os": require.resolve("os-browserify/browser"),
         "path": require.resolve("path-browserify"),
@@ -70,8 +69,8 @@ function createConfig({ filename, minify }) {
         "tls": false,
         "url": require.resolve("url/"),
         "util": require.resolve("util/"),
-        "vm": false, //require.resolve("vm-browserify"),
-        "zlib": false, //require.resolve("browserify-zlib"),
+        "vm": false, 
+        "zlib": false, 
       },
     },
     performance: {
