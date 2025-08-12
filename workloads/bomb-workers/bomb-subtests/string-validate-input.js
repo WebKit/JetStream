@@ -86,10 +86,25 @@ function addResult(r)
    endResult += "\n" + r;
 }
 
-doTest();
+function workload() {
 
-// FIXME: Come up with a way of validating this test.
-// https://bugs.webkit.org/show_bug.cgi?id=114851
+   doTest();
 
-postMessage("done");
-close();
+   // FIXME: Come up with a way of validating this test.
+   // https://bugs.webkit.org/show_bug.cgi?id=114851
+
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");

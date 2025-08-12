@@ -261,14 +261,29 @@ function makeTagCloud(tagInfo)
     return output;
 }
 
-var tagcloud = makeTagCloud(tagInfo);
+function workload() {
+    var tagcloud = makeTagCloud(tagInfo);
 
-var expectedMinLength = 315000;
+    var expectedMinLength = 315000;
 
-if (tagcloud.length < expectedMinLength)
-    throw "ERROR: bad result: expected length at least " + expectedMinLength + " but got " + tagcloud.length;
+    if (tagcloud.length < expectedMinLength)
+        throw "ERROR: bad result: expected length at least " + expectedMinLength + " but got " + tagcloud.length;
 
-tagInfo = null;
+    tagInfo = null;
 
-postMessage("done");
-close();
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");
+

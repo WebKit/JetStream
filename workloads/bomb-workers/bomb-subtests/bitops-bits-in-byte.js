@@ -22,11 +22,25 @@ for(var y=0; y<256; y++) sum += func(y);
 return sum;
 }
 
-result = TimeFunc(bitsinbyte);
+function workload() {
+    const result = TimeFunc(bitsinbyte);
 
-var expected = 358400;
-if (result != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + result;
+    var expected = 358400;
+    if (result != expected)
+        throw "ERROR: bad result: expected " + expected + " but got " + result;
 
-postMessage("done");
-close();
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");
