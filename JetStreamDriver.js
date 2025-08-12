@@ -95,9 +95,16 @@ function displayCategoryScores() {
     if (!categoryScores)
         return;
 
+    let scoreDetails = `<div class="benchmark benchmark-done">`;
+    for (let [category, scores] of categoryScores) {
+        scoreDetails += `<span class="result">
+                <span>${uiFriendlyScore(geomeanScore(scores))}</span>
+                <label>${category}</label>
+            </span>`;
+    }
+    scoreDetails += "</div>";
     let summaryElement = document.getElementById("result-summary");
-    for (let [category, scores] of categoryScores)
-        summaryElement.innerHTML += `<p> ${category}: ${uiFriendlyScore(geomeanScore(scores))}</p>`
+    summaryElement.innerHTML += scoreDetails;
 
     categoryScores = null;
 }
@@ -127,7 +134,6 @@ if (isInBrowser) {
         const key = keyboardEvent.key;
         if (key === "d" || key === "D") {
             showScoreDetails = true;
-
             displayCategoryScores();
         }
     };
@@ -178,7 +184,7 @@ function updateUI() {
 function uiFriendlyNumber(num) {
     if (Number.isInteger(num))
         return num;
-    return num.toFixed(3);
+    return num.toFixed(2);
 }
 
 function uiFriendlyScore(num) {
@@ -237,10 +243,8 @@ class Driver {
 
     async start() {
         let statusElement = false;
-        let summaryElement = false;
         if (isInBrowser) {
             statusElement = document.getElementById("status");
-            summaryElement = document.getElementById("result-summary");
             statusElement.innerHTML = `<label>Running...</label>`;
         } else if (!dumpJSONResults)
             console.log("Starting JetStream3");
@@ -308,8 +312,10 @@ class Driver {
         assert(totalScore > 0, `Invalid total score: ${totalScore}`);
 
         if (isInBrowser) {
+            const summaryElement = document.getElementById("result-summary");
             summaryElement.classList.add("done");
-            summaryElement.innerHTML = `<div class="score">${uiFriendlyScore(totalScore)}</div><label>Score</label>`;
+            summaryElement.innerHTML = `<div class="score">${uiFriendlyScore(totalScore)}</div>
+                    <label>Score</label>`;
             summaryElement.onclick = displayCategoryScores;
             if (showScoreDetails)
                 displayCategoryScores();
@@ -318,7 +324,6 @@ class Driver {
             console.log("\n");
             for (let [category, scores] of categoryScores)
                 console.log(`${category}: ${uiFriendlyScore(geomeanScore(scores))}`);
-
             console.log("\nTotal Score: ", uiFriendlyScore(totalScore), "\n");
         }
 
@@ -347,12 +352,14 @@ class Driver {
             if (isInBrowser) {
                 text +=
                     `<div class="benchmark" id="benchmark-${benchmark.name}">
-                    <h3 class="benchmark-name"><a href="in-depth.html#${benchmark.name}">${benchmark.name}</a></h3>
-                    <h4 class="score" id="${overallScoreId}">___</h4><p>`;
+                    <h3 class="benchmark-name">${benchmark.name} <a class="info" href="in-depth.html#${benchmark.name}">i</a></h3>
+                    <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
+                    <h4 class="plot" id="plot-${benchmark.name}">&nbsp;</h4>
+                    <p>`;
                 for (let i = 0; i < scoreIds.length; i++) {
                     const scoreId = scoreIds[i];
                     const label = description[i];
-                    text += `<span class="result"><span id="${scoreId}">___</span><label>${label}</label></span>`
+                    text += `<span class="result"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`
                 }
                 text += `</p></div>`;
             }
@@ -692,6 +699,7 @@ class Benchmark {
         this.isAsync = !!plan.isAsync;
         this.scripts = null;
         this.preloads = null;
+        this.results = [];
         this._state = BenchmarkState.READY;
     }
 
@@ -742,8 +750,9 @@ class Benchmark {
             top.currentResolve(results);`;
     }
 
-    processResults() {
-        throw new Error("Subclasses need to implement this");
+    processResults(results) {
+        this.results = Array.from(results);
+        return this.results;
     }
 
     get score() {
@@ -1061,6 +1070,36 @@ class Benchmark {
 
         for (const [name, value] of scoreEntries)
             document.getElementById(this.scoreIdentifier(name)).innerHTML = uiFriendlyScore(value);
+
+        this.renderScatterPlot();
+    }
+
+    renderScatterPlot() {
+        const plotContainer = document.getElementById(`plot-${this.name}`);
+        if (!plotContainer || !this.results || this.results.length === 0)
+            return;
+
+        const scoreElement = document.getElementById(this.scoreIdentifier("Score"));
+        const width = scoreElement.offsetWidth;
+        const height = scoreElement.offsetHeight;
+
+        const padding = 5;
+        const maxResult = Math.max(...this.results);
+        const minResult = Math.min(...this.results);
+
+        const xRatio = (width - 2 * padding) / (this.results.length - 1 || 1);
+        const yRatio = (height - 2 * padding) / (maxResult - minResult || 1);
+        const radius = Math.max(1.5, Math.min(2.5, 10 - (this.iterations / 10)));
+
+        let circlesSVG = "";
+        for (let i = 0; i < this.results.length; i++) {
+            const result = this.results[i];
+            const cx = padding + i * xRatio;
+            const cy = height - padding - (result - minResult) * yRatio;
+            const title = `Iteration ${i + 1}: ${uiFriendlyDuration(result)}`;
+            circlesSVG += `<circle cx="${cx}" cy="${cy}" r="${radius}"><title>${title}</title></circle>`;
+        }
+        plotContainer.innerHTML = `<svg width="${width}px" height="${height}px">${circlesSVG}</svg>`;
     }
 
     updateConsoleAfterRun(scoreEntries) {
@@ -1102,13 +1141,7 @@ class DefaultBenchmark extends Benchmark {
     }
 
     processResults(results) {
-        function copyArray(a) {
-            const result = [];
-            for (let x of a)
-                result.push(x);
-            return result;
-        }
-        results = copyArray(results);
+        results = super.processResults(results)
 
         this.firstIterationTime = results[0];
         this.firstIterationScore = toScore(results[0]);
@@ -1238,27 +1271,12 @@ class WasmEMCCBenchmark extends AsyncBenchmark {
                 postRun: [],
                 noInitialRun: true,
                 print: print,
-                printErr: printErr,
-                setStatus: function(text) {
-                },
-                totalDependencies: 0,
-                monitorRunDependencies: function(left) {
-                    this.totalDependencies = Math.max(this.totalDependencies, left);
-                    Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-                },
+                printErr: printErr
             };
 
             globalObject.Module = Module;
             ${super.prerunCode};
         `;
-
-        if (isSpiderMonkey) {
-            str += `
-                // Needed because SpiderMonkey shell doesn't have a setTimeout.
-                Module.setStatus = null;
-                Module.monitorRunDependencies = null;
-            `;
-        }
 
         return str;
     }
@@ -1275,6 +1293,7 @@ class WSLBenchmark extends Benchmark {
     }
 
     processResults(results) {
+        results = super.processResults(results);
         this.stdlibTime = results[0];
         this.stdlibScore = toScore(results[0]);
         this.mainRunTime = results[1];
@@ -1332,6 +1351,7 @@ class WasmLegacyBenchmark extends Benchmark {
     }
 
     processResults(results) {
+        results = super.processResults(results);
         this.startupTime = results[0];
         this.startupScore= toScore(results[0]);
         this.runTime = results[1];
@@ -1378,14 +1398,7 @@ class WasmLegacyBenchmark extends Benchmark {
                 preRun: [],
                 postRun: [],
                 print: globalObject.print,
-                printErr: globalObject.print,
-                setStatus: function(text) {
-                },
-                totalDependencies: 0,
-                monitorRunDependencies: function(left) {
-                    this.totalDependencies = Math.max(this.totalDependencies, left);
-                    Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-                }
+                printErr: globalObject.print
             };
             globalObject.Module = Module;
             `;
@@ -1415,9 +1428,6 @@ class WasmLegacyBenchmark extends Benchmark {
                     throw new Error;
                 };
             };
-
-            Module.setStatus = null;
-            Module.monitorRunDependencies = null;
 
             Promise.resolve(42).then(() => {
                 try {
