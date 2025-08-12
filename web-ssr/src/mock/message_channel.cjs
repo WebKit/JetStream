@@ -56,4 +56,4 @@ class MessageChannel {
 
 module.exports = {
   MessageChannel,
-}
+};

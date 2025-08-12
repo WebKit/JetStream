@@ -2,10 +2,10 @@ const React = require('react');
 const { countryFlags } = require('./country-flags.cjs');
 
 const Review = ({ review }) => (
-  <div className="review">
-    <h4>{review.user} ({review.rating}/100)</h4>
-    <p>{review.comment}</p>
-  </div>
+    <div className="review">
+        <h4>{review.user} ({review.rating}/100)</h4>
+        <p>{review.comment}</p>
+    </div>
 );
 
 const Grape = ({ grape }) => (
@@ -26,19 +26,19 @@ const Grape = ({ grape }) => (
             }}></div>
         </div>
     </li>
-)
+);
 
 const GrapeComposition = ({ composition }) => (
-  <ul className="grape-composition">
-    {composition.map(g => (
-      <Grape key={g.grape} grape={g} />
-    ))}
-  </ul>
+    <ul className="grape-composition">
+        {composition.map(g => (
+            <Grape key={g.grape} grape={g} />
+        ))}
+    </ul>
 );
 
 const WineName = ({ name, hasHighRating }) => (
     <h2>{name} {hasHighRating && '⭐'}</h2>
-)
+);
 
 const Winemaker = ({ winemaker }) => (
     <div className="winemaker">
@@ -46,7 +46,7 @@ const Winemaker = ({ winemaker }) => (
         <p>{winemaker.description}</p>
         <p>Established: {winemaker.establishedDate}</p>
     </div>
-)
+);
 
 const Region = ({ region }) => (
     <h3>
@@ -54,11 +54,11 @@ const Region = ({ region }) => (
         <a href={`/list/?country=${region.country}`}>{region.country}</a>
         {countryFlags[region.country]}
     </h3>
-)
+);
 
 const Tag = ({ tag }) => (
     <li key={tag}><a href={`/list/?tag=${tag}`}>{tag}</a></li>
-)
+);
 
 const Tags = ({ tags }) => (
     <ul className="tags">
@@ -66,27 +66,27 @@ const Tags = ({ tags }) => (
             <Tag key={t} tag={t} />
         ))}
     </ul>
-)
+);
 
 const Vintage = ({ vintage }) => (
     <h4>Vintage: {vintage}</h4>
-)
+);
 
 const getSaleInfo = (price, salePrice) => {
     const onSale = salePrice && salePrice < price;
     const percentageDiff = onSale ? Math.round(((price - salePrice) / price) * 100) : 0;
     return { onSale, percentageDiff };
-}
+};
 
 const getPriceRating = (price) => {
     if (price < 100) return "€";
     if (price < 1000) return "€€";
-    return "€€€"
-}
+    return "€€€";
+};
 
 const PriceRating = ({ price }) => (
     <span>{getPriceRating(price)}</span>
-)
+);
 
 const Price = ({ price, salePrice }) => {
     const onSale = salePrice && salePrice < price;
@@ -110,8 +110,8 @@ const Bottle750 = ({ bottle }) => {
             750ml: {quantity} {quantity < 10 && '(Low stock)'} - <Price price={price} salePrice={salePrice} /> <PriceRating price={price} />
             {onSale && <span>❗({percentageDiff}% off)</span>}
         </li>
-    )
-}
+    );
+};
 
 const BottleMagnum = ({ bottle }) => {
     const { quantity, price, salePrice } = bottle;
@@ -122,8 +122,8 @@ const BottleMagnum = ({ bottle }) => {
             Magnum: {quantity} {quantity < 10 && '(Low stock)'} - <Price price={price} salePrice={salePrice} /> <PriceRating price={price} />
             {onSale && <span>❗({percentageDiff}% off)</span>}
         </li>
-    )
-}
+    );
+};
 
 const BottleBalthazar = ({ bottle }) => {
     const { quantity, price, salePrice } = bottle;
@@ -134,8 +134,8 @@ const BottleBalthazar = ({ bottle }) => {
             Balthazar: {quantity} {quantity < 10 && '(Low stock)'} - <Price price={price} salePrice={salePrice} /> <PriceRating price={price} />
             {onSale && <span>❗({percentageDiff}% off)</span>}
         </li>
-    )
-}
+    );
+};
 
 const Stock = ({ stock }) => (
     <div className="stock">
@@ -150,34 +150,34 @@ const Stock = ({ stock }) => (
             <p>Out of stock</p>
         )}
     </div>
-)
+);
 
 const Wine = ({ wine }) => (
-  <div className="wine-card">
-    <WineName name={wine.name} hasHighRating={wine.reviews.some(r => r.rating > 90)} />
-    <Winemaker winemaker={wine.winemaker} />
-    <Region region={wine.region} />
-    <Vintage vintage={wine.vintage} />
-    <h4>Tasting Notes</h4>
-    <p>{wine.tastingNotes}</p>
-    <Tags tags={wine.tags} />
-    <h4>Grape Composition</h4>
-    <GrapeComposition composition={wine.grapeComposition} />
-    <Stock stock={wine.stock} />
-    <h4>Reviews</h4>
-    {wine.reviews.map((review, i) => (
-      <Review key={i} review={review} />
-    ))}
-  </div>
+    <div className="wine-card">
+        <WineName name={wine.name} hasHighRating={wine.reviews.some(r => r.rating > 90)} />
+        <Winemaker winemaker={wine.winemaker} />
+        <Region region={wine.region} />
+        <Vintage vintage={wine.vintage} />
+        <h4>Tasting Notes</h4>
+        <p>{wine.tastingNotes}</p>
+        <Tags tags={wine.tags} />
+        <h4>Grape Composition</h4>
+        <GrapeComposition composition={wine.grapeComposition} />
+        <Stock stock={wine.stock} />
+        <h4>Reviews</h4>
+        {wine.reviews.map((review, i) => (
+            <Review key={i} review={review} />
+        ))}
+    </div>
 );
 
 const WineList = ({ wines }) => (
-  <div className="wine-list">
-    <h1>Complex Wine List</h1>
-    {wines.map((wine, i) => (
-      <Wine key={i} wine={wine} />
-    ))}
-  </div>
+    <div className="wine-list">
+        <h1>Complex Wine List</h1>
+        {wines.map((wine, i) => (
+            <Wine key={i} wine={wine} />
+        ))}
+    </div>
 );
 
 module.exports = {
@@ -198,4 +198,4 @@ module.exports = {
     Stock,
     Wine,
     WineList,
-}
+};

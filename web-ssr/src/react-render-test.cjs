@@ -19,4 +19,4 @@ function renderTest() {
 
 module.exports = {
   renderTest
-}
+};

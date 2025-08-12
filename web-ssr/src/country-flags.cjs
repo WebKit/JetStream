@@ -4,8 +4,8 @@ const countryFlags = {
     "Australia": "🇦🇺",
     "Spain": "🇪🇸",
     "Country": "🏳️"
-}
+};
 
 module.exports = {
     countryFlags
-}
+};

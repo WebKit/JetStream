@@ -1,6 +1,6 @@
 // node standalone version of the benchmark for local testing.
 
-const {renderTest } = require("./src/react-render-test.cjs")
+const { renderTest } = require("./src/react-render-test.cjs");
 
 console.log("Starting TypeScript in-memory compilation benchmark...");
 const startTime = performance.now();
