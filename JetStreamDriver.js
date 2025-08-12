@@ -1271,27 +1271,12 @@ class WasmEMCCBenchmark extends AsyncBenchmark {
                 postRun: [],
                 noInitialRun: true,
                 print: print,
-                printErr: printErr,
-                setStatus: function(text) {
-                },
-                totalDependencies: 0,
-                monitorRunDependencies: function(left) {
-                    this.totalDependencies = Math.max(this.totalDependencies, left);
-                    Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-                },
+                printErr: printErr
             };
 
             globalObject.Module = Module;
             ${super.prerunCode};
         `;
-
-        if (isSpiderMonkey) {
-            str += `
-                // Needed because SpiderMonkey shell doesn't have a setTimeout.
-                Module.setStatus = null;
-                Module.monitorRunDependencies = null;
-            `;
-        }
 
         return str;
     }
@@ -1413,14 +1398,7 @@ class WasmLegacyBenchmark extends Benchmark {
                 preRun: [],
                 postRun: [],
                 print: globalObject.print,
-                printErr: globalObject.print,
-                setStatus: function(text) {
-                },
-                totalDependencies: 0,
-                monitorRunDependencies: function(left) {
-                    this.totalDependencies = Math.max(this.totalDependencies, left);
-                    Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies-left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-                }
+                printErr: globalObject.print
             };
             globalObject.Module = Module;
             `;
@@ -1450,9 +1428,6 @@ class WasmLegacyBenchmark extends Benchmark {
                     throw new Error;
                 };
             };
-
-            Module.setStatus = null;
-            Module.monitorRunDependencies = null;
 
             Promise.resolve(42).then(() => {
                 try {
