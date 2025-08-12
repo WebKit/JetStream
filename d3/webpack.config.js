@@ -11,7 +11,6 @@ function createConfig({ filename, minify }) {
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: filename,
-      assetModuleFilename: 'data/[name][ext]',
       library: "d3Test",
       libraryTarget: "umd",
       globalObject: "this",
@@ -27,11 +26,6 @@ function createConfig({ filename, minify }) {
               plugins: [path.resolve(__dirname, "build/cache-buster-comment-plugin.cjs")],
             },
           },
-        },
-        {
-          test: [/\.csv$/, /\.json$/],
-          include: path.resolve(__dirname, "src/data"),
-          type: "asset/resource",
         },
       ]
     },

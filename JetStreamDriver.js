@@ -1916,15 +1916,14 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "d3",
         files: [
-            "./d3/dist/d3.js",
-            "./d3/dist/topojson/topojson.js",
-            "./d3/dist/counties-albers-10m.js",
-            "./d3/dist/unemployment-x.csv",
+            "./d3/dist/d3.minified.js",
             "./d3/benchmark.js",
         ],
+        preload: {
+            usDataBlob: "./d3/data/counties-albers-10m.json",
+            airportsBlob: "./d3/data/airports.csv",
+        },
         tags: ["d3", "data-processing"],
-        // iterations: 3,
-        // worstCaseCount: 2,
     }),
     // Class fields
     new DefaultBenchmark({
