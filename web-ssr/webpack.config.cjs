@@ -2,12 +2,12 @@ const path = require("path");
 const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
 
-function createConfig({filename, minify}) {
+function createConfig({ filename, minify }) {
   return {
     mode: "production",
     devtool: "source-map",
     target: "web",
-    entry: path.resolve(__dirname, "src/react-render-test.cjs"),
+    entry: "./src/react-render-test.cjs",
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: filename,
@@ -21,7 +21,7 @@ function createConfig({filename, minify}) {
       new webpack.ProvidePlugin({
         TextEncoder: ["text-encoding", "TextEncoder"],
         TextDecoder: ["text-encoding", "TextDecoder"],
-        MessageChannel: [path.resolve(__dirname, "src/mock/message_channel.cjs"), "MessageChannel"],
+        MessageChannel: ["src/mock/message_channel.cjs", "MessageChannel"],
         process: "process/browser",
         Buffer: ["buffer", "Buffer"],
       }),
@@ -79,9 +79,9 @@ function createConfig({filename, minify}) {
         "crypto": false,
         "fs": false,
         "http": false,
-        "https": false, 
+        "https": false,
         "net": false,
-        "os": false, 
+        "os": false,
         "path": require.resolve("path-browserify"),
         "stream": require.resolve("stream-browserify"),
         "string_decoder": require.resolve("string_decoder/"),
@@ -101,6 +101,6 @@ function createConfig({filename, minify}) {
 
 
 module.exports = [
-    createConfig({filename: "react-render-test.minified.js", minify: true}),
-    createConfig({filename: "react-render-test.js", minify: false})
+  createConfig({ filename: "react-render-test.minified.js", minify: true }),
+  createConfig({ filename: "react-render-test.js", minify: false })
 ];
