@@ -58,11 +58,10 @@ const WORKER_SUB_TESTS = [
 ];
 
 class Benchmark {
-    workers = []
+    workers = [];
 
     async runIteration() {
         if (this.workers.length != 0) {
-            console.error(this)
             throw new Error("Something bad happened.");
         }
         await this.startWorkers();
@@ -104,13 +103,13 @@ class BenchmarkWorker {
         this._worker = new Worker(file);
         this.readyPromise = new Promise((resolve, reject) => {
             this._worker.onmessage = (event) => {
-                switch(event.data) {
+                switch (event.data) {
                     case "ready": {
-                        resolve()
+                        resolve();
                         break;
                     }
                     default:
-                        reject(new Error(`Unknown worker message: ${event.data}`))
+                        reject(new Error(`Unknown worker message: ${event.data}`));
                 }
             };
         });
@@ -119,9 +118,9 @@ class BenchmarkWorker {
     async runWorkload() {
         await new Promise((resolve, reject) => {
             this._worker.onmessage = (event) => {
-                switch(event.data) {
+                switch (event.data) {
                     case "done": {
-                        resolve()
+                        resolve();
                         break;
                     }
                     default:
