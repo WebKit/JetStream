@@ -23,7 +23,25 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-html {
+:root {
+    --color-primary: #34AADC;
+    --color-secondary: #86D9FF;
+    --text-color-inverse: white;
+    --text-color-primary: black;
+    --text-color-secondary: #555555;
+    --text-color-tertiary: #444444;
+    --text-color-subtle: #6c6c71;
+    --text-color-very-subtle: #8E8E93;
+    --heading-color: #2C98D1;
+    --link-hover-color: #0086BF;
+    --button-color-primary: rgb(52,170,220);
+    --error-text-color: #d24a59;
+    --benchmark-heading-color: rgb(183, 183, 183);
+    --benchmark-error-text-color: #ff8686;
+    --benchmark-done-result-color: #4A4A4A;
+}
+
+html,  svg text {
     font-family: "Helvetica Neue", Helvetica, Verdana, sans-serif;
     font-size: 62.5%;
     font-synthesis: none;
@@ -42,8 +60,8 @@ body {
 }
 
 ::selection {
-    background-color: #34AADC;
-    color: white;
+    background-color: var(--color-primary);
+    color: var(--text-color-inverse);
 }
 
 main {
@@ -126,13 +144,13 @@ article, .summary {
 }
 
 h1 {
-    color: black;
+    color: var(--text-color-primary);
     text-align: center;
 }
 
 
 h2, h3, h4, h5, h6 {
-     color: #2C98D1;
+     color: var(--heading-color);
      text-align: left;
 }
 
@@ -143,7 +161,7 @@ h4, h5, h6 {
 
 p {
     text-align: left;
-    color: #555555;
+    color: var(--text-color-secondary);
     margin: 0 0 3rem 0;
 }
 
@@ -152,7 +170,7 @@ h5, h6 {
 }
 
 h6 {
-    color: #444444;
+    color: var(--text-color-tertiary);
 }
 
 dt {
@@ -169,12 +187,12 @@ dd {
 
 a:link,
 a:visited {
-    color: #34AADC;
+    color: var(--color-primary);
 }
 
 a:hover,
 a:active {
-    color: #0086BF;
+    color: var(--link-hover-color);
 }
 
 #status {
@@ -187,10 +205,10 @@ a.button {
     font-weight: 500;
     text-decoration: none;
     font-size: 2rem;
-    background-color: rgb(52,170,220);
-    background-image: linear-gradient(180deg, rgba(134,217,255,1) -80%, rgba(52,170,220,1) 100%);
-    color: rgb(255,255,255);
-    border: 1px solid rgb(52,170,220);
+    background-color: var(--button-color-primary);
+    background-image: linear-gradient(180deg, rgba(134,217,255,1) -80%, rgb(52,170,220) 100%);
+    color: var(--text-color-inverse);
+    border: 1px solid var(--button-color-primary);
     border-radius: 2px;
     padding: 0.3rem 9rem 0.5rem;
     -webkit-touch-callout: none;
@@ -238,7 +256,7 @@ a.button {
 }
 
 .error h2, .error p {
-    color: #d24a59;
+    color: var(--error-text-color);
     margin-bottom: 0;
     text-align: center;
     font-weight: 500;
@@ -259,15 +277,20 @@ a.button {
 }
 
 #result-summary label {
-    color: #6c6c71;
+    color: var(--text-color-subtle);
 }
 
 #result-summary .score {
     font-weight: bold;
     font-size: 4rem;
     line-height: 1;
-    color: #34AADC;
+    color: var(--color-primary);
     font-weight: 500;
+}
+
+.benchmark .plot svg {
+    display: inline-block;
+    vertical-align: middle;
 }
 
 #result-summary .score .interval {
@@ -289,30 +312,30 @@ a.button {
     max-width: 20%;
     min-width: 200px;
     text-align: left;
-    color: #8E8E93;
+    color: var(--text-color-very-subtle);
     font-size: 1.6rem;
     margin: 0 1.6rem 3rem 0;
 
 }
 
-.benchmark h4, .benchmark .result, .benchmark label {
+.benchmark h4, .benchmark .result, .benchmark label, .benchmark .plot  {
     color: transparent;
     background: linear-gradient(160deg, rgba(249,249,249,1) 0%, rgba(238,238,238,1) 100%);
     border-radius: 3px;
 }
 
 .benchmark h3 {
-    color:  rgb(183, 183, 183);
+    color:  var(--benchmark-heading-color);
 }
 
-.benchmark-running h4, .benchmark-running .result, .benchmark-running label {
-    color: #86D9FF;
-    background-color: #86D9FF;
+.benchmark-running h4, .benchmark-running .result, .benchmark-running label,  .benchmark-running .plot {
+    color: var(--color-secondary);
+    background-color: var(--color-secondary);
     background-image: none;
 }
 
 
-.benchmark-done h3, .benchmark-done h4, .benchmark-done .result, .benchmark-done label {
+.benchmark-done h3, .benchmark-done h4, .benchmark-done .result, .benchmark-done label,  .benchmark-done .plot {
     background-color: transparent;
     background-image: none;
     -webkit-touch-callout: revert;
@@ -322,14 +345,14 @@ a.button {
     user-select: text;
 }
 
-.benchmark-error h4, .benchmark-error .result, .benchmark-error label {
-    color: #ff8686;
-    background-color: #ff8686;
+.benchmark-error h4, .benchmark-error .result, .benchmark-error label, .benchmark-error  .plot {
+    color: var(--benchmark-error-text-color);
+    background-color: var(--benchmark-error-text-color);
     background-image: none;
 }
 
 .benchmark-error h3 {
-    color: #ff8686;
+    color: var(--benchmark-error-text-color);
 }
 
 .benchmark h3 {
@@ -341,11 +364,11 @@ a.button {
 .benchmark-running h3 {
     background-color: transparent;
     background-image: none;
-    color: #34AADC;
+    color: var(--color-primary);
 }
 
 .benchmark-done h3 {
-    color: #6c6c71;
+    color: var(--text-color-subtle);
 }
 
 .benchmark h3 a,
@@ -358,7 +381,7 @@ a.button {
 }
 
 .benchmark-done h3 a:hover {
-    color: #34AADC;
+    color: var(--color-primary);
     text-decoration: underline;
 }
 
@@ -370,7 +393,7 @@ a.button {
 }
 
 .benchmark-done h4 {
-    color: #34AADC;
+    color: var(--color-primary);
     background-color: none;
 }
 
@@ -387,8 +410,15 @@ a.button {
     font-weight: bold;
 }
 
+#result-summary .benchmark {
+    text-align: center;
+    max-width: 100%;
+    margin: 0;
+    margin-left: 1.6rem;
+}
+
 .benchmark-done .result {
-    color: #4A4A4A;
+    color: var(--benchmark-done-result-color);
 }
 
 .benchmark label {
@@ -396,8 +426,13 @@ a.button {
 }
 
 .benchmark-done label {
-    color: #8E8E93;
+    color: var(--text-color-very-subtle);
     font-weight: 400;
+}
+
+.plot svg circle {
+    fill: var(--color-primary);
+    opacity: 0.8;
 }
 
 @keyframes fadein {
