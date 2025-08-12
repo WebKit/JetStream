@@ -23,6 +23,8 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const NUM_WORKERS = 40;
+
 const MAX_CONCURRENCY_STARTUP = 8;
 const MAX_CONCURRENT_RUNNING = 16;
 
@@ -73,13 +75,12 @@ class Benchmark {
     async startWorkers() {
         if (!JetStream.isInBrowser)
             throw new Error("Only works in browser");
-
-        let testIndex = 0;
-        while (testIndex < WORKER_SUB_TESTS.length) {
+        for (let testIndex = 0; testIndex < NUM_WORKERS.length; testIndex++) {
             const workerGroup = [];
             for (let i = 0; i < MAX_CONCURRENCY_STARTUP; i++) {
-                const worker = new BenchmarkWorker(WORKER_SUB_TESTS[testIndex % WORKER_SUB_TESTS.length]);
-                workerGroup.push(worker)
+                const subtest = WORKER_SUB_TESTS[testIndex % WORKER_SUB_TESTS.length];
+                const worker = new BenchmarkWorker(subtest);
+                workerGroup.push(worker);
                 this.workers.push(worker);
                 testIndex++;
             }
