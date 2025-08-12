@@ -1913,6 +1913,19 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "Proxy"],
     }),
+    new DefaultBenchmark({
+        name: "d3",
+        files: [
+            "./d3/dist/d3.js",
+            "./d3/dist/topojson/topojson.js",
+            "./d3/dist/counties-albers-10m.js",
+            "./d3/dist/unemployment-x.csv",
+            "./d3/benchmark.js",
+        ],
+        tags: ["d3", "data-processing"],
+        // iterations: 3,
+        // worstCaseCount: 2,
+    }),
     // Class fields
     new DefaultBenchmark({
         name: "raytrace-public-class-fields",
