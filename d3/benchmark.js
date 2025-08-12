@@ -12,12 +12,15 @@ function quickHash(str) {
 
 const CACHE_BUST_COMMENT = "/*ThouShaltNotCache*/";
 const CACHE_BUST_COMMENT_RE = new RegExp(`\n${RegExp.escape(CACHE_BUST_COMMENT)}\n`, "g");
+
 const EXPECTED_LAST_RESULT_LENGTH = 691366;
+const EXPECTED_LAST_RESULT_HASH = 144487595;
 
 globalThis.clearTimeout = () => { };
 
 class Benchmark {
     measureStartup = true;
+
     sourceCode = "";
     sourceHash = 0;
     iterationSourceCodes = [];
@@ -49,7 +52,7 @@ class Benchmark {
 
     prepareCode(iteration) {
         if (!this.measureStartup)
-            return this.originalSource;
+            return this.sourceCode;
         // Alter the code per iteration to prevent caching.
         const iterationSourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iteration}*/`);
         return iterationSourceCode;
@@ -62,12 +65,18 @@ class Benchmark {
         // Module in sourceCode it assigned to the ReactRenderTest variable.
         let D3Test;
         eval(iterationSourceCode);
-        this.lastResult = D3Test.runTest(this.airportsCsvString, this.usData);
+        const html = D3Test.runTest(this.airportsCsvString, this.usData);
+        this.lastResult = {
+            html,
+            htmlHash: quickHash(html),
+        };
         this.currentIteration++;
     }
 
     validate() {
-        if (this.lastResult.length != EXPECTED_LAST_RESULT_LENGTH)
-            throw new Error(`Expected this.lastResult.length to be ${EXPECTED_LAST_RESULT_LENGTH} but got ${this.lastResult.length}`);
+        if (this.lastResult.html.length != EXPECTED_LAST_RESULT_LENGTH)
+            throw new Error(`Expected this.lastResult.html.length to be ${EXPECTED_LAST_RESULT_LENGTH} but got ${this.lastResult.length}`);
+        if (this.lastResult.htmlHash != EXPECTED_LAST_RESULT_HASH)
+            throw new Error(`Expected this.lastResult.htmlHash to be ${EXPECTED_LAST_RESULT_HASH} but got ${this.lastResult.htmlHash}`);
     }
 }
