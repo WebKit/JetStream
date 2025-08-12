@@ -2,11 +2,14 @@ import { JSDOM } from "jsdom";
 import * as d3 from "d3";
 import * as topojson from "topojson-client";
 
-export async function runTest(airports, usData) {
+export function runTest(airportsData, usData) {
+    const airports = d3.csvParse(airportsData, d3.autoType);
+
     // Setup jsdom
     const dom = new JSDOM(`<!DOCTYPE html><body></body>`);
     const document = dom.window.document;
     const body = d3.select(document.body);
+
 
     const width = 975;
     const height = 610;

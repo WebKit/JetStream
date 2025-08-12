@@ -11,10 +11,21 @@ function createConfig({ filename, minify }) {
     output: {
       path: path.resolve(__dirname, "dist"),
       filename: filename,
-      library: "d3Test",
-      libraryTarget: "umd",
-      globalObject: "this",
+      library: {
+        name: "D3Test",
+        type: "globalThis",
+      },
+      libraryTarget: "assign",
     },
+    plugins: [
+      new webpack.ProvidePlugin({
+        TextEncoder: ["text-encoding", "TextEncoder"],
+        TextDecoder: ["text-encoding", "TextDecoder"],
+        // MessageChannel: [path.resolve(__dirname, "src/mock/message_channel.cjs"), "MessageChannel"],
+        process: "process/browser",
+        Buffer: ["buffer", "Buffer"],
+      }),
+    ],
     module: {
       rules: [
         {
@@ -44,29 +55,32 @@ function createConfig({ filename, minify }) {
     },
     resolve: {
       fallback: {
-        "path": require.resolve("path-browserify"),
-        "fs": false,
-        "https": false,
-        "http": false,
-        "net": false,
-        "tls": false,
-        "url": false,
-        "assert": false,
-        "buffer": false,
-        "vm": false,
-        "crypto": false,
-        "stream": false,
-        "zlib": false,
-        "util": false,
-        "os": false,
+        "assert": require.resolve("assert/"),
+        "buffer": require.resolve("buffer/"),
+        "canvas": false,
         "child_process": false,
-        "canvas": false
+        "crypto": false,
+        "fs": false,
+        "http": require.resolve("stream-http"),
+        "https": require.resolve("https-browserify"),
+        "net": false,
+        "os": require.resolve("os-browserify/browser"),
+        "path": require.resolve("path-browserify"),
+        "stream": require.resolve("stream-browserify"),
+        "tls": false,
+        "url": require.resolve("url/"),
+        "util": require.resolve("util/"),
+        "vm": require.resolve("vm-browserify"),
+        "zlib": require.resolve("browserify-zlib"),
       },
+    },
+    performance: {
+      hints: false
     },
   };
 };
 
 module.exports = [
-  createConfig({ filename: "d3.minified.js", minify: true }),
-  createConfig({ filename: "d3.js", minify: false })
+  createConfig({ filename: "d3-test.minified.js", minify: true }),
+  createConfig({ filename: "d3-test.js", minify: false })
 ];

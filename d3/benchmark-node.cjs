@@ -6,12 +6,11 @@ async function main() {
     const { runTest } = await import('./src/test.mjs');
 
     const usData = JSON.parse(fs.readFileSync('./data/counties-albers-10m.json', 'utf-8'));
-    const airportsData = fs.readFileSync('./data/airports.csv', 'utf-8');
-    const airports = d3.csvParse(airportsData, d3.autoType);
+    const airportsData = fs.readFileSync('.//data/airports.csv', 'utf-8');
 
     const startTime = performance.now();
 
-    const svg = await runTest(airports, usData);
+    const svg = await runTest(airportsData, usData);
 
     const endTime = performance.now();
 

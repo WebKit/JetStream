@@ -1185,7 +1185,7 @@ class AsyncBenchmark extends DefaultBenchmark {
     get runnerCode() {
         return `
         async function doRun() {
-            let __benchmark = new Benchmark();
+            let __benchmark = new Benchmark(${this.iterations});
             await __benchmark.init?.();
             let results = [];
             let benchmarkName = "${this.name}";
@@ -1913,17 +1913,20 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "Proxy"],
     }),
-    new DefaultBenchmark({
+    new AsyncBenchmark({
         name: "d3",
         files: [
-            "./d3/dist/d3.minified.js",
             "./d3/benchmark.js",
         ],
         preload: {
+            // sourceCodeBlob: "./d3/dist/d3-test.js",
+            sourceCodeBlob: "./d3/dist/d3-test.minified.js",
             usDataBlob: "./d3/data/counties-albers-10m.json",
             airportsBlob: "./d3/data/airports.csv",
         },
         tags: ["d3", "data-processing"],
+        iterations: 4,
+        worstCaseCount: 2,
     }),
     // Class fields
     new DefaultBenchmark({
