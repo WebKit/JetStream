@@ -21,7 +21,7 @@ function createConfig({ filename, minify }) {
       new webpack.ProvidePlugin({
         TextEncoder: ["text-encoding", "TextEncoder"],
         TextDecoder: ["text-encoding", "TextDecoder"],
-        MessageChannel: ["src/mock/message_channel.cjs", "MessageChannel"],
+        MessageChannel: [path.resolve(__dirname, "src/mock/message_channel.cjs"), "MessageChannel"],
         process: "process/browser",
         Buffer: ["buffer", "Buffer"],
       }),
