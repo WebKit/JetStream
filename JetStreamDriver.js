@@ -1926,14 +1926,14 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "d3-startup",
         files: [
-            "./d3/benchmark.js",
+            "./d3-startup/benchmark.js",
         ],
         preload: {
             // Unminified sources for profiling.
-            // sourceCodeBlob: "./d3/dist/d3-test.js",
-            sourceCodeBlob: "./d3/dist/d3-test.minified.js",
-            usDataBlob: "./d3/data/counties-albers-10m.json",
-            airportsBlob: "./d3/data/airports.csv",
+            // sourceCodeBlob: "./d3-startup/dist/d3-test.js",
+            sourceCodeBlob: "./d3-startup/dist/d3-test.minified.js",
+            usDataBlob: "./d3-startup/data/counties-albers-10m.json",
+            airportsBlob: "./d3-startup/data/airports.csv",
         },
         tags: ["d3", "startup"],
         iterations: 10,
