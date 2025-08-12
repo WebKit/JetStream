@@ -12,7 +12,7 @@ function quickHash(str) {
 
 const CACHE_BUST_COMMENT = "/*ThouShaltNotCache*/";
 const CACHE_BUST_COMMENT_RE = new RegExp(`\n${RegExp.escape(CACHE_BUST_COMMENT)}\n`, "g");
-const EXPECTED_LAST_RESULT_LENGTH = 992979;
+const EXPECTED_LAST_RESULT_LENGTH = 691366;
 
 globalThis.clearTimeout = () => { };
 
@@ -41,7 +41,7 @@ class Benchmark {
             this.iterationSourceCodes[i] = this.prepareCode(i);
 
         this.airportsCsvString = (await getString(airportsBlob));
-        this.assert(this.airportsCsvString.length == 210365, `Expected this.airportsCsvString.length to be 210365 but got ${this.airportsCsvString.length}`);
+        this.assert(this.airportsCsvString.length == 145493, `Expected this.airportsCsvString.length to be 141490 but got ${this.airportsCsvString.length}`);
         this.usDataJsonString = await getString(usDataBlob);
         this.assert(this.usDataJsonString.length == 2880996, `Expected this.usData.length to be 2880996 but got ${this.usDataJsonString.length}`);
         this.usData = JSON.parse(this.usDataJsonString);
@@ -51,8 +51,7 @@ class Benchmark {
         if (!this.measureStartup)
             return this.originalSource;
         // Alter the code per iteration to prevent caching.
-        const iterationId = `${String.fromCharCode(97 + (iteration % 25))}${iteration}`;
-        const iterationSourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iterationId}*/`);
+        const iterationSourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iteration}*/`);
         return iterationSourceCode;
     }
 

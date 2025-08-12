@@ -19,10 +19,13 @@ function createConfig({ filename, minify }) {
     },
     plugins: [
       new webpack.ProvidePlugin({
-        TextEncoder: ["text-encoding", "TextEncoder"],
-        TextDecoder: ["text-encoding", "TextDecoder"],
+        TextEncoder: [path.resolve(__dirname, "src/mock/text-encoding-mock.js"), "TextEncoder"],
+        TextDecoder: [path.resolve(__dirname, "src/mock/text-encoding-mock.js"), "TextDecoder"],
         process: "process/browser",
         Buffer: ["buffer", "Buffer"],
+      }),
+      new webpack.BannerPlugin({
+        banner: `For license information, please see ${filename}.LICENSE.txt`,
       }),
     ],
     module: {
@@ -49,6 +52,7 @@ function createConfig({ filename, minify }) {
               comments: /ThouShaltNotCache/i,
             },
           },
+          extractComments: true,
         }),
       ],
     },
