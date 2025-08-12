@@ -23,7 +23,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
-const NUM_WORKERS = 40;
+const NUM_WORKERS = 25;
 
 const MAX_CONCURRENCY_STARTUP = 8;
 const MAX_CONCURRENT_RUNNING = 16;
@@ -65,8 +65,8 @@ class Benchmark {
             throw new Error("Something bad happened.");
         }
         await this.startWorkers();
-        if (this.workers.length % MAX_CONCURRENCY_STARTUP != 0)
-            throw new Error(`Invalid worker count: ${this.workers.length}`);
+        if (this.workers.length != NUM_WORKERS)
+            throw new Error(`Invalid total worker count, got ${this.workers.length} expected ${NUM_WORKERS}`);
         await this.runSubTests();
         this.workers = [];
     }
@@ -74,7 +74,8 @@ class Benchmark {
     async startWorkers() {
         if (!JetStream.isInBrowser)
             throw new Error("Only works in browser");
-        for (let testIndex = 0; testIndex < NUM_WORKERS.length; testIndex++) {
+        let testIndex = 0;
+        while (this.workers.length < NUM_WORKERS) {
             const workerGroup = [];
             for (let i = 0; i < MAX_CONCURRENCY_STARTUP; i++) {
                 const subtest = WORKER_SUB_TESTS[testIndex % WORKER_SUB_TESTS.length];
@@ -82,6 +83,8 @@ class Benchmark {
                 workerGroup.push(worker);
                 this.workers.push(worker);
                 testIndex++;
+                if (this.workers.length == NUM_WORKERS)
+                    break;
             }
             await Promise.all(workerGroup.map(worker => worker.readyPromise));
         }
