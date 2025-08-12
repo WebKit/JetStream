@@ -21,33 +21,42 @@ function quickHash(str) {
 
 const CACHE_BUST_COMMENT = "/*ThouShaltNotCache*/";
 const CACHE_BUST_COMMENT_RE = new RegExp(`\n${RegExp.escape(CACHE_BUST_COMMENT)}\n`, "g");
-// Warm up the hash function.
-const REACT_RENDER_TEST_SRC_HASH = quickHash(REACT_RENDER_TEST_SRC);
 
 // JetStream benchmark.
 class Benchmark {
   measureStartup = true;
+  iterationCount = 0;
   iteration = 0;
   lastResult = {};
-  sources = [];
+  sourceCode;
+  sourceHash = 0
+  iterationSourceCodes = [];
 
-  constructor(iterations) {
-    this.originalSource = REACT_RENDER_TEST_SRC;
-    for (let i = 0; i < iterations; i++)
-      this.sources[i] = this.prepareCode(i);
+  constructor(iterationCount) {
+    this.iterationCount = iterationCount
   }
+
+  async init() {
+    this.sourceCode = await getString(REACT_RENDER_TEST_BLOB);
+    this.expect("Cache Comment Count", this.sourceCode.match(CACHE_BUST_COMMENT_RE).length, 597);
+    // Warm up the hash function.
+    this.sourceHash = quickHash(this.sourceCode);
+    for (let i = 0; i < this.iterationCount; i++)
+      this.iterationSourceCodes[i] = this.prepareCode(i);
+  }
+
 
   prepareCode(iteration) {
     if (!this.measureStartup)
-      return this.originalSource;
+      return this.sourceCode;
     // Alter the code per iteration to prevent caching.
     const iterationId = `${String.fromCharCode(97 + (iteration % 25))}${iteration}`;
-    const sourceCode = this.originalSource.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iterationId}*/`);
+    const sourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iterationId}*/`);
     return sourceCode;
   }
 
   runIteration() {
-    let sourceCode = this.sources[this.iteration];
+    let sourceCode = this.iterationSourceCodes[this.iteration];
     if (!sourceCode)
       throw new Error(`Could not find source for iteration ${this.iteration}`);
     // Module in sourceCode it assigned to the ReactRenderTest variable.
@@ -71,7 +80,6 @@ class Benchmark {
   }
 
   validate() {
-    this.expect("Cache Comment Count", REACT_RENDER_TEST_SRC.match(CACHE_BUST_COMMENT_RE).length, 597);
     this.expect("HTML length", this.lastResult.html.length, 183778);
     this.expect("HTML hash", this.lastResult.htmlHash, 1177839858);
   }

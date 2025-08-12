@@ -1218,7 +1218,7 @@ class AsyncBenchmark extends DefaultBenchmark {
     get runnerCode() {
         return `
         async function doRun() {
-            let __benchmark = new Benchmark();
+            let __benchmark = new Benchmark(${this.iterations});
             await __benchmark.init?.();
             let results = [];
             let benchmarkName = "${this.name}";
@@ -1923,14 +1923,16 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "Proxy"],
     }),
-    new DefaultBenchmark({
+    new AsyncBenchmark({
         name: "web-ssr",
         files: [
-            // Debug Sources for nicer profiling.
-            // "./web-ssr/dist/react-render-test.src.js",
-            "./web-ssr/dist/react-render-test.minified.src.js",
             "./web-ssr/benchmark.js",
         ],
+        preload: {
+            // Debug Sources for nicer profiling.
+            // sourceCodeBlob: "./web-ssr/dist/react-render-test.js",
+            REACT_RENDER_TEST_BLOB: "./web-ssr/dist/react-render-test.minified.js",
+        },
         tags: ["Default", "web", "ssr"],
         iterations: 5,
         worstCaseCount: 3,
