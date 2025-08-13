@@ -1132,8 +1132,8 @@ class DefaultBenchmark extends Benchmark {
         this.worstCaseCount = getWorstCaseCount(this.plan);
         this.firstIterationTime = null;
         this.firstIterationScore = null;
-        this.worst4Time = null;
-        this.worst4Score = null;
+        this.worstTime = null;
+        this.worstScore = null;
         this.averageTime = null;
         this.averageScore = null;
 
@@ -1154,8 +1154,8 @@ class DefaultBenchmark extends Benchmark {
         const worstCase = [];
         for (let i = 0; i < this.worstCaseCount; ++i)
             worstCase.push(results[i]);
-        this.worst4Time = mean(worstCase);
-        this.worst4Score = toScore(this.worst4Time);
+        this.worstTime = mean(worstCase);
+        this.worstScore = toScore(this.worstTime);
         this.averageTime = mean(results);
         this.averageScore = toScore(this.averageTime);
     }
@@ -1163,7 +1163,7 @@ class DefaultBenchmark extends Benchmark {
     subScores() {
         return {
             "First": this.firstIterationScore,
-            "Worst": this.worst4Score,
+            "Worst": this.worstScore,
             "Average": this.averageScore,
         };
     }
