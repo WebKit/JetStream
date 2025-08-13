@@ -25,7 +25,7 @@
 
 const isInBrowser = false;
 if (typeof console == "undefined")
-    console = {}
+    console = {};
 
 console.debug ??= (...args) => console.log("Debug:", ...args);
 console.log ??= (...args) => print(args.join(" "));
