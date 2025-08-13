@@ -146,8 +146,7 @@ if (argsSplit != -1) {
     ms = Math.max(0, ms);
     var id = timerIdCounter++;
     // A callback can be scheduled at most once.
-    // (console.assert is only available on D8)
-    if (isD8) console.assert(f.$timerId === undefined);
+    console.assert(f.$timerId === undefined);
     f.$timerId = id;
     timerIds[id] = f;
     if (ms == 0 && !isNextTimerDue()) {
