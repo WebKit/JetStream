@@ -1935,7 +1935,7 @@ let BENCHMARKS = [
             usDataBlob: "./d3-startup/data/counties-albers-10m.json",
             airportsBlob: "./d3-startup/data/airports.csv",
         },
-        tags: ["d3", "startup" "jsdom"],
+        tags: ["d3", "startup", "jsdom"],
         iterations: 10,
         worstCaseCount: 4,
     }),
