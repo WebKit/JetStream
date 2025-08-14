@@ -24,11 +24,22 @@
 */
 
 const isInBrowser = false;
-console = {
-    log: globalThis?.console?.log ?? print,
-    error: globalThis?.console?.error ?? print,
-    warn: globalThis?.console?.warn ?? print,
-}
+if (typeof console == "undefined")
+    console = {};
+
+console.debug ??= (...args) => console.log("Debug:", ...args);
+console.log ??= (...args) => print(args.join(" "));
+console.warn ??= (...args) => console.log("Warn:", ...args);
+console.error ??= (...args) => console.log("Error:", ...args); 
+console.assert ??=  (condition, message) => {
+    if (!condition)
+        throw new Error(`Assertion failed: ${message}`);
+};
+console.trace ??= () => {
+    const targetObject = {};
+    Error.captureStackTrace(targetObject);
+    console.log(targetObject.stack);
+};
 
 const isD8 = typeof Realm !== "undefined";
 if (isD8)
