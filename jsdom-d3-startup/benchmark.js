@@ -39,7 +39,6 @@ class Benchmark {
 
     async init(verbose = 0) {
         this.sourceCode = await getString(sourceCodeBlob);
-        this.sourceHash = quickHash(this.sourceCode);
         for (let i = 0; i < this.iterations; i++)
             this.iterationSourceCodes[i] = this.prepareCode(i);
 
@@ -55,6 +54,8 @@ class Benchmark {
             return this.sourceCode;
         // Alter the code per iteration to prevent caching.
         const iterationSourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iteration}*/`);
+        // Warm up hash function.
+        this.sourceHash = quickHash(iterationSourceCode);
         return iterationSourceCode;
     }
 
