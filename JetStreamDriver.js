@@ -629,7 +629,7 @@ class ShellScripts extends Scripts {
         } else
             globalObject = runString("");
 
-        globalObject.console = console;
+        globalObject.console = Object.assign({}, console);
         globalObject.self = globalObject;
         globalObject.top = {
             currentResolve,
@@ -1710,7 +1710,7 @@ let BENCHMARKS = [
         tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
-        name: "typescript",
+        name: "typescript-octane",
         files: [
             "./Octane/typescript-compiler.js",
             "./Octane/typescript-input.js",
@@ -1719,7 +1719,7 @@ let BENCHMARKS = [
         iterations: 15,
         worstCaseCount: 2,
         deterministicRandom: true,
-        tags: ["Default", "Octane"],
+        tags: ["Default", "Octane", "typescript"],
     }),
     // RexBench
     new DefaultBenchmark({
@@ -1933,6 +1933,17 @@ let BENCHMARKS = [
             "./class-fields/raytrace-private-class-fields.js",
         ],
         tags: ["Default", "ClassFields"],
+    }),
+    new DefaultBenchmark({
+        name: "typescript-lib",
+        files: [
+            "./TypeScript/src/mock/sys.js",
+            "./TypeScript/dist/typescript-compile-test.js",
+            "./TypeScript/benchmark.js",
+        ],
+        iterations: 3,
+        worstCaseCount: 2,
+        tags: ["Default", "typescript"],
     }),
     // Generators
     new AsyncBenchmark({
