@@ -1926,7 +1926,7 @@ let BENCHMARKS = [
         ],
         preload: {
             // Debug Sources for nicer profiling.
-            // sourceCodeBlob: "./web-ssr/dist/react-render-test.js",
+            // REACT_RENDER_TEST_BLOB: "./web-ssr/dist/react-render-test.js",
             REACT_RENDER_TEST_BLOB: "./web-ssr/dist/react-render-test.minified.js",
         },
         tags: ["Default", "web", "ssr"],

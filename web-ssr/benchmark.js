@@ -39,8 +39,6 @@ class Benchmark {
   async init() {
     this.sourceCode = await getString(REACT_RENDER_TEST_BLOB);
     this.expect("Cache Comment Count", this.sourceCode.match(CACHE_BUST_COMMENT_RE).length, 597);
-    // Warm up the hash function.
-    this.sourceHash = quickHash(this.sourceCode);
     for (let i = 0; i < this.iterationCount; i++)
       this.iterationSourceCodes[i] = this.prepareCode(i);
   }
@@ -52,6 +50,8 @@ class Benchmark {
     // Alter the code per iteration to prevent caching.
     const iterationId = `${String.fromCharCode(97 + (iteration % 25))}${iteration}`;
     const sourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iterationId}*/`);
+    // Warm up the hash function.
+    this.sourceHash = quickHash(sourceCode);
     return sourceCode;
   }
 
