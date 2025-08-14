@@ -1,13 +1,15 @@
 const { create } = require("domain");
 const path = require("path");
 const TerserPlugin = require("terser-webpack-plugin");
-
+const { LicenseFilePlugin } = require("generate-license-file-webpack-plugin");
 
 function createConfig({es6, filename, minify }) {
+   const cacheBuster = path.resolve(__dirname, "build/cache-buster-comment-plugin.cjs");
    return {
       entry: "./src/test.mjs",
       mode: "production",
       devtool: "source-map",
+      target: "web",
       output: {
         path: path.resolve(__dirname, "dist"),
         filename: filename,
@@ -28,7 +30,7 @@ function createConfig({es6, filename, minify }) {
               loader: "babel-loader",
               options: {
                 presets: ["@babel/preset-env"],
-                plugins: [path.resolve(__dirname, "build/cache-buster-comment-plugin.cjs")],
+                plugins: [cacheBuster],
               }
             }
           },
@@ -38,12 +40,17 @@ function createConfig({es6, filename, minify }) {
             use: {
               loader: "babel-loader",
               options: {
-                plugins: [path.resolve(__dirname, "build/cache-buster-comment-plugin.cjs")],
+                plugins: [cacheBuster],
               },
             },
           },
         ]
       },
+      plugins: [
+        new LicenseFilePlugin({
+          outputFileName: "LICENSE.txt",
+        }),
+      ],
       optimization: {
         minimizer: [
           new TerserPlugin({
@@ -72,7 +79,7 @@ module.exports = [
   createConfig({
     es6: true,
     filename: "startup.es6.min.js",
-    minify: true,
+    minify: false,
   }),
   // Non-minified sources for better profiling
   // createConfig({
