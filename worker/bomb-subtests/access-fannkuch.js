@@ -61,12 +61,27 @@ function fannkuch(n) {
    }
 }
 
-var n = 8;
-var ret = fannkuch(n);
+function workload() {
+   var n = 8;
+   var ret = fannkuch(n);
 
-var expected = 22;
-if (ret != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + ret;
+   var expected = 22;
+   if (ret != expected)
+      throw "ERROR: bad result: expected " + expected + " but got " + ret;
 
-postMessage("done");
-close();
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");
+
