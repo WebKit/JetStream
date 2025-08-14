@@ -63,21 +63,23 @@ function createConfig({es6, filename, minify }) {
 
 
 module.exports = [
-  createConfig({
-    es6: true,
-    filename: "startup.es6.js",
-    minify: false,
-  }),
+  // Non-minified sources for better profiling
+  // createConfig({
+  //   es6: true,
+  //   filename: "startup.es6.js",
+  //   minify: false,
+  // }),
   createConfig({
     es6: true,
     filename: "startup.es6.min.js",
     minify: true,
   }),
-  createConfig({
-    es6: false,
-    filename: "startup.es5.js",
-    minify: false,
-  }),
+  // Non-minified sources for better profiling
+  // createConfig({
+  //   es6: false,
+  //   filename: "startup.es5.js",
+  //   minify: false,
+  // }),
   createConfig({
     es6: false,
     filename: "startup.es5.min.js",
