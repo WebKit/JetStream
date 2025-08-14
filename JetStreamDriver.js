@@ -726,9 +726,9 @@ class Benchmark {
 
     get runnerCode() {
         return `{
-            let benchmark = new Benchmark(${this.iterations});
-            let results = [];
-            let benchmarkName = "${this.name}";
+            const benchmark = new Benchmark(${this.iterations});
+            const results = [];
+            const benchmarkName = "${this.name}";
 
             for (let i = 0; i < ${this.iterations}; i++) {
                 ${this.preIterationCode}
@@ -736,9 +736,9 @@ class Benchmark {
                 const iterationMarkLabel = benchmarkName + "-iteration-" + i;
                 const iterationStartMark = performance.mark(iterationMarkLabel);
 
-                let start = performance.now();
+                const start = performance.now();
                 benchmark.runIteration(i);
-                let end = performance.now();
+                const end = performance.now();
 
                 performance.measure(iterationMarkLabel, iterationMarkLabel);
 
@@ -925,7 +925,7 @@ class Benchmark {
     updateCounter() {
         const counter = JetStream.counter;
         ++counter.loadedResources;
-        var statusElement = document.getElementById("status");
+        const statusElement = document.getElementById("status");
         statusElement.innerHTML = `Loading ${counter.loadedResources} of ${counter.totalResources} ...`;
     }
 
@@ -1411,7 +1411,7 @@ class WasmLegacyBenchmark extends Benchmark {
 
         if (isInBrowser) {
             str += `
-                var xhr = new XMLHttpRequest();
+                const xhr = new XMLHttpRequest();
                 xhr.open('GET', path, true);
                 xhr.responseType = 'arraybuffer';
                 xhr.onload = function() {
