@@ -1920,16 +1920,16 @@ let BENCHMARKS = [
         tags: ["Default", "Proxy"],
     }),
     new AsyncBenchmark({
-        name: "d3-startup",
+        name: "jsdom-d3-startup",
         files: [
-            "./d3-startup/benchmark.js",
+            "./jsdom-d3-startup/benchmark.js",
         ],
         preload: {
             // Unminified sources for profiling.
-            // sourceCodeBlob: "./d3-startup/dist/d3-test.js",
-            sourceCodeBlob: "./d3-startup/dist/d3-test.minified.js",
-            usDataBlob: "./d3-startup/data/counties-albers-10m.json",
-            airportsBlob: "./d3-startup/data/airports.csv",
+            // sourceCodeBlob: "./jsdom-d3-startup/dist/d3-test.js",
+            sourceCodeBlob: "./jsdom-d3-startup/dist/d3-test.minified.js",
+            usDataBlob: "./jsdom-d3-startup/data/counties-albers-10m.json",
+            airportsBlob: "./jsdom-d3-startup/data/airports.csv",
         },
         tags: ["d3", "startup", "jsdom"],
         iterations: 10,
