@@ -629,7 +629,7 @@ class ShellScripts extends Scripts {
         } else
             globalObject = runString("");
 
-        globalObject.console = console;
+        globalObject.console = Object.assign({}, console);
         globalObject.self = globalObject;
         globalObject.top = {
             currentResolve,
