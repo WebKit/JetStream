@@ -4,6 +4,7 @@ set -eo pipefail
 
 # Cleanup old files.
 rm -rf build/
+rm -rf compose-multiplatform/
 
 BUILD_LOG="$(realpath build.log)"
 echo -e "Built on $(date --rfc-3339=seconds)" | tee "$BUILD_LOG"
@@ -15,6 +16,10 @@ echo -e "Built on $(date --rfc-3339=seconds)" | tee "$BUILD_LOG"
 git clone -b ok/jetstream3_hotfix https://github.com/JetBrains/compose-multiplatform.git |& tee -a "$BUILD_LOG"
 pushd compose-multiplatform/
 git log -1 --oneline | tee -a "$BUILD_LOG"
+# Do not read `isD8` in the main function which decides whether to run eagerly.
+# Instead, just patch that out statically.
+# TODO: Upstream that fix to the compose-multiplatform repo.
+git apply ../empty-main-function.patch | tee -a "$BUILD_LOG"
 # FIXME: Use stable 2.3 Kotlin/Wasm toolchain, once available around Sep 2025.
 git apply ../use-beta-toolchain.patch | tee -a "$BUILD_LOG"
 pushd benchmarks/multiplatform

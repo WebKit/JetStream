@@ -172,7 +172,6 @@ export async function instantiate(imports={}, runInitializer=true) {
         'org.w3c.dom.matches_$external_prop_getter' : (_this) => _this.matches,
         'org.w3c.dom.protocol_$external_prop_getter' : (_this) => _this.protocol,
         'org.w3c.dom.hostname_$external_prop_getter' : (_this) => _this.hostname,
-        'org.w3c.dom.search_$external_prop_getter' : (_this) => _this.search,
         'org.w3c.dom.getData_$external_fun' : (_this, p0) => _this.getData(p0),
         'org.w3c.dom.setData_$external_fun' : (_this, p0, p1) => _this.setData(p0, p1),
         'org.w3c.dom.language_$external_prop_getter' : (_this) => _this.language,
@@ -198,8 +197,6 @@ export async function instantiate(imports={}, runInitializer=true) {
         'org.w3c.dom.reason_$external_prop_getter' : (_this) => _this.reason,
         'org.w3c.dom.parsing.DOMParser_$external_fun' : () => new DOMParser(),
         'org.w3c.dom.parsing.parseFromString_$external_fun' : (_this, p0, p1) => _this.parseFromString(p0, p1),
-        'org.w3c.dom.url.URLSearchParams_$external_fun' : (p0, isDefault0) => new URLSearchParams(isDefault0 ? undefined : p0, ),
-        'org.w3c.dom.url.get_$external_fun' : (_this, p0) => _this.get(p0),
         'org.w3c.fetch.status_$external_prop_getter' : (_this) => _this.status,
         'org.w3c.fetch.ok_$external_prop_getter' : (_this) => _this.ok,
         'org.w3c.fetch.statusText_$external_prop_getter' : (_this) => _this.statusText,
@@ -358,7 +355,6 @@ export async function instantiate(imports={}, runInitializer=true) {
         'io.ktor.client.utils.makeJsNew' : (ctor) => new ctor(),
         'io.ktor.client.utils.setObjectField' : (obj, name, value) => obj[name]=value,
         'io.ktor.client.utils.toJsArrayImpl' : (x) => new Uint8Array(x),
-        'isD8env' : () => typeof isD8 !== 'undefined',
         'runGC' : () => { (typeof gc === 'function')? gc() : console.log('Manual GC is not available. Ensure that the browser was started with the appropriate flags.') }
     }
     

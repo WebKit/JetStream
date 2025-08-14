@@ -2005,7 +2005,9 @@ let BENCHMARKS = [
             wasmBinary: "./wasm/HashSet/build/HashSet.wasm",
         },
         iterations: 50,
-        tags: ["Default", "Wasm"],
+        // No longer run by-default: We have more realistic Wasm workloads by
+        // now, and it was over-incentivizing inlining.
+        tags: ["Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "tsf-wasm",
@@ -2069,15 +2071,33 @@ let BENCHMARKS = [
         tags: ["Default", "Wasm"],
     }),
     new WasmEMCCBenchmark({
-        name: "Dart-flute-wasm",
+        name: "Dart-flute-complex-wasm",
         files: [
             "./Dart/benchmark.js",
         ],
         preload: {
-            jsModule: "./Dart/build/flute.dart2wasm.mjs",
-            wasmBinary: "./Dart/build/flute.dart2wasm.wasm",
+            jsModule: "./Dart/build/flute.complex.dart2wasm.mjs",
+            wasmBinary: "./Dart/build/flute.complex.dart2wasm.wasm",
         },
         iterations: 15,
+        worstCaseCount: 2,
+        // Not run by default because the `CupertinoTimePicker` widget is very allocation-heavy,
+        // leading to an unrealistic GC-dominated workload. See
+        // https://github.com/WebKit/JetStream/pull/97#issuecomment-3139924169
+        // The todomvc workload below is less allocation heavy and a replacement for now.
+        // TODO: Revisit, once Dart/Flutter worked on this widget or workload.
+        tags: ["Wasm"],
+    }),
+    new WasmEMCCBenchmark({
+        name: "Dart-flute-todomvc-wasm",
+        files: [
+            "./Dart/benchmark.js",
+        ],
+        preload: {
+            jsModule: "./Dart/build/flute.todomvc.dart2wasm.mjs",
+            wasmBinary: "./Dart/build/flute.todomvc.dart2wasm.wasm",
+        },
+        iterations: 30,
         worstCaseCount: 2,
         tags: ["Default", "Wasm"],
     }),
