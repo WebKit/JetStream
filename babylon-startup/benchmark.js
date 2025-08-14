@@ -17,13 +17,14 @@ const CACHE_BUST_COMMENT_RE = new RegExp(`\n${RegExp.escape(CACHE_BUST_COMMENT)}
 
 // JetStream benchmark.
 class Benchmark {
-  measureStartup = true;
+  // How many times (separate iterations) should we reuse the source code.
+  CODE_REUSE_COUNT = 2
   iterationCount = 0;
   iteration = 0;
-  lastResult = {};
   sourceCode;
   sourceHash = 0
   iterationSourceCodes = [];
+  lastResult = {};
 
   constructor(iterationCount) {
     this.iterationCount = iterationCount
@@ -38,12 +39,13 @@ class Benchmark {
 
 
   prepareCode(iteration) {
-    if (!this.measureStartup)
-      return this.sourceCode;
     // Alter the code per iteration to prevent caching.
-    const iterationId = `${String.fromCharCode(97 + (iteration % 25))}${iteration}`;
-    const sourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iterationId}*/`);
-    // Warm up the hash function.
+    const cacheId = Math.floor(iteration / this.CODE_REUSE_COUNT);
+    const previousSourceCode = this.iterationSourceCodes[cacheId];
+    if (previousSourceCode)
+      return previousSourceCode
+    const sourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${cacheId}*/`);
+    // Ensure efficient string representation.
     this.sourceHash = quickHash(sourceCode);
     return sourceCode;
   }
@@ -52,27 +54,24 @@ class Benchmark {
     let sourceCode = this.iterationSourceCodes[this.iteration];
     if (!sourceCode)
       throw new Error(`Could not find source for iteration ${this.iteration}`);
-    // Module in sourceCode it assigned to the ReactRenderTest variable.
-    for (let i = 0; i < 3; i++) {
-      let ClassStartupTest;
+    // Module in sourceCode it assigned to the ClassStartupTest variable.
+    let ClassStartupTest;
 
-      let initStart = performance.now();
-      const res = eval(sourceCode);
-      const runStart = performance.now();
+    let initStart = performance.now();
+    const res = eval(sourceCode);
+    const runStart = performance.now();
 
-      const classNames = ClassStartupTest.runTest(30);
-      this.lastResult = {
-        classNames,
-      };
-      const end = performance.now();
-      const loadTime = runStart - initStart;
-      const runTime = end - runStart;
-      // For local debugging: 
-      // print(`Iteration ${this.iteration}:`);
-      // print(`  Load time: ${loadTime.toFixed(2)}ms`);
-      // print(`  Render time: ${runTime.toFixed(2)}ms`);
-    }
-
+    const classNames = ClassStartupTest.runTest(30);
+    this.lastResult = {
+      classNames,
+    };
+    const end = performance.now();
+    const loadTime = runStart - initStart;
+    const runTime = end - runStart;
+    // For local debugging: 
+    // print(`Iteration ${this.iteration}:`);
+    // print(`  Load time: ${loadTime.toFixed(2)}ms`);
+    // print(`  Render time: ${runTime.toFixed(2)}ms`);
     this.iteration++;
   }
 
