@@ -2140,16 +2140,26 @@ let BENCHMARKS = [
         tags: ["Default", "Wasm"],
     }),
     new AsyncBenchmark({
-        name: "classes-startup",
+        name: "babylon-startup-es5",
         files: [
-            "./classes-startup/benchmark.js",
+            "./babylon-startup/benchmark.js",
         ],
         preload: {
-            // Debug Sources for nicer profiling.
-            // REACT_RENDER_TEST_BLOB: "./web-ssr/dist/react-render-test.js",
-            REACT_RENDER_TEST_BLOB: "./web-ssr/dist/react-render-test.minified.js",
+            CLASS_STARTUP_BLOB: "./babylon-startup/dist/startup.es5.min.js",
         },
-        tags: ["Default", "web", "ssr"],
+        tags: ["Default", "startup", "class", "es5"],
+        iterations: 5,
+        worstCaseCount: 3,
+    }),
+    new AsyncBenchmark({
+        name: "babylon-startup-es6",
+        files: [
+            "./babylon-startup/benchmark.js",
+        ],
+        preload: {
+            CLASS_STARTUP_BLOB: "./babylon-startup/dist/startup.es6.min.js",
+        },
+        tags: ["Default", "startup", "class", "es6"],
         iterations: 5,
         worstCaseCount: 3,
     }),
