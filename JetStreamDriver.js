@@ -2139,6 +2139,20 @@ let BENCHMARKS = [
         deterministicRandom: true,
         tags: ["Default", "Wasm"],
     }),
+    new AsyncBenchmark({
+        name: "classes-startup",
+        files: [
+            "./classes-startup/benchmark.js",
+        ],
+        preload: {
+            // Debug Sources for nicer profiling.
+            // REACT_RENDER_TEST_BLOB: "./web-ssr/dist/react-render-test.js",
+            REACT_RENDER_TEST_BLOB: "./web-ssr/dist/react-render-test.minified.js",
+        },
+        tags: ["Default", "web", "ssr"],
+        iterations: 5,
+        worstCaseCount: 3,
+    }),
     // WorkerTests
     new AsyncBenchmark({
         name: "bomb-workers",
