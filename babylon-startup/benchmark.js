@@ -60,7 +60,7 @@ class Benchmark {
       const res = eval(sourceCode);
       const runStart = performance.now();
 
-      const classNames = ClassStartupTest.runTest();
+      const classNames = ClassStartupTest.runTest(30);
       this.lastResult = {
         classNames,
       };
