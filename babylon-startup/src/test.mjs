@@ -1,7 +1,8 @@
 import * as BABYLON from "@babylonjs/core";
 
-export function runTest(frames) {
+export function runTest(frames=10) {
   const allClassNames = Object.values(BABYLON).map((cls) => cls.name);
+  BABYLON.Logger.LogLevels = BABYLON.Logger.NoneLogLevel;
   const engine = new BABYLON.NullEngine();
   const scene = createScene(engine);
   for (let i = 0; i < frames; i++) {

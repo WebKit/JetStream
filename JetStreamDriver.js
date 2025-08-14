@@ -2148,8 +2148,7 @@ let BENCHMARKS = [
             CLASS_STARTUP_BLOB: "./babylon-startup/dist/startup.es5.min.js",
         },
         tags: ["Default", "startup", "class", "es5"],
-        iterations: 5,
-        worstCaseCount: 3,
+        iterations: 10,
     }),
     new AsyncBenchmark({
         name: "babylon-startup-es6",
@@ -2160,8 +2159,7 @@ let BENCHMARKS = [
             CLASS_STARTUP_BLOB: "./babylon-startup/dist/startup.es6.min.js",
         },
         tags: ["Default", "startup", "class", "es6"],
-        iterations: 5,
-        worstCaseCount: 3,
+        iterations: 10,
     }),
     // WorkerTests
     new AsyncBenchmark({

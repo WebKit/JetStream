@@ -31,7 +31,7 @@ class Benchmark {
 
   async init() {
     this.sourceCode = await getString(CLASS_STARTUP_BLOB);
-    this.expect("Cache Comment Count", this.sourceCode.match(CACHE_BUST_COMMENT_RE).length, 20302);
+    this.expect("Cache Comment Count", this.sourceCode.match(CACHE_BUST_COMMENT_RE).length, 20301);
     for (let i = 0; i < this.iterationCount; i++)
       this.iterationSourceCodes[i] = this.prepareCode(i);
   }
