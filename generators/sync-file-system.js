@@ -34,14 +34,18 @@ function computeIsLittleEndian() {
 }
 
 const isLittleEndian = computeIsLittleEndian();
+let globalCounter = 0;
 
-function randomFileContents(bytes = ((Math.random() * 128) >>> 0) + 2056) {
-    let result = new ArrayBuffer(bytes);
+function randomFileContents() {
+    const numBytes = (globalCounter % 128)  + 2056;
+    globalCounter++;
+    let result = new ArrayBuffer(numBytes);
     let view = new Uint8Array(result);
-    for (let i = 0; i < bytes; ++i)
-        view[i] = (Math.random() * 255) >>> 0;
+    for (let i = 0; i < numBytes; ++i)
+        view[i] = (i + globalCounter) % 255;
     return new DataView(result);
 }
+
 
 class File {
     constructor(dataView, permissions) {
@@ -145,19 +149,22 @@ class Directory {
 function setupDirectory() {
     const fs = new Directory;
     let dirs = [fs];
+    let counter = 0;
     for (let dir of dirs) {
-        for (let i = 0; i < 8; ++i) {
-            if (dirs.length < 250 && Math.random() >= 0.3) {
+        for (let i = 0; i < 10; ++i) {
+            if (dirs.length < 400 && (counter % 3) <= 1) {
                 dirs.push(dir.addDirectory(`dir-${i}`));
             }
+            counter++;
         }
     }
 
     for (let dir of dirs) {
         for (let i = 0; i < 5; ++i) {
-            if (Math.random() >= 0.6) {
+            if ((counter % 3) === 0) {
                 dir.addFile(`file-${i}`, new File(randomFileContents()));
             }
+            counter++;
         }
     }
 
@@ -165,7 +172,7 @@ function setupDirectory() {
 }
 
 class Benchmark {
-    EXPECTED_FILE_COUNT = 411;
+    EXPECTED_FILE_COUNT = 666;
 
     totalFileCount = 0;
     lastFileHash = undefined;

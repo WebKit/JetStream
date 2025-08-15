@@ -86,8 +86,8 @@ function assertEquals(actual, expected, message) {
       assertTrue(typeof(name) == "string");
       // "Score" can only be part of allScores().
       assertFalse(name == "Score");
-      // Without running all values should be null.
-      assertEquals(value, null);
+      // Without running values should be either null (or 0 for GroupedBenchmark)
+      assertFalse(value)
     }
   }
 })();
