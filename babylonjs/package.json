@@ -5,10 +5,10 @@
   "scripts": {
     "test:startup": "babel-node benchmark/startup-node.mjs",
     "test:scene": "babel-node benchmark/scene-node.mjs",
-    "prebuild": "rm -rf dist/* && npm run build:data",
+    "clean": "rm -rf dist/*",
     "build": "webpack",
     "build:data": "node build/build.mjs",
-    "build:dev": "npm run prebuild && webpack --mode development"
+    "build:dev": "webpack --mode development"
   },
   "dependencies": {
     "@babel/core": "^7.28.3",
@@ -16,8 +16,11 @@
     "@babel/preset-env": "^7.28.3",
     "@babylonjs/core": "^8.23.0",
     "@babylonjs/loaders": "^8.23.1",
+    "ammojs-typed": "^1.0.6",
+    "assert": "^2.1.0",
     "babel-loader": "^10.0.0",
     "generate-license-file-webpack-plugin": "^4.0.0",
+    "path-browserify": "^1.0.1",
     "terser-webpack-plugin": "^5.3.14",
     "webpack": "^5.101.1",
     "webpack-cli": "^6.0.1"

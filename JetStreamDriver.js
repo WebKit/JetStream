@@ -2145,7 +2145,7 @@ let BENCHMARKS = [
             "./babylonjs/benchmark/startup.js",
         ],
         preload: {
-            CLASS_STARTUP_BLOB: "./babylonjs/dist/benchmark.es5.min.js",
+            BUNDLE_BLOB: "./babylonjs/dist/benchmark.es5.min.js",
         },
         tags: ["Default", "startup", "class", "es5"],
         iterations: 10,
@@ -2156,15 +2156,17 @@ let BENCHMARKS = [
             "./babylonjs/benchmark/startup.js",
         ],
         preload: {
-            CLASS_STARTUP_BLOB: "./babylonjs/dist/benchmark.es6.min.js",
+            BUNDLE_BLOB: "./babylonjs/dist/benchmark.es6.min.js",
         },
         tags: ["Default", "startup", "class", "es6"],
         iterations: 10,
     }),
     new AsyncBenchmark({
-        name: "babylonjs-scene-es6",
+        name: "babylonjs-scene-es5",
         files: [
-            "./babylonjs/dist/benchmark.es6.min.js",
+            // Use non-minified sources for easier profiling:
+            // "./babylonjs/dist/benchmark.es5.js",
+            "./babylonjs/dist/benchmark.es5.min.js",
             "./babylonjs/benchmark/scene.js",
         ],
         preload: {
@@ -2176,13 +2178,20 @@ let BENCHMARKS = [
         iterations: 5,
     }),
     new AsyncBenchmark({
-        name: "babylonjs-scene-es5",
+        name: "babylonjs-scene-es6",
         files: [
-            "./babylonjs/dist/benchmark.es5.min.js",
+            // Use non-minified sources for easier profiling:
+            // "./babylonjs/dist/benchmark.es6.js",
+            "./babylonjs/dist/benchmark.es6.min.js",
             "./babylonjs/benchmark/scene.js",
         ],
-        tags: ["Default", "class", "es6"],
-        iterations: 10,
+        preload: {
+            PARTICLES_BLOB: "./babylonjs/data/particles.json",
+            PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
+            CANNON_BLOB: "./babylonjs/data/cannon.glb",
+        },
+        tags: ["Default", "scene", "es6"],
+        iterations: 5,
     }),
     // WorkerTests
     new AsyncBenchmark({

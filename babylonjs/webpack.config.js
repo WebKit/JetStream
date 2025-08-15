@@ -64,32 +64,48 @@ function createConfig({es6, filename, minify }) {
           }),
         ],
       },
+      resolve: {
+        fallback: {
+          "assert": require.resolve("assert/"),
+          "fs": false,
+          "path": require.resolve("path-browserify"),
+        },
+      },
     };
 }
 
 
 
-module.exports = [
-  // Non-minified sources for better profiling
-  // createConfig({
-  //   es6: true,
-  //   filename: "benchmark.es6.js",
-  //   minify: false,
-  // }),
-  createConfig({
-    es6: true,
-    filename: "benchmark.es6.min.js",
-    minify: false,
-  }),
-  // Non-minified sources for better profiling
-  // createConfig({
-  //   es6: false,
-  //   filename: "benchmark.es5.js",
-  //   minify: false,
-  // }),
-  createConfig({
-    es6: false,
-    filename: "benchmark.es5.min.js",
-    minify: true,
-  }),
-]
+module.exports = (env, argv) => {
+  const isDevelopment = argv.mode === 'development';
+
+  const nonMinifiedConfigs = [
+    createConfig({
+      es6: true,
+      filename: "benchmark.es6.js",
+      minify: false,
+    }),
+    createConfig({
+      es6: false,
+      filename: "benchmark.es5.js",
+      minify: false,
+    }),
+  ];
+
+  if (isDevelopment) {
+    return nonMinifiedConfigs;
+  }
+
+  return [
+    createConfig({
+      es6: true,
+      filename: "benchmark.es6.min.js",
+      minify: false,
+    }),
+    createConfig({
+      es6: false,
+      filename: "benchmark.es5.min.js",
+      minify: false,
+    }),
+  ];
+};

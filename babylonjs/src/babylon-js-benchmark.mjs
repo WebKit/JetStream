@@ -1,5 +1,6 @@
 import * as BABYLON from "@babylonjs/core";
 import "@babylonjs/loaders";
+import Ammo from "ammojs-typed";
 
 export function runTest(frames = 10) {
   const allClassNames = Object.values(BABYLON).map((cls) => cls.name);
@@ -75,10 +76,11 @@ async function createComplexScene(engine, fortData, cannonData, particleData) {
     scene
   );
   camera.lowerRadiusLimit = 10;
-  // scene.enablePhysics(
-  //   new BABYLON.Vector3(0, -9.8, 0),
-  //   new BABYLON.AmmoJSPlugin()
-  // );
+  const ammo = await Ammo();
+  scene.enablePhysics(
+    new BABYLON.Vector3(0, -9.8, 0),
+    new BABYLON.AmmoJSPlugin(true, ammo)
+  );
   let cannonAnimationPairings = {};
   let cannonReadyToPlay = {};
 

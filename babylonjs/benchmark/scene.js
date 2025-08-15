@@ -30,7 +30,7 @@ class Benchmark {
       this.preloaded.fortData,
       this.preloaded.cannonData,
       this.preloaded.particlesJson,
-      300
+      100
     );
     this.lastResult = {
       classNames,
