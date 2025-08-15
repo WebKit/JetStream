@@ -1,6 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
 const TerserPlugin = require("terser-webpack-plugin");
+const UnicodeEscapePlugin = require("@dapplets/unicode-escape-webpack-plugin");
 
 function createConfig({ filename, minify }) {
   return {
@@ -26,6 +27,9 @@ function createConfig({ filename, minify }) {
       }),
       new webpack.BannerPlugin({
         banner: `For license information, please see ${filename}.LICENSE.txt`,
+      }),
+      new UnicodeEscapePlugin({
+        test: /\.(js|jsx|ts|tsx)$/, // Escape Unicode in JavaScript and TypeScript files
       }),
     ],
     module: {
@@ -84,6 +88,6 @@ function createConfig({ filename, minify }) {
 };
 
 module.exports = [
-  createConfig({ filename: "d3-test.minified.js", minify: true }),
-  createConfig({ filename: "d3-test.js", minify: false })
+  createConfig({ filename: "bundle.min.js", minify: true }),
+  createConfig({ filename: "bundle.js", minify: false })
 ];

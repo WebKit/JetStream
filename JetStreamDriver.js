@@ -2012,8 +2012,8 @@ let BENCHMARKS = [
         ],
         preload: {
             // Unminified sources for profiling.
-            // sourceCodeBlob: "./jsdom-d3-startup/dist/d3-test.js",
-            sourceCodeBlob: "./jsdom-d3-startup/dist/d3-test.minified.js",
+            // sourceCodeBlob: "./jsdom-d3-startup/dist/bundle.js",
+            sourceCodeBlob: "./jsdom-d3-startup/dist/bundle.min.js",
             usDataBlob: "./jsdom-d3-startup/data/counties-albers-10m.json",
             airportsBlob: "./jsdom-d3-startup/data/airports.csv",
         },

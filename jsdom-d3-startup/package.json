@@ -6,6 +6,7 @@
     "build:dev": "npm run prebuild && webpack --mode development"
   },
   "dependencies": {
+    "@dapplets/unicode-escape-webpack-plugin": "^0.1.1",
     "assert": "^2.1.0",
     "babel-loader": "^10.0.0",
     "buffer": "^6.0.3",
