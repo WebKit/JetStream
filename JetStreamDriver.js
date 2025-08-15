@@ -2266,6 +2266,60 @@ let BENCHMARKS = [
         deterministicRandom: true,
         tags: ["Default", "Wasm"],
     }),
+    new AsyncBenchmark({
+        name: "babylonjs-startup-es5",
+        files: [
+            "./babylonjs/benchmark/startup.js",
+        ],
+        preload: {
+            BUNDLE_BLOB: "./babylonjs/dist/bundle.es5.min.js",
+        },
+        tags: ["Default", "startup", "class", "es5"],
+        iterations: 10,
+    }),
+    new AsyncBenchmark({
+        name: "babylonjs-startup-es6",
+        files: [
+            "./babylonjs/benchmark/startup.js",
+        ],
+        preload: {
+            BUNDLE_BLOB: "./babylonjs/dist/bundle.es6.min.js",
+        },
+        tags: ["Default", "startup", "class", "es6"],
+        iterations: 10,
+    }),
+    new AsyncBenchmark({
+        name: "babylonjs-scene-es5",
+        files: [
+            // Use non-minified sources for easier profiling:
+            // "./babylonjs/dist/bundle.es5.js",
+            "./babylonjs/dist/bundle.es5.min.js",
+            "./babylonjs/benchmark/scene.js",
+        ],
+        preload: {
+            PARTICLES_BLOB: "./babylonjs/data/particles.json",
+            PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
+            CANNON_BLOB: "./babylonjs/data/cannon.glb",
+        },
+        tags: ["Default", "scene", "es6"],
+        iterations: 5,
+    }),
+    new AsyncBenchmark({
+        name: "babylonjs-scene-es6",
+        files: [
+            // Use non-minified sources for easier profiling:
+            // "./babylonjs/dist/bundle.es6.js",
+            "./babylonjs/dist/bundle.es6.min.js",
+            "./babylonjs/benchmark/scene.js",
+        ],
+        preload: {
+            PARTICLES_BLOB: "./babylonjs/data/particles.json",
+            PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
+            CANNON_BLOB: "./babylonjs/data/cannon.glb",
+        },
+        tags: ["Default", "scene", "es6"],
+        iterations: 5,
+    }),
     // WorkerTests
     new AsyncBenchmark({
         name: "bomb-workers",
