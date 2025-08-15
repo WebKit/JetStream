@@ -262,7 +262,7 @@ class Driver {
 
             if (isInBrowser && globalThis.prefetchResources) {
                 const cache = JetStream.blobDataCache;
-                for (const file of benchmark.plan.files) {
+                for (const file of benchmark.files) {
                     const blobData = cache[file];
                     blobData.refCount--;
                     if (!blobData.refCount)
@@ -629,7 +629,9 @@ class ShellScripts extends Scripts {
         } else
             globalObject = runString("");
 
-        globalObject.console = console;
+        // Expose console copy in the realm so we don't accidentally modify
+        // the original object.
+        globalObject.console = Object.assign({}, console);
         globalObject.self = globalObject;
         globalObject.top = {
             currentResolve,
@@ -709,6 +711,7 @@ class Benchmark {
     }
 
     get name() { return this.plan.name; }
+    get files() { return this.plan.files; }
 
     get isDone() {
         return this._state == BenchmarkState.DONE || this._state == BenchmarkState.ERROR;
@@ -1118,6 +1121,89 @@ class Benchmark {
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
         console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
+    }
+};
+
+class GroupedBenchmark extends Benchmark {
+    constructor(plan, benchmarks) {
+        super(plan);
+        console.assert(benchmarks.length);
+        for (const benchmark of benchmarks) {
+            // FIXME: Tags don't work for grouped tests anyway but if they did then this would be weird and probably wrong.
+            console.assert(!benchmark.hasAnyTag("Default"), `Grouped benchmark sub-benchmarks shouldn't have the "Default" tag`, benchmark.tags);
+        }
+        benchmarks.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? 1 : -1);
+        this.benchmarks = benchmarks;
+    }
+
+    async prefetchResourcesForBrowser() {
+        for (const benchmark of this.benchmarks)
+            await benchmark.prefetchResourcesForBrowser();
+    }
+
+    async retryPrefetchResourcesForBrowser() {
+        for (const benchmark of this.benchmarks)
+            await benchmark.retryPrefetchResourcesForBrowser();
+    }
+
+    prefetchResourcesForShell() {
+        for (const benchmark of this.benchmarks)
+            benchmark.prefetchResourcesForShell();
+    }
+
+    get files() {
+        let files = [];
+        for (const benchmark of this.benchmarks)
+            files = files.concat(benchmark.files);
+        return files;
+    }
+
+    async run() {
+        this._state = BenchmarkState.PREPARE;
+        performance.mark(this.name);
+        this.startTime = performance.now();
+
+        let benchmark;
+        try {
+            this._state = BenchmarkState.RUNNING;
+            for (benchmark of this.benchmarks)
+                await benchmark.run();
+        } catch (e) {
+            this._state = BenchmarkState.ERROR;
+            console.log(`Error in runCode of grouped benchmark ${benchmark.name}: `, e);
+            console.log(e.stack);
+            throw e;
+        } finally {
+            this._state = BenchmarkState.FINALIZE;
+        }
+
+        this.endTime = performance.now();
+        performance.measure(this.name, this.name);
+
+        this.processResults();
+        this._state = BenchmarkState.DONE;
+    }
+
+    processResults() {
+        this.results = [];
+        for (const benchmark of this.benchmarks)
+            this.results = this.results.concat(benchmark.results);
+    }
+
+    subScores() {
+        const results = {};
+
+        for (const benchmark of this.benchmarks) {
+            let scores = benchmark.subScores();
+            for (let subScore in scores) {
+                results[subScore] ??= [];
+                results[subScore].push(scores[subScore]);
+            }
+        }
+
+        for (let subScore in results)
+            results[subScore] = geomeanScore(results[subScore]);
+        return results;
     }
 };
 
@@ -2139,7 +2225,7 @@ let BENCHMARKS = [
         },
         async: true,
         deterministicRandom: true,
-        tags: ["Default", "Wasm"],
+        tags: ["Wasm"],
     }),
     new WasmLegacyBenchmark({
         name: "tfjs-wasm-simd",
@@ -2159,7 +2245,7 @@ let BENCHMARKS = [
         },
         async: true,
         deterministicRandom: true,
-        tags: ["Default", "Wasm"],
+        tags: ["Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "argon2-wasm",
@@ -2449,15 +2535,20 @@ const SUNSPIDER_TESTS = [
     "string-unpack-code",
     "tagcloud",
 ];
+let SUNSPIDER_BENCHMARKS = [];
 for (const test of SUNSPIDER_TESTS) {
-    BENCHMARKS.push(new DefaultBenchmark({
+    SUNSPIDER_BENCHMARKS.push(new DefaultBenchmark({
         name: `${test}-SP`,
         files: [
             `./SunSpider/${test}.js`
         ],
-        tags: ["Default", "SunSpider"],
+        tags: [],
     }));
 }
+BENCHMARKS.push(new GroupedBenchmark({
+    name: "Sunspider",
+    tags: ["Default", "SunSpider"],
+}, SUNSPIDER_BENCHMARKS))
 
 // WTB (Web Tooling Benchmark) tests
 const WTB_TESTS = [
