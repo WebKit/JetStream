@@ -112,20 +112,20 @@ class Benchmark {
     // console.log("init");
 
     preload = {
-      'skiko.wasm': await getBinary(skikoWasmBinary),
-      './compose-benchmarks-benchmarks.wasm': await getBinary(composeWasmBinary),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/drawable/compose-multiplatform.png': await getBinary(inputImageCompose),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/drawable/example1_cat.jpg': await getBinary(inputImageCat),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/files/example1_compose-community-primary.png': await getBinary(inputImageComposeCommunity),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/font/jetbrainsmono_italic.ttf': await getBinary(inputFontItalic),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/font/jetbrainsmono_regular.ttf': await getBinary(inputFontRegular),
+      'skiko.wasm': await JetStream.getBinary(JetStream.preload.skikoWasmBinary),
+      './compose-benchmarks-benchmarks.wasm': await JetStream.getBinary(JetStream.preload.composeWasmBinary),
+      './composeResources/compose_benchmarks.benchmarks.generated.resources/drawable/compose-multiplatform.png': await JetStream.getBinary(JetStream.preload.inputImageCompose),
+      './composeResources/compose_benchmarks.benchmarks.generated.resources/drawable/example1_cat.jpg': await JetStream.getBinary(JetStream.preload.inputImageCat),
+      './composeResources/compose_benchmarks.benchmarks.generated.resources/files/example1_compose-community-primary.png': await JetStream.getBinary(JetStream.preload.inputImageComposeCommunity),
+      './composeResources/compose_benchmarks.benchmarks.generated.resources/font/jetbrainsmono_italic.ttf': await JetStream.getBinary(JetStream.preload.inputFontItalic),
+      './composeResources/compose_benchmarks.benchmarks.generated.resources/font/jetbrainsmono_regular.ttf': await JetStream.getBinary(JetStream.preload.inputFontRegular),
     };
 
     // We patched `skiko.mjs` to not immediately instantiate the `skiko.wasm`
     // module, so that we can move the dynamic JS import here but measure 
     // WebAssembly compilation and instantiation as part of the first iteration.
-    this.skikoInstantiate = (await dynamicImport(skikoJsModule)).default;
-    this.mainInstantiate = (await dynamicImport(composeJsModule)).instantiate;
+    this.skikoInstantiate = (await JetStream.dynamicImport(JetStream.preload.skikoJsModule)).default;
+    this.mainInstantiate = (await JetStream.dynamicImport(JetStream.preload.composeJsModule)).instantiate;
   }
 
   async runIteration() {
