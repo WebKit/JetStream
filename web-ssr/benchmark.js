@@ -24,7 +24,9 @@ const CACHE_BUST_COMMENT_RE = new RegExp(`\n${RegExp.escape(CACHE_BUST_COMMENT)}
 
 // JetStream benchmark.
 class Benchmark {
-  measureStartup = true;
+  // How many times (separate iterations) should we reuse the source code.
+  // Use 0 to skip.
+  CODE_REUSE_COUNT = 1;
   iterationCount = 0;
   iteration = 0;
   lastResult = {};
@@ -43,14 +45,16 @@ class Benchmark {
       this.iterationSourceCodes[i] = this.prepareCode(i);
   }
 
-
   prepareCode(iteration) {
-    if (!this.measureStartup)
+    if (!this.CODE_REUSE_COUNT)
       return this.sourceCode;
     // Alter the code per iteration to prevent caching.
-    const iterationId = `${iteration}`;
-    const sourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iterationId}*/`);
-    // Warm up the hash function.
+    const cacheId = Math.floor(iteration / this.CODE_REUSE_COUNT);
+    const previousSourceCode = this.iterationSourceCodes[cacheId];
+    if (previousSourceCode)
+      return previousSourceCode
+    const sourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${cacheId}*/`);
+    // Ensure efficient string representation.
     this.sourceHash = quickHash(sourceCode);
     return sourceCode;
   }

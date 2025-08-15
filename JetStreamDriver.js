@@ -2035,8 +2035,7 @@ let BENCHMARKS = [
             BUNDLE_BLOB: "./web-ssr/dist/bundle.min.js",
         },
         tags: ["Default", "web", "ssr"],
-        iterations: 5,
-        worstCaseCount: 3,
+        iterations: 30,
     }),
     // Class fields
     new DefaultBenchmark({
