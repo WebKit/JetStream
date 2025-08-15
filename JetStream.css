@@ -488,7 +488,30 @@ dt:target {
 
 .plot svg circle {
     fill: var(--color-primary);
+    opacity: 0.9;
+}
+
+.plot svg .worst-line {
+    stroke: var(--color-primary);
+    stroke-width: 1.5;
+    stroke-dasharray: 10, 6;
+    stroke-linecap: round;
     opacity: 0.8;
+}
+
+.plot svg .average-line {
+    stroke: var(--text-color-subtle);
+    stroke-width: 1.5;
+    stroke-dasharray: 6, 10;
+    stroke-dashoffset: 6;
+    stroke-linecap: round;
+    opacity: 0.8;
+}
+
+.plot svg .line-hitbox {
+    stroke: var(--text-color-inverse);
+    stroke-width: 8;
+    opacity: 1.0;
 }
 
 @keyframes fadein {

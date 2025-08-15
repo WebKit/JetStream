@@ -1097,27 +1097,51 @@ class Benchmark {
         if (!plotContainer || !this.results || this.results.length === 0)
             return;
 
-        const scoreElement = document.getElementById(this.scoreIdentifier("Score"));
-        const width = scoreElement.offsetWidth;
-        const height = scoreElement.offsetHeight;
+        const scoreElementBounds = document.getElementById(this.scoreIdentifier("Score")).getBoundingClientRect();
+        const width = scoreElementBounds.width;
+        const height = scoreElementBounds.height;
 
-        const padding = 5;
+        const radius = Math.max(1.5, Math.min(2.5, 10 - (this.iterations / 10)));
+
+        const padding = radius;
         const maxResult = Math.max(...this.results);
         const minResult = Math.min(...this.results);
 
-        const xRatio = (width - 2 * padding) / (this.results.length - 1 || 1);
-        const yRatio = (height - 2 * padding) / (maxResult - minResult || 1);
-        const radius = Math.max(1.5, Math.min(2.5, 10 - (this.iterations / 10)));
+        const xRatio = (width - 2 * padding) / (this.results.length - 1);
+        const yRatio = (height - 2 * padding) / (maxResult - minResult);
+
+        const yPos = (value) => height - padding - (value - minResult) * yRatio;
 
         let circlesSVG = "";
         for (let i = 0; i < this.results.length; i++) {
             const result = this.results[i];
             const cx = padding + i * xRatio;
-            const cy = height - padding - (result - minResult) * yRatio;
+            const cy = yPos(result);
             const title = `Iteration ${i + 1}: ${uiFriendlyDuration(result)}`;
             circlesSVG += `<circle cx="${cx}" cy="${cy}" r="${radius}"><title>${title}</title></circle>`;
         }
-        plotContainer.innerHTML = `<svg width="${width}px" height="${height}px">${circlesSVG}</svg>`;
+
+        let linesSVG = "";
+        let linesHitBoxSVG = "";
+        const lineWidth = width - padding;
+        if (this.worst4Time) {
+            const worstY = yPos(this.worst4Time);
+            const title = `Worst: ${uiFriendlyDuration(this.worst4Time)}`;
+            linesSVG += `<line x1="${padding}" y1="${worstY}" x2="${lineWidth}" y2="${worstY}" class="worst-line"></line>`;
+            linesHitBoxSVG += `<line x1="${padding}" y1="${worstY}" x2="${lineWidth}" y2="${worstY}" class="line-hitbox"><title>${title}</title></line>`;
+        }
+        if (this.averageTime) {
+            const averageY = yPos(this.averageTime);
+            const title = `Average: ${uiFriendlyDuration(this.averageTime)}`;
+            linesSVG += `<line x1="${padding}" y1="${averageY}" x2="${lineWidth}" y2="${averageY}" class="average-line"></line>`;
+            linesHitBoxSVG += `<line x1="${padding}" y1="${averageY}" x2="${lineWidth}" y2="${averageY}" class="line-hitbox"><title>${title}</title></line>`;
+        }
+
+        plotContainer.innerHTML = `<svg width="${width}px" height="${height}px">
+                <g>${linesHitBoxSVG}</g>
+                <g>${circlesSVG}$</g>
+                <g>${linesSVG}</g>
+            </svg>`;
     }
 
     updateConsoleAfterRun(scoreEntries) {
