@@ -38,13 +38,13 @@ class Benchmark {
     }
 
     async init(verbose = 0) {
-        this.sourceCode = await getString(sourceCodeBlob);
+        this.sourceCode = await JetStream.getString(JetStream.preload.SOURCE_CODE);
         for (let i = 0; i < this.iterations; i++)
             this.iterationSourceCodes[i] = this.prepareCode(i);
 
-        this.airportsCsvString = (await getString(airportsBlob));
+        this.airportsCsvString = (await JetStream.getString(JetStream.preload.AIRPORTS));
         this.assert(this.airportsCsvString.length == 145493, `Expected this.airportsCsvString.length to be 141490 but got ${this.airportsCsvString.length}`);
-        this.usDataJsonString = await getString(usDataBlob);
+        this.usDataJsonString = await JetStream.getString(JetStream.preload.US_DATA);
         this.assert(this.usDataJsonString.length == 2880996, `Expected this.usData.length to be 2880996 but got ${this.usDataJsonString.length}`);
         this.usData = JSON.parse(this.usDataJsonString);
     }
