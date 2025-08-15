@@ -2140,7 +2140,7 @@ let BENCHMARKS = [
         tags: ["Default", "Wasm"],
     }),
     new AsyncBenchmark({
-        name: "babylon-startup-es5",
+        name: "babylonjs-startup-es5",
         files: [
             "./babylonjs/benchmark/startup.js",
         ],

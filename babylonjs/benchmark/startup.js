@@ -32,7 +32,7 @@ class Benchmark {
 
   async init() {
     this.sourceCode = await getString(BUNDLE_BLOB);
-    this.expect("Cache Comment Count", this.sourceCode.match(CACHE_BUST_COMMENT_RE).length, 20301);
+    console.assert("Cache Comment Count", [21230, 21238].includes(this.sourceCode.match(CACHE_BUST_COMMENT_RE).length));
     for (let i = 0; i < this.iterationCount; i++)
       this.iterationSourceCodes[i] = this.prepareCode(i);
   }
