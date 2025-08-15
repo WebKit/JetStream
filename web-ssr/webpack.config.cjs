@@ -101,6 +101,6 @@ function createConfig({ filename, minify }) {
 
 
 module.exports = [
-  createConfig({ filename: "react-render-test.minified.js", minify: true }),
-  createConfig({ filename: "react-render-test.js", minify: false })
+  createConfig({ filename: "bundle.min.js", minify: true }),
+  createConfig({ filename: "bundle.js", minify: false })
 ];
