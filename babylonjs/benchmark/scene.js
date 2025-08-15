@@ -26,7 +26,7 @@ class Benchmark {
   }
 
   async runIteration() {
-    const classNames = await BabylonJSBenchmark.runComplexScene(
+    const {classNames, cameraRotationLength} = await BabylonJSBenchmark.runComplexScene(
       this.preloaded.fortData,
       this.preloaded.cannonData,
       this.preloaded.particlesJson,
@@ -34,11 +34,13 @@ class Benchmark {
     );
     this.lastResult = {
       classNames,
+      cameraRotationLength
     };
   }
 
   validate() {
-    this.expect("Exported Classes", this.lastResult.classNames.length, 2135);
+    this.expect("this.lastResult.classNames.length", this.lastResult.classNames.length, 2135);
+    this.expect("this.lastResult.cameraRotationLength", this.lastResult.cameraRotationLength, 0);
   }
 
   expect(name, value, expected) {

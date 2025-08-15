@@ -63,9 +63,10 @@ class Benchmark {
     const res = eval(sourceCode);
     const runStart = performance.now();
 
-    const classNames = BabylonJSBenchmark.runTest(30);
+    const {classNames, cameraRotationLength} = BabylonJSBenchmark.runTest(30);
     this.lastResult = {
       classNames,
+      cameraRotationLength,
     };
     const end = performance.now();
     const loadTime = runStart - initStart;
@@ -78,7 +79,8 @@ class Benchmark {
   }
 
   validate() {
-    this.expect("Exported Classes", this.lastResult.classNames.length, 2135);
+    this.expect("this.lastResult.classNames.length", this.lastResult.classNames.length, 2135);
+    this.expect("this.lastResult.cameraRotationLength", this.lastResult.cameraRotationLength, 0);
   }
 
   expect(name, value, expected) {

@@ -10,11 +10,15 @@ export function runTest(frames = 10) {
   for (let i = 0; i < frames; i++) {
     scene.render();
   }
-  return allClassNames;
+  return {
+    allClassNames,
+    cameraRotationLength: scene.cameras[0].rotation.length()
+  };
 }
 
 function createScene(engine) {
   const scene = new BABYLON.Scene(engine);
+  scene.useConstantAnimationDeltaTime = true;
   const camera = new BABYLON.FreeCamera(
     "camera1",
     new BABYLON.Vector3(0, 5, -10),
@@ -48,7 +52,9 @@ export async function runComplexScene(
 ) {
   const allClassNames = Object.values(BABYLON).map((cls) => cls.name);
   BABYLON.Logger.LogLevels = BABYLON.Logger.NoneLogLevel;
-  const engine = new BABYLON.NullEngine();
+  const engine = new BABYLON.NullEngine({
+    deterministicLockstep: true
+  });
   const scene = await createComplexScene(
     engine,
     fortData,
@@ -56,9 +62,14 @@ export async function runComplexScene(
     particleData
   );
   for (let i = 0; i < frames; i++) {
+    scene.animate();
     scene.render();
   }
-  return allClassNames;
+  // Leak state to the outside.
+  return {
+    allClassNames,
+    cameraRotationLength: scene.cameras[0].rotation.length()
+  };
 }
 
 async function createComplexScene(engine, fortData, cannonData, particleData) {
@@ -66,6 +77,7 @@ async function createComplexScene(engine, fortData, cannonData, particleData) {
   // - https://www.babylonjs.com/featureDemos/
   // - https://playground.babylonjs.com/#C21DGD#2
   const scene = new BABYLON.Scene(engine);
+  scene.useConstantAnimationDeltaTime = true;
   scene.clearColor = new BABYLON.Color3(0.31, 0.48, 0.64);
   let camera = new BABYLON.ArcRotateCamera(
     "camera",

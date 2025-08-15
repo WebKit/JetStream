@@ -15,7 +15,7 @@ async function main() {
     const fortBuffer = await fs.readFile(fortPath);
     const cannonBuffer = await fs.readFile(cannonPath);
     const particleData = JSON.parse(await fs.readFile(particlePath, "utf-8"))
-    await runComplexScene(fortBuffer, cannonBuffer, particleData);
+    const {classNames, cameraRotationLength} = await runComplexScene(fortBuffer, cannonBuffer, particleData, 1000);
     } catch(e) {
         console.error(e);
         console.error(e.stack);
