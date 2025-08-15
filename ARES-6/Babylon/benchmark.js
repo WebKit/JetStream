@@ -30,14 +30,14 @@ class Benchmark {
         let sources = [];
 
         const files = [
-              [airBlob, {}]
-            , [basicBlob, {}]
-            , [inspectorBlob, {}]
-            , [babylonBlob, {sourceType: "module"}]
+            [JetStream.preload.airBlob, {}],
+            [JetStream.preload.basicBlob, {}],
+            [JetStream.preload.inspectorBlob, {}],
+            [JetStream.preload.babylonBlob, {sourceType: "module"}],
         ];
 
         for (let [file, options] of files)
-            sources.push([file, await getString(file), options]);
+            sources.push([file, await JetStream.getString(file), options]);
 
         this.sources = sources;
     }

@@ -561,17 +561,27 @@ const BenchmarkState = Object.freeze({
 class Scripts {
     constructor() {
         this.scripts = [];
+        // Expose a globalThis.JetStream object to the workload. We use
+        // a proxy to prevent prototype access and throw on unknown properties.
         this.add(`
-            const isInBrowser = ${isInBrowser};
-            const isD8 = ${isD8};
-            if (typeof performance.mark === 'undefined') {
-                performance.mark = function(name) { return { name }};
-            }
-            if (typeof performance.measure === 'undefined') {
-                performance.measure = function() {};
-            }
+            const throwOnAccess = (name) => new Proxy({},  {
+                get(target, property, receiver) {
+                    throw new Error(name + "." + property + " is not defined.");
+                }
+            }); 
+            globalThis.JetStream = {
+                __proto__: throwOnAccess("JetStream"),
+                preload: {
+                    __proto__: throwOnAccess("JetStream.preload"),
+                },
+            };
+            `);
+        this.add(`
+            performance.mark ??= function(name) { return { name }};
+            performance.measure ??= function() {};
         `);
     }
+
 
     run() {
         throw new Error("Subclasses need to implement this");
@@ -583,6 +593,13 @@ class Scripts {
 
     addWithURL(url) {
         throw new Error("addWithURL not supported");
+    }
+
+    addBrowserTest() {
+        this.add(`
+            globalThis.JetStream.isInBrowser = ${isInBrowser};
+            globalThis.JetStream.isD8 = ${isD8};
+        `);
     }
 
     addDeterministicRandom() {
@@ -799,11 +816,13 @@ class Benchmark {
 
         if (!!this.plan.deterministicRandom)
             scripts.addDeterministicRandom()
+        if (!!this.plan.exposeBrowserTest)
+            scripts.addBrowserTest();
 
         if (this.plan.preload) {
             let preloadCode = "";
             for (let [ variableName, blobURLOrPath ] of this.preloads)
-                preloadCode += `const ${variableName} = "${blobURLOrPath}";\n`;
+                preloadCode += `JetStream.preload.${variableName} = "${blobURLOrPath}";\n`;
             scripts.add(preloadCode);
         }
 
@@ -1259,31 +1278,31 @@ class AsyncBenchmark extends DefaultBenchmark {
         // with this class and make all benchmarks async.
         if (isInBrowser) {
             str += `
-                async function getBinary(blobURL) {
+                JetStream.getBinary = async function(blobURL) {
                     const response = await fetch(blobURL);
                     return new Int8Array(await response.arrayBuffer());
-                }
+                };
 
-                async function getString(blobURL) {
+                JetStream.getString = async function(blobURL) {
                     const response = await fetch(blobURL);
                     return response.text();
-                }
+                };
 
-                async function dynamicImport(blobURL) {
+                JetStream.dynamicImport = async function(blobURL) {
                     return await import(blobURL);
-                }
+                };
             `;
         } else {
             str += `
-                async function getBinary(path) {
+                JetStream.getBinary = async function(path) {
                     return new Int8Array(read(path, "binary"));
-                }
+                };
 
-                async function getString(path) {
+                JetStream.getString = async function(path) {
                     return read(path);
-                }
+                };
 
-                async function dynamicImport(path) {
+                JetStream.dynamicImport = async function(path) {
                     try {
                         return await import(path);
                     } catch (e) {
@@ -1291,7 +1310,7 @@ class AsyncBenchmark extends DefaultBenchmark {
                         // without the "./" prefix (e.g., JSC requires it).
                         return await import(path.slice("./".length))
                     }
-                }
+                };
             `;
         }
         return str;
@@ -1323,7 +1342,7 @@ class AsyncBenchmark extends DefaultBenchmark {
             }
             benchmark.validate?.(${this.iterations});
             top.currentResolve(results);
-        }
+        };
         doRun().catch((error) => { top.currentReject(error); });`
     }
 };
@@ -1342,7 +1361,7 @@ class WasmEMCCBenchmark extends AsyncBenchmark {
                     console.log('Intercepted quit/abort');
             };
 
-            oldPrint = globalObject.print;
+            const oldPrint = globalObject.print;
             globalObject.print = globalObject.printErr = (...args) => {
                 if (verbose)
                     console.log('Intercepted print: ', ...args);
@@ -1409,7 +1428,6 @@ class WSLBenchmark extends Benchmark {
 
                 performance.measure(markLabel, markLabel);
             }
-
             top.currentResolve(results);
         }`;
     }
@@ -1469,8 +1487,7 @@ class WasmLegacyBenchmark extends Benchmark {
                     console.log('Intercepted quit/abort');
             };
 
-            oldPrint = globalObject.print;
-            oldConsoleLog = globalObject.console.log;
+            const oldConsoleLog = globalObject.console.log;
             globalObject.print = globalObject.printErr = (...args) => {
                 if (verbose)
                     oldConsoleLog('Intercepted print: ', ...args);
@@ -1483,12 +1500,12 @@ class WasmLegacyBenchmark extends Benchmark {
                 printErr: globalObject.print
             };
             globalObject.Module = Module;
-            `;
+        `;
         return str;
     }
 
     get runnerCode() {
-        let str = `function loadBlob(key, path, andThen) {`;
+        let str = `JetStream.loadBlob = function(key, path, andThen) {`;
 
         if (isInBrowser) {
             str += `
@@ -1519,15 +1536,15 @@ class WasmLegacyBenchmark extends Benchmark {
                     console.log(e.stack);
                     throw e;
                 }
-            })
+            });
             `;
         }
 
-        str += "}";
+        str += "};\n";
 
         const keys = Object.keys(this.plan.preload);
         for (let i = 0; i < keys.length; ++i) {
-            str += `loadBlob("${keys[i]}", "${this.plan.preload[keys[i]]}", () => {\n`;
+            str += `JetStream.loadBlob("${keys[i]}", "${this.plan.preload[keys[i]]}", () => {\n`;
         }
         if (this.plan.async) {
             str += `doRun().catch((e) => {
@@ -1845,6 +1862,8 @@ let BENCHMARKS = [
             "./RexBench/UniPoker/benchmark.js",
         ],
         deterministicRandom: true,
+        // FIXME: UniPoker should not access isInBrowser.
+        exposeBrowserTest: true,
         tags: ["Default", "RexBench"],
     }),
     // Simple
@@ -2225,6 +2244,7 @@ let BENCHMARKS = [
         },
         async: true,
         deterministicRandom: true,
+        exposeBrowserTest: true,
         tags: ["Wasm"],
     }),
     new WasmLegacyBenchmark({
@@ -2245,6 +2265,7 @@ let BENCHMARKS = [
         },
         async: true,
         deterministicRandom: true,
+        exposeBrowserTest: true,
         tags: ["Wasm"],
     }),
     new WasmEMCCBenchmark({
@@ -2267,6 +2288,7 @@ let BENCHMARKS = [
         files: [
             "./worker/bomb.js",
         ],
+        exposeBrowserTest: true,
         iterations: 80,
         preload: {
             rayTrace3D: "./worker/bomb-subtests/3d-raytrace.js",

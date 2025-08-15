@@ -77,7 +77,7 @@ const saltLength = 12;
 
 class Benchmark {
     async init() {
-        Module.wasmBinary = await getBinary(wasmBinary);
+        Module.wasmBinary = await JetStream.getBinary(JetStream.preload.wasmBinary);
     }
 
     async runIteration() {

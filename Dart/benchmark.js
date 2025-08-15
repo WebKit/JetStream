@@ -264,8 +264,8 @@ class Benchmark {
     // The generated JavaScript code from dart2wasm is an ES module, which we
     // can only load with a dynamic import (since this file is not a module.)
 
-    Module.wasmBinary = await getBinary(wasmBinary);
-    this.dart2wasmJsModule = await dynamicImport(jsModule);
+    Module.wasmBinary = await JetStream.getBinary(JetStream.preload.wasmBinary);
+    this.dart2wasmJsModule = await JetStream.dynamicImport(JetStream.preload.jsModule);
   }
 
   async runIteration() {

@@ -24,9 +24,9 @@
  */
 
 async function doRun() {
-    if (!isInBrowser) {
-        globalThis.tfjsBackendWasmSimdBlob = Module.tfjsBackendWasmSimdBlob;
-        globalThis.tfjsBackendWasmBlob = Module.tfjsBackendWasmBlob;
+    if (!JetStream.isInBrowser) {
+        JetStream.preload.tfjsBackendWasmSimdBlob = Module.tfjsBackendWasmSimdBlob;
+        JetStream.preload.tfjsBackendWasmBlob = Module.tfjsBackendWasmBlob;
     }
 
     let start = benchmarkTime();
