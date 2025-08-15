@@ -16,9 +16,9 @@ class Benchmark {
 
   async init() {
     const [fort, cannon, particles] = await Promise.all([
-      getBinary(PIRATE_FORT_BLOB),
-      getBinary(CANNON_BLOB),
-      getString(PARTICLES_BLOB),
+      JetStream.getBinary(JetStream.preload.PIRATE_FORT_BLOB),
+      JetStream.getBinary(JetStream.preload.CANNON_BLOB),
+      JetStream.getString(JetStream.preload.PARTICLES_BLOB),
     ]);
     this.preloaded.fortData = fort;
     this.preloaded.cannonData = cannon;

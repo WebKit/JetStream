@@ -3,7 +3,7 @@ import "@babylonjs/loaders";
 import Ammo from "ammojs-typed";
 
 export function runTest(frames = 10) {
-  const allClassNames = Object.values(BABYLON).map((cls) => cls.name);
+  const classNames = Object.values(BABYLON).map((cls) => cls.name);
   BABYLON.Logger.LogLevels = BABYLON.Logger.NoneLogLevel;
   const engine = new BABYLON.NullEngine();
   const scene = createScene(engine);
@@ -11,7 +11,7 @@ export function runTest(frames = 10) {
     scene.render();
   }
   return {
-    allClassNames,
+    classNames,
     cameraRotationLength: scene.cameras[0].rotation.length()
   };
 }
@@ -50,7 +50,7 @@ export async function runComplexScene(
   particleData,
   frames = 10
 ) {
-  const allClassNames = Object.values(BABYLON).map((cls) => cls.name);
+  const classNames = Object.values(BABYLON).map((cls) => cls.name);
   BABYLON.Logger.LogLevels = BABYLON.Logger.NoneLogLevel;
   const engine = new BABYLON.NullEngine({
     deterministicLockstep: true
@@ -67,7 +67,7 @@ export async function runComplexScene(
   }
   // Leak state to the outside.
   return {
-    allClassNames,
+    classNames,
     cameraRotationLength: scene.cameras[0].rotation.length()
   };
 }

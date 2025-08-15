@@ -2272,7 +2272,7 @@ let BENCHMARKS = [
             "./babylonjs/benchmark/startup.js",
         ],
         preload: {
-            BUNDLE_BLOB: "./babylonjs/dist/benchmark.es5.min.js",
+            BUNDLE_BLOB: "./babylonjs/dist/bundle.es5.min.js",
         },
         tags: ["Default", "startup", "class", "es5"],
         iterations: 10,
@@ -2283,7 +2283,7 @@ let BENCHMARKS = [
             "./babylonjs/benchmark/startup.js",
         ],
         preload: {
-            BUNDLE_BLOB: "./babylonjs/dist/benchmark.es6.min.js",
+            BUNDLE_BLOB: "./babylonjs/dist/bundle.es6.min.js",
         },
         tags: ["Default", "startup", "class", "es6"],
         iterations: 10,
@@ -2292,8 +2292,8 @@ let BENCHMARKS = [
         name: "babylonjs-scene-es5",
         files: [
             // Use non-minified sources for easier profiling:
-            // "./babylonjs/dist/benchmark.es5.js",
-            "./babylonjs/dist/benchmark.es5.min.js",
+            // "./babylonjs/dist/bundle.es5.js",
+            "./babylonjs/dist/bundle.es5.min.js",
             "./babylonjs/benchmark/scene.js",
         ],
         preload: {
@@ -2308,8 +2308,8 @@ let BENCHMARKS = [
         name: "babylonjs-scene-es6",
         files: [
             // Use non-minified sources for easier profiling:
-            // "./babylonjs/dist/benchmark.es6.js",
-            "./babylonjs/dist/benchmark.es6.min.js",
+            // "./babylonjs/dist/bundle.es6.js",
+            "./babylonjs/dist/bundle.es6.min.js",
             "./babylonjs/benchmark/scene.js",
         ],
         preload: {

@@ -82,12 +82,12 @@ module.exports = (env, argv) => {
   const nonMinifiedConfigs = [
     createConfig({
       es6: true,
-      filename: "benchmark.es6.js",
+      filename: "bundle.es6.js",
       minify: false,
     }),
     createConfig({
       es6: false,
-      filename: "benchmark.es5.js",
+      filename: "bundle.es5.js",
       minify: false,
     }),
   ];
@@ -99,12 +99,12 @@ module.exports = (env, argv) => {
   return [
     createConfig({
       es6: true,
-      filename: "benchmark.es6.min.js",
+      filename: "bundle.es6.min.js",
       minify: false,
     }),
     createConfig({
       es6: false,
-      filename: "benchmark.es5.min.js",
+      filename: "bundle.es5.min.js",
       minify: false,
     }),
   ];

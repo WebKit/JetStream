@@ -18,6 +18,7 @@ const CACHE_BUST_COMMENT_RE = new RegExp(`\n${RegExp.escape(CACHE_BUST_COMMENT)}
 // JetStream benchmark.
 class Benchmark {
   // How many times (separate iterations) should we reuse the source code.
+  // Use 0 to skip.
   CODE_REUSE_COUNT = 2
   iterationCount = 0;
   iteration = 0;
@@ -31,7 +32,7 @@ class Benchmark {
   }
 
   async init() {
-    this.sourceCode = await getString(BUNDLE_BLOB);
+    this.sourceCode = await JetStream.getString(JetStream.preload.BUNDLE_BLOB);
     console.assert("Cache Comment Count", [21230, 21238].includes(this.sourceCode.match(CACHE_BUST_COMMENT_RE).length));
     for (let i = 0; i < this.iterationCount; i++)
       this.iterationSourceCodes[i] = this.prepareCode(i);
@@ -80,7 +81,7 @@ class Benchmark {
 
   validate() {
     this.expect("this.lastResult.classNames.length", this.lastResult.classNames.length, 2135);
-    this.expect("this.lastResult.cameraRotationLength", this.lastResult.cameraRotationLength, 0);
+    this.expect("this.lastResult.cameraRotationLength", Math.round(this.lastResult.cameraRotationLength * 1000), 464);
   }
 
   expect(name, value, expected) {
