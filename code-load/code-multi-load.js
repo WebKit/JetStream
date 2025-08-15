@@ -26,7 +26,7 @@
 let indirectEval = eval;
 class Benchmark {
     async init() {
-        this.inspectorText = `let _____top_level_____ = ${Math.random()}; ${await getString(inspectorPayloadBlob)}`;
+        this.inspectorText = `let _____top_level_____ = ${Math.random()}; ${await JetStream.getString(JetStream.preload.inspectorPayloadBlob)}`;
         this.index = 0;
     }
 

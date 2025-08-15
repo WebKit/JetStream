@@ -53,7 +53,7 @@ class Benchmark {
   sqlite3Module;
 
   async init() {
-    Module.wasmBinary = await getBinary(wasmBinary);
+    Module.wasmBinary = await JetStream.getBinary(JetStream.preload.wasmBinary);
   }
 
   async runIteration() {

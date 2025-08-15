@@ -38,8 +38,8 @@ class Benchmark {
   romBinary;
 
   async init() {
-    Module.wasmBinary = await getBinary(wasmBinary);
-    this.romBinary = await getBinary(romBinary);
+    Module.wasmBinary = await JetStream.getBinary(JetStream.preload.wasmBinary);
+    this.romBinary = await JetStream.getBinary(JetStream.preload.romBinary);
   }
 
   async runIteration() {

@@ -560,7 +560,7 @@ class AsyncTaskWorker {
 
     constructor()
     {
-        this._webWorker = new Worker(asyncTaskBlob);
+        this._webWorker = new Worker(JetStream.preload.asyncTaskBlob);
         this._webWorker.onmessage = this._didRecieveMessage.bind(this);
         this._id = AsyncTaskWorker._workerId;
         this._startTime = Date.now();

@@ -29,6 +29,7 @@
         "test:spidermonkey": "node tests/run-shell.mjs --shell spidermonkey"
     },
     "devDependencies": {
+        "@actions/core": "^1.11.1",
         "@babel/core": "^7.21.3",
         "@babel/eslint-parser": "^7.21.3",
         "@babel/plugin-proposal-decorators": "^7.21.0",
@@ -40,7 +41,6 @@
         "jsvu": "^2.5.1",
         "local-web-server": "^5.4.0",
         "prettier": "^2.8.3",
-        "selenium-webdriver": "^4.8.0",
-        "@actions/core": "^1.11.1"
+        "selenium-webdriver": "^4.35.0"
     }
 }

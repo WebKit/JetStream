@@ -2,8 +2,11 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-// Excerpt from `build/run_wasm.js` to add own task queue implementation, since
-// `setTimeout` and `queueMicrotask` are not always available in shells.
+// Excerpt from `wasm_gc_benchmarks/tools/run_wasm.js` to add own task queue
+// implementation, since `setTimeout` and `queueMicrotask` are not always
+// available in shells.
+// TODO: Now (2025-08-14) that all shells have `setTimeout` available, can we
+// remove this? Talk to Dart2wasm folks.
 function addTaskQueue(self) {
   "use strict";
 
@@ -261,8 +264,8 @@ class Benchmark {
     // The generated JavaScript code from dart2wasm is an ES module, which we
     // can only load with a dynamic import (since this file is not a module.)
 
-    Module.wasmBinary = await getBinary(wasmBinary);
-    this.dart2wasmJsModule = await dynamicImport(jsModule);
+    Module.wasmBinary = await JetStream.getBinary(JetStream.preload.wasmBinary);
+    this.dart2wasmJsModule = await JetStream.dynamicImport(JetStream.preload.jsModule);
   }
 
   async runIteration() {
@@ -282,7 +285,7 @@ class Benchmark {
     const framesToDraw = 100;
     const initialFramesToSkip = 0;
     const dartArgs = [
-      startTimeSinceEpochSeconds,
+      startTimeSinceEpochSeconds.toString(),
       framesToDraw.toString(),
       initialFramesToSkip.toString()
     ];
