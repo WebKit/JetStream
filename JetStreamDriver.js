@@ -2024,6 +2024,19 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "Proxy"],
     }),
+    new AsyncBenchmark({
+        name: "web-ssr",
+        files: [
+            "./web-ssr/benchmark.js",
+        ],
+        preload: {
+            // Debug Sources for nicer profiling.
+            // BUNDLE_BLOB: "./web-ssr/dist/bundle.js",
+            BUNDLE_BLOB: "./web-ssr/dist/bundle.min.js",
+        },
+        tags: ["Default", "web", "ssr"],
+        iterations: 30,
+    }),
     // Class fields
     new DefaultBenchmark({
         name: "raytrace-public-class-fields",
