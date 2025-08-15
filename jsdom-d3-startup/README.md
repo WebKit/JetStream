@@ -1,8 +1,12 @@
 # JSDOM D3 Startup Benchmark
 
-This workload benchmarks the time it takes to generate an SVG map of US airports using D3.js in a Node.js environment with `jsdom`.
-
 The benchmark reads airport and US geography data, then uses D3 to create a Voronoi diagram of the airports overlaid on a map of the US.
+It uses jsdom to simulate a browser environment for D3 to render to an SVG element.
+
+## JetStream integration
+- We use a custom `./build/build/cache-buster-comment-plugin.cjs` which injects a known comment into every function in the bundle
+- The JetStream benchmark replaces these comments with a unique string per iteration
+- Each benchmark iteration includes parse and top-level eval time
 
 ## Setup
 ```bash
