@@ -1813,7 +1813,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "prismjs",
         files: [
-            "./prismjs/dist/bundle.es6.min.js",
+            "./prismjs/dist/bundle.es6.js",
             "./prismjs/benchmark.js",
         ],
         preload: {
@@ -1821,6 +1821,7 @@ let BENCHMARKS = [
             SAMPLE_CSS: "./prismjs/data/sample.css",
             SAMPLE_JS: "./prismjs/data/sample.js",
             SAMPLE_HTML: "./prismjs/data/sample.html",
+            SAMPLE_MD: "./prismjs/data/sample.md",
         },
         tags: ["Default", "CodeLoad"],
     }),

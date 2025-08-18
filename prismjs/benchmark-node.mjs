@@ -7,10 +7,11 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const samples = [
-  { data: "data/sample.html", lang: "markup" },
-  { data: "data/sample.js", lang: "javascript" },
-  { data: "data/sample.css", lang: "css" },
-  { data: "data/sample.cpp", lang: "cpp" },
+  { file: "data/sample.html", lang: "markup" },
+  { file: "data/sample.js", lang: "javascript" },
+  { file: "data/sample.css", lang: "css" },
+  { file: "data/sample.cpp", lang: "cpp" },
+  { file: "data/sample.md", lang: "markdown" },
 ];
 
 const samplesWithContent = samples.map(sample => {
@@ -25,9 +26,7 @@ const endTime = process.hrtime.bigint();
 const duration = Number(endTime - startTime) / 1e6; // milliseconds
 
 for (const result of results) {
-    console.log(`\n--- Test Result: (${result.file}) ---`);
-    console.log(`File size: ${result.originalSize} characters`);
-    console.log(`Output size: ${result.highlightedSize} characters`);
+    console.log(`Output size: ${result.length} characters`);
 }
 
 console.log(`\nTotal highlighting time for all files: ${duration.toFixed(2)}ms`);

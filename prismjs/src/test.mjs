@@ -1,17 +1,19 @@
 import Prism from "prismjs";
-import loadLanguages from "prismjs/components/index.js";
-
-// Load Languages
-loadLanguages(["markup", "css", "javascript", "clike", "cpp"]);
+import "prismjs/components/prism-markup.js";
+import "prismjs/components/prism-css.js";
+import "prismjs/components/prism-clike.js";
+import "prismjs/components/prism-javascript.js";
+import "prismjs/components/prism-c.js";
+import "prismjs/components/prism-cpp.js";
+import "prismjs/components/prism-markdown.js";
 
 export function runTest(samples) {
   const results = [];
-  for (const { content: data, lang} of samples) {
-    const highlighted = Prism.highlight(data, Prism.languages[lang], lang);
+  for (const { content, lang} of samples) {
+    const highlighted = Prism.highlight(content, Prism.languages[lang], lang);
     results.push({
-      originalSize: data.length,
-      highlightedSize: highlighted.length,
-    });
+      html: highlighted
+  });
   }
   return results;
 }
