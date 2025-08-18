@@ -1869,7 +1869,9 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "validatorjs",
         files: [
-            "./validatorjs/dist/bundle.es6.js",
+            // Use the unminified version for easier local profiling.
+            // "./validatorjs/dist/bundle.es6.js",
+            "./validatorjs/dist/bundle.es6.min.js",
             "./validatorjs/benchmark.js",
         ],
         tags: ["Default", "regexp"],
