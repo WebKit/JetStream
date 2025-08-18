@@ -11,7 +11,10 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@babel/core": "^7.28.3",
+    "babel-loader": "^10.0.0",
     "prismjs": "^1.30.0",
+    "terser-webpack-plugin": "^5.3.14",
     "webpack": "^5.101.3",
     "webpack-cli": "^6.0.1"
   }

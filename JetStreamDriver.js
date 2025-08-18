@@ -1825,14 +1825,15 @@ let BENCHMARKS = [
         tags: ["Default", "Octane"],
     }),
     new AsyncBenchmark({
-        name: "prismjs",
+        name: "prismjs-startup",
         files: [
-            // Use non-minified bundle for better local profiling.
-            // "./prismjs/dist/bundle.es6.js",
             "./prismjs/dist/bundle.es6.min.js",
             "./prismjs/benchmark.js",
         ],
         preload: {
+            // Use non-minified bundle for better local profiling.
+            // BUNDLE: "./prismjs/dist/bundle.es6.js",
+            BUNDLE: "./prismjs/dist/bundle.es6.js",
             SAMPLE_CPP: "./prismjs/data/sample.cpp",
             SAMPLE_CSS: "./prismjs/data/sample.css",
             SAMPLE_HTML: "./prismjs/data/sample.html",
@@ -1843,7 +1844,7 @@ let BENCHMARKS = [
             SAMPLE_SQL: "./prismjs/data/sample.sql",
             SAMPLE_TS: "./prismjs/data/sample.TS",
         },
-        tags: ["Default", "parser", "regexp"],
+        tags: ["Default", "parser", "regexp", "startup"],
     }),
     // RexBench
     new DefaultBenchmark({

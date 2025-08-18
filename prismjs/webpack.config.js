@@ -1,5 +1,7 @@
 const path = require("path");
 const webpack = require("webpack");
+const TerserPlugin = require("terser-webpack-plugin");
+const CacheBusterCommentPlugin = require("./build/cache-buster-comment-plugin.cjs");
 
 function config({ filename, minify }) {
   return {
@@ -17,14 +19,35 @@ function config({ filename, minify }) {
       libraryTarget: "assign",
       chunkFormat: "commonjs",
     },
-    plugins: [
-    ],
+    module: {
+      rules: [
+        {
+          test: /\.m?js$/,
+          use: {
+            loader: "babel-loader",
+            options: {
+              plugins: [CacheBusterCommentPlugin],
+            },
+          },
+        },
+      ],
+    },
+    plugins: [],
     resolve: {
-      fallback: {
-      },
+      fallback: {},
     },
     optimization: {
-      minimize: minify,
+      minimizer: [
+        new TerserPlugin({
+          terserOptions: {
+            mangle: minify,
+            format: {
+              // Keep this comment for cache-busting.
+              comments: /ThouShaltNotCache/i,
+            },
+          },
+        }),
+      ],
     },
   };
 }
