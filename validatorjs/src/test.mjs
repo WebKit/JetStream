@@ -15646,5 +15646,832 @@ describe('Validators', () => {
   });
 });
 
+
+describe('isAfter', () => {
+  it('should validate dates against a start date', () => {
+    test({
+      validator: 'isAfter',
+      args: [{ comparisonDate: '2011-08-03' }],
+      valid: ['2011-08-04', new Date(2011, 8, 10).toString()],
+      invalid: ['2010-07-02', '2011-08-03', new Date(0).toString(), 'foo'],
+    });
+
+    test({
+      validator: 'isAfter',
+      valid: ['2100-08-04', new Date(Date.now() + 86400000).toString()],
+      invalid: ['2010-07-02', new Date(0).toString()],
+    });
+
+    test({
+      validator: 'isAfter',
+      args: [{ comparisonDate: '2011-08-03' }],
+      valid: ['2015-09-17'],
+      invalid: ['invalid date'],
+    });
+
+    test({
+      validator: 'isAfter',
+      args: [{ comparisonDate: 'invalid date' }],
+      invalid: ['invalid date', '2015-09-17'],
+    });
+    test({
+      validator: 'isAfter',
+      args: [], // will fall back to the current date
+      valid: ['2100-08-04', new Date(Date.now() + 86400000).toString()],
+    });
+    test({
+      validator: 'isAfter',
+      args: [undefined], // will fall back to the current date
+      valid: ['2100-08-04', new Date(Date.now() + 86400000).toString()],
+    });
+    test({
+      validator: 'isAfter',
+      args: [{ comparisonDate: undefined }], // will fall back to the current date
+      valid: ['2100-08-04', new Date(Date.now() + 86400000).toString()],
+    });
+  });
+
+  describe('(legacy syntax)', () => {
+    it('should validate dates against a start date', () => {
+      test({
+        validator: 'isAfter',
+        args: ['2011-08-03'],
+        valid: ['2011-08-04', new Date(2011, 8, 10).toString()],
+        invalid: ['2010-07-02', '2011-08-03', new Date(0).toString(), 'foo'],
+      });
+
+      test({
+        validator: 'isAfter',
+        valid: ['2100-08-04', new Date(Date.now() + 86400000).toString()],
+        invalid: ['2010-07-02', new Date(0).toString()],
+      });
+
+      test({
+        validator: 'isAfter',
+        args: ['2011-08-03'],
+        valid: ['2015-09-17'],
+        invalid: ['invalid date'],
+      });
+
+      test({
+        validator: 'isAfter',
+        args: ['invalid date'],
+        invalid: ['invalid date', '2015-09-17'],
+      });
+    });
+  });
+});
+
+describe('isBase64', () => {
+  it('should validate base64 strings with default options', () => {
+    test({
+      validator: 'isBase64',
+      valid: [
+        '',
+        'Zg==',
+        'Zm8=',
+        'Zm9v',
+        'Zm9vYg==',
+        'Zm9vYmE=',
+        'Zm9vYmFy',
+        'TG9yZW0gaXBzdW0gZG9sb3Igc2l0IGFtZXQsIGNvbnNlY3RldHVyIGFkaXBpc2NpbmcgZWxpdC4=',
+        'Vml2YW11cyBmZXJtZW50dW0gc2VtcGVyIHBvcnRhLg==',
+        'U3VzcGVuZGlzc2UgbGVjdHVzIGxlbw==',
+        'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAuMPNS1Ufof9EW/M98FNw' +
+        'UAKrwflsqVxaxQjBQnHQmiI7Vac40t8x7pIb8gLGV6wL7sBTJiPovJ0V7y7oc0Ye' +
+        'rhKh0Rm4skP2z/jHwwZICgGzBvA0rH8xlhUiTvcwDCJ0kc+fh35hNt8srZQM4619' +
+        'FTgB66Xmp4EtVyhpQV+t02g6NzK72oZI0vnAvqhpkxLeLiMCyrI416wHm5Tkukhx' +
+        'QmcL2a6hNOyu0ixX/x2kSFXApEnVrJ+/IxGyfyw8kf4N2IZpW5nEP847lpfj0SZZ' +
+        'Fwrd1mnfnDbYohX2zRptLy2ZUn06Qo9pkG5ntvFEPo9bfZeULtjYzIl6K8gJ2uGZ' +
+        'HQIDAQAB',
+      ],
+      invalid: [
+        '12345',
+        'Vml2YW11cyBmZXJtZtesting123',
+        'Zg=',
+        'Z===',
+        'Zm=8',
+        '=m9vYg==',
+        'Zm9vYmFy====',
+      ],
+    });
+
+    test({
+      validator: 'isBase64',
+      args: [{ urlSafe: true }],
+      valid: [
+        '',
+        'bGFkaWVzIGFuZCBnZW50bGVtZW4sIHdlIGFyZSBmbG9hdGluZyBpbiBzcGFjZQ',
+        '1234',
+        'bXVtLW5ldmVyLXByb3Vk',
+        'PDw_Pz8-Pg',
+        'VGhpcyBpcyBhbiBlbmNvZGVkIHN0cmluZw',
+      ],
+      invalid: [
+        ' AA',
+        '\tAA',
+        '\rAA',
+        '\nAA',
+        'This+isa/bad+base64Url==',
+        '0K3RgtC+INC30LDQutC+0LTQuNGA0L7QstCw0L3QvdCw0Y8g0YHRgtGA0L7QutCw',
+      ],
+      error: [
+        null,
+        undefined,
+        {},
+        [],
+        42,
+      ],
+    });
+
+    for (let i = 0, str = '', encoded; i < 1000; i++) {
+      str += String.fromCharCode(Math.random() * 26 | 97); // eslint-disable-line no-bitwise
+      encoded = Buffer.from(str).toString('base64');
+      if (!validatorjs.isBase64(encoded)) {
+        let msg = format('validator.isBase64() failed with "%s"', encoded);
+        throw new Error(msg);
+      }
+    }
+  });
+
+  it('should validate standard Base64 with padding', () => {
+    test({
+      validator: 'isBase64',
+      args: [{ urlSafe: false, padding: true }],
+      valid: [
+        '',
+        'TWFu',
+        'TWE=',
+        'TQ==',
+        'SGVsbG8=',
+        'U29mdHdhcmU=',
+        'YW55IGNhcm5hbCBwbGVhc3VyZS4=',
+      ],
+      invalid: [
+        'TWF',
+        'TWE===',
+        'SGVsbG8@',
+        'SGVsbG8===',
+        'SGVsb G8=',
+        '====',
+      ],
+    });
+  });
+
+  it('should validate standard Base64 without padding', () => {
+    test({
+      validator: 'isBase64',
+      args: [{ urlSafe: false, padding: false }],
+      valid: [
+        '',
+        'TWFu',
+        'TWE',
+        'TQ',
+        'SGVsbG8',
+        'U29mdHdhcmU',
+        'YW55IGNhcm5hbCBwbGVhc3VyZS4',
+      ],
+      invalid: [
+        'TWE=',
+        'TQ===',
+        'SGVsbG8@',
+        'SGVsbG8===',
+        'SGVsb G8',
+        '====',
+      ],
+    });
+  });
+
+  it('should validate Base64url with padding', () => {
+    test({
+      validator: 'isBase64',
+      args: [{ urlSafe: true, padding: true }],
+      valid: [
+        '',
+        'SGVsbG8=',
+        'U29mdHdhcmU=',
+        'YW55IGNhcm5hbCBwbGVhc3VyZS4=',
+        'SGVsbG8-',
+        'SGVsbG8_',
+      ],
+      invalid: [
+        'SGVsbG8===',
+        'SGVsbG8@',
+        'SGVsb G8=',
+        '====',
+      ],
+    });
+  });
+
+  it('should validate Base64url without padding', () => {
+    test({
+      validator: 'isBase64',
+      args: [{ urlSafe: true, padding: false }],
+      valid: [
+        '',
+        'SGVsbG8',
+        'U29mdHdhcmU',
+        'YW55IGNhcm5hbCBwbGVhc3VyZS4',
+        'SGVsbG8-',
+        'SGVsbG8_',
+      ],
+      invalid: [
+        'SGVsbG8=',
+        'SGVsbG8===',
+        'SGVsbG8@',
+        'SGVsb G8',
+        '====',
+      ],
+    });
+  });
+
+  it('should handle mixed cases correctly', () => {
+    test({
+      validator: 'isBase64',
+      args: [{ urlSafe: false, padding: true }],
+      valid: [
+        '',
+        'TWFu',
+        'TWE=',
+        'TQ==',
+      ],
+      invalid: [
+        'TWE',
+        'TQ=',
+        'TQ===',
+      ],
+    });
+
+    test({
+      validator: 'isBase64',
+      args: [{ urlSafe: true, padding: false }],
+      valid: [
+        '',
+        'SGVsbG8',
+        'SGVsbG8-',
+        'SGVsbG8_',
+      ],
+      invalid: [
+        'SGVsbG8=',
+        'SGVsbG8@',
+        'SGVsb G8',
+      ],
+    });
+  });
+});
+
+describe('isBefore', () => {
+  describe('should validate dates a given end date', () => {
+    describe('new syntax', () => {
+      test({
+        validator: 'isBefore',
+        args: [{ comparisonDate: '08/04/2011' }],
+        valid: ['2010-07-02', '2010-08-04', new Date(0).toString()],
+        invalid: ['08/04/2011', new Date(2011, 9, 10).toString()],
+      });
+      test({
+        validator: 'isBefore',
+        args: [{ comparisonDate: new Date(2011, 7, 4).toString() }],
+        valid: ['2010-07-02', '2010-08-04', new Date(0).toString()],
+        invalid: ['08/04/2011', new Date(2011, 9, 10).toString()],
+      });
+      test({
+        validator: 'isBefore',
+        args: [{ comparisonDate: '2011-08-03' }],
+        valid: ['1999-12-31'],
+        invalid: ['invalid date'],
+      });
+      test({
+        validator: 'isBefore',
+        args: [{ comparisonDate: 'invalid date' }],
+        invalid: ['invalid date', '1999-12-31'],
+      });
+    });
+
+    describe('legacy syntax', () => {
+      test({
+        validator: 'isBefore',
+        args: ['08/04/2011'],
+        valid: ['2010-07-02', '2010-08-04', new Date(0).toString()],
+        invalid: ['08/04/2011', new Date(2011, 9, 10).toString()],
+      });
+      test({
+        validator: 'isBefore',
+        args: [new Date(2011, 7, 4).toString()],
+        valid: ['2010-07-02', '2010-08-04', new Date(0).toString()],
+        invalid: ['08/04/2011', new Date(2011, 9, 10).toString()],
+      });
+      test({
+        validator: 'isBefore',
+        args: ['2011-08-03'],
+        valid: ['1999-12-31'],
+        invalid: ['invalid date'],
+      });
+      test({
+        validator: 'isBefore',
+        args: ['invalid date'],
+        invalid: ['invalid date', '1999-12-31'],
+      });
+    });
+  });
+
+  describe('should validate dates a default end date', () => {
+    describe('new syntax', () => {
+      test({
+        validator: 'isBefore',
+        valid: [
+          '2000-08-04',
+          new Date(0).toString(),
+          new Date(Date.now() - 86400000).toString(),
+        ],
+        invalid: ['2100-07-02', new Date(2217, 10, 10).toString()],
+      });
+      test({
+        validator: 'isBefore',
+        args: undefined, // will fall back to the current date
+        valid: ['1999-06-07'],
+      });
+      test({
+        validator: 'isBefore',
+        args: [], // will fall back to the current date
+        valid: ['1999-06-07'],
+      });
+      test({
+        validator: 'isBefore',
+        args: [undefined], // will fall back to the current date
+        valid: ['1999-06-07'],
+      });
+      test({
+        validator: 'isBefore',
+        args: [{ comparisonDate: undefined }], // will fall back to the current date
+        valid: ['1999-06-07'],
+      });
+    });
+
+    describe('legacy syntax', () => {
+      test({
+        validator: 'isBefore',
+        valid: [
+          '2000-08-04',
+          new Date(0).toString(),
+          new Date(Date.now() - 86400000).toString(),
+        ],
+        invalid: ['2100-07-02', new Date(2217, 10, 10).toString()],
+      });
+      test({
+        validator: 'isBefore',
+        args: undefined, // will fall back to the current date
+        valid: ['1999-06-07'],
+      });
+      test({
+        validator: 'isBefore',
+        args: [], // will fall back to the current date
+        valid: ['1999-06-07'],
+      });
+      test({
+        validator: 'isBefore',
+        args: [undefined], // will fall back to the current date
+        valid: ['1999-06-07'],
+      });
+    });
+  });
+});
+
+describe('isFQDN', () => {
+  it('should validate domain names.', () => {
+    test({
+      validator: 'isFQDN',
+      args: [],
+      valid: [
+        'google.com',
+      ],
+      invalid: [
+        'google.l33t',
+      ],
+    });
+    test({
+      validator: 'isFQDN',
+      args: [{ allow_numeric_tld: true }],
+      valid: [
+        'google.com',
+        'google.l33t',
+      ],
+      invalid: [
+      ],
+    });
+  });
+});
+
+describe('isIP', () => {
+  it('should validate IP addresses', () => {
+    test({
+      validator: 'isIP',
+      valid: [
+        '127.0.0.1',
+        '0.0.0.0',
+        '255.255.255.255',
+        '1.2.3.4',
+        '::1',
+        '2001:db8:0000:1:1:1:1:1',
+        '2001:db8:3:4::192.0.2.33',
+        '2001:41d0:2:a141::1',
+        '::ffff:127.0.0.1',
+        '::0000',
+        '0000::',
+        '1::',
+        '1111:1:1:1:1:1:1:1',
+        'fe80::a6db:30ff:fe98:e946',
+        '::',
+        '::8',
+        '::ffff:127.0.0.1',
+        '::ffff:255.255.255.255',
+        '::ffff:0:255.255.255.255',
+        '::2:3:4:5:6:7:8',
+        '::255.255.255.255',
+        '0:0:0:0:0:ffff:127.0.0.1',
+        '1:2:3:4:5:6:7::',
+        '1:2:3:4:5:6::8',
+        '1::7:8',
+        '1:2:3:4:5::7:8',
+        '1:2:3:4:5::8',
+        '1::6:7:8',
+        '1:2:3:4::6:7:8',
+        '1:2:3:4::8',
+        '1::5:6:7:8',
+        '1:2:3::5:6:7:8',
+        '1:2:3::8',
+        '1::4:5:6:7:8',
+        '1:2::4:5:6:7:8',
+        '1:2::8',
+        '1::3:4:5:6:7:8',
+        '1::8',
+        'fe80::7:8%eth0',
+        'fe80::7:8%1',
+        '64:ff9b::192.0.2.33',
+        '0:0:0:0:0:0:10.0.0.1',
+      ],
+      invalid: [
+        'abc',
+        '256.0.0.0',
+        '0.0.0.256',
+        '26.0.0.256',
+        '0200.200.200.200',
+        '200.0200.200.200',
+        '200.200.0200.200',
+        '200.200.200.0200',
+        '::banana',
+        'banana::',
+        '::1banana',
+        '::1::',
+        '1:',
+        ':1',
+        ':1:1:1::2',
+        '1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1',
+        '::11111',
+        '11111:1:1:1:1:1:1:1',
+        '2001:db8:0000:1:1:1:1::1',
+        '0:0:0:0:0:0:ffff:127.0.0.1',
+        '0:0:0:0:ffff:127.0.0.1',
+        'BC:e4d5:c:e7b9::%40i0nccymtl9cwfKo.5vaeXLSGRMe:EDh2qs5wkhnPws5xQKqafjfAMm6wGFCJ.bVFsZfb',
+        '1dC:0DF8:62D:3AC::%KTatXocjaFVioS0RTNQl4mA.V151o0RSy.JIu-D-D8.d3171ZWsSJ7PK4YjkJCRN0F',
+      ],
+    });
+
+    test({
+      validator: 'isIP',
+      args: [{ version: 'invalid version' }],
+      valid: [],
+      invalid: [
+        '127.0.0.1',
+        '0.0.0.0',
+        '255.255.255.255',
+        '1.2.3.4',
+      ],
+    });
+
+    test({
+      validator: 'isIP',
+      args: [{ version: null }],
+      valid: [
+        '127.0.0.1',
+        '0.0.0.0',
+        '255.255.255.255',
+        '1.2.3.4',
+      ],
+    });
+
+    test({
+      validator: 'isIP',
+      args: [{ version: undefined }],
+      valid: [
+        '127.0.0.1',
+        '0.0.0.0',
+        '255.255.255.255',
+        '1.2.3.4',
+      ],
+    });
+
+    test({
+      validator: 'isIP',
+      args: [{ version: 4 }],
+      valid: [
+        '127.0.0.1',
+        '0.0.0.0',
+        '255.255.255.255',
+        '1.2.3.4',
+        '255.0.0.1',
+        '0.0.1.1',
+      ],
+      invalid: [
+        '::1',
+        '2001:db8:0000:1:1:1:1:1',
+        '::ffff:127.0.0.1',
+        '137.132.10.01',
+        '0.256.0.256',
+        '255.256.255.256',
+      ],
+    });
+
+    test({
+      validator: 'isIP',
+      args: [{ version: 6 }],
+      valid: [
+        '::1',
+        '2001:db8:0000:1:1:1:1:1',
+        '::ffff:127.0.0.1',
+        'fe80::1234%1',
+        'ff08::9abc%10',
+        'ff08::9abc%interface10',
+        'ff02::5678%pvc1.3',
+      ],
+      invalid: [
+        '127.0.0.1',
+        '0.0.0.0',
+        '255.255.255.255',
+        '1.2.3.4',
+        '::ffff:287.0.0.1',
+        '%',
+        'fe80::1234%',
+        'fe80::1234%1%3%4',
+        'fe80%fe80%',
+      ],
+    });
+
+    test({
+      validator: 'isIP',
+      args: [{ version: 10 }],
+      valid: [],
+      invalid: [
+        '127.0.0.1',
+        '0.0.0.0',
+        '255.255.255.255',
+        '1.2.3.4',
+        '::1',
+        '2001:db8:0000:1:1:1:1:1',
+      ],
+    });
+  });
+
+  describe('legacy syntax', () => {
+    it('should validate IP addresses', () => {
+      test({
+        validator: 'isIP',
+        valid: [
+          '127.0.0.1',
+          '0.0.0.0',
+          '255.255.255.255',
+          '1.2.3.4',
+          '::1',
+          '2001:db8:0000:1:1:1:1:1',
+          '2001:db8:3:4::192.0.2.33',
+          '2001:41d0:2:a141::1',
+          '::ffff:127.0.0.1',
+          '::0000',
+          '0000::',
+          '1::',
+          '1111:1:1:1:1:1:1:1',
+          'fe80::a6db:30ff:fe98:e946',
+          '::',
+          '::8',
+          '::ffff:127.0.0.1',
+          '::ffff:255.255.255.255',
+          '::ffff:0:255.255.255.255',
+          '::2:3:4:5:6:7:8',
+          '::255.255.255.255',
+          '0:0:0:0:0:ffff:127.0.0.1',
+          '1:2:3:4:5:6:7::',
+          '1:2:3:4:5:6::8',
+          '1::7:8',
+          '1:2:3:4:5::7:8',
+          '1:2:3:4:5::8',
+          '1::6:7:8',
+          '1:2:3:4::6:7:8',
+          '1:2:3:4::8',
+          '1::5:6:7:8',
+          '1:2:3::5:6:7:8',
+          '1:2:3::8',
+          '1::4:5:6:7:8',
+          '1:2::4:5:6:7:8',
+          '1:2::8',
+          '1::3:4:5:6:7:8',
+          '1::8',
+          'fe80::7:8%eth0',
+          'fe80::7:8%1',
+          '64:ff9b::192.0.2.33',
+          '0:0:0:0:0:0:10.0.0.1',
+        ],
+        invalid: [
+          'abc',
+          '256.0.0.0',
+          '0.0.0.256',
+          '26.0.0.256',
+          '0200.200.200.200',
+          '200.0200.200.200',
+          '200.200.0200.200',
+          '200.200.200.0200',
+          '::banana',
+          'banana::',
+          '::1banana',
+          '::1::',
+          '1:',
+          ':1',
+          ':1:1:1::2',
+          '1:1:1:1:1:1:1:1:1:1:1:1:1:1:1:1',
+          '::11111',
+          '11111:1:1:1:1:1:1:1',
+          '2001:db8:0000:1:1:1:1::1',
+          '0:0:0:0:0:0:ffff:127.0.0.1',
+          '0:0:0:0:ffff:127.0.0.1',
+        ],
+      });
+      test({
+        validator: 'isIP',
+        args: [4],
+        valid: [
+          '127.0.0.1',
+          '0.0.0.0',
+          '255.255.255.255',
+          '1.2.3.4',
+          '255.0.0.1',
+          '0.0.1.1',
+        ],
+        invalid: [
+          '::1',
+          '2001:db8:0000:1:1:1:1:1',
+          '::ffff:127.0.0.1',
+          '137.132.10.01',
+          '0.256.0.256',
+          '255.256.255.256',
+        ],
+      });
+      test({
+        validator: 'isIP',
+        args: [6],
+        valid: [
+          '::1',
+          '2001:db8:0000:1:1:1:1:1',
+          '::ffff:127.0.0.1',
+          'fe80::1234%1',
+          'ff08::9abc%10',
+          'ff08::9abc%interface10',
+          'ff02::5678%pvc1.3',
+        ],
+        invalid: [
+          '127.0.0.1',
+          '0.0.0.0',
+          '255.255.255.255',
+          '1.2.3.4',
+          '::ffff:287.0.0.1',
+          '%',
+          'fe80::1234%',
+          'fe80::1234%1%3%4',
+          'fe80%fe80%',
+        ],
+      });
+      test({
+        validator: 'isIP',
+        args: [10],
+        valid: [],
+        invalid: [
+          '127.0.0.1',
+          '0.0.0.0',
+          '255.255.255.255',
+          '1.2.3.4',
+          '::1',
+          '2001:db8:0000:1:1:1:1:1',
+        ],
+      });
+    });
+  });
+});
+describe('isISBN', () => {
+  it('should validate ISBNs', () => {
+    test({
+      validator: 'isISBN',
+      args: [{ version: 10 }],
+      valid: [
+        '3836221195', '3-8362-2119-5', '3 8362 2119 5',
+        '1617290858', '1-61729-085-8', '1 61729 085-8',
+        '0007269706', '0-00-726970-6', '0 00 726970 6',
+        '3423214120', '3-423-21412-0', '3 423 21412 0',
+        '340101319X', '3-401-01319-X', '3 401 01319 X',
+      ],
+      invalid: [
+        '3423214121', '3-423-21412-1', '3 423 21412 1',
+        '978-3836221191', '9783836221191',
+        '123456789a', 'foo', '',
+      ],
+    });
+    test({
+      validator: 'isISBN',
+      args: [{ version: 13 }],
+      valid: [
+        '9783836221191', '978-3-8362-2119-1', '978 3 8362 2119 1',
+        '9783401013190', '978-3401013190', '978 3401013190',
+        '9784873113685', '978-4-87311-368-5', '978 4 87311 368 5',
+      ],
+      invalid: [
+        '9783836221190', '978-3-8362-2119-0', '978 3 8362 2119 0',
+        '3836221195', '3-8362-2119-5', '3 8362 2119 5',
+        '01234567890ab', 'foo', '',
+      ],
+    });
+    test({
+      validator: 'isISBN',
+      valid: [
+        '340101319X',
+        '9784873113685',
+      ],
+      invalid: [
+        '3423214121',
+        '9783836221190',
+      ],
+    });
+    test({
+      validator: 'isISBN',
+      args: [{ version: 'foo' }],
+      invalid: [
+        '340101319X',
+        '9784873113685',
+      ],
+    });
+  });
+
+  describe('(legacy syntax)', () => {
+    it('should validate ISBNs', () => {
+      test({
+        validator: 'isISBN',
+        args: [10],
+        valid: [
+          '3836221195', '3-8362-2119-5', '3 8362 2119 5',
+          '1617290858', '1-61729-085-8', '1 61729 085-8',
+          '0007269706', '0-00-726970-6', '0 00 726970 6',
+          '3423214120', '3-423-21412-0', '3 423 21412 0',
+          '340101319X', '3-401-01319-X', '3 401 01319 X',
+        ],
+        invalid: [
+          '3423214121', '3-423-21412-1', '3 423 21412 1',
+          '978-3836221191', '9783836221191',
+          '123456789a', 'foo', '',
+        ],
+      });
+      test({
+        validator: 'isISBN',
+        args: [13],
+        valid: [
+          '9783836221191', '978-3-8362-2119-1', '978 3 8362 2119 1',
+          '9783401013190', '978-3401013190', '978 3401013190',
+          '9784873113685', '978-4-87311-368-5', '978 4 87311 368 5',
+        ],
+        invalid: [
+          '9783836221190', '978-3-8362-2119-0', '978 3 8362 2119 0',
+          '3836221195', '3-8362-2119-5', '3 8362 2119 5',
+          '01234567890ab', 'foo', '',
+        ],
+      });
+      test({
+        validator: 'isISBN',
+        valid: [
+          '340101319X',
+          '9784873113685',
+        ],
+        invalid: [
+          '3423214121',
+          '9783836221190',
+        ],
+      });
+      test({
+        validator: 'isISBN',
+        args: ['foo'],
+        invalid: [
+          '340101319X',
+          '9784873113685',
+        ],
+      });
+    });
+  });
+});
+
+
   return assertionCount;
 };
