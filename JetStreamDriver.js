@@ -1813,7 +1813,9 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "prismjs",
         files: [
-            "./prismjs/dist/bundle.es6.js",
+            // Use non-minified bundle for better local profiling.
+            // "./prismjs/dist/bundle.es6.js",
+            "./prismjs/dist/bundle.es6.min.js",
             "./prismjs/benchmark.js",
         ],
         preload: {
