@@ -1829,7 +1829,7 @@ let BENCHMARKS = [
             SAMPLE_SQL: "./prismjs/data/sample.sql",
             SAMPLE_TS: "./prismjs/data/sample.TS",
         },
-        tags: ["Default", "CodeLoad"],
+        tags: ["Default", "parser", "regexp"],
     }),
     // RexBench
     new DefaultBenchmark({
