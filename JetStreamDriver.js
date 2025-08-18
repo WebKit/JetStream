@@ -1832,8 +1832,8 @@ let BENCHMARKS = [
         ],
         preload: {
             // Use non-minified bundle for better local profiling.
-            // BUNDLE: "./prismjs/dist/bundle.es6.js",
-            BUNDLE: "./prismjs/dist/bundle.es6.js",
+            // BUNDLE: "./prismjs/dist/bundle.es5.js",
+            BUNDLE: "./prismjs/dist/bundle.es5.min.js",
             SAMPLE_CPP: "./prismjs/data/sample.cpp",
             SAMPLE_CSS: "./prismjs/data/sample.css",
             SAMPLE_HTML: "./prismjs/data/sample.html",
