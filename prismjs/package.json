@@ -1,0 +1,18 @@
+{
+  "name": "prismjs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./benchmark-node.mjs",
+    "clean": "rm -rf dist/*",
+    "build": "webpack"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "prismjs": "^1.30.0",
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1"
+  }
+}

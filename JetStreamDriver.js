@@ -1650,20 +1650,6 @@ let BENCHMARKS = [
         iterations: 60,
         tags: ["Default", "ARES"],
     }),
-    new AsyncBenchmark({
-        name: "Babylon",
-        files: [
-            "./ARES-6/Babylon/index.js",
-            "./ARES-6/Babylon/benchmark.js",
-        ],
-        preload: {
-            airBlob: "./ARES-6/Babylon/air-blob.js",
-            basicBlob: "./ARES-6/Babylon/basic-blob.js",
-            inspectorBlob: "./ARES-6/Babylon/inspector-blob.js",
-            babylonBlob: "./ARES-6/Babylon/babylon-blob.js",
-        },
-        tags: ["Default", "ARES"],
-    }),
     // CDJS
     new DefaultBenchmark({
         name: "cdjs",
@@ -1823,6 +1809,19 @@ let BENCHMARKS = [
         worstCaseCount: 2,
         deterministicRandom: true,
         tags: ["Default", "Octane"],
+    }),
+    new AsyncBenchmark({
+        name: "prismjs",
+        files: [
+            "./prismjs/benchmark.js",
+        ],
+        preload: {
+            SAMPLE_CPP: "./prismjs/data/sample.cpp",
+            SAMPLE_CSS: "./prismjs/data/sample.css",
+            SAMPLE_JS: "./prismjs/data/sample.js",
+            SAMPLE_HTML: "./prismjs/data/sample.html",
+        },
+        tags: ["Default", "CodeLoad"],
     }),
     // RexBench
     new DefaultBenchmark({
