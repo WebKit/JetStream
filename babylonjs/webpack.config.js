@@ -9,7 +9,7 @@ function createConfig({es6, filename, minify }) {
       entry: "./src/babylon-js-benchmark.mjs",
       mode: "production",
       devtool: "source-map",
-      target: "web",
+      target: ["web", es6 ? "es6" : "es5"],
       output: {
         path: path.resolve(__dirname, "dist"),
         filename: filename,
@@ -20,7 +20,6 @@ function createConfig({es6, filename, minify }) {
         libraryTarget: "assign",
         chunkFormat: "commonjs",
       },
-      target: es6 ? "es6" : "es5",
       module: {
         rules: [
           {
