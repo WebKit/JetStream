@@ -12,6 +12,10 @@ const samples = [
   { file: "data/sample.css", lang: "css" },
   { file: "data/sample.cpp", lang: "cpp" },
   { file: "data/sample.md", lang: "markdown" },
+  { file: "data/sample.json", lang: "json" },
+  { file: "data/sample.sql", lang: "sql" },
+  { file: "data/sample.py", lang: "python" },
+  { file: "data/sample.ts", lang: "typescript" },
 ];
 
 const samplesWithContent = samples.map(sample => {
@@ -26,7 +30,7 @@ const endTime = process.hrtime.bigint();
 const duration = Number(endTime - startTime) / 1e6; // milliseconds
 
 for (const result of results) {
-    console.log(`Output size: ${result.length} characters`);
+    console.log(`Output size: ${result.html.length} characters`);
 }
 
 console.log(`\nTotal highlighting time for all files: ${duration.toFixed(2)}ms`);

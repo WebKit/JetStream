@@ -23,6 +23,9 @@ class Benchmark {
       this.loadData("markup", JetStream.preload.SAMPLE_HTML, -270772291),
       this.loadData("js", JetStream.preload.SAMPLE_JS, -838545229),
       this.loadData("markdown", JetStream.preload.SAMPLE_MD, 5859883),
+      this.loadData("sql", JetStream.preload.SAMPLE_SQL, 5859883),
+      this.loadData("json", JetStream.preload.SAMPLE_JSON, 5859883),
+      this.loadData("typescript", JetStream.preload.SAMPLE_TS, 5859883),
     ]);
   }
 

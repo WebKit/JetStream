@@ -7,6 +7,9 @@ import "prismjs/components/prism-c.js";
 import "prismjs/components/prism-cpp.js";
 import "prismjs/components/prism-markdown.js";
 import "prismjs/components/prism-json.js";
+import "prismjs/components/prism-sql.js";
+import "prismjs/components/prism-python.js";
+import "prismjs/components/prism-typescript.js";
 
 export function runTest(samples) {
   const results = [];
