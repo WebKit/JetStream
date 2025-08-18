@@ -1,6 +1,51 @@
 import validator from 'validator';
 import assert from 'assert';
 
+function testIsAlpha() {
+  assert(validator.isAlpha('abcdefg'));
+  assert(!validator.isAlpha('abcdefg1'));
+  assert(validator.isAlpha('абвгдеёжзийклмнопрстуфхцчшщъыьэюя', 'ru-RU'));
+  assert(!validator.isAlpha('абвгдеёжзийклмнопрстуфхцчшщъыьэюя1', 'ru-RU'));
+}
+
+function testIsAlphanumeric() {
+  assert(validator.isAlphanumeric('abcdefg123'));
+  assert(!validator.isAlphanumeric('abcdefg123!'));
+  assert(validator.isAlphanumeric('абвгдеёжзийклмнопрстуфхцчшщъыьэюя123', 'ru-RU'));
+  assert(!validator.isAlphanumeric('абвгдеёжзийклмнопрстуфхцчшщъыьэюя123!', 'ru-RU'));
+}
+
+function testIsEmail() {
+  assert(validator.isEmail('foo@bar.com'));
+  assert(validator.isEmail('foo.bar@bar.com'));
+  assert(validator.isEmail('foo+bar@bar.com'));
+  assert(validator.isEmail('foo-bar@bar.com'));
+  assert(validator.isEmail('foo@bar.co.uk'));
+  assert(validator.isEmail('foo@bar.io'));
+  assert(validator.isEmail('foo@bar.museum'));
+  assert(validator.isEmail('foo@sub.domain.com'));
+  assert(validator.isEmail('123@bar.com'));
+  assert(validator.isEmail('test@example.com', { allow_display_name: true }));
+  assert(validator.isEmail('"test"@example.com', { allow_display_name: true }));
+  assert(validator.isEmail('test <test@example.com>', { allow_display_name: true }));
+
+  assert(!validator.isEmail('foo@bar'));
+  assert(!validator.isEmail('foo@'));
+  assert(!validator.isEmail('@bar.com'));
+  assert(!validator.isEmail('foo'));
+  assert(!validator.isEmail('foo@bar.c'));
+  assert(!validator.isEmail('foo@bar..com'));
+  assert(!validator.isEmail('foo@.bar.com'));
+  assert(!validator.isEmail('.foo@bar.com'));
+  assert(!validator.isEmail('foo@bar.com.'));
+  assert(!validator.isEmail('foo@-bar.com'));
+  assert(!validator.isEmail('foo@bar-.com'));
+  assert(!validator.isEmail('foo@bar.com-'));
+  assert(!validator.isEmail('foo@_bar.com'));
+  assert(!validator.isEmail('foo@bar_.com'));
+  assert(!validator.isEmail('foo@bar._com'));
+}
+
 export function runTest() {
   // Validators
   assert(validator.contains('hello world', 'world'));
@@ -11,14 +56,8 @@ export function runTest() {
   assert(!validator.isAbaRouting('123456789'));
   assert(validator.isAfter('2025-08-19'));
   assert(!validator.isAfter('2025-08-17'));
-  assert(validator.isAlpha('abcdefg'));
-  assert(!validator.isAlpha('abcdefg1'));
-  assert(validator.isAlpha('абвгдеёжзийклмнопрстуфхцчшщъыьэюя', 'ru-RU'));
-  assert(!validator.isAlpha('абвгдеёжзийклмнопрстуфхцчшщъыьэюя1', 'ru-RU'));
-  assert(validator.isAlphanumeric('abcdefg123'));
-  assert(!validator.isAlphanumeric('abcdefg123!'));
-  assert(validator.isAlphanumeric('абвгдеёжзийклмнопрстуфхцчшщъыьэюя123', 'ru-RU'));
-  assert(!validator.isAlphanumeric('абвгдеёжзийклмнопрстуфхцчшщъыьэюя123!', 'ru-RU'));
+  testIsAlpha();
+  testIsAlphanumeric();
   assert(validator.isAscii('hello'));
   assert(!validator.isAscii('你好'));
   assert(validator.isBase32('GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ'));
@@ -51,8 +90,7 @@ export function runTest() {
   assert(!validator.isDivisibleBy('10', '3'));
   assert(validator.isEAN('9783161484100'));
   assert(!validator.isEAN('123456789012'));
-  assert(validator.isEmail('foo@bar.com'));
-  assert(!validator.isEmail('foo@bar'));
+  testIsEmail();
   assert(validator.isEmpty(''));
   assert(!validator.isEmpty('not empty'));
   assert(validator.isEthereumAddress('0x71c7656ec7ab88b098defb751b7401b5f6d8976f'));

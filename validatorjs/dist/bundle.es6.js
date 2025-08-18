@@ -12972,6 +12972,28 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
+function testIsAlpha() {
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAlpha('abcdefg'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAlpha('abcdefg1'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAlpha('абвгдеёжзийклмнопрстуфхцчшщъыьэюя', 'ru-RU'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAlpha('абвгдеёжзийклмнопрстуфхцчшщъыьэюя1', 'ru-RU'));
+}
+
+function testIsAlphanumeric() {
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAlphanumeric('abcdefg123'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAlphanumeric('abcdefg123!'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAlphanumeric('абвгдеёжзийклмнопрстуфхцчшщъыьэюя123', 'ru-RU'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAlphanumeric('абвгдеёжзийклмнопрстуфхцчшщъыьэюя123!', 'ru-RU'));
+}
+
+function testIsEmail() {
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isEmail('foo@bar.com'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isEmail('foo@bar'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isEmail('test@example.com', { allow_display_name: true }));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isEmail('"test"@example.com', { allow_display_name: true }));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isEmail('test <test@example.com>', { allow_display_name: true }));
+}
+
 function runTest() {
   // Validators
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.contains('hello world', 'world'));
@@ -12982,14 +13004,8 @@ function runTest() {
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAbaRouting('123456789'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAfter('2025-08-19'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAfter('2025-08-17'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAlpha('abcdefg'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAlpha('abcdefg1'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAlpha('абвгдеёжзийклмнопрстуфхцчшщъыьэюя', 'ru-RU'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAlpha('абвгдеёжзийклмнопрстуфхцчшщъыьэюя1', 'ru-RU'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAlphanumeric('abcdefg123'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAlphanumeric('abcdefg123!'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAlphanumeric('абвгдеёжзийклмнопрстуфхцчшщъыьэюя123', 'ru-RU'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAlphanumeric('абвгдеёжзийклмнопрстуфхцчшщъыьэюя123!', 'ru-RU'));
+  testIsAlpha();
+  testIsAlphanumeric();
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isAscii('hello'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isAscii('你好'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isBase32('GEZDGNBVGY3TQOJQGEZDGNBVGY3TQOJQ'));
@@ -13005,7 +13021,7 @@ function runTest() {
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isBoolean('true'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isBoolean('not a boolean'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isBtcAddress('1BoatSLRHtKNngkdXEeobR76b53LETtpyT'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isBtcAddress('1BoatSLRHtKNngkdXEeobR76b53LETtpy'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isBtcAddress('not a btc address'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isByteLength('hello', { min: 1, max: 10 }));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isByteLength('hello world', { min: 1, max: 10 }));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isCreditCard('4242 4242 4242 4242'));
@@ -13022,8 +13038,7 @@ function runTest() {
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isDivisibleBy('10', '3'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isEAN('9783161484100'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isEAN('123456789012'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isEmail('foo@bar.com'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isEmail('foo@bar'));
+  testIsEmail();
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isEmpty(''));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isEmpty('not empty'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isEthereumAddress('0x71c7656ec7ab88b098defb751b7401b5f6d8976f'));
@@ -13073,7 +13088,7 @@ function runTest() {
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isISO6391('en'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isISO6391('eng'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isISO8601('2025-08-18T12:00:00.000Z'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isISO8601('2025-08-18T12:00:00'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isISO8601('not a date'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isISO15924('Latn'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isISO15924('Latin'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isISO31661Alpha2('US'));
@@ -13091,17 +13106,17 @@ function runTest() {
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isJSON('{"foo": "bar"}'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isJSON('{"foo": "bar"'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isJWT('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isJWT('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isJWT('not a jwt'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isLatLong('23.23,23.23'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isLatLong('23.23'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isLength('hello', { min: 1, max: 10 }));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isLength('hello world', { min: 1, max: 10 }));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isLicensePlate('B-AB 123', 'de-DE'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isLicensePlate('B-AB 1234', 'de-DE'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isLicensePlate('not a license plate', 'de-DE'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isLicensePlate('ABC-123', 'hu-HU'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isLicensePlate('ABC-1234', 'hu-HU'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isLocale('en-US'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isLocale('en_US'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isLocale('not a locale'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isLowercase('hello'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isLowercase('Hello'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isLuhnNumber('79927398713'));
@@ -13121,13 +13136,13 @@ function runTest() {
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isMobilePhone('+919876543210', 'en-IN'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isMobilePhone('+91987654321', 'en-IN'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isMobilePhone('+5511987654321', 'pt-BR'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isMobilePhone('+551198765432', 'pt-BR'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isMobilePhone('not a mobile phone number', 'pt-BR'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isMongoId('507f191e810c19729de860ea'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isMongoId('507f191e810c19729de860e'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isMultibyte('你好'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isMultibyte('hello'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isNumeric('123'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isNumeric('1.23'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isNumeric('not a numeric value'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isOctal('123'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isOctal('128'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isPassportNumber('123456789', 'US'));
@@ -13159,7 +13174,18 @@ function runTest() {
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isTaxID('123456789', 'en-US'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isTaxID('12345678', 'en-US'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com'));
-  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isURL('example.com'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com/path'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com/path/'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com?foo=bar'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com?foo=bar&baz=qux'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com#fragment'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com/path#fragment'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com/path?foo=bar'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com/path?foo=bar#fragment'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('https://example.com'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://example.com:8080'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isURL('http://user:pass@example.com'));
+  assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isURL('not a url'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isULID('01F8X3Z2Y6W8T4J0E1N9C2R5A7'));
   assert__WEBPACK_IMPORTED_MODULE_1__(!validator__WEBPACK_IMPORTED_MODULE_0__.isULID('01F8X3Z2Y6W8T4J0E1N9C2R5A'));
   assert__WEBPACK_IMPORTED_MODULE_1__(validator__WEBPACK_IMPORTED_MODULE_0__.isUUID('a6a1e7e2-3e4b-4b6e-8b0a-9b0c0d0e0f0a'));
