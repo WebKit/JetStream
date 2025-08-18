@@ -17,20 +17,9 @@ function config({ filename, minify }) {
       libraryTarget: "assign",
       chunkFormat: "commonjs",
     },
-    resolve: {
-      fallback: {
-        assert: require.resolve("assert/"),
-        process: require.resolve("process/browser"),
-      },
-    },
     optimization: {
       minimize: minify,
     },
-    plugins: [
-      new webpack.ProvidePlugin({
-        process: "process/browser",
-      }),
-    ],
   };
 }
 
