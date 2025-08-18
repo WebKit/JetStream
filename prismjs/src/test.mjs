@@ -1,8 +1,8 @@
-import Prism from 'prismjs';
-import loadLanguages from 'prismjs/components/index.js';
+import Prism from "prismjs";
+import loadLanguages from "prismjs/components/index.js";
 
 // Load Languages
-loadLanguages(['markup', 'css', 'javascript', 'clike', 'cpp']);
+loadLanguages(["markup", "css", "javascript", "clike", "cpp"]);
 
 export function runTest(samples) {
   const results = [];
