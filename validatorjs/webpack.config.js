@@ -17,6 +17,16 @@ function config({ filename, minify }) {
       libraryTarget: "assign",
       chunkFormat: "commonjs",
     },
+    plugins: [
+      new webpack.ProvidePlugin({
+        Buffer: ["buffer", "Buffer"],
+      }),
+    ],
+    resolve: {
+      fallback: {
+        buffer: require.resolve("buffer/"),
+      },
+    },
     optimization: {
       minimize: minify,
     },

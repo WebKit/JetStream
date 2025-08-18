@@ -8,6 +8,7 @@
     "build": "webpack"
   },
   "dependencies": {
+    "buffer": "^6.0.3",
     "process": "^0.11.10",
     "validator": "^13.15.15",
     "webpack": "^5.101.2",

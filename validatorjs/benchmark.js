@@ -1,5 +1,6 @@
 
-const EXPECTED_ASSERTION_COUNT = 1156560;
+const EXPECTED_ASSERTION_COUNT = 1213680;
+
 class Benchmark {
   assertionCount = 0;
   runIteration() {
