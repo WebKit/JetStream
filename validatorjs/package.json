@@ -1,0 +1,21 @@
+{
+  "name": "validatorjs",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node benchmark-node.mjs",
+    "build": "webpack"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "validator": "^13.15.15"
+  },
+  "devDependencies": {
+    "assert": "^2.1.0",
+    "process": "^0.11.10",
+    "webpack": "^5.101.2",
+    "webpack-cli": "^6.0.1"
+  }
+}

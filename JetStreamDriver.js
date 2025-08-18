@@ -1866,6 +1866,14 @@ let BENCHMARKS = [
         exposeBrowserTest: true,
         tags: ["Default", "RexBench"],
     }),
+    new DefaultBenchmark({
+        name: "validatorjs",
+        files: [
+            "./validatorjs/dist/bundle.es6.js",
+            "./validatorjs/benchmark.js",
+        ],
+        tags: ["Default", "regexp"],
+    }),
     // Simple
     new DefaultBenchmark({
         name: "hash-map",
