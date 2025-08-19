@@ -1,0 +1,81 @@
+{
+  "name": "web-tooling-benchmark",
+  "description": "JavaScript benchmark for common web developer workloads",
+  "version": "0.5.3",
+  "repository": "https://github.com/v8/web-tooling-benchmark",
+  "main": "src/cli.js",
+  "scripts": {
+    "benchmark": "node dist/cli.js",
+    "build:terser-bundled": "node node_modules/terser/bin/uglifyjs -b preamble=\"'const Terser = module.exports = {};'\" --self > build/terser-bundled.js",
+    "build:uglify-js-bundled": "node node_modules/uglify-js/bin/uglifyjs -b preamble=\"'const UglifyJS = module.exports = {};'\" --self > build/uglify-js-bundled.js",
+    "build": "webpack",
+    "postinstall": "npm run build:terser-bundled && npm run build:uglify-js-bundled && npm run build",
+    "precommit": "node tools/hooks/pre-commit.js && lint-staged",
+    "test": "jest",
+    "update-lock": "npm install --package-lock",
+    "new-benchmark": "wtb-generate"
+  },
+  "lint-staged": {
+    "src/**/*.css": [
+      "prettier --write",
+      "git add"
+    ],
+    "src/**/*.js": [
+      "prettier --write",
+      "git add"
+    ],
+    "webpack.config.js": [
+      "prettier --write",
+      "git add"
+    ]
+  },
+  "browserslist": [
+    "Chrome 50",
+    "Firefox 50"
+  ],
+  "author": {
+    "name": "Benedikt Meurer",
+    "email": "bmeurer@chromium.org",
+    "url": "http://benediktmeurer.de"
+  },
+  "license": "BSD-3-Clause",
+  "dependencies": {
+    "@babel/standalone": "7.0.0-beta.32",
+    "acorn": "5.5.3",
+    "autoprefixer": "8.2.0",
+    "babel-minify": "0.4.3",
+    "babylon": "7.0.0-beta.32",
+    "benchmark": "^2.1.4",
+    "buble": "0.19.3",
+    "chai": "4.1.2",
+    "coffeescript": "2.2.3",
+    "compute-gmean": "^1.1.0",
+    "espree": "3.5.4",
+    "esprima": "4.0.0",
+    "jshint": "2.9.7",
+    "lebab": "2.7.7",
+    "postcss": "6.0.21",
+    "postcss-nested": "3.0.0",
+    "prepack": "0.2.25",
+    "prettier": "1.9.2",
+    "source-map": "0.6.1",
+    "string-align": "^0.2.0",
+    "terser": "3.8.2",
+    "typescript": "3.3.1",
+    "uglify-js": "3.3.16",
+    "virtualfs": "^2.1.0"
+  },
+  "devDependencies": {
+    "copy-webpack-plugin": "^4.2.0",
+    "html-webpack-plugin": "^2.30.1",
+    "husky": "^0.14.3",
+    "jest": "^21.2.1",
+    "lint-staged": "^4.3.0",
+    "node-libs-browser": "^2.1.0",
+    "os-browserify": "^0.3.0",
+    "raw-loader": "github:bmeurer/raw-loader#escape",
+    "semver": "^5.5.0",
+    "web-tooling-benchmark-generator": "^1.0.2",
+    "webpack": "^3.8.1"
+  }
+}
