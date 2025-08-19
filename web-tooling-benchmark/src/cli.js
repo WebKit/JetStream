@@ -2,8 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-const align = require("string-align");
-const gmean = require("compute-gmean");
 const packageJson = require("../package.json");
 const suite = require("./suite");
 

@@ -8,9 +8,9 @@ const path = require("path");
 const webpack = require("webpack");
 const targetList = require("./src/cli-flags-helper").targetList;
 
-function getTarget(env) {
-  return env && targetList.has(env.only) && env.only;
-}
+// function getTarget(env) {
+//   return env && targetList.has(env.only) && env.only;
+// }
 
 module.exports = env => [
   {
@@ -37,9 +37,9 @@ module.exports = env => [
           "}",
         raw: true
       }),
-      new webpack.DefinePlugin({
-        ONLY: JSON.stringify(getTarget(env))
-      })
+      // new webpack.DefinePlugin({
+      //   ONLY: JSON.stringify(getTarget(env))
+      // })
     ]
   },
   {
@@ -58,18 +58,6 @@ module.exports = env => [
       }
     },
     plugins: [
-      new CopyWebpackPlugin([{ from: "style.css" }, { from: "Logo.png" }]),
-      new webpack.BannerPlugin({
-        banner:
-          "// Work-around for the weird JaegerMonkey\n" +
-          "// work-around inside benchmark.js.\n" +
-          "const define = { amd: {} };\n",
-        raw: true
-      }),
-      new HtmlWebpackPlugin({
-        template: "./index.html",
-        inject: "head"
-      }),
       new webpack.DefinePlugin({
         ONLY: JSON.stringify(getTarget(env))
       })
