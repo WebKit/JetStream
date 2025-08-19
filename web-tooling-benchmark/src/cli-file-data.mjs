@@ -24,7 +24,8 @@ const fileNames = [
   "preact-8.2.5.js.map",
   "source-map.min-0.5.7.js.map",
   "underscore.min-1.8.3.js.map",
-  "todomvc/typescript-angular.ts"
+  "todomvc/typescript-angular.ts",
+  "source-map/lib/mappings.wasm",
 ];
 
 const fileData = {};

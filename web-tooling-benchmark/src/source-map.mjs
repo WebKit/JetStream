@@ -14,6 +14,10 @@ const payloads = [
 export async function runTest(fileData) {
   const testData = payloads.map(name => fileData[name]);
 
+  sourceMap.SourceMapConsumer.initialize({
+    "lib/mappings.wasm": fileData["source-map/lib/mappings.wasm"],
+  });
+
   for (const payload of testData) {
     // Parse the source map first...
     const smc = await new sourceMap.SourceMapConsumer(payload);

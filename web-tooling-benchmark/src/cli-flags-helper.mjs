@@ -9,7 +9,7 @@ export const targetList = new Set([
   "lebab",
   "postcss",
   "prettier",
-  "rollup",
+  // "rollup",
   "source-map",
   "terser",
   "typescript",
