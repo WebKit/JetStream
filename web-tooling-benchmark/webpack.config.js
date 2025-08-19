@@ -39,6 +39,7 @@ module.exports = async env => {
         vm: require.resolve("vm-browserify"),
         buffer: require.resolve("buffer/"),
         fs: false,
+        "fs/promises": false,
         module: false,
         perf_hooks: false,
         process: false,
