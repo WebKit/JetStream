@@ -52097,6 +52097,7 @@ function addMappingInternal(skipable, map, mapping) {
 /***/ (function(module, __unused_webpack_exports, __webpack_require__) {
 
 /* module decorator */ module = __webpack_require__.nmd(module);
+/* provided dependency */ var TextDecoder = __webpack_require__(/*! ./src/mocks/textdecoder.mjs */ "./src/mocks/textdecoder.mjs")["TextDecoder"];
 (function (global, factory) {
   if (true) {
     factory(module);
@@ -78814,6 +78815,58 @@ try {
   // add if support for Symbol.iterator is present
   __webpack_require__(/*! ./iterator.js */ "./node_modules/yallist/iterator.js")(Yallist)
 } catch (er) {}
+
+
+/***/ }),
+
+/***/ "./src/mocks/textdecoder.mjs":
+/*!***********************************!*\
+  !*** ./src/mocks/textdecoder.mjs ***!
+  \***********************************/
+/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   TextDecoder: () => (/* binding */ TextDecoder)
+/* harmony export */ });
+// Basic TextDecoder mock implementation
+class TextDecoder {
+  constructor(encoding = "utf-8") {
+    // For simplicity, this mock only supports utf-8
+    if (encoding.toLowerCase() !== "utf-8") {
+      throw new Error(`Encoding not supported: ${encoding}`);
+    }
+  }
+
+  decode(buffer) {
+    let string = "";
+    let i = 0;
+    while (i < buffer.length) {
+      let byte = buffer[i];
+      if (byte < 0x80) {
+        string += String.fromCharCode(byte);
+        i++;
+      } else if (byte >= 0xc2 && byte < 0xe0) {
+        string += String.fromCharCode(
+          ((byte & 0x1f) << 6) | (buffer[i + 1] & 0x3f)
+        );
+        i += 2;
+      } else if (byte >= 0xe0 && byte < 0xf0) {
+        string += String.fromCharCode(
+          ((byte & 0x0f) << 12) |
+            ((buffer[i + 1] & 0x3f) << 6) |
+            (buffer[i + 2] & 0x3f)
+        );
+        i += 3;
+      } else {
+        // For simplicity, handling of 4-byte characters and surrogates is omitted
+        i++;
+      }
+    }
+    return string;
+  }
+}
 
 
 /***/ }),

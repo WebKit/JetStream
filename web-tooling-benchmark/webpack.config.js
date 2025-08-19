@@ -28,6 +28,9 @@ module.exports = async (env) => {
     entry: entries,
     target: ["web", "es6"],
     resolve: {
+      alias: {
+        url: require.resolve("whatwg-url"),
+      },
       fallback: {
         path: require.resolve("path-browserify"),
         assert: require.resolve("assert/"),
@@ -51,6 +54,8 @@ module.exports = async (env) => {
     plugins: [
       new webpack.ProvidePlugin({
         process: "process/browser.js",
+        TextEncoder: [path.resolve(__dirname, "src/mocks/textencoder.mjs"), "TextEncoder"],
+        TextDecoder: [path.resolve(__dirname, "src/mocks/textdecoder.mjs"), "TextDecoder"],
       }),
     ],
   };
