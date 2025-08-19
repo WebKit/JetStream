@@ -5,7 +5,24 @@
 import postcss from "postcss";
 import nested from "postcss-nested";
 import autoprefixer from "autoprefixer";
-import nestedRules from "./mocks/nested-rules.js";
+
+
+const nestedRules = `
+.phone {
+  &_title {
+      width: 500px;
+      @media (max-width: 500px) {
+          width: auto;
+      }
+      body.is_dark & {
+          color: white;
+      }
+  }
+  img {
+      display: block;
+  }
+}`;
+
 
 const payloads = [
   {
