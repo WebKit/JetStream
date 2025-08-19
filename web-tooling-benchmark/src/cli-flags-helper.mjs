@@ -1,4 +1,4 @@
-const targetList = new Set([
+export const targetList = new Set([
   "acorn",
   "babel",
   "babel-minify",
@@ -23,16 +23,13 @@ function getOnlyFlag() {
   }
 }
 
-export default {
-  getTarget: () => {
-    const onlyArg = getOnlyFlag();
-    if (targetList.has(onlyArg)) {
-      return [onlyArg];
-    } else if (typeof ONLY != "undefined" && targetList.has(ONLY)) {
-      return [ONLY];
-    } else {
-      return [...targetList];
-    }
-  },
-  targetList: targetList
-};
+export function getTarget() {
+  const onlyArg = getOnlyFlag();
+  if (targetList.has(onlyArg)) {
+    return [onlyArg];
+  } else if (typeof ONLY != "undefined" && targetList.has(ONLY)) {
+    return [ONLY];
+  } else {
+    return [...targetList];
+  }
+}

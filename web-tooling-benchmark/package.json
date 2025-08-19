@@ -49,6 +49,7 @@
     "jest": "^30.0.5",
     "lint-staged": "^16.1.5",
     "os-browserify": "^0.3.0",
-    "webpack": "^5.101.3"
+    "webpack": "^5.101.3",
+    "webpack-cli": "^6.0.1"
   }
 }
