@@ -4,7 +4,6 @@
   "main": "src/cli.js",
   "scripts": {
     "benchmark": "node dist/cli.js",
-    "build:terser-bundled": "node node_modules/terser/bin/uglifyjs -b preamble=\"'const Terser = module.exports = {};'\" --self > build/terser-bundled.js",
     "build": "webpack",
     "test": "jest",
     "update-lock": "npm install --package-lock"
