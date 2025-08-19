@@ -6,7 +6,7 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
 const webpack = require("webpack");
-const targetList = require("./src/cli-flags-helper").targetList;
+const targetList = require("./src/cli-flags-helper.mjs").targetList;
 
 // function getTarget(env) {
 //   return env && targetList.has(env.only) && env.only;
@@ -15,7 +15,7 @@ const targetList = require("./src/cli-flags-helper").targetList;
 module.exports = env => [
   {
     context: path.resolve("src"),
-    entry: "./cli.js",
+    entry: "./cli.mjs",
     output: {
       filename: "cli.js",
       path: path.resolve("dist")
@@ -23,7 +23,7 @@ module.exports = env => [
     bail: true,
     resolve: {
       alias: {
-        fs: require.resolve("./src/vfs"),
+        fs: require.resolve("./src/vfs.mjs"),
         module: require.resolve("./src/mocks/dummy")
       }
     },
@@ -44,7 +44,7 @@ module.exports = env => [
   },
   {
     context: path.resolve("src"),
-    entry: "./bootstrap.js",
+    entry: "./bootstrap.mjs",
     output: {
       filename: "browser.js",
       path: path.resolve("dist")
@@ -53,7 +53,7 @@ module.exports = env => [
     resolve: {
       alias: {
         define: require.resolve("./src/mocks/dummy"),
-        fs: require.resolve("./src/vfs"),
+        fs: require.resolve("./src/vfs.mjs"),
         module: require.resolve("./src/mocks/dummy")
       }
     },
