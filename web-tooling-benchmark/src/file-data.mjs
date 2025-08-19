@@ -16,7 +16,6 @@ const fileNames = [
   "todomvc/react/app.jsx",
   "todomvc/react/footer.jsx",
   "todomvc/react/todoItem.jsx",
-  "coffeescript-lexer-2.0.1.coffee",
   "mootools-core-1.6.0.js",
   "bootstrap-4.0.0.css",
   "foundation-6.4.2.css",

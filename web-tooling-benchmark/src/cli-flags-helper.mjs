@@ -5,7 +5,6 @@ const targetList = new Set([
   "babylon",
   "buble",
   "chai",
-  "coffeescript",
   "espree",
   "esprima",
   "jshint",
