@@ -2602,6 +2602,7 @@ for (const name of WTB_TESTS) {
     BENCHMARKS.push(new AsyncBenchmark({
         name: `${name}-wtb`,
         files: [
+            `./web-tooling-benchmark/dist/${name}.bundle.js`,
             "./web-tooling-benchmark/benchmark.js",
         ],
         preload: {

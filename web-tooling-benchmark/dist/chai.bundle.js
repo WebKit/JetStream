@@ -1,5 +1,5 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	// runtime can't be in strict mode because a global variable is assign and maybe created.
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./node_modules/assertion-error/index.js":
@@ -8,7 +8,6 @@
   \***********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   AssertionError: () => (/* binding */ AssertionError),
@@ -84,7 +83,6 @@ class AssertionResult {
   \************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Assertion: () => (/* reexport safe */ _lib_chai_js__WEBPACK_IMPORTED_MODULE_0__.Assertion),
@@ -109,7 +107,6 @@ __webpack_require__.r(__webpack_exports__);
   \***************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Assertion: () => (/* reexport safe */ _chai_assertion_js__WEBPACK_IMPORTED_MODULE_5__.Assertion),
@@ -206,7 +203,6 @@ function use(fn) {
   \*************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Assertion: () => (/* binding */ Assertion)
@@ -428,7 +424,6 @@ class Assertion {
   \**********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   config: () => (/* binding */ config)
@@ -555,7 +550,6 @@ const config = {
   \*******************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _assertion_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../assertion.js */ "./node_modules/chai/lib/chai/assertion.js");
 /* harmony import */ var assertion_error__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! assertion-error */ "./node_modules/assertion-error/index.js");
@@ -4727,7 +4721,6 @@ _assertion_js__WEBPACK_IMPORTED_MODULE_0__.Assertion.addMethod('containSubset', 
   \********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   assert: () => (/* binding */ assert)
@@ -7974,7 +7967,6 @@ for (const [name, as] of aliases) {
   \********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   expect: () => (/* binding */ expect)
@@ -8051,7 +8043,6 @@ expect.fail = function (actual, expected, message, operator) {
   \********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Should: () => (/* binding */ Should),
@@ -8296,7 +8287,6 @@ const Should = loadShould;
   \****************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   addChainableMethod: () => (/* binding */ addChainableMethod)
@@ -8462,7 +8452,6 @@ function addChainableMethod(ctx, name, method, chainingBehavior) {
   \************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   addLengthGuard: () => (/* binding */ addLengthGuard)
@@ -8550,7 +8539,6 @@ function addLengthGuard(fn, assertionName, isChainable) {
   \*******************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   addMethod: () => (/* binding */ addMethod)
@@ -8636,7 +8624,6 @@ function addMethod(ctx, name, method) {
   \*********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   addProperty: () => (/* binding */ addProperty)
@@ -8725,7 +8712,6 @@ function addProperty(ctx, name, getter) {
   \**************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   compareByInspect: () => (/* binding */ compareByInspect)
@@ -8767,7 +8753,6 @@ function compareByInspect(a, b) {
   \*********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   expectTypes: () => (/* binding */ expectTypes)
@@ -8843,7 +8828,6 @@ function expectTypes(obj, types) {
   \**************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   flag: () => (/* binding */ flag)
@@ -8892,7 +8876,6 @@ function flag(obj, key, value) {
   \*******************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getActual: () => (/* binding */ getActual)
@@ -8927,7 +8910,6 @@ function getActual(obj, args) {
   \********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getMessage: () => (/* binding */ getMessage)
@@ -8997,7 +8979,6 @@ function getMessage(obj, args) {
   \*********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getOperator: () => (/* binding */ getOperator)
@@ -9072,7 +9053,6 @@ function getOperator(obj, args) {
   \************************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getOwnEnumerableProperties: () => (/* binding */ getOwnEnumerableProperties)
@@ -9112,7 +9092,6 @@ function getOwnEnumerableProperties(obj) {
   \*****************************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getOwnEnumerablePropertySymbols: () => (/* binding */ getOwnEnumerablePropertySymbols)
@@ -9153,7 +9132,6 @@ function getOwnEnumerablePropertySymbols(obj) {
   \***********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getProperties: () => (/* binding */ getProperties)
@@ -9206,7 +9184,6 @@ function getProperties(object) {
   \***************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   addChainableMethod: () => (/* reexport safe */ _addChainableMethod_js__WEBPACK_IMPORTED_MODULE_16__.addChainableMethod),
@@ -9394,7 +9371,6 @@ function isNumeric(obj) {
   \*****************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   inspect: () => (/* binding */ inspect)
@@ -9442,7 +9418,6 @@ function inspect(obj, showHidden, depth, colors) {
   \***************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   isNaN: () => (/* binding */ isNaN)
@@ -9464,7 +9439,6 @@ const isNaN = Number.isNaN;
   \************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   isProxyEnabled: () => (/* binding */ isProxyEnabled)
@@ -9506,7 +9480,6 @@ function isProxyEnabled() {
   \********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   objDisplay: () => (/* binding */ objDisplay)
@@ -9570,7 +9543,6 @@ function objDisplay(obj) {
   \**********************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   overwriteChainableMethod: () => (/* binding */ overwriteChainableMethod)
@@ -9656,7 +9628,6 @@ function overwriteChainableMethod(ctx, name, method, chainingBehavior) {
   \*************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   overwriteMethod: () => (/* binding */ overwriteMethod)
@@ -9766,7 +9737,6 @@ function overwriteMethod(ctx, name, method) {
   \***************************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   overwriteProperty: () => (/* binding */ overwriteProperty)
@@ -9874,7 +9844,6 @@ function overwriteProperty(ctx, name, getter) {
   \*****************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   proxify: () => (/* binding */ proxify)
@@ -10051,7 +10020,6 @@ function stringDistanceCapped(strA, strB, cap) {
   \**************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   test: () => (/* binding */ test)
@@ -10091,7 +10059,6 @@ function test(obj, args) {
   \***********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   transferFlags: () => (/* binding */ transferFlags)
@@ -10154,7 +10121,6 @@ function transferFlags(assertion, object, includeAll) {
   \*********************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   type: () => (/* binding */ type)
@@ -10189,7 +10155,6 @@ function type(obj) {
   \*******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   compatibleConstructor: () => (/* binding */ compatibleConstructor),
@@ -10343,7 +10308,6 @@ function getMessage(errorLike) {
   \****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   MemoizeMap: () => (/* binding */ MemoizeMap),
@@ -10872,7 +10836,6 @@ function mapSymbols(arr) {
   \*********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectArguments)
@@ -10895,7 +10858,6 @@ function inspectArguments(args, options) {
   \*****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectArray)
@@ -10927,7 +10889,6 @@ function inspectArray(array, options) {
   \******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectBigInt)
@@ -10950,7 +10911,6 @@ function inspectBigInt(number, options) {
   \*****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectClass)
@@ -10981,7 +10941,6 @@ function inspectClass(value, options) {
   \****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectDate)
@@ -11008,7 +10967,6 @@ function inspectDate(dateObject, options) {
   \*****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectObject)
@@ -11059,7 +11017,6 @@ function inspectObject(error, options) {
   \********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectFunction)
@@ -11084,7 +11041,6 @@ function inspectFunction(func, options) {
   \*******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   inspectList: () => (/* binding */ inspectList),
@@ -11262,7 +11218,6 @@ function inspectProperty([key, value], options) {
   \****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectHTML),
@@ -11323,7 +11278,6 @@ function inspectHTML(element, options) {
   \*****************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   custom: () => (/* binding */ custom),
@@ -11512,7 +11466,6 @@ const custom = chaiInspect;
   \***************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectMap)
@@ -11550,7 +11503,6 @@ function inspectMap(map, options) {
   \******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectNumber)
@@ -11583,7 +11535,6 @@ function inspectNumber(number, options) {
   \******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectObject)
@@ -11621,7 +11572,6 @@ function inspectObject(object, options) {
   \*******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
@@ -11638,7 +11588,6 @@ const getPromiseValue = () => 'Promise{…}';
   \******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectRegExp)
@@ -11661,7 +11610,6 @@ function inspectRegExp(value, options) {
   \***************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectSet)
@@ -11692,7 +11640,6 @@ function inspectSet(set, options) {
   \******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectString)
@@ -11732,7 +11679,6 @@ function inspectString(string, options) {
   \******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectSymbol)
@@ -11753,7 +11699,6 @@ function inspectSymbol(value) {
   \**********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ inspectTypedArray)
@@ -11807,7 +11752,6 @@ function inspectTypedArray(array, options) {
   \***************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   getPathInfo: () => (/* binding */ getPathInfo),
@@ -12168,9 +12112,8 @@ function setPathValue(obj, path, val) {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
-"use strict";
 /*!**********************!*\
   !*** ./src/chai.mjs ***!
   \**********************/
@@ -16003,6 +15946,6 @@ function runTest(fileData) {
 
 })();
 
-WTBenchmark = __webpack_exports__;
+self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;

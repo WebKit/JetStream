@@ -1,5 +1,5 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	// runtime can't be in strict mode because a global variable is assign and maybe created.
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./node_modules/babylon/lib/index.js":
@@ -8,7 +8,6 @@
   \*******************************************/
 /***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
@@ -10654,9 +10653,8 @@ exports.tokTypes = types;
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
-"use strict";
 /*!*************************!*\
   !*** ./src/babylon.mjs ***!
   \*************************/
@@ -10726,6 +10724,6 @@ function runTest(fileData) {
 }
 })();
 
-WTBenchmark = __webpack_exports__;
+self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;

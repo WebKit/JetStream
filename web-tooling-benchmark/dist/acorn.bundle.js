@@ -1,5 +1,5 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	// runtime can't be in strict mode because a global variable is assign and maybe created.
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./node_modules/acorn-walk/dist/walk.mjs":
@@ -8,7 +8,6 @@
   \***********************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ancestor: () => (/* binding */ ancestor),
@@ -470,7 +469,6 @@ base.MethodDefinition = base.PropertyDefinition = base.Property = function (node
   \*******************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   Node: () => (/* binding */ Node),
@@ -6790,9 +6788,8 @@ function tokenizer(input, options) {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
-"use strict";
 /*!***********************!*\
   !*** ./src/acorn.mjs ***!
   \***********************/
@@ -6868,6 +6865,6 @@ function runTest(fileData) {
 }
 })();
 
-WTBenchmark = __webpack_exports__;
+self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;

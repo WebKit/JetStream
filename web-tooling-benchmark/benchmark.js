@@ -13,14 +13,17 @@ class Benchmark {
     let WTBenchmark;
     await this.loadAllFiles(JetStream.preload);
     this.sourceCode = this.files.SCRIPT_BUNDLE;
-    eval(this.sourceCode);
-    this.WTBenchmark = WTBenchmark;
+    this.WTBenchmark = self.WTBenchmark;
   }
 
   async loadAllFiles(preload) {
     const loadPromises = Object.entries(preload).map(
       async ([name, url]) => {
-        this.files[name] = await JetStream.getString(url);
+        if (name.endsWith(".wasm")) {
+          this.files[name] = (await JetStream.getBinary(url)).buffer;
+        } else {
+          this.files[name] = await JetStream.getString(url);
+        }
       })
     await Promise.all(loadPromises);
   }

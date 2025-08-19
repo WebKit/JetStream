@@ -7670,6 +7670,6 @@ async function runTest(fileData) {
 }
 })();
 
-WTBenchmark = __webpack_exports__;
+self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;

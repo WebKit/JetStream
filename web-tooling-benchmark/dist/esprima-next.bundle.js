@@ -1,5 +1,5 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	// runtime can't be in strict mode because a global variable is assign and maybe created.
+/******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
 /***/ "./node_modules/esprima-next/dist/esprima.js":
@@ -8,7 +8,6 @@
   \***************************************************/
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
-"use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   ArrayExpression: () => (/* binding */ ArrayExpression),
@@ -7868,9 +7867,8 @@ var esprima_default = {
 /******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
-// This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
-"use strict";
 /*!******************************!*\
   !*** ./src/esprima-next.mjs ***!
   \******************************/
@@ -7904,6 +7902,6 @@ function runTest(fileData) {
 }
 })();
 
-WTBenchmark = __webpack_exports__;
+self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;

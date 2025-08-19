@@ -63,9 +63,9 @@ module.exports = async (env) => {
         filename: "[name].bundle.js",
         library: {
           name: "WTBenchmark",
-          type: "globalThis",
+          type: "global",
         },
-        libraryTarget: "assign",
+        //libraryTarget: "assign",
         chunkFormat: "commonjs",
       },
       mode: "development",
