@@ -3,7 +3,7 @@
 // found in the LICENSE file.
 
 import * as acorn from "acorn";
-import * as walk from "acorn/dist/walk";
+import * as walk from "acorn-walk";
 
 const payloads = [
   {

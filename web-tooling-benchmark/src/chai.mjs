@@ -70,7 +70,7 @@ describe("assert", () => {
 
       expect(() => {
         assert[isOk](0);
-      }).to.throw(AssertionError, "expected 0 to be truthy");
+      }).to.throw(AssertionError, "expected +0 to be truthy");
 
       expect(() => {
         assert[isOk]("");
@@ -107,7 +107,7 @@ describe("assert", () => {
 
     expect(() => {
       assert.isFalse(0);
-    }).to.throw(AssertionError, "expected 0 to be false");
+    }).to.throw(AssertionError, "expected +0 to be false");
   });
 
   it("isNotFalse", () => {
@@ -274,11 +274,11 @@ describe("assert", () => {
 
     expect(() => {
       assert.instanceOf(new Foo(), 1);
-    }).to.throw("assertion needs a constructor but number was given");
+    }).to.throw("The instanceof assertion needs a constructor but Number was given.");
 
     expect(() => {
       assert.instanceOf(new Foo(), "Foo");
-    }).to.throw("assertion needs a constructor but string was given");
+    }).to.throw("The instanceof assertion needs a constructor but String was given.");
 
     expect(() => {
       assert.instanceOf(4, FakeConstructor);
@@ -292,7 +292,7 @@ describe("assert", () => {
 
     expect(() => {
       assert.notInstanceOf(new Foo(), Foo);
-    }).to.throw("expected {} to not be an instance of Foo");
+    }).to.throw("expected Foo{} to not be an instance of Foo");
 
     expect(() => {
       assert.notInstanceOf(3, FakeConstructor);
@@ -309,7 +309,7 @@ describe("assert", () => {
 
     expect(() => {
       assert.isObject(Foo);
-    }).to.throw(AssertionError, "expected [Function: Foo] to be an object");
+    }).to.throw(AssertionError, "expected [Function Foo] to be an object");
 
     expect(() => {
       assert.isObject("foo");
@@ -403,28 +403,28 @@ describe("assert", () => {
       assert.include(true, true, "blah");
     }).to.throw(
       AssertionError,
-      "blah: object tested must be an array, a map, an object, a set, a string, or a weakset, but boolean given"
+      "blah: the given combination of arguments (boolean and boolean) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a boolean"
     );
 
     expect(() => {
       assert.include(42, "bar");
     }).to.throw(
       AssertionError,
-      "object tested must be an array, a map, an object, a set, a string, or a weakset, but number given"
+      'the given combination of arguments (number and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string',
     );
 
     expect(() => {
       assert.include(null, 42);
     }).to.throw(
       AssertionError,
-      "object tested must be an array, a map, an object, a set, a string, or a weakset, but null given"
+      'the given combination of arguments (null and number) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a number'
     );
 
     expect(() => {
       assert.include(undefined, "bar");
     }).to.throw(
       AssertionError,
-      "object tested must be an array, a map, an object, a set, a string, or a weakset, but undefined given"
+      'the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string'
     );
   });
 
@@ -495,28 +495,28 @@ describe("assert", () => {
       assert.notInclude(true, true, "blah");
     }).to.throw(
       AssertionError,
-      "blah: object tested must be an array, a map, an object, a set, a string, or a weakset, but boolean given"
+      "blah: the given combination of arguments (boolean and boolean) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a boolean"
     );
 
     expect(() => {
       assert.notInclude(42, "bar");
     }).to.throw(
       AssertionError,
-      "object tested must be an array, a map, an object, a set, a string, or a weakset, but number given"
+      'the given combination of arguments (number and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string',
     );
 
     expect(() => {
       assert.notInclude(null, 42);
     }).to.throw(
       AssertionError,
-      "object tested must be an array, a map, an object, a set, a string, or a weakset, but null given"
+      'the given combination of arguments (null and number) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a number'
     );
 
     expect(() => {
       assert.notInclude(undefined, "bar");
     }).to.throw(
       AssertionError,
-      "object tested must be an array, a map, an object, a set, a string, or a weakset, but undefined given"
+      'the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string'
     );
 
     expect(() => {
@@ -665,7 +665,7 @@ describe("assert", () => {
       );
     }).to.throw(
       AssertionError,
-      "blah: expected { a: { b: [ [Object] ] } } to have deep nested property 'a.b[0]' of { y: 2 }, but got { x: 1 }"
+      "blah: expected { a: { b: [ { x: 1 } ] } } to have deep nested property 'a.b[0]' of { y: 2 }, but got { x: 1 }"
     );
 
     expect(() => {
@@ -676,14 +676,14 @@ describe("assert", () => {
       );
     }).to.throw(
       AssertionError,
-      "blah: expected { a: { b: [ [Object] ] } } to have deep nested property 'a.b[0]' of { y: 2 }, but got { x: 1 }"
+      "blah: expected { a: { b: [ { x: 1 } ] } } to have deep nested property 'a.b[0]' of { y: 2 }, but got { x: 1 }"
     );
 
     expect(() => {
       assert.deepNestedInclude({ a: { b: [{ x: 1 }] } }, { "a.c": { x: 1 } });
     }).to.throw(
       AssertionError,
-      "expected { a: { b: [ [Object] ] } } to have deep nested property 'a.c'"
+       "expected { a: { b: [ { x: 1 } ] } } to have deep nested property 'a.c'"
     );
 
     expect(() => {
@@ -694,7 +694,7 @@ describe("assert", () => {
       );
     }).to.throw(
       AssertionError,
-      "blah: expected { a: { b: [ [Object] ] } } to not have deep nested property 'a.b[0]' of { x: 1 }"
+      "blah: expected { a: { b: [ { x: 1 } ] } } to not have deep nested property 'a.b[0]' of { x: 1 }"
     );
   });
 
@@ -995,21 +995,21 @@ describe("expect", () => {
       expect(new Foo()).to.an.instanceof(1, "blah");
     }).to.throw(
       AssertionError,
-      "blah: The instanceof assertion needs a constructor but number was given."
+      'blah: The instanceof assertion needs a constructor but Number was given.',
     );
 
     expect(() => {
       expect(new Foo(), "blah").to.an.instanceof(1);
     }).to.throw(
       AssertionError,
-      "blah: The instanceof assertion needs a constructor but number was given."
+      "blah: The instanceof assertion needs a constructor but Number was given."
     );
 
     expect(() => {
       expect(new Foo()).to.an.instanceof("batman");
     }).to.throw(
       AssertionError,
-      "The instanceof assertion needs a constructor but string was given."
+      "The instanceof assertion needs a constructor but String was given."
     );
 
     expect(() => {
@@ -1023,7 +1023,7 @@ describe("expect", () => {
       expect(new Foo()).to.an.instanceof(true);
     }).to.throw(
       AssertionError,
-      "The instanceof assertion needs a constructor but boolean was given."
+      "The instanceof assertion needs a constructor but Boolean was given."
     );
 
     expect(() => {
@@ -1047,14 +1047,14 @@ describe("expect", () => {
       expect(t).to.an.instanceof(Thing);
     }).to.throw(
       AssertionError,
-      "The instanceof assertion needs a constructor but function was given."
+      "The instanceof assertion needs a constructor but Function was given."
     );
 
     expect(() => {
       expect(new Foo()).to.an.instanceof(Symbol());
     }).to.throw(
       AssertionError,
-      "The instanceof assertion needs a constructor but symbol was given."
+      "The instanceof assertion needs a constructor but Symbol was given."
     );
 
     expect(() => {
@@ -3816,9 +3816,7 @@ describe("expect", () => {
   });
 });
 
-export default {
-  name: "chai",
-  fn() {
-    tests.forEach(test => test.func());
-  }
+
+export default function runTest(fileData) {
+  tests.forEach(test => test.func());
 };

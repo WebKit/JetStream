@@ -3,7 +3,6 @@ const targetList = new Set([
   "babel",
   "babel-minify",
   "babylon",
-  "buble",
   "chai",
   "espree",
   "esprima-next",

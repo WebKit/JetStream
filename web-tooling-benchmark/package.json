@@ -27,8 +27,10 @@
   "dependencies": {
     "@babel/standalone": "7.28.3",
     "acorn": "8.15.0",
+    "acorn-walk": "^8.3.4",
     "autoprefixer": "10.4.21",
     "babylon": "7.0.0-beta.32",
+    "babel-minify": "^0.5.2",
     "chai": "5.3.1",
     "eslint": "^9.33.0",
     "espree": "10.4.0",

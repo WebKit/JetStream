@@ -11,10 +11,12 @@ async function main() {
   const targets = cliFlags.getTarget();
   for (const target of targets) {
     console.log(`${target}:`)
+    const then = performance.now();
     const benchmark = await import(`./${target}.mjs`);
     benchmark.default(fileData)
+    const duration = performance.now() - then;
+    console.log(`   duration: ${duration.toFixed(2)}ms`)
   }
-
 }
 
 main();
