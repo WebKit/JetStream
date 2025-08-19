@@ -11,18 +11,21 @@ const payloads = [
   "underscore.min-1.8.3.js.map"
 ];
 
-export default function runTest(fileData) {
+export default async function runTest(fileData) {
   const testData = payloads.map(name => fileData[name]);
 
-  testData.forEach(payload => {
+  for (const payload of testData) {
     // Parse the source map first...
-    const smc = new sourceMap.SourceMapConsumer(payload);
+    const smc = await new sourceMap.SourceMapConsumer(payload);
     // ...then serialize the parsed source map to a String.
     const smg = sourceMap.SourceMapGenerator.fromSourceMap(smc);
 
     // Create a SourceNode from the generated code and a SourceMapConsumer.
-    const fswsm = sourceMap.SourceNode.fromStringWithSourceMap(payload, smc);
+    const fswsm = await sourceMap.SourceNode.fromStringWithSourceMap(
+      payload,
+      smc
+    );
 
     return [smg.toString(), fswsm.toString()];
-  });
+  }
 }

@@ -1218,9 +1218,9 @@ describe("expect", () => {
     const now = new Date();
     const oneSecondAgo = new Date(now.getTime() - 1000);
     const oneSecondAfter = new Date(now.getTime() + 1000);
-    const nowUTC = now.toUTCString();
-    const beforeUTC = oneSecondAgo.toUTCString();
-    const afterUTC = oneSecondAfter.toUTCString();
+    const nowISO = now.toISOString();
+    const beforeISO = oneSecondAgo.toISOString();
+    const afterISO = oneSecondAfter.toISOString();
 
     expect(now).to.be.within(oneSecondAgo, oneSecondAfter);
     expect(now).to.be.within(now, oneSecondAfter);
@@ -1232,11 +1232,11 @@ describe("expect", () => {
     }).to.throw(
       AssertionError,
       "blah: expected " +
-        nowUTC +
+        nowISO +
         " to not be within " +
-        nowUTC +
+        nowISO +
         ".." +
-        afterUTC
+        afterISO
     );
 
     expect(() => {
@@ -1244,18 +1244,18 @@ describe("expect", () => {
     }).to.throw(
       AssertionError,
       "blah: expected " +
-        nowUTC +
+        nowISO +
         " to not be within " +
-        beforeUTC +
+        beforeISO +
         ".." +
-        afterUTC
+        afterISO
     );
 
     expect(() => {
       expect(now).to.have.length.within(5, 7, "blah");
     }).to.throw(
       AssertionError,
-      "blah: expected " + nowUTC + " to have property 'length'"
+      "blah: expected " + nowISO + " to have property 'length'"
     );
 
     expect(() => {
@@ -1399,9 +1399,9 @@ describe("expect", () => {
     }).to.throw(
       AssertionError,
       "blah: expected " +
-        now.toUTCString() +
+        now.toISOString() +
         " to be above " +
-        oneSecondAfter.toUTCString()
+        oneSecondAfter.toISOString()
     );
 
     expect(() => {
@@ -1412,7 +1412,7 @@ describe("expect", () => {
       expect(now).to.have.length.above(4, "blah");
     }).to.throw(
       AssertionError,
-      "blah: expected " + now.toUTCString() + " to have property 'length'"
+      "blah: expected " + now.toISOString() + " to have property 'length'"
     );
 
     expect(() => {
@@ -1648,9 +1648,9 @@ describe("expect", () => {
     }).to.throw(
       AssertionError,
       "blah: expected " +
-        now.toUTCString() +
+        now.toISOString() +
         " to be below " +
-        oneSecondAgo.toUTCString()
+        oneSecondAgo.toISOString()
     );
 
     expect(() => {
@@ -1658,9 +1658,9 @@ describe("expect", () => {
     }).to.throw(
       AssertionError,
       "blah: expected " +
-        now.toUTCString() +
+        now.toISOString() +
         " to be at least " +
-        oneSecondAfter.toUTCString()
+        oneSecondAfter.toISOString()
     );
 
     expect(() => {
@@ -1686,7 +1686,7 @@ describe("expect", () => {
       expect(now).to.have.length.below(0, "blah");
     }).to.throw(
       AssertionError,
-      "blah: expected " + now.toUTCString() + " to have property 'length'"
+      "blah: expected " + now.toISOString() + " to have property 'length'"
     );
 
     expect(() => {
@@ -1805,9 +1805,8 @@ describe("expect", () => {
     const now = new Date();
     const oneSecondBefore = new Date(now.getTime() - 1000);
     const oneSecondAfter = new Date(now.getTime() + 1000);
-    const nowUTC = now.toUTCString();
-    const beforeUTC = oneSecondBefore.toUTCString();
-    const afterUTC = oneSecondAfter.toUTCString();
+    const nowISO = now.toISOString();
+    const beforeISO = oneSecondBefore.toISOString();
 
     expect(now).to.be.at.most(oneSecondAfter);
     expect(now).to.be.at.most(now);
@@ -1817,21 +1816,21 @@ describe("expect", () => {
       expect(now).to.be.at.most(oneSecondBefore, "blah");
     }).to.throw(
       AssertionError,
-      "blah: expected " + nowUTC + " to be at most " + beforeUTC
+      "blah: expected " + nowISO + " to be at most " + beforeISO
     );
 
     expect(() => {
       expect(now).to.not.be.at.most(now, "blah");
     }).to.throw(
       AssertionError,
-      "blah: expected " + nowUTC + " to be above " + nowUTC
+      "blah: expected " + nowISO + " to be above " + nowISO
     );
 
     expect(() => {
       expect(now).to.have.length.of.at.most(2, "blah");
     }).to.throw(
       AssertionError,
-      "blah: expected " + nowUTC + " to have property 'length'"
+      "blah: expected " + nowISO + " to have property 'length'"
     );
 
     expect(() => {
@@ -2004,7 +2003,7 @@ describe("expect", () => {
 
     expect(() => {
       expect(new Map()).not.to.be.empty;
-    }).to.throw(AssertionError, "expected {} not to be empty");
+    }).to.throw(AssertionError, "expected Map{} not to be empty");
 
     map = new Map();
     map.key = "val";
@@ -2012,7 +2011,7 @@ describe("expect", () => {
 
     expect(() => {
       expect(map).not.to.be.empty;
-    }).to.throw(AssertionError, "expected { key: 'val' } not to be empty");
+    }).to.throw(AssertionError, "expected Map{} not to be empty");
 
     expect(new Set()).to.be.empty;
 
@@ -2023,7 +2022,7 @@ describe("expect", () => {
 
     expect(() => {
       expect(new Set()).not.to.be.empty;
-    }).to.throw(AssertionError, "expected {} not to be empty");
+    }).to.throw(AssertionError, "expected Set{} not to be empty");
 
     set = new Set();
     set.key = "val";
@@ -2031,7 +2030,7 @@ describe("expect", () => {
 
     expect(() => {
       expect(set).not.to.be.empty;
-    }).to.throw(AssertionError, "expected { key: 'val' } not to be empty");
+    }).to.throw(AssertionError, "expected Set{} not to be empty");
 
     expect(() => {
       expect("", "blah").not.to.be.empty;
@@ -2051,11 +2050,11 @@ describe("expect", () => {
 
     expect(() => {
       expect(new FakeArgs()).not.to.be.empty;
-    }).to.throw(AssertionError, "expected { length: 0 } not to be empty");
+    }).to.throw(AssertionError, "expected FakeArgs{} not to be empty");
 
     expect(() => {
       expect({ arguments: 0 }).to.be.empty;
-    }).to.throw(AssertionError, "expected { arguments: 0 } to be empty");
+    }).to.throw(AssertionError, "expected { arguments: +0 } to be empty");
 
     expect(() => {
       expect({}).not.to.be.empty;
@@ -2106,7 +2105,7 @@ describe("expect", () => {
 
     expect(() => {
       expect(0).to.be.empty;
-    }).to.throw(AssertionError, ".empty was passed non-string primitive 0");
+    }).to.throw(AssertionError, ".empty was passed non-string primitive +0");
 
     expect(() => {
       expect(1).to.be.empty;
@@ -2869,175 +2868,175 @@ describe("expect", () => {
       expect(goodFn, "blah").to.throw();
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: goodFn)*\] to throw an error$/
+      /^blah: expected \[Function( goodFn)*\] to throw an error$/
     );
 
     expect(() => {
       expect(goodFn, "blah").to.throw(ReferenceError);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: goodFn)*\] to throw ReferenceError$/
+      /^blah: expected \[Function( goodFn)*\] to throw ReferenceError$/
     );
 
     expect(() => {
       expect(goodFn, "blah").to.throw(specificError);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: goodFn)*\] to throw 'RangeError: boo'$/
+      /^blah: expected \[Function( goodFn)*\] to throw 'RangeError: boo'$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.not.throw();
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to not throw an error but 'Error: testing' was thrown$/
+      /^blah: expected \[Function( badFn)*\] to not throw an error but 'Error: testing' was thrown$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.throw(ReferenceError);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to throw 'ReferenceError' but 'Error: testing' was thrown$/
+      /^blah: expected \[Function( badFn)*\] to throw 'ReferenceError' but 'Error: testing' was thrown$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.throw(specificError);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to throw 'RangeError: boo' but 'Error: testing' was thrown$/
+      /^blah: expected \[Function( badFn)*\] to throw 'RangeError: boo' but 'Error: testing' was thrown$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.not.throw(Error);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to not throw 'Error' but 'Error: testing' was thrown$/
+      /^blah: expected \[Function( badFn)*\] to not throw 'Error' but 'Error: testing' was thrown$/
     );
 
     expect(() => {
       expect(refErrFn, "blah").to.not.throw(ReferenceError);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: refErrFn)*\] to not throw 'ReferenceError' but 'ReferenceError: hello' was thrown$/
+      /^blah: expected \[Function( refErrFn)*\] to not throw 'ReferenceError' but 'ReferenceError: hello' was thrown$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.throw(PoorlyConstructedError);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to throw 'PoorlyConstructedError' but 'Error: testing' was thrown$/
+      /^blah: expected \[Function( badFn)*\] to throw 'PoorlyConstructedError' but 'Error: testing' was thrown$/
     );
 
     expect(() => {
       expect(ickyErrFn, "blah").to.not.throw(PoorlyConstructedError);
     }).to.throw(
       AssertionError,
-      /^blah: (expected \[Function(: ickyErrFn)*\] to not throw 'PoorlyConstructedError' but)(.*)(PoorlyConstructedError|\{ Object \()(.*)(was thrown)$/
+      /^blah: (expected \[Function( ickyErrFn)*\] to not throw 'PoorlyConstructedError' but)(.*)(PoorlyConstructedError|\{ Object \()(.*)(was thrown)$/
     );
 
     expect(() => {
       expect(ickyErrFn, "blah").to.throw(ReferenceError);
     }).to.throw(
       AssertionError,
-      /^blah: (expected \[Function(: ickyErrFn)*\] to throw 'ReferenceError' but)(.*)(PoorlyConstructedError|\{ Object \()(.*)(was thrown)$/
+      /^blah: (expected \[Function( ickyErrFn)*\] to throw 'ReferenceError' but)(.*)(PoorlyConstructedError|\{ Object \()(.*)(was thrown)$/
     );
 
     expect(() => {
       expect(specificErrFn, "blah").to.throw(new ReferenceError("eek"));
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: specificErrFn)*\] to throw 'ReferenceError: eek' but 'RangeError: boo' was thrown$/
+      /^blah: expected \[Function( specificErrFn)*\] to throw 'ReferenceError: eek' but 'RangeError: boo' was thrown$/
     );
 
     expect(() => {
       expect(specificErrFn, "blah").to.not.throw(specificError);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: specificErrFn)*\] to not throw 'RangeError: boo'$/
+      /^blah: expected \[Function( specificErrFn)*\] to not throw 'RangeError: boo'$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.not.throw(/testing/);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to throw error not matching \/testing\/$/
+      /^blah: expected \[Function( badFn)*\] to throw error not matching \/testing\/$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.throw(/hello/);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to throw error matching \/hello\/ but got 'testing'$/
+      /^blah: expected \[Function( badFn)*\] to throw error matching \/hello\/ but got 'testing'$/
     );
 
     expect(() => {
       expect(badFn).to.throw(Error, /hello/, "blah");
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to throw error matching \/hello\/ but got 'testing'$/
+      /^blah: expected \[Function( badFn)*\] to throw error matching \/hello\/ but got 'testing'$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.throw(Error, /hello/);
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to throw error matching \/hello\/ but got 'testing'$/
+      /^blah: expected \[Function( badFn)*\] to throw error matching \/hello\/ but got 'testing'$/
     );
 
     expect(() => {
       expect(badFn).to.throw(Error, "hello", "blah");
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to throw error including 'hello' but got 'testing'$/
+      /^blah: expected \[Function( badFn)*\] to throw error including 'hello' but got 'testing'$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.throw(Error, "hello");
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to throw error including 'hello' but got 'testing'$/
+      /^blah: expected \[Function( badFn)*\] to throw error including 'hello' but got 'testing'$/
     );
 
     expect(() => {
       expect(customErrFn, "blah").to.not.throw();
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: customErrFn)*\] to not throw an error but 'CustomError: foo' was thrown$/
+      /^blah: expected \[Function( customErrFn)*\] to not throw an error but 'CustomError: foo' was thrown$/
     );
 
     expect(() => {
       expect(badFn).to.not.throw(Error, "testing", "blah");
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to not throw 'Error' but 'Error: testing' was thrown$/
+      /^blah: expected \[Function( badFn)*\] to not throw 'Error' but 'Error: testing' was thrown$/
     );
 
     expect(() => {
       expect(badFn, "blah").to.not.throw(Error, "testing");
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: badFn)*\] to not throw 'Error' but 'Error: testing' was thrown$/
+      /^blah: expected \[Function( badFn)*\] to not throw 'Error' but 'Error: testing' was thrown$/
     );
 
     expect(() => {
       expect(emptyStringErrFn).to.not.throw(Error, "", "blah");
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: emptyStringErrFn)*\] to not throw 'Error' but 'Error' was thrown$/
+      /^blah: expected \[Function( emptyStringErrFn)*\] to not throw 'Error' but 'Error' was thrown$/
     );
 
     expect(() => {
       expect(emptyStringErrFn, "blah").to.not.throw(Error, "");
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: emptyStringErrFn)*\] to not throw 'Error' but 'Error' was thrown$/
+      /^blah: expected \[Function( emptyStringErrFn)*\] to not throw 'Error' but 'Error' was thrown$/
     );
 
     expect(() => {
       expect(emptyStringErrFn, "blah").to.not.throw("");
     }).to.throw(
       AssertionError,
-      /^blah: expected \[Function(: emptyStringErrFn)*\] to throw error not including ''$/
+      /^blah: expected \[Function( emptyStringErrFn)*\] to throw error not including ''$/
     );
 
     expect(() => {
@@ -3068,14 +3067,14 @@ describe("expect", () => {
       expect(Foo).to.respondTo("baz", "constructor");
     }).to.throw(
       AssertionError,
-      /^(constructor: expected)(.*)(\[Function: Foo\])(.*)(to respond to \'baz\')$/
+      /^(constructor: expected)(.*)(\[Function Foo\])(.*)(to respond to \'baz\')$/
     );
 
     expect(() => {
       expect(Foo, "constructor").to.respondTo("baz");
     }).to.throw(
       AssertionError,
-      /^(constructor: expected)(.*)(\[Function: Foo\])(.*)(to respond to \'baz\')$/
+      /^(constructor: expected)(.*)(\[Function Foo\])(.*)(to respond to \'baz\')$/
     );
 
     expect(() => {
@@ -3104,14 +3103,14 @@ describe("expect", () => {
       expect(2).to.satisfy(matcher, "blah");
     }).to.throw(
       AssertionError,
-      /^blah: expected 2 to satisfy \[Function(: matcher)*\]$/
+      /^blah: expected 2 to satisfy \[Function( matcher)*\]$/
     );
 
     expect(() => {
       expect(2, "blah").to.satisfy(matcher);
     }).to.throw(
       AssertionError,
-      /^blah: expected 2 to satisfy \[Function(: matcher)*\]$/
+      /^blah: expected 2 to satisfy \[Function( matcher)*\]$/
     );
   });
 
@@ -3214,19 +3213,19 @@ describe("expect", () => {
 
     expect(() => {
       expect({}).members([], "blah");
-    }).to.throw(AssertionError, "blah: expected {} to be an array");
+    }).to.throw(AssertionError, "blah: expected {} to be an iterable");
 
     expect(() => {
       expect({}, "blah").members([]);
-    }).to.throw(AssertionError, "blah: expected {} to be an array");
+    }).to.throw(AssertionError, "blah: expected {} to be an iterable");
 
     expect(() => {
       expect([]).members({}, "blah");
-    }).to.throw(AssertionError, "blah: expected {} to be an array");
+    }).to.throw(AssertionError, "blah: expected {} to be an iterable");
 
     expect(() => {
       expect([], "blah").members({});
-    }).to.throw(AssertionError, "blah: expected {} to be an array");
+    }).to.throw(AssertionError, "blah: expected {} to be an iterable");
   });
 
   it("deep.members", () => {

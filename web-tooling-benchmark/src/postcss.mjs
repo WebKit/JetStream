@@ -5,10 +5,7 @@
 import postcss from "postcss";
 import nested from "postcss-nested";
 import autoprefixer from "autoprefixer";
-import nestedRules from "./mocks/nested-rules.mjs";
-
-const cleaner = postcss([autoprefixer({ add: false, browsers: [] })]);
-const processor = postcss([autoprefixer, nested]);
+import nestedRules from "./mocks/nested-rules.js";
 
 const payloads = [
   {
@@ -26,6 +23,9 @@ const payloads = [
 ];
 
 export default function runTest(fileData) {
+  const cleaner = postcss([autoprefixer({ add: false, overrideBrowserslist: [] })]);
+  const processor = postcss([autoprefixer, nested]);
+
   const testData = payloads.map(({ name, options }) => {
     // Clean prefixes.
     const source = fileData[name];

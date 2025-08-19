@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import Terser from "../build/terser-bundled.js";
+import { minify } from "terser";
 
 const payloads = [
   {
@@ -11,13 +11,13 @@ const payloads = [
   }
 ];
 
-export default function runTest(fileData) {
+export default async function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
     options
   }));
 
-  return testData.map(({ payload, options }) =>
-    Terser.minify(payload, options)
+  return await Promise.all(
+    testData.map(({ payload, options }) => minify(payload, options))
   );
 }

@@ -13,7 +13,7 @@ async function main() {
     console.log(`${target}:`)
     const then = performance.now();
     const benchmark = await import(`./${target}.mjs`);
-    benchmark.default(fileData)
+    await benchmark.default(fileData)
     const duration = performance.now() - then;
     console.log(`   duration: ${duration.toFixed(2)}ms`)
   }

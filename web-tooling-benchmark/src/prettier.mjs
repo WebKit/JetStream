@@ -7,23 +7,23 @@ import * as prettier from "prettier";
 const payloads = [
   {
     name: "preact-8.2.5.js",
-    options: { semi: false, useTabs: false }
+    options: { semi: false, useTabs: false, parser: "babel" }
   },
   {
     name: "lodash.core-4.17.4.js",
-    options: { semi: true, useTabs: true }
+    options: { semi: true, useTabs: true, parser: "babel" }
   },
   {
     name: "todomvc/react/app.jsx",
-    options: { semi: false, useTabs: true }
+    options: { semi: false, useTabs: true, parser: "babel" }
   },
   {
     name: "todomvc/react/footer.jsx",
-    options: { jsxBracketSameLine: true, semi: true, useTabs: true }
+    options: { jsxBracketSameLine: true, semi: true, useTabs: true, parser: "babel" }
   },
   {
     name: "todomvc/react/todoItem.jsx",
-    options: { semi: false, singleQuote: true, useTabs: true }
+    options: { semi: false, singleQuote: true, useTabs: true, parser: "babel" }
   }
 ];
 

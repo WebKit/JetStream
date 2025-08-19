@@ -29,8 +29,8 @@
     "acorn": "8.15.0",
     "acorn-walk": "^8.3.4",
     "autoprefixer": "10.4.21",
-    "babylon": "7.0.0-beta.32",
     "babel-minify": "^0.5.2",
+    "babylon": "7.0.0-beta.32",
     "chai": "5.3.1",
     "eslint": "^9.33.0",
     "espree": "10.4.0",
@@ -42,8 +42,7 @@
     "rollup": "^4.46.3",
     "source-map": "0.7.6",
     "terser": "5.43.1",
-    "typescript": "5.9.2",
-    "virtualfs": "^2.2.0"
+    "typescript": "5.9.2"
   },
   "devDependencies": {
     "copy-webpack-plugin": "^13.0.1",
