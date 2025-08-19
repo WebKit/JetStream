@@ -40,7 +40,7 @@ const payloads = [
   }
 ];
 
-export default function runTest(fileData) {
+export function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
     options: Object.assign(options, { locations: true }, { ranges: true })

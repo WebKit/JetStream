@@ -11,7 +11,7 @@ const payloads = [
   "underscore-1.8.3.js"
 ];
 
-export default function runTest(fileData) {
+export function runTest(fileData) {
   const testData = payloads.map(name => fileData[name]);
 
   return testData.map(payload => {

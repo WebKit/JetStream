@@ -12,7 +12,7 @@ const payloads = [
   }
 ];
 
-export default function runTest(fileData) {
+export function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => {
     const code = fileData[name];
     const ast = babylon.parse(code, options);

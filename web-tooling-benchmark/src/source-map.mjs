@@ -11,7 +11,7 @@ const payloads = [
   "underscore.min-1.8.3.js.map"
 ];
 
-export default async function runTest(fileData) {
+export async function runTest(fileData) {
   const testData = payloads.map(name => fileData[name]);
 
   for (const payload of testData) {

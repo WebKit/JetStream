@@ -3,6 +3,7 @@
 // found in the LICENSE file.
 
 const path = require("path");
+const webpack = require("webpack");
 const { targetList } = require("./src/cli-flags-helper.mjs");
 
 const srcDir = path.resolve(__dirname, "src");
@@ -16,14 +17,13 @@ function getTargets(env) {
   return [...targetList];
 }
 
-module.exports = async env => {
+module.exports = async (env) => {
   const targets = getTargets(env);
   const entries = Object.create(null);
   for (const target of targets) {
     entries[target] = path.join(srcDir, `${target}.mjs`);
   }
 
-  
   const baseConfig = {
     entry: entries,
     target: ["web", "es6"],
@@ -43,9 +43,16 @@ module.exports = async env => {
         module: false,
         perf_hooks: false,
         process: false,
-         "v8": false,
-      }
+        v8: false,
+        fsevents: false,
+        process: require.resolve("process/browser.js"),
+      },
     },
+    plugins: [
+      new webpack.ProvidePlugin({
+        process: "process/browser.js",
+      }),
+    ],
   };
 
   return [
@@ -53,10 +60,16 @@ module.exports = async env => {
       ...baseConfig,
       output: {
         path: distDir,
-        filename: "[name].js"
+        filename: "[name].bundle.js",
+        library: {
+          name: "WTBenchmark",
+          type: "globalThis",
+        },
+        libraryTarget: "assign",
+        chunkFormat: "commonjs",
       },
       mode: "development",
-      devtool: false
+      devtool: false,
     },
     // {
     //   ...baseConfig,

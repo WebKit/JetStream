@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import cliFlags from "./cli-flags-helper.mjs";
+import { getTarget } from "./cli-flags-helper.mjs";
 import fileData from "./file-data.mjs";
 
 
 
 async function main() {
-  const targets = cliFlags.getTarget();
+  const targets = getTarget();
   for (const target of targets) {
     console.log(`${target}:`)
     const then = performance.now();
     const benchmark = await import(`./${target}.mjs`);
-    await benchmark.default(fileData)
+    await benchmark.runTest(fileData)
     const duration = performance.now() - then;
     console.log(`   duration: ${duration.toFixed(2)}ms`)
   }

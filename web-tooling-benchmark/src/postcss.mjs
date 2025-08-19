@@ -39,7 +39,7 @@ const payloads = [
   }
 ];
 
-export default function runTest(fileData) {
+export function runTest(fileData) {
   const cleaner = postcss([autoprefixer({ add: false, overrideBrowserslist: [] })]);
   const processor = postcss([autoprefixer, nested]);
 

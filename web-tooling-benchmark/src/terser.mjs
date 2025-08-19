@@ -11,7 +11,7 @@ const payloads = [
   }
 ];
 
-export default async function runTest(fileData) {
+export async function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
     options

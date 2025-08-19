@@ -3816,6 +3816,6 @@ describe("expect", () => {
 });
 
 
-export default function runTest(fileData) {
+export function runTest(fileData) {
   tests.forEach(test => test.func());
 };

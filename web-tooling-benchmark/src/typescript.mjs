@@ -27,7 +27,7 @@ const payloads = [
   }
 ];
 
-export default function runTest(fileData) {
+export function runTest(fileData) {
   const testData = payloads.map(({ name, transpileOptions }) => ({
     input: fileData[name],
     transpileOptions
