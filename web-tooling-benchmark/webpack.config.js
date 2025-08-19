@@ -3,12 +3,12 @@
 // found in the LICENSE file.
 
 const path = require("path");
+const { targetList } = require("./src/cli-flags-helper.mjs");
 
-import { targetList } from ".src/cli-flags-helper.mjs";
 const srcDir = path.resolve(__dirname, "src");
 const distDir = path.resolve(__dirname, "dist");
 
-async function getTargets(env) {
+function getTargets(env) {
   const only = env && env.only;
   if (only && targetList.has(only)) {
     return [only];
@@ -17,16 +17,15 @@ async function getTargets(env) {
 }
 
 module.exports = async env => {
-  const targets = await getTargets(env);
-
-  const entry = targets.reduce((acc, name) => {
-    acc[name] = path.join(srcDir, `${name}.mjs`);
-    return acc;
-  }, {});
+  const targets = getTargets(env);
+  const entries = {};
+  for (const target of targets) {
+    entries[target] = path.join(srcDir, `${target}.mjs`);
+  }
 
   return [
     {
-      entry,
+      entry: entries,
       output: {
         path: distDir,
         filename: "[name].js"
@@ -34,13 +33,13 @@ module.exports = async env => {
       mode: "development",
       devtool: false
     },
-    {
-      entry,
-      output: {
-        path: distDir,
-        filename: "[name].min.js"
-      },
-      mode: "production"
-    }
+    // {
+    //   entry: entries,
+    //   output: {
+    //     path: distDir,
+    //     filename: "[name].min.js"
+    //   },
+    //   mode: "production"
+    // }
   ];
 };
