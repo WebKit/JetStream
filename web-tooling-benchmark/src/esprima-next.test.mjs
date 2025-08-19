@@ -2,6 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import esprima from "./esprima.mjs";
+import esprimaNext from "./esprima-next.mjs";
 
-it("esprima runs to completion", () => void esprima.fn());
+it("esprima-next runs to completion", () => void esprimaNext.fn());
