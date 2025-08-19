@@ -42,9 +42,7 @@
     "rollup": "^4.46.3",
     "source-map": "0.7.6",
     "terser": "5.43.1",
-    "typescript": "5.9.2"
-  },
-  "devDependencies": {
+    "typescript": "5.9.2",
     "assert": "^2.1.0",
     "buffer": "^6.0.3",
     "crypto-browserify": "^3.12.1",
