@@ -2609,8 +2609,8 @@ for (const name of WTB_TESTS) {
             SCRIPT_BUNDLE: `./web-tooling-benchmark/dist/${name}.bundle.js`,
             ...WPT_FILES,
         },
-        iterations: 5,
-        worstCaseCount: 1,
+        iterations: 15,
+        // worstCaseCount: 1,
         tags: ["Default", "WTB"],
     }));
 }

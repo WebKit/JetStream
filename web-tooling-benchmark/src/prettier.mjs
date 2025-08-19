@@ -2,7 +2,9 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import * as prettier from "prettier";
+import * as prettier from "prettier/standalone";
+import * as babelParser from "prettier/parser-babel";
+import * as estree from "prettier/plugins/estree";
 
 const payloads = [
   {
@@ -34,6 +36,6 @@ export function runTest(fileData) {
   }));
 
   return testData.map(({ payload, options }) =>
-    prettier.format(payload, options)
+    prettier.format(payload, { ...options, plugins: [babelParser, estree] })
   );
 }
