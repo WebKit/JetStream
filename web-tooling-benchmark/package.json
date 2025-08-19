@@ -32,6 +32,7 @@
     "chai": "5.3.1",
     "eslint": "^9.33.0",
     "espree": "10.4.0",
+    "esprima-next": "^6.0.3",
     "lebab": "3.2.7",
     "postcss": "8.5.6",
     "postcss-nested": "7.0.2",
