@@ -2,6 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import chaiBenchmark from "./chai-benchmark.mjs";
+import chai from "./chai.mjs";
 
-it("chai-benchmark runs to completion", () => void chaiBenchmark.fn());
+it("chai runs to completion", () => void chai.fn());

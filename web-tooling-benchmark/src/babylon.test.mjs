@@ -2,6 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import babylonBenchmark from "./babylon-benchmark.mjs";
+import babylon from "./babylon.mjs";
 
-it("babylon-benchmark runs to completion", () => void babylonBenchmark.fn());
+it("babylon runs to completion", () => void babylon.fn());

@@ -2,6 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import jshintBenchmark from "./jshint-benchmark.mjs";
+import jshint from "./jshint.mjs";
 
-it("jshint-benchmark runs to completion", () => void jshintBenchmark.fn());
+it("jshint runs to completion", () => void jshint.fn());

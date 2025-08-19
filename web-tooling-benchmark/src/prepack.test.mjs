@@ -2,6 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import prepackBenchmark from "./prepack-benchmark.mjs";
+import prepack from "./prepack.mjs";
 
-it("prepack-benchmark runs to completion", () => void prepackBenchmark.fn());
+it("prepack runs to completion", () => void prepack.fn());

@@ -8,7 +8,7 @@ import cliFlags from "./cli-flags-helper.mjs";
 const targets = cliFlags.getTarget();
 
 for (const target of targets) {
-  const benchmark = await import(`./${target}-benchmark.mjs`);
+  const benchmark = await import(`./${target}.mjs`);
   suite.add(benchmark.default);
 }
 

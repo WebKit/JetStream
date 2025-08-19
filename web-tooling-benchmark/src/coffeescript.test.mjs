@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import coffeescriptBenchmark from "./coffeescript-benchmark.mjs";
+import coffeescript from "./coffeescript.mjs";
 
-it("coffeescript-benchmark runs to completion", () =>
-  void coffeescriptBenchmark.fn());
+it("coffeescript runs to completion", () =>
+  void coffeescript.fn());

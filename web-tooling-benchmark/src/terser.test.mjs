@@ -2,6 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import terserBenchmark from "./terser-benchmark.mjs";
+import terser from "./terser.mjs";
 
-it("terser-benchmark runs to completion", () => void terserBenchmark.fn());
+it("terser runs to completion", () => void terser.fn());

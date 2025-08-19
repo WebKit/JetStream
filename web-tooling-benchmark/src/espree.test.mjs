@@ -2,6 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import espreeBenchmark from "./espree-benchmark.mjs";
+import espree from "./espree.mjs";
 
-it("espree-benchmark runs to completion", () => void espreeBenchmark.fn());
+it("espree runs to completion", () => void espree.fn());

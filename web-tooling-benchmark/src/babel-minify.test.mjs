@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import babelMinifyBenchmark from "./babel-minify-benchmark.mjs";
+import babelMinify from "./babel-minify.mjs";
 
-it("babel-minify-benchmark runs to completion", () =>
-  void babelMinifyBenchmark.fn());
+it("babel-minify runs to completion", () =>
+  void babelMinify.fn());

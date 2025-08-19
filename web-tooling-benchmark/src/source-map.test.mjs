@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import sourceMapBenchmark from "./source-map-benchmark.mjs";
+import sourceMap from "./source-map.mjs";
 
-it("source-map-benchmark runs to completion", () =>
-  void sourceMapBenchmark.fn());
+it("source-map runs to completion", () =>
+  void sourceMap.fn());

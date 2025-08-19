@@ -2,6 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import lebabBenchmark from "./lebab-benchmark.mjs";
+import lebab from "./lebab.mjs";
 
-it("lebab-benchmark runs to completion", () => void lebabBenchmark.fn());
+it("lebab runs to completion", () => void lebab.fn());
