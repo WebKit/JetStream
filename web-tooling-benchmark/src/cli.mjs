@@ -4,12 +4,16 @@
 
 import suite from "./suite.mjs";
 import cliFlags from "./cli-flags-helper.mjs";
+import fileData from "./file-data.mjs";
 
 const targets = cliFlags.getTarget();
 
 for (const target of targets) {
   const benchmark = await import(`./${target}.mjs`);
-  suite.add(benchmark.default);
+  suite.add({
+    name: target,
+    fn: () => benchmark.default(fileData)
+  });
 }
 
 suite.run({

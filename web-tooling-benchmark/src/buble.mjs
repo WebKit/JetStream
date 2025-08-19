@@ -3,23 +3,21 @@
 // found in the LICENSE file.
 
 import * as buble from "buble";
-import * as fs from "fs";
 
 const payloads = [
   {
     name: "vue.runtime.esm-nobuble-2.4.4.js",
     options: {}
   }
-].map(({ name, options }) => ({
-  payload: fs.readFileSync(`third_party/${name}`, "utf8"),
-  options: { transforms: { modules: false } }
-}));
+];
 
-export default {
-  name: "buble",
-  fn() {
-    return payloads.map(({ payload, options }) =>
-      buble.transform(payload, options)
-    );
-  }
-};
+export default function runTest(fileData) {
+  const testData = payloads.map(({ name, options }) => ({
+    payload: fileData[name],
+    options: { transforms: { modules: false } }
+  }));
+
+  return testData.map(({ payload, options }) =>
+    buble.transform(payload, options)
+  );
+}

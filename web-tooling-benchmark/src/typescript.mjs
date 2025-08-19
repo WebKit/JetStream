@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import * as fs from "fs";
 import * as ts from "typescript";
 
 const payloads = [
@@ -26,16 +25,15 @@ const payloads = [
       }
     }
   }
-].map(({ name, transpileOptions }) => ({
-  input: fs.readFileSync(`third_party/${name}`, "utf8"),
-  transpileOptions
-}));
+];
 
-export default {
-  name: "typescript",
-  fn() {
-    return payloads.map(({ input, transpileOptions }) =>
-      ts.transpileModule(input, transpileOptions)
-    );
-  }
-};
+export default function runTest(fileData) {
+  const testData = payloads.map(({ name, transpileOptions }) => ({
+    input: fileData[name],
+    transpileOptions
+  }));
+
+  return testData.map(({ input, transpileOptions }) =>
+    ts.transpileModule(input, transpileOptions)
+  );
+}

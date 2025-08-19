@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import * as babylon from "babylon";
-import * as fs from "fs";
 
 const payloads = [
   {
@@ -46,16 +45,15 @@ const payloads = [
     name: "vue.runtime.esm-nobuble-2.4.4.js",
     options: { sourceType: "module" }
   }
-].map(({ name, options }) => ({
-  payload: fs.readFileSync(`third_party/${name}`, "utf8"),
-  options
-}));
+];
 
-export default {
-  name: "babylon",
-  fn() {
-    return payloads.map(({ payload, options }) =>
-      babylon.parse(payload, options)
-    );
-  }
-};
+export default function runTest(fileData) {
+  const testData = payloads.map(({ name, options }) => ({
+    payload: fileData[name],
+    options
+  }));
+
+  return testData.map(({ payload, options }) =>
+    babylon.parse(payload, options)
+  );
+}

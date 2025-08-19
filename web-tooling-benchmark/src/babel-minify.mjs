@@ -3,23 +3,21 @@
 // found in the LICENSE file.
 
 import babelMinify from "babel-minify";
-import * as fs from "fs";
 
 const payloads = [
   {
     name: "speedometer-es2015-test-2.0.js",
     options: {}
   }
-].map(({ name, options }) => ({
-  payload: fs.readFileSync(`third_party/${name}`, "utf8"),
-  options
-}));
+];
 
-export default {
-  name: "babel-minify",
-  fn() {
-    return payloads.map(({ payload, options }) =>
-      babelMinify(payload, options)
-    );
-  }
-};
+export default function runTest(fileData) {
+  const testData = payloads.map(({ name, options }) => ({
+    payload: fileData[name],
+    options
+  }));
+
+  return testData.map(({ payload, options }) =>
+    babelMinify(payload, options)
+  );
+}

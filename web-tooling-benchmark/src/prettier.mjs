@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import * as fs from "fs";
 import * as prettier from "prettier";
 
 const payloads = [
@@ -26,16 +25,15 @@ const payloads = [
     name: "todomvc/react/todoItem.jsx",
     options: { semi: false, singleQuote: true, useTabs: true }
   }
-].map(({ name, options }) => ({
-  payload: fs.readFileSync(`third_party/${name}`, "utf8"),
-  options
-}));
+];
 
-export default {
-  name: "prettier",
-  fn() {
-    return payloads.map(({ payload, options }) =>
-      prettier.format(payload, options)
-    );
-  }
-};
+export default function runTest(fileData) {
+  const testData = payloads.map(({ name, options }) => ({
+    payload: fileData[name],
+    options
+  }));
+
+  return testData.map(({ payload, options }) =>
+    prettier.format(payload, options)
+  );
+}

@@ -3,16 +3,12 @@
 // found in the LICENSE file.
 
 import * as CoffeeScript from "coffeescript";
-import * as fs from "fs";
 
-const input = fs.readFileSync(
-  "third_party/coffeescript-lexer-2.0.1.coffee",
-  "utf8"
-);
-
-export default {
-  name: "coffeescript",
-  fn() {
-    return CoffeeScript.compile(input);
-  }
+const payload = {
+  name: "coffeescript-lexer-2.0.1.coffee"
 };
+
+export default function runTest(fileData) {
+  const input = fileData[payload.name];
+  return CoffeeScript.compile(input);
+}

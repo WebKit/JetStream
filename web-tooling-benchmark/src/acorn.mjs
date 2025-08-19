@@ -3,7 +3,6 @@
 // found in the LICENSE file.
 
 import * as acorn from "acorn";
-import * as fs from "fs";
 import * as walk from "acorn/dist/walk";
 
 const payloads = [
@@ -39,28 +38,27 @@ const payloads = [
     name: "vue.runtime.esm-nobuble-2.4.4.js",
     options: { ecmaVersion: 7, sourceType: "module" }
   }
-].map(({ name, options }) => ({
-  payload: fs.readFileSync(`third_party/${name}`, "utf8"),
-  options: Object.assign(options, { locations: true }, { ranges: true })
-}));
+];
 
-export default {
-  name: "acorn",
-  fn() {
-    return payloads.map(({ payload, options }) => {
-      let count = 0;
+export default function runTest(fileData) {
+  const testData = payloads.map(({ name, options }) => ({
+    payload: fileData[name],
+    options: Object.assign(options, { locations: true }, { ranges: true })
+  }));
 
-      // Test the tokenizer by counting the resulting tokens.
-      for (const token of acorn.tokenizer(payload, options)) {
-        count++;
-      }
+  return testData.map(({ payload, options }) => {
+    let count = 0;
 
-      // Test the parser.
-      const ast = acorn.parse(payload, options);
+    // Test the tokenizer by counting the resulting tokens.
+    for (const token of acorn.tokenizer(payload, options)) {
+      count++;
+    }
 
-      // Test the AST walker.
-      walk.full(ast, node => count++);
-      return count;
-    });
-  }
-};
+    // Test the parser.
+    const ast = acorn.parse(payload, options);
+
+    // Test the AST walker.
+    walk.full(ast, node => count++);
+    return count;
+  });
+}

@@ -3,23 +3,21 @@
 // found in the LICENSE file.
 
 import * as esprima from "esprima";
-import * as fs from "fs";
 
 const payloads = [
   "backbone-1.1.0.js",
   "jquery-3.2.1.js",
   "mootools-core-1.6.0.js",
   "underscore-1.8.3.js"
-].map(name => fs.readFileSync(`third_party/${name}`, "utf8"));
+];
 
-export default {
-  name: "esprima",
-  fn() {
-    return payloads.map(payload => {
-      let count = 0;
-      count += esprima.tokenize(payload, { loc: true, range: true }).length;
-      count += esprima.parse(payload, { loc: true, range: true }).body.length;
-      return count;
-    });
-  }
-};
+export default function runTest(fileData) {
+  const testData = payloads.map(name => fileData[name]);
+
+  return testData.map(payload => {
+    let count = 0;
+    count += esprima.tokenize(payload, { loc: true, range: true }).length;
+    count += esprima.parse(payload, { loc: true, range: true }).body.length;
+    return count;
+  });
+}

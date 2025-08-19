@@ -2,20 +2,18 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-import * as fs from "fs";
 import * as prepack from "prepack";
 
-const sourceFiles = [
-  "third_party/preact-8.2.5.js",
-  "third_party/redux.min-3.7.2.js"
-].map(filePath => ({
-  filePath,
-  fileContents: fs.readFileSync(filePath, "utf8")
-}));
+const payloads = [
+  "preact-8.2.5.js",
+  "redux.min-3.7.2.js"
+];
 
-export default {
-  name: "prepack",
-  fn() {
-    return prepack.prepackSources(sourceFiles);
-  }
-};
+export default function runTest(fileData) {
+  const sourceFiles = payloads.map(name => ({
+    filePath: `third_party/${name}`,
+    fileContents: fileData[name]
+  }));
+
+  return prepack.prepackSources(sourceFiles);
+}

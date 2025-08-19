@@ -3,28 +3,26 @@
 // found in the LICENSE file.
 
 import * as sourceMap from "source-map";
-import * as fs from "fs";
 
 const payloads = [
   "lodash.min-4.17.4.js.map",
   "preact-8.2.5.js.map",
   "source-map.min-0.5.7.js.map",
   "underscore.min-1.8.3.js.map"
-].map(name => fs.readFileSync(`third_party/${name}`, "utf8"));
+];
 
-export default {
-  name: "source-map",
-  fn() {
-    payloads.forEach(payload => {
-      // Parse the source map first...
-      const smc = new sourceMap.SourceMapConsumer(payload);
-      // ...then serialize the parsed source map to a String.
-      const smg = sourceMap.SourceMapGenerator.fromSourceMap(smc);
+export default function runTest(fileData) {
+  const testData = payloads.map(name => fileData[name]);
 
-      // Create a SourceNode from the generated code and a SourceMapConsumer.
-      const fswsm = sourceMap.SourceNode.fromStringWithSourceMap(payload, smc);
+  testData.forEach(payload => {
+    // Parse the source map first...
+    const smc = new sourceMap.SourceMapConsumer(payload);
+    // ...then serialize the parsed source map to a String.
+    const smg = sourceMap.SourceMapGenerator.fromSourceMap(smc);
 
-      return [smg.toString(), fswsm.toString()];
-    });
-  }
-};
+    // Create a SourceNode from the generated code and a SourceMapConsumer.
+    const fswsm = sourceMap.SourceNode.fromStringWithSourceMap(payload, smc);
+
+    return [smg.toString(), fswsm.toString()];
+  });
+}
