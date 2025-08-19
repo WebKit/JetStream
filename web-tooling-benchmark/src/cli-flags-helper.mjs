@@ -4,7 +4,6 @@ export const targetList = new Set([
   "babel-minify",
   "babylon",
   "chai",
-  "eslint",
   "espree",
   "esprima-next",
   "lebab",
