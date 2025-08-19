@@ -672,7 +672,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   encodeGeneratedRanges: () => (/* binding */ encodeGeneratedRanges),
 /* harmony export */   encodeOriginalScopes: () => (/* binding */ encodeOriginalScopes)
 /* harmony export */ });
-/* provided dependency */ var TextDecoder = __webpack_require__(/*! ./src/mocks/textdecoder.mjs */ "./src/mocks/textdecoder.mjs")["TextDecoder"];
+/* provided dependency */ var TextDecoder = __webpack_require__(/*! text-encoder */ "./node_modules/text-encoder/index.js")["TextDecoder"];
 // src/vlq.ts
 var comma = ",".charCodeAt(0);
 var semicolon = ";".charCodeAt(0);
@@ -36078,54 +36078,72 @@ var domprops = [
 
 /***/ }),
 
-/***/ "./src/mocks/textdecoder.mjs":
-/*!***********************************!*\
-  !*** ./src/mocks/textdecoder.mjs ***!
-  \***********************************/
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
+/***/ "./node_modules/text-encoder/index.js":
+/*!********************************************!*\
+  !*** ./node_modules/text-encoder/index.js ***!
+  \********************************************/
+/***/ ((module) => {
 
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   TextDecoder: () => (/* binding */ TextDecoder)
-/* harmony export */ });
-// Basic TextDecoder mock implementation
-class TextDecoder {
-  constructor(encoding = "utf-8") {
-    // For simplicity, this mock only supports utf-8
-    if (encoding.toLowerCase() !== "utf-8") {
-      throw new Error(`Encoding not supported: ${encoding}`);
-    }
-  }
+var utf8Encodings = [
+  'utf8',
+  'utf-8',
+  'unicode-1-1-utf-8'
+];
 
-  decode(buffer) {
-    let string = "";
-    let i = 0;
-    while (i < buffer.length) {
-      let byte = buffer[i];
-      if (byte < 0x80) {
-        string += String.fromCharCode(byte);
-        i++;
-      } else if (byte >= 0xc2 && byte < 0xe0) {
-        string += String.fromCharCode(
-          ((byte & 0x1f) << 6) | (buffer[i + 1] & 0x3f)
-        );
-        i += 2;
-      } else if (byte >= 0xe0 && byte < 0xf0) {
-        string += String.fromCharCode(
-          ((byte & 0x0f) << 12) |
-            ((buffer[i + 1] & 0x3f) << 6) |
-            (buffer[i + 2] & 0x3f)
-        );
-        i += 3;
-      } else {
-        // For simplicity, handling of 4-byte characters and surrogates is omitted
-        i++;
+function TextEncoder(encoding) {
+  if (utf8Encodings.indexOf(encoding) < 0 && typeof encoding !== 'undefined' && encoding != null) {
+    throw new RangeError('Invalid encoding type. Only utf-8 is supported');
+  } else {
+    this.encoding = 'utf-8';
+    this.encode = function(str) {
+      if (typeof str !== 'string') {
+        throw new TypeError('passed argument must be of tye string');
       }
-    }
-    return string;
+      var binstr = unescape(encodeURIComponent(str)),
+        arr = new Uint8Array(binstr.length);
+      const split = binstr.split('');
+      for (let i = 0; i < split.length; i++) {
+        arr[i] = split[i].charCodeAt(0);
+      }
+      return arr;
+    };
   }
 }
+
+function TextDecoder(encoding) {
+  if (utf8Encodings.indexOf(encoding) < 0 && typeof encoding !== 'undefined' && encoding != null) {
+    throw new RangeError('Invalid encoding type. Only utf-8 is supported');
+  }
+  else {
+    this.encoding = 'utf-8';
+    this.decode = function (view, options) {
+      if (typeof view === 'undefined') {
+        return '';
+      }
+
+      var stream = (typeof options !== 'undefined' && stream in options) ? options.stream : false;
+      if (typeof stream !== 'boolean') {
+        throw new TypeError('stream option must be boolean');
+      }
+
+      if (!ArrayBuffer.isView(view)) {
+        throw new TypeError('passed argument must be an array buffer view');
+      } else {
+        var arr = new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
+          charArr = new Array(arr.length);
+        for (let i = 0; i < arr.length; i++) {
+          charArr[i] = String.fromCharCode(arr[i]);
+        }
+        return decodeURIComponent(escape(charArr.join('')));
+      }
+    }
+  }
+}
+
+module.exports = {
+  TextEncoder,
+  TextDecoder,
+};
 
 
 /***/ })

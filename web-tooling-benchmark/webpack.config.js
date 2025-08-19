@@ -54,8 +54,8 @@ module.exports = async (env) => {
     plugins: [
       new webpack.ProvidePlugin({
         process: "process/browser.js",
-        TextEncoder: [path.resolve(__dirname, "src/mocks/textencoder.mjs"), "TextEncoder"],
-        TextDecoder: [path.resolve(__dirname, "src/mocks/textdecoder.mjs"), "TextDecoder"],
+        TextEncoder: ["text-encoder", "TextEncoder"],
+        TextDecoder: ["text-encoder", "TextDecoder"],
       }),
     ],
   };

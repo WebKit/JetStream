@@ -3583,6 +3583,76 @@ exports.SourceNode = __webpack_require__(/*! ./lib/source-node */ "./node_module
 
 /***/ }),
 
+/***/ "./node_modules/text-encoder/index.js":
+/*!********************************************!*\
+  !*** ./node_modules/text-encoder/index.js ***!
+  \********************************************/
+/***/ ((module) => {
+
+var utf8Encodings = [
+  'utf8',
+  'utf-8',
+  'unicode-1-1-utf-8'
+];
+
+function TextEncoder(encoding) {
+  if (utf8Encodings.indexOf(encoding) < 0 && typeof encoding !== 'undefined' && encoding != null) {
+    throw new RangeError('Invalid encoding type. Only utf-8 is supported');
+  } else {
+    this.encoding = 'utf-8';
+    this.encode = function(str) {
+      if (typeof str !== 'string') {
+        throw new TypeError('passed argument must be of tye string');
+      }
+      var binstr = unescape(encodeURIComponent(str)),
+        arr = new Uint8Array(binstr.length);
+      const split = binstr.split('');
+      for (let i = 0; i < split.length; i++) {
+        arr[i] = split[i].charCodeAt(0);
+      }
+      return arr;
+    };
+  }
+}
+
+function TextDecoder(encoding) {
+  if (utf8Encodings.indexOf(encoding) < 0 && typeof encoding !== 'undefined' && encoding != null) {
+    throw new RangeError('Invalid encoding type. Only utf-8 is supported');
+  }
+  else {
+    this.encoding = 'utf-8';
+    this.decode = function (view, options) {
+      if (typeof view === 'undefined') {
+        return '';
+      }
+
+      var stream = (typeof options !== 'undefined' && stream in options) ? options.stream : false;
+      if (typeof stream !== 'boolean') {
+        throw new TypeError('stream option must be boolean');
+      }
+
+      if (!ArrayBuffer.isView(view)) {
+        throw new TypeError('passed argument must be an array buffer view');
+      } else {
+        var arr = new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
+          charArr = new Array(arr.length);
+        for (let i = 0; i < arr.length; i++) {
+          charArr[i] = String.fromCharCode(arr[i]);
+        }
+        return decodeURIComponent(escape(charArr.join('')));
+      }
+    }
+  }
+}
+
+module.exports = {
+  TextEncoder,
+  TextDecoder,
+};
+
+
+/***/ }),
+
 /***/ "./node_modules/tr46/index.js":
 /*!************************************!*\
   !*** ./node_modules/tr46/index.js ***!
@@ -5984,8 +6054,8 @@ const Impl = __webpack_require__(/*! ./URLSearchParams-impl.js */ "./node_module
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 "use strict";
-/* provided dependency */ var TextEncoder = __webpack_require__(/*! ./src/mocks/textencoder.mjs */ "./src/mocks/textencoder.mjs")["TextEncoder"];
-/* provided dependency */ var TextDecoder = __webpack_require__(/*! ./src/mocks/textdecoder.mjs */ "./src/mocks/textdecoder.mjs")["TextDecoder"];
+/* provided dependency */ var TextEncoder = __webpack_require__(/*! text-encoder */ "./node_modules/text-encoder/index.js")["TextEncoder"];
+/* provided dependency */ var TextDecoder = __webpack_require__(/*! text-encoder */ "./node_modules/text-encoder/index.js")["TextDecoder"];
 
 const utf8Encoder = new TextEncoder();
 const utf8Decoder = new TextDecoder("utf-8", { ignoreBOM: true });
@@ -7796,107 +7866,6 @@ const URLSearchParams = __webpack_require__(/*! ./lib/URLSearchParams */ "./node
 
 exports.URL = URL;
 exports.URLSearchParams = URLSearchParams;
-
-
-/***/ }),
-
-/***/ "./src/mocks/textdecoder.mjs":
-/*!***********************************!*\
-  !*** ./src/mocks/textdecoder.mjs ***!
-  \***********************************/
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   TextDecoder: () => (/* binding */ TextDecoder)
-/* harmony export */ });
-// Basic TextDecoder mock implementation
-class TextDecoder {
-  constructor(encoding = "utf-8") {
-    // For simplicity, this mock only supports utf-8
-    if (encoding.toLowerCase() !== "utf-8") {
-      throw new Error(`Encoding not supported: ${encoding}`);
-    }
-  }
-
-  decode(buffer) {
-    let string = "";
-    let i = 0;
-    while (i < buffer.length) {
-      let byte = buffer[i];
-      if (byte < 0x80) {
-        string += String.fromCharCode(byte);
-        i++;
-      } else if (byte >= 0xc2 && byte < 0xe0) {
-        string += String.fromCharCode(
-          ((byte & 0x1f) << 6) | (buffer[i + 1] & 0x3f)
-        );
-        i += 2;
-      } else if (byte >= 0xe0 && byte < 0xf0) {
-        string += String.fromCharCode(
-          ((byte & 0x0f) << 12) |
-            ((buffer[i + 1] & 0x3f) << 6) |
-            (buffer[i + 2] & 0x3f)
-        );
-        i += 3;
-      } else {
-        // For simplicity, handling of 4-byte characters and surrogates is omitted
-        i++;
-      }
-    }
-    return string;
-  }
-}
-
-
-/***/ }),
-
-/***/ "./src/mocks/textencoder.mjs":
-/*!***********************************!*\
-  !*** ./src/mocks/textencoder.mjs ***!
-  \***********************************/
-/***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
-
-"use strict";
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   TextEncoder: () => (/* binding */ TextEncoder)
-/* harmony export */ });
-// Basic TextEncoder mock implementation
-class TextEncoder {
-  encode(string) {
-    const utf8 = [];
-    for (let i = 0; i < string.length; i++) {
-      let charcode = string.charCodeAt(i);
-      if (charcode < 0x80) {
-        utf8.push(charcode);
-      } else if (charcode < 0x800) {
-        utf8.push(0xc0 | (charcode >> 6), 0x80 | (charcode & 0x3f));
-      } else if (charcode < 0xd800 || charcode >= 0xe000) {
-        utf8.push(
-          0xe0 | (charcode >> 12),
-          0x80 | ((charcode >> 6) & 0x3f),
-          0x80 | (charcode & 0x3f)
-        );
-      } else {
-        // surrogate pair
-        i++;
-        // UTF-16 encodes 0x10000-0x10FFFF by subtracting 0x10000 and
-        // splitting the 20 bits of 0x0-0xFFFFF into two halves
-        charcode =
-          0x10000 + (((charcode & 0x3ff) << 10) | (string.charCodeAt(i) & 0x3ff));
-        utf8.push(
-          0xf0 | (charcode >> 18),
-          0x80 | ((charcode >> 12) & 0x3f),
-          0x80 | ((charcode >> 6) & 0x3f),
-          0x80 | (charcode & 0x3f)
-        );
-      }
-    }
-    return new Uint8Array(utf8);
-  }
-}
 
 
 /***/ })
