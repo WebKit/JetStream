@@ -10684,7 +10684,7 @@ const payloads = [
   },
   {
     name: "redux-5.0.1.min.js",
-    options: { sourceType: "module" }
+    options: { sourceType: "module", plugins: ["objectRestSpread"] }
   },
   {
     name: "speedometer-es2015-test-2.0.js",
@@ -10720,7 +10720,6 @@ function runTest(fileData) {
   }));
 
   return testData.map(({ payload, name, options }) => {
-    console.log(name);
     babylon__WEBPACK_IMPORTED_MODULE_0__.parse(payload, options)
   });
 }
