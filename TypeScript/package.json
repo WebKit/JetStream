@@ -6,7 +6,7 @@
   "scripts": {
     "test": "node ./src/benchmark-node.cjs",
     "clean": "rm -rf dist/* && rm -rf src/gen/*.cjs",
-    "import": "node ./build/import-src-project.js",
+    "import": "node ./build/import-src-project.mjs",
     "prebuild": "npm run clean  && npm run import",
     "build": "webpack && npm run postbuild",
     "build:dev": "npm run prebuild && webpack --mode development && npm run postbuild",

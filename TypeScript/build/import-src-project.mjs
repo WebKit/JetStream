@@ -1,8 +1,11 @@
-const fs = require("fs");
-const path = require("path");
-const { spawnSync } = require("child_process");
-const glob = require("glob");
-const assert = require('assert/strict');
+import fs from "fs";
+import path from "path";
+import { spawnSync } from "child_process";
+import { globSync } from "glob";
+import assert from 'assert/strict';
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 
 class Importer {
@@ -41,7 +44,7 @@ class Importer {
   readSrcFileData() {
     const patterns = [`${this.srcFolder}/**/*.ts`, `${this.srcFolder}/**/*.d.ts`, `${this.srcFolder}/*.d.ts`];
     patterns.forEach(pattern => {
-      const files = glob.sync(pattern, { cwd: this.repoDir, nodir: true });
+      const files = globSync(pattern, { cwd: this.repoDir, nodir: true });
       files.forEach(file => {
         const filePath = path.join(this.repoDir, file);
         const relativePath = path.relative(this.repoDir, filePath).toLowerCase();
@@ -54,8 +57,8 @@ class Importer {
   addExtraFilesFromDirs() {
     this.extraDirs.forEach(({ dir, nameOnly = false }) => {
       const absoluteSourceDir = path.resolve(__dirname, dir);
-      let allFiles = glob.sync("**/*.d.ts", { cwd: absoluteSourceDir, nodir: true });
-      allFiles = allFiles.concat(glob.sync("**/*.d.mts", { cwd: absoluteSourceDir, nodir: true }));
+      let allFiles = globSync("**/*.d.ts", { cwd: absoluteSourceDir, nodir: true });
+      allFiles = allFiles.concat(globSync("**/*.d.mts", { cwd: absoluteSourceDir, nodir: true }));
 
       allFiles.forEach(file => {
         const filePath = path.join(absoluteSourceDir, file);
