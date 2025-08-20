@@ -12183,7 +12183,7 @@ describe("assert", () => {
   });
 
   it("isOk / ok", () => {
-    ["isOk", "ok"].forEach(isOk => {
+    ["isOk", "ok"].forEach((isOk) => {
       assert[isOk](true);
       assert[isOk](1);
       assert[isOk]("test");
@@ -12203,7 +12203,7 @@ describe("assert", () => {
   });
 
   it("isNotOk / notOk", () => {
-    ["isNotOk", "notOk"].forEach(isNotOk => {
+    ["isNotOk", "notOk"].forEach((isNotOk) => {
       assert[isNotOk](false);
       assert[isNotOk](0);
       assert[isNotOk]("");
@@ -12387,7 +12387,7 @@ describe("assert", () => {
   const FakeConstructor = {
     [Symbol.hasInstance](x) {
       return x === 3;
-    }
+    },
   };
 
   it("instanceOf", () => {
@@ -12398,11 +12398,15 @@ describe("assert", () => {
 
     expect(() => {
       assert.instanceOf(new Foo(), 1);
-    }).to.throw("The instanceof assertion needs a constructor but Number was given.");
+    }).to.throw(
+      "The instanceof assertion needs a constructor but Number was given."
+    );
 
     expect(() => {
       assert.instanceOf(new Foo(), "Foo");
-    }).to.throw("The instanceof assertion needs a constructor but String was given.");
+    }).to.throw(
+      "The instanceof assertion needs a constructor but String was given."
+    );
 
     expect(() => {
       assert.instanceOf(4, FakeConstructor);
@@ -12534,21 +12538,21 @@ describe("assert", () => {
       assert.include(42, "bar");
     }).to.throw(
       AssertionError,
-      'the given combination of arguments (number and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string',
+      "the given combination of arguments (number and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
     );
 
     expect(() => {
       assert.include(null, 42);
     }).to.throw(
       AssertionError,
-      'the given combination of arguments (null and number) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a number'
+      "the given combination of arguments (null and number) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a number"
     );
 
     expect(() => {
       assert.include(undefined, "bar");
     }).to.throw(
       AssertionError,
-      'the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string'
+      "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
     );
   });
 
@@ -12626,21 +12630,21 @@ describe("assert", () => {
       assert.notInclude(42, "bar");
     }).to.throw(
       AssertionError,
-      'the given combination of arguments (number and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string',
+      "the given combination of arguments (number and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
     );
 
     expect(() => {
       assert.notInclude(null, 42);
     }).to.throw(
       AssertionError,
-      'the given combination of arguments (null and number) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a number'
+      "the given combination of arguments (null and number) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a number"
     );
 
     expect(() => {
       assert.notInclude(undefined, "bar");
     }).to.throw(
       AssertionError,
-      'the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string'
+      "the given combination of arguments (undefined and string) is invalid for this assertion. You can use an array, a map, an object, a set, a string, or a weakset instead of a string"
     );
 
     expect(() => {
@@ -12807,7 +12811,7 @@ describe("assert", () => {
       assert.deepNestedInclude({ a: { b: [{ x: 1 }] } }, { "a.c": { x: 1 } });
     }).to.throw(
       AssertionError,
-       "expected { a: { b: [ { x: 1 } ] } } to have deep nested property 'a.c'"
+      "expected { a: { b: [ { x: 1 } ] } } to have deep nested property 'a.c'"
     );
 
     expect(() => {
@@ -12932,25 +12936,25 @@ describe("expect", () => {
   const sym = Symbol();
 
   describe("proxify", () => {
-    it("throws when invalid property follows expect", function() {
+    it("throws when invalid property follows expect", function () {
       expect(() => {
         expect(42).pizza;
       }).to.throw(Error, "Invalid Chai property: pizza");
     });
 
-    it("throws when invalid property follows language chain", function() {
+    it("throws when invalid property follows language chain", function () {
       expect(() => {
         expect(42).to.pizza;
       }).to.throw(Error, "Invalid Chai property: pizza");
     });
 
-    it("throws when invalid property follows property assertion", function() {
+    it("throws when invalid property follows property assertion", function () {
       expect(() => {
         expect(42).ok.pizza;
       }).to.throw(Error, "Invalid Chai property: pizza");
     });
 
-    it("throws when invalid property follows uncalled method assertion", function() {
+    it("throws when invalid property follows uncalled method assertion", function () {
       expect(() => {
         expect(42).equal.pizza;
       }).to.throw(
@@ -12959,25 +12963,25 @@ describe("expect", () => {
       );
     });
 
-    it("throws when invalid property follows called method assertion", function() {
+    it("throws when invalid property follows called method assertion", function () {
       expect(() => {
         expect(42).equal(42).pizza;
       }).to.throw(Error, "Invalid Chai property: pizza");
     });
 
-    it("throws when invalid property follows uncalled chainable method assertion", function() {
+    it("throws when invalid property follows uncalled chainable method assertion", function () {
       expect(() => {
         expect(42).a.pizza;
       }).to.throw(Error, "Invalid Chai property: pizza");
     });
 
-    it("throws when invalid property follows called chainable method assertion", function() {
+    it("throws when invalid property follows called chainable method assertion", function () {
       expect(() => {
         expect(42).a("number").pizza;
       }).to.throw(Error, "Invalid Chai property: pizza");
     });
 
-    it("doesn't throw if invalid property is excluded via config", function() {
+    it("doesn't throw if invalid property is excluded via config", function () {
       expect(() => {
         expect(42).then;
       }).to.not.throw();
@@ -13000,8 +13004,8 @@ describe("expect", () => {
       "of",
       "same",
       "but",
-      "does"
-    ].forEach(chain => {
+      "does",
+    ].forEach((chain) => {
       // tests that chain exists
       expect(expect(1)[chain]).not.undefined;
 
@@ -13098,7 +13102,7 @@ describe("expect", () => {
   });
 
   it("arguments", () => {
-    var args = (function() {
+    var args = (function () {
       return arguments;
     })(1, 2, 3);
     expect(args).to.be.arguments;
@@ -13119,7 +13123,7 @@ describe("expect", () => {
       expect(new Foo()).to.an.instanceof(1, "blah");
     }).to.throw(
       AssertionError,
-      'blah: The instanceof assertion needs a constructor but Number was given.',
+      "blah: The instanceof assertion needs a constructor but Number was given."
     );
 
     expect(() => {
@@ -13184,7 +13188,7 @@ describe("expect", () => {
     expect(() => {
       var FakeConstructor = {};
       var fakeInstanceB = 4;
-      FakeConstructor[Symbol.hasInstance] = function(val) {
+      FakeConstructor[Symbol.hasInstance] = function (val) {
         return val === 3;
       };
       expect(fakeInstanceB).to.be.an.instanceof(FakeConstructor);
@@ -13196,7 +13200,7 @@ describe("expect", () => {
     expect(() => {
       var FakeConstructor = {};
       var fakeInstanceB = 4;
-      FakeConstructor[Symbol.hasInstance] = function(val) {
+      FakeConstructor[Symbol.hasInstance] = function (val) {
         return val === 4;
       };
       expect(fakeInstanceB).to.not.be.an.instanceof(FakeConstructor);
@@ -14258,7 +14262,7 @@ describe("expect", () => {
     );
 
     expect(() => {
-      expect(function() {}, "blah").to.be.empty;
+      expect(function () {}, "blah").to.be.empty;
     }).to.throw(AssertionError, "blah: .empty was passed a function");
 
     expect(() => {
@@ -14330,7 +14334,7 @@ describe("expect", () => {
     }).to.throw(AssertionError, "expected [] to be NaN");
   });
 
-  it("finite", function() {
+  it("finite", function () {
     expect(4).to.be.finite;
     expect(-10).to.be.finite;
 
@@ -14355,7 +14359,7 @@ describe("expect", () => {
     }).to.throw(AssertionError, "expected {} to be a finite number");
   });
 
-  it("property(name)", function() {
+  it("property(name)", function () {
     expect("test").to.have.property("length");
     expect({ a: 1 }).to.have.property("toString");
     expect(4).to.not.have.property("length");
@@ -14366,7 +14370,7 @@ describe("expect", () => {
     // Properties with the value 'undefined' are still properties
     var obj = { foo: undefined };
     Object.defineProperty(obj, "bar", {
-      get: function() {}
+      get: function () {},
     });
     expect(obj).to.have.property("foo");
     expect(obj).to.have.property("bar");
@@ -14438,7 +14442,7 @@ describe("expect", () => {
     expect({ foo: obj1, bar: obj2 }).to.not.include({ foo: { a: 1 } });
     expect({ foo: obj1, bar: obj2 }).to.not.include({
       foo: obj1,
-      bar: { b: 2 }
+      bar: { b: 2 },
     });
 
     var map = new Map();
@@ -14492,14 +14496,14 @@ describe("expect", () => {
     expect({ foo: obj1, bar: obj2 }).to.deep.include({ foo: { a: 1 } });
     expect({ foo: obj1, bar: obj2 }).to.deep.include({
       foo: { a: 1 },
-      bar: { b: 2 }
+      bar: { b: 2 },
     });
     expect({ foo: obj1, bar: obj2 }).to.not.deep.include({ foo: { a: 9 } });
     expect({ foo: obj1, bar: obj2 }).to.not.deep.include({ foo: { z: 1 } });
     expect({ foo: obj1, bar: obj2 }).to.not.deep.include({ baz: { a: 1 } });
     expect({ foo: obj1, bar: obj2 }).to.not.deep.include({
       foo: { a: 1 },
-      bar: { b: 9 }
+      bar: { b: 9 },
     });
 
     var map = new Map();
@@ -14519,31 +14523,31 @@ describe("expect", () => {
     expect({ a: { b: ["x", "y"] } }).to.not.nested.include({ "a.c": "y" });
 
     expect({ a: { b: [{ x: 1 }] } }).to.not.nested.include({
-      "a.b[0]": { x: 1 }
+      "a.b[0]": { x: 1 },
     });
 
     expect({ ".a": { "[b]": "x" } }).to.nested.include({ "\\.a.\\[b\\]": "x" });
     expect({ ".a": { "[b]": "x" } }).to.not.nested.include({
-      "\\.a.\\[b\\]": "y"
+      "\\.a.\\[b\\]": "y",
     });
   });
 
   it("deep.nested.include()", () => {
     expect({ a: { b: [{ x: 1 }] } }).to.deep.nested.include({
-      "a.b[0]": { x: 1 }
+      "a.b[0]": { x: 1 },
     });
     expect({ a: { b: [{ x: 1 }] } }).to.not.deep.nested.include({
-      "a.b[0]": { y: 2 }
+      "a.b[0]": { y: 2 },
     });
     expect({ a: { b: [{ x: 1 }] } }).to.not.deep.nested.include({
-      "a.c": { x: 1 }
+      "a.c": { x: 1 },
     });
 
     expect({ ".a": { "[b]": { x: 1 } } }).to.deep.nested.include({
-      "\\.a.\\[b\\]": { x: 1 }
+      "\\.a.\\[b\\]": { x: 1 },
     });
     expect({ ".a": { "[b]": { x: 1 } } }).to.not.deep.nested.include({
-      "\\.a.\\[b\\]": { y: 2 }
+      "\\.a.\\[b\\]": { y: 2 },
     });
   });
 
@@ -14551,7 +14555,7 @@ describe("expect", () => {
     expect({ a: 1 }).to.own.include({ a: 1 });
     expect({ a: 1 }).to.not.own.include({ a: 3 });
     expect({ a: 1 }).to.not.own.include({
-      toString: Object.prototype.toString
+      toString: Object.prototype.toString,
     });
 
     expect({ a: { b: 2 } }).to.not.own.include({ a: { b: 2 } });
@@ -14561,7 +14565,7 @@ describe("expect", () => {
     expect({ a: { b: 2 } }).to.deep.own.include({ a: { b: 2 } });
     expect({ a: { b: 2 } }).to.not.deep.own.include({ a: { c: 3 } });
     expect({ a: { b: 2 } }).to.not.deep.own.include({
-      toString: Object.prototype.toString
+      toString: Object.prototype.toString,
     });
   });
 
@@ -14620,7 +14624,7 @@ describe("expect", () => {
 
     Object.defineProperty(obj, nonEnumProp, {
       enumerable: false,
-      value: "nonEnumProp"
+      value: "nonEnumProp",
     });
 
     expect(obj).to.have.all.keys([enumProp1, enumProp2]);
@@ -14638,7 +14642,7 @@ describe("expect", () => {
 
     Object.defineProperty(obj, sym3, {
       enumerable: false,
-      value: "sym3"
+      value: "sym3",
     });
 
     expect(obj).to.have.all.keys([sym1, sym2, str]);
@@ -14678,7 +14682,7 @@ describe("expect", () => {
     expect(testMap).to.not.have.any.keys([
       { 13: 37 },
       "thisDoesNotExist",
-      "thisToo"
+      "thisToo",
     ]);
     expect(testMap).to.not.have.any.keys([20, 1, { 13: 37 }]);
     expect(testMap).to.not.have.all.keys([aKey, { iDoNot: "exist" }]);
@@ -14686,7 +14690,7 @@ describe("expect", () => {
     // Using the same assertions as above but with `.deep` flag instead of using referential equality
     expect(testMap).to.have.any.deep.keys({ thisIs: "anExampleObject" });
     expect(testMap).to.have.any.deep.keys("thisDoesNotExist", "thisToo", {
-      thisIs: "anExampleObject"
+      thisIs: "anExampleObject",
     });
 
     expect(testMap).to.contain.all.deep.keys({ thisIs: "anExampleObject" });
@@ -14702,14 +14706,14 @@ describe("expect", () => {
       { 33: 20 }
     );
     expect(testMap).to.not.have.all.deep.keys("thisDoesNotExist", "thisToo", {
-      doingThisBecauseOf: "referential equality"
+      doingThisBecauseOf: "referential equality",
     });
 
     expect(testMap).to.have.any.deep.keys([{ thisIs: "anExampleObject" }]);
     expect(testMap).to.have.any.deep.keys([
       20,
       1,
-      { thisIs: "anExampleObject" }
+      { thisIs: "anExampleObject" },
     ]);
 
     expect(testMap).to.have.all.deep.keys(
@@ -14720,12 +14724,12 @@ describe("expect", () => {
     expect(testMap).to.not.have.any.deep.keys([
       { 13: 37 },
       "thisDoesNotExist",
-      "thisToo"
+      "thisToo",
     ]);
     expect(testMap).to.not.have.any.deep.keys([20, 1, { 13: 37 }]);
     expect(testMap).to.not.have.all.deep.keys([
       { thisIs: "anExampleObject" },
-      { iDoNot: "exist" }
+      { iDoNot: "exist" },
     ]);
 
     var weirdMapKey1 = Object.create(null),
@@ -14790,7 +14794,7 @@ describe("expect", () => {
     expect(testSet).to.not.have.any.keys([
       { 13: 37 },
       "thisDoesNotExist",
-      "thisToo"
+      "thisToo",
     ]);
     expect(testSet).to.not.have.any.keys([20, 1, { 13: 37 }]);
     expect(testSet).to.not.have.all.keys([aKey, { iDoNot: "exist" }]);
@@ -14798,7 +14802,7 @@ describe("expect", () => {
     // Using the same assertions as above but with `.deep` flag instead of using referential equality
     expect(testSet).to.have.any.deep.keys({ thisIs: "anExampleObject" });
     expect(testSet).to.have.any.deep.keys("thisDoesNotExist", "thisToo", {
-      thisIs: "anExampleObject"
+      thisIs: "anExampleObject",
     });
 
     expect(testSet).to.contain.all.deep.keys({ thisIs: "anExampleObject" });
@@ -14814,30 +14818,30 @@ describe("expect", () => {
       { 33: 20 }
     );
     expect(testSet).to.not.have.all.deep.keys("thisDoesNotExist", "thisToo", {
-      doingThisBecauseOf: "referential equality"
+      doingThisBecauseOf: "referential equality",
     });
 
     expect(testSet).to.have.any.deep.keys([{ thisIs: "anExampleObject" }]);
     expect(testSet).to.have.any.deep.keys([
       20,
       1,
-      { thisIs: "anExampleObject" }
+      { thisIs: "anExampleObject" },
     ]);
 
     expect(testSet).to.have.all.deep.keys([
       { thisIs: "anExampleObject" },
-      { doingThisBecauseOf: "referential equality" }
+      { doingThisBecauseOf: "referential equality" },
     ]);
 
     expect(testSet).to.not.have.any.deep.keys([
       { 13: 37 },
       "thisDoesNotExist",
-      "thisToo"
+      "thisToo",
     ]);
     expect(testSet).to.not.have.any.deep.keys([20, 1, { 13: 37 }]);
     expect(testSet).to.not.have.all.deep.keys([
       { thisIs: "anExampleObject" },
-      { iDoNot: "exist" }
+      { iDoNot: "exist" },
     ]);
 
     var weirdSetKey1 = Object.create(null),
@@ -14881,41 +14885,31 @@ describe("expect", () => {
 
   it("chaining", () => {
     var tea = { name: "chai", extras: ["milk", "sugar", "smile"] };
-    expect(tea)
-      .to.have.property("extras")
-      .with.lengthOf(3);
+    expect(tea).to.have.property("extras").with.lengthOf(3);
 
-    expect(tea)
-      .to.have.property("extras")
-      .which.contains("smile");
+    expect(tea).to.have.property("extras").which.contains("smile");
 
     expect(() => {
-      expect(tea)
-        .to.have.property("extras")
-        .with.lengthOf(4);
+      expect(tea).to.have.property("extras").with.lengthOf(4);
     }).to.throw(
       AssertionError,
       "expected [ 'milk', 'sugar', 'smile' ] to have a length of 4 but got 3"
     );
 
-    expect(tea)
-      .to.be.a("object")
-      .and.have.property("name", "chai");
+    expect(tea).to.be.a("object").and.have.property("name", "chai");
 
-    var badFn = function() {
+    var badFn = function () {
       throw new Error("testing");
     };
 
-    expect(badFn)
-      .to.throw(Error)
-      .with.property("message", "testing");
+    expect(badFn).to.throw(Error).with.property("message", "testing");
   });
 
-  it("throw", function() {
+  it("throw", function () {
     // See GH-45: some poorly-constructed custom errors don't have useful names
     // on either their constructor or their constructor prototype, but instead
     // only set the name inside the constructor itself.
-    var PoorlyConstructedError = function() {
+    var PoorlyConstructedError = function () {
       this.name = "PoorlyConstructedError";
     };
     PoorlyConstructedError.prototype = Object.create(Error.prototype);
@@ -14928,28 +14922,28 @@ describe("expect", () => {
 
     var specificError = new RangeError("boo");
 
-    var goodFn = function() {
+    var goodFn = function () {
         1 == 1;
       },
-      badFn = function() {
+      badFn = function () {
         throw new Error("testing");
       },
-      refErrFn = function() {
+      refErrFn = function () {
         throw new ReferenceError("hello");
       },
-      ickyErrFn = function() {
+      ickyErrFn = function () {
         throw new PoorlyConstructedError();
       },
-      specificErrFn = function() {
+      specificErrFn = function () {
         throw specificError;
       },
-      customErrFn = function() {
+      customErrFn = function () {
         throw new CustomError("foo");
       },
-      emptyErrFn = function() {
+      emptyErrFn = function () {
         throw new Error();
       },
-      emptyStringErrFn = function() {
+      emptyStringErrFn = function () {
         throw new Error("");
       };
 
@@ -15174,11 +15168,11 @@ describe("expect", () => {
 
   it("respondTo", () => {
     function Foo() {}
-    Foo.prototype.bar = function() {};
-    Foo.func = function() {};
+    Foo.prototype.bar = function () {};
+    Foo.func = function () {};
 
     var bar = {};
-    bar.foo = function() {};
+    bar.foo = function () {};
 
     expect(Foo).to.respondTo("bar");
     expect(Foo).to.not.respondTo("foo");
@@ -15217,7 +15211,7 @@ describe("expect", () => {
   });
 
   it("satisfy", () => {
-    var matcher = function(num) {
+    var matcher = function (num) {
       return num === 1;
     };
 
@@ -15357,28 +15351,28 @@ describe("expect", () => {
     expect([{ a: 1 }, { b: 2 }, { b: 2 }]).deep.members([
       { a: 1 },
       { b: 2 },
-      { b: 2 }
+      { b: 2 },
     ]);
 
     expect([{ id: 2 }]).not.deep.members([{ id: 1 }]);
     expect([{ a: 1 }, { b: 2 }]).not.deep.members([
       { a: 1 },
       { b: 2 },
-      { b: 2 }
-    ]);
-    expect([{ a: 1 }, { b: 2 }, { b: 2 }]).not.deep.members([
-      { a: 1 },
-      { b: 2 }
+      { b: 2 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { b: 2 }]).not.deep.members([
       { a: 1 },
       { b: 2 },
-      { c: 3 }
+    ]);
+    expect([{ a: 1 }, { b: 2 }, { b: 2 }]).not.deep.members([
+      { a: 1 },
+      { b: 2 },
+      { c: 3 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.deep.members([
       { a: 1 },
       { b: 2 },
-      { b: 2 }
+      { b: 2 },
     ]);
 
     expect(() => {
@@ -15399,17 +15393,17 @@ describe("expect", () => {
   it("include.deep.members", () => {
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).include.deep.members([
       { b: 2 },
-      { a: 1 }
+      { a: 1 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).include.deep.members([
       { b: 2 },
       { a: 1 },
-      { a: 1 }
+      { a: 1 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.include.deep.members([
       { b: 2 },
       { a: 1 },
-      { f: 5 }
+      { f: 5 },
     ]);
 
     expect(() => {
@@ -15426,7 +15420,7 @@ describe("expect", () => {
       expect([{ a: 1 }, { b: 2 }, { c: 3 }], "blah").include.deep.members([
         { b: 2 },
         { a: 1 },
-        { f: 5 }
+        { f: 5 },
       ]);
     }).to.throw(
       AssertionError,
@@ -15499,37 +15493,37 @@ describe("expect", () => {
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).deep.ordered.members([
       { a: 1 },
       { b: 2 },
-      { c: 3 }
+      { c: 3 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { b: 2 }]).deep.ordered.members([
       { a: 1 },
       { b: 2 },
-      { b: 2 }
+      { b: 2 },
     ]);
 
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.deep.ordered.members([
       { b: 2 },
       { a: 1 },
-      { c: 3 }
+      { c: 3 },
     ]);
     expect([{ a: 1 }, { b: 2 }]).not.deep.ordered.members([
       { a: 1 },
       { b: 2 },
-      { b: 2 }
-    ]);
-    expect([{ a: 1 }, { b: 2 }, { b: 2 }]).not.deep.ordered.members([
-      { a: 1 },
-      { b: 2 }
+      { b: 2 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { b: 2 }]).not.deep.ordered.members([
       { a: 1 },
       { b: 2 },
-      { c: 3 }
+    ]);
+    expect([{ a: 1 }, { b: 2 }, { b: 2 }]).not.deep.ordered.members([
+      { a: 1 },
+      { b: 2 },
+      { c: 3 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.deep.ordered.members([
       { a: 1 },
       { b: 2 },
-      { b: 2 }
+      { b: 2 },
     ]);
 
     expect(() => {
@@ -15546,7 +15540,7 @@ describe("expect", () => {
       expect([{ a: 1 }, { b: 2 }, { c: 3 }], "blah").deep.ordered.members([
         { b: 2 },
         { a: 1 },
-        { c: 3 }
+        { c: 3 },
       ]);
     }).to.throw(
       AssertionError,
@@ -15557,7 +15551,7 @@ describe("expect", () => {
       expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.deep.ordered.members([
         { a: 1 },
         { b: 2 },
-        { c: 3 }
+        { c: 3 },
       ]);
     }).to.throw(
       AssertionError,
@@ -15568,20 +15562,20 @@ describe("expect", () => {
   it("include.deep.ordered.members", () => {
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).include.deep.ordered.members([
       { a: 1 },
-      { b: 2 }
+      { b: 2 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.include.deep.ordered.members([
       { b: 2 },
-      { a: 1 }
+      { a: 1 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.include.deep.ordered.members([
       { b: 2 },
-      { c: 3 }
+      { c: 3 },
     ]);
     expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.include.deep.ordered.members([
       { a: 1 },
       { b: 2 },
-      { b: 2 }
+      { b: 2 },
     ]);
 
     expect(() => {
@@ -15607,7 +15601,7 @@ describe("expect", () => {
     expect(() => {
       expect([{ a: 1 }, { b: 2 }, { c: 3 }]).not.include.deep.ordered.members([
         { a: 1 },
-        { b: 2 }
+        { b: 2 },
       ]);
     }).to.throw(
       AssertionError,
@@ -15626,31 +15620,19 @@ describe("expect", () => {
     const lenFn = () => heroes.length;
 
     expect(fn).to.change(obj, "value");
-    expect(fn)
-      .to.change(obj, "value")
-      .by(5);
-    expect(fn)
-      .to.change(obj, "value")
-      .by(-5);
+    expect(fn).to.change(obj, "value").by(5);
+    expect(fn).to.change(obj, "value").by(-5);
 
-    expect(decFn)
-      .to.change(obj, "value")
-      .by(20);
-    expect(decFn)
-      .to.change(obj, "value")
-      .but.not.by(21);
+    expect(decFn).to.change(obj, "value").by(20);
+    expect(decFn).to.change(obj, "value").but.not.by(21);
 
     expect(sameFn).to.not.change(obj, "value");
 
     expect(sameFn).to.not.change(obj, "str");
     expect(bangFn).to.change(obj, "str");
 
-    expect(batFn)
-      .to.change(lenFn)
-      .by(1);
-    expect(batFn)
-      .to.change(lenFn)
-      .but.not.by(2);
+    expect(batFn).to.change(lenFn).by(1);
+    expect(batFn).to.change(lenFn).but.not.by(2);
 
     expect(() => {
       expect(sameFn).to.change(obj, "value", "blah");
@@ -15685,91 +15667,69 @@ describe("expect", () => {
     }).to.throw(AssertionError, "blah: expected {} to be a function");
 
     expect(() => {
-      expect(fn)
-        .to.change(obj, "value")
-        .by(10, "blah");
+      expect(fn).to.change(obj, "value").by(10, "blah");
     }).to.throw(AssertionError, "blah: expected .value to change by 10");
 
     expect(() => {
-      expect(fn, "blah")
-        .to.change(obj, "value")
-        .by(10);
+      expect(fn, "blah").to.change(obj, "value").by(10);
     }).to.throw(AssertionError, "blah: expected .value to change by 10");
 
     expect(() => {
-      expect(fn)
-        .to.change(obj, "value")
-        .but.not.by(5, "blah");
+      expect(fn).to.change(obj, "value").but.not.by(5, "blah");
     }).to.throw(AssertionError, "blah: expected .value to not change by 5");
   });
 
   it("increase, decrease", () => {
     var obj = { value: 10, noop: null },
       arr = ["one", "two"],
-      pFn = function() {
+      pFn = function () {
         arr.push("three");
       },
-      popFn = function() {
+      popFn = function () {
         arr.pop();
       },
-      nFn = function() {
+      nFn = function () {
         return null;
       },
-      lenFn = function() {
+      lenFn = function () {
         return arr.length;
       },
-      incFn = function() {
+      incFn = function () {
         obj.value += 2;
       },
-      decFn = function() {
+      decFn = function () {
         obj.value -= 3;
       },
-      smFn = function() {
+      smFn = function () {
         obj.value += 0;
       };
 
     expect(smFn).to.not.increase(obj, "value");
     expect(decFn).to.not.increase(obj, "value");
     expect(incFn).to.increase(obj, "value");
-    expect(incFn)
-      .to.increase(obj, "value")
-      .by(2);
-    expect(incFn)
-      .to.increase(obj, "value")
-      .but.not.by(1);
+    expect(incFn).to.increase(obj, "value").by(2);
+    expect(incFn).to.increase(obj, "value").but.not.by(1);
 
     expect(smFn).to.not.decrease(obj, "value");
     expect(incFn).to.not.decrease(obj, "value");
     expect(decFn).to.decrease(obj, "value");
-    expect(decFn)
-      .to.decrease(obj, "value")
-      .by(3);
-    expect(decFn)
-      .to.decrease(obj, "value")
-      .but.not.by(2);
+    expect(decFn).to.decrease(obj, "value").by(3);
+    expect(decFn).to.decrease(obj, "value").but.not.by(2);
 
     expect(popFn).to.not.increase(lenFn);
     expect(nFn).to.not.increase(lenFn);
     expect(pFn).to.increase(lenFn);
-    expect(pFn)
-      .to.increase(lenFn)
-      .by(1);
-    expect(pFn)
-      .to.increase(lenFn)
-      .but.not.by(2);
+    expect(pFn).to.increase(lenFn).by(1);
+    expect(pFn).to.increase(lenFn).but.not.by(2);
 
     expect(popFn).to.decrease(lenFn);
-    expect(popFn)
-      .to.decrease(lenFn)
-      .by(1);
-    expect(popFn)
-      .to.decrease(lenFn)
-      .but.not.by(2);
+    expect(popFn).to.decrease(lenFn).by(1);
+    expect(popFn).to.decrease(lenFn).but.not.by(2);
     expect(nFn).to.not.decrease(lenFn);
     expect(pFn).to.not.decrease(lenFn);
   });
 
-  it("extensible", function() {
+  it("extensible", function () {
     const nonExtensibleObject = Object.preventExtensions({});
 
     expect({}).to.be.extensible;
@@ -15815,7 +15775,7 @@ describe("expect", () => {
       {
         isExtensible() {
           throw new TypeError();
-        }
+        },
       }
     );
 
@@ -15824,7 +15784,7 @@ describe("expect", () => {
     }).to.throw(TypeError);
   });
 
-  it("sealed", function() {
+  it("sealed", function () {
     const sealedObject = Object.seal({});
 
     expect(sealedObject).to.be.sealed;
@@ -15870,7 +15830,7 @@ describe("expect", () => {
       {
         ownKeys() {
           throw new TypeError();
-        }
+        },
       }
     );
 
@@ -15881,7 +15841,7 @@ describe("expect", () => {
     }).to.throw(TypeError);
   });
 
-  it("frozen", function() {
+  it("frozen", function () {
     const frozenObject = Object.freeze({});
 
     expect(frozenObject).to.be.frozen;
@@ -15927,7 +15887,7 @@ describe("expect", () => {
       {
         ownKeys() {
           throw new TypeError();
-        }
+        },
       }
     );
 
@@ -15939,10 +15899,9 @@ describe("expect", () => {
   });
 });
 
-
 function runTest(fileData) {
-  tests.forEach(test => test.func());
-};
+  tests.forEach((test) => test.func());
+}
 
 })();
 

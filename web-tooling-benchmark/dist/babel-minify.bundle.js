@@ -79010,20 +79010,19 @@ __webpack_require__.r(__webpack_exports__);
 const payloads = [
   {
     name: "speedometer-es2015-test-2.0.js",
-    options: {}
-  }
+    options: {},
+  },
 ];
 
 function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
-    options
+    options,
   }));
 
-  return testData.map(({ payload, options }) =>
-    babel_minify__WEBPACK_IMPORTED_MODULE_0__(payload, options)
-  );
+  return testData.map(({ payload, options }) => babel_minify__WEBPACK_IMPORTED_MODULE_0__(payload, options));
 }
+
 })();
 
 self.WTBenchmark = __webpack_exports__;

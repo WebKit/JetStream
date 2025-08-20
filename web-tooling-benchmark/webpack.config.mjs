@@ -2,9 +2,14 @@
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
 
-const path = require("path");
-const webpack = require("webpack");
-const { targetList } = require("./src/cli/flags-helper.mjs");
+import path from "path";
+import webpack from "webpack";
+import { fileURLToPath } from "url";
+import { targetList } from "./src/cli/flags-helper.mjs";
+import { createRequire } from "module";
+
+const require = createRequire(import.meta.url);
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const srcDir = path.resolve(__dirname, "src");
 const distDir = path.resolve(__dirname, "dist");
@@ -17,7 +22,7 @@ function getTargets(env) {
   return [...targetList];
 }
 
-module.exports = async (env) => {
+export default async (env) => {
   const targets = getTargets(env);
   const entries = Object.create(null);
   for (const target of targets) {

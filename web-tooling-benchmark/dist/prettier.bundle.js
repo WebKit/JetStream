@@ -218,30 +218,35 @@ __webpack_require__.r(__webpack_exports__);
 const payloads = [
   {
     name: "preact-8.2.5.js",
-    options: { semi: false, useTabs: false, parser: "babel" }
+    options: { semi: false, useTabs: false, parser: "babel" },
   },
   {
     name: "lodash.core-4.17.21.js",
-    options: { semi: true, useTabs: true, parser: "babel" }
+    options: { semi: true, useTabs: true, parser: "babel" },
   },
   {
     name: "todomvc/react/app.jsx",
-    options: { semi: false, useTabs: true, parser: "babel" }
+    options: { semi: false, useTabs: true, parser: "babel" },
   },
   {
     name: "todomvc/react/footer.jsx",
-    options: { jsxBracketSameLine: true, semi: true, useTabs: true, parser: "babel" }
+    options: {
+      jsxBracketSameLine: true,
+      semi: true,
+      useTabs: true,
+      parser: "babel",
+    },
   },
   {
     name: "todomvc/react/todoItem.jsx",
-    options: { semi: false, singleQuote: true, useTabs: true, parser: "babel" }
-  }
+    options: { semi: false, singleQuote: true, useTabs: true, parser: "babel" },
+  },
 ];
 
 async function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
-    options
+    options,
   }));
 
   return Promise.all(
@@ -250,6 +255,7 @@ async function runTest(fileData) {
     )
   );
 }
+
 })();
 
 self.WTBenchmark = __webpack_exports__;

@@ -47297,21 +47297,22 @@ const payloads = [
       "template",
       "includes",
       "obj-method",
-      "obj-shorthand"
-    ]
-  }
+      "obj-shorthand",
+    ],
+  },
 ];
 
 function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
-    options
+    options,
   }));
 
   return testData.map(({ payload, options }) =>
     lebab__WEBPACK_IMPORTED_MODULE_0__.transform(payload, options)
   );
 }
+
 })();
 
 self.WTBenchmark = __webpack_exports__;

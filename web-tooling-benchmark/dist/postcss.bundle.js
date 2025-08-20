@@ -26967,7 +26967,6 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-
 const nestedRules = `
 .phone {
   &_title {
@@ -26984,24 +26983,25 @@ const nestedRules = `
   }
 }`;
 
-
 const payloads = [
   {
     name: "bootstrap-5.3.7.css",
-    options: { from: `third_party/bootstrap-5.3.7.css`, map: false }
+    options: { from: `third_party/bootstrap-5.3.7.css`, map: false },
   },
   {
     name: "foundation-6.9.0.css",
-    options: { from: `third_party/foundation-6.9.0.css`, map: false }
+    options: { from: `third_party/foundation-6.9.0.css`, map: false },
   },
   {
     name: "angular-material-20.1.6.css",
-    options: { from: `third_party/angular-material-20.1.6.css`, map: false }
-  }
+    options: { from: `third_party/angular-material-20.1.6.css`, map: false },
+  },
 ];
 
 function runTest(fileData) {
-  const cleaner = (0,postcss__WEBPACK_IMPORTED_MODULE_0__["default"])([autoprefixer__WEBPACK_IMPORTED_MODULE_2__({ add: false, overrideBrowserslist: [] })]);
+  const cleaner = (0,postcss__WEBPACK_IMPORTED_MODULE_0__["default"])([
+    autoprefixer__WEBPACK_IMPORTED_MODULE_2__({ add: false, overrideBrowserslist: [] }),
+  ]);
   const processor = (0,postcss__WEBPACK_IMPORTED_MODULE_0__["default"])([autoprefixer__WEBPACK_IMPORTED_MODULE_2__, postcss_nested__WEBPACK_IMPORTED_MODULE_1__]);
 
   const testData = payloads.map(({ name, options }) => {
@@ -27012,7 +27012,7 @@ function runTest(fileData) {
 
     return {
       payload: css,
-      options
+      options,
     };
   });
 
@@ -27020,6 +27020,7 @@ function runTest(fileData) {
     ({ payload, options }) => processor.process(payload, options).css
   );
 }
+
 })();
 
 self.WTBenchmark = __webpack_exports__;

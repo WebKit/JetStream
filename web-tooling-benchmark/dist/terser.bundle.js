@@ -36225,14 +36225,14 @@ __webpack_require__.r(__webpack_exports__);
 const payloads = [
   {
     name: "speedometer-es2015-test-2.0.js",
-    options: { compress: { passes: 1, sequences: false } }
-  }
+    options: { compress: { passes: 1, sequences: false } },
+  },
 ];
 
 async function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
-    options
+    options,
   }));
 
   return await Promise.all(
