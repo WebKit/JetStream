@@ -11,9 +11,9 @@ const payloads = [
     transpileOptions: {
       compilerOptions: {
         module: ts.ModuleKind.CommonJS,
-        target: ts.ScriptTarget.ES3
-      }
-    }
+        target: ts.ScriptTarget.ES3,
+      },
+    },
   },
   {
     // Compile typescript-angular.ts to ESNext (latest)
@@ -21,16 +21,16 @@ const payloads = [
     transpileOptions: {
       compilerOptions: {
         module: ts.ModuleKind.CommonJS,
-        target: ts.ScriptTarget.ESNext
-      }
-    }
-  }
+        target: ts.ScriptTarget.ESNext,
+      },
+    },
+  },
 ];
 
 export function runTest(fileData) {
   const testData = payloads.map(({ name, transpileOptions }) => ({
     input: fileData[name],
-    transpileOptions
+    transpileOptions,
   }));
 
   return testData.map(({ input, transpileOptions }) =>

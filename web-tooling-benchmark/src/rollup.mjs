@@ -6,19 +6,17 @@ import { rollup } from "rollup";
 
 const payloads = [
   {
-    name: "preact-8.2.5.js"
-  }
+    name: "preact-8.2.5.js",
+  },
 ];
 
 export async function runTest(fileData) {
   const testData = payloads.map(({ name }) => ({
     payload: fileData[name],
     options: {
-      input: `third_party/${name}`
-    }
+      input: `third_party/${name}`,
+    },
   }));
 
-  return await Promise.all(
-    testData.map(({ options }) => rollup(options))
-  );
+  return await Promise.all(testData.map(({ options }) => rollup(options)));
 }

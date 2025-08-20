@@ -8,11 +8,11 @@ const payloads = [
   "lodash-4.17.4.min.js.map",
   "preact-10.27.1.min.module.js.map",
   "source-map.min-0.5.7.js.map",
-  "underscore-1.13.7.min.js.map"
+  "underscore-1.13.7.min.js.map",
 ];
 
 export async function runTest(fileData) {
-  const testData = payloads.map(name => fileData[name]);
+  const testData = payloads.map((name) => fileData[name]);
 
   sourceMap.SourceMapConsumer.initialize({
     "lib/mappings.wasm": fileData["source-map/lib/mappings.wasm"],

@@ -6,7 +6,6 @@ import postcss from "postcss";
 import nested from "postcss-nested";
 import autoprefixer from "autoprefixer";
 
-
 const nestedRules = `
 .phone {
   &_title {
@@ -23,24 +22,25 @@ const nestedRules = `
   }
 }`;
 
-
 const payloads = [
   {
     name: "bootstrap-5.3.7.css",
-    options: { from: `third_party/bootstrap-5.3.7.css`, map: false }
+    options: { from: `third_party/bootstrap-5.3.7.css`, map: false },
   },
   {
     name: "foundation-6.9.0.css",
-    options: { from: `third_party/foundation-6.9.0.css`, map: false }
+    options: { from: `third_party/foundation-6.9.0.css`, map: false },
   },
   {
     name: "angular-material-20.1.6.css",
-    options: { from: `third_party/angular-material-20.1.6.css`, map: false }
-  }
+    options: { from: `third_party/angular-material-20.1.6.css`, map: false },
+  },
 ];
 
 export function runTest(fileData) {
-  const cleaner = postcss([autoprefixer({ add: false, overrideBrowserslist: [] })]);
+  const cleaner = postcss([
+    autoprefixer({ add: false, overrideBrowserslist: [] }),
+  ]);
   const processor = postcss([autoprefixer, nested]);
 
   const testData = payloads.map(({ name, options }) => {
@@ -51,7 +51,7 @@ export function runTest(fileData) {
 
     return {
       payload: css,
-      options
+      options,
     };
   });
 

@@ -17,15 +17,15 @@ const payloads = [
       "template",
       "includes",
       "obj-method",
-      "obj-shorthand"
-    ]
-  }
+      "obj-shorthand",
+    ],
+  },
 ];
 
 export function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
-    options
+    options,
   }));
 
   return testData.map(({ payload, options }) =>

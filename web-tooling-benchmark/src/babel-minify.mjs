@@ -7,17 +7,15 @@ import babelMinify from "babel-minify";
 const payloads = [
   {
     name: "speedometer-es2015-test-2.0.js",
-    options: {}
-  }
+    options: {},
+  },
 ];
 
 export function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
-    options
+    options,
   }));
 
-  return testData.map(({ payload, options }) =>
-    babelMinify(payload, options)
-  );
+  return testData.map(({ payload, options }) => babelMinify(payload, options));
 }

@@ -8,8 +8,12 @@ import * as babylon from "babylon";
 const payloads = [
   {
     name: "redux-5.0.1.esm.js",
-    options: { presets: ["env"], sourceType: "module", plugins: ["objectRestSpread"] }
-  }
+    options: {
+      presets: ["env"],
+      sourceType: "module",
+      plugins: ["objectRestSpread"],
+    },
+  },
 ];
 
 export function runTest(fileData) {
@@ -20,6 +24,9 @@ export function runTest(fileData) {
   });
 
   return testData.map(({ ast, code, options }) =>
-    Babel.transformFromAst(ast, code, { ...options, plugins: ["transform-object-rest-spread"] })
+    Babel.transformFromAst(ast, code, {
+      ...options,
+      plugins: ["transform-object-rest-spread"],
+    })
   );
 }
