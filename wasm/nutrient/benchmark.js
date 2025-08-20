@@ -228,8 +228,10 @@ const PAGE_HEIGHT = 841;
 
 class Benchmark {
   async init() {
-    Module.wasmBinary = await getBinary(wasmBinary);
-    Module.annotations = await getBinary(annotations);
+    Module.wasmBinary = await JetStream.getBinary(JetStream.preload.wasmBinary);
+    Module.annotations = await JetStream.getBinary(
+      JetStream.preload.annotations
+    );
 
     setupPrerequisites();
     injectRequiredGlobals(globalThis);
@@ -239,7 +241,10 @@ class Benchmark {
     if (!Module.initPSPDFKit) {
       await initializeNutrient();
 
-      Module.FS.writeFile("/document.pdf", await getBinary(pdfDocument));
+      Module.FS.writeFile(
+        "/document.pdf",
+        await JetStream.getBinary(JetStream.preload.pdfDocument)
+      );
     }
 
     openDocument("/document.pdf");
