@@ -2,7 +2,7 @@ This license applies to all parts of web-tooling-benchmark that are not
 externally maintained libraries. The externally maintained libraries
 used by web-tooling-benchmark are:
 
-  - The Backbone.js distribution, located in third_party/backbone-1.1.0.js.
+  - The Backbone.js distribution, located in third_party/backbone-1.6.1.js.
     This is copyrighted by Jeremy Ashkenas, DocumentCloud, and released
     under the terms of the MIT license.
 
@@ -10,12 +10,12 @@ used by web-tooling-benchmark are:
     third_party/coffeescript-lexer-2.0.1.coffee, which is copyrighted by
     Jeremy Ashkenas, and relased under the terms of the MIT license.
 
-  - The jQuery distribution, located in third_party/jquery-3.2.1.js. This
+  - The jQuery distribution, located in third_party/jquery-3.7.1.js. This
     is copyrighted by the JS Foundation and other contributors, and
     released under the terms of the MIT license.
 
-  - The Lodash distribution, located in third_party/lodash.core-4.17.4.js
-    and third_party/lodash.min-4.17.4.js.map. This is copyrighted by
+  - The Lodash distribution, located in third_party/lodash.core-4.17.21.js
+    and third_party/lodash-4.17.4.min.js.map. This is copyrighted by
     the JS Foundation and other contributors, and released under the
     terms of the MIT license.
 
@@ -24,10 +24,10 @@ used by web-tooling-benchmark are:
     terms of the MIT license.
 
   - The Preact distribution, located in third_party/preact-8.2.5.js and
-    third_party/preact-8.2.5.js.map. This is copyrighted by Jason Miller,
+    third_party/preact-10.27.1.min.module.js.map. This is copyrighted by Jason Miller,
     and released under the terms of the MIT license.
 
-  - The Redux distribution, located in third_party/redux.min-3.7.2.js.
+  - The Redux distribution, located in third_party/redux-5.0.1.min.js.
     This is copyrighted by Dan Abramov, and released under the terms
     of the MIT license.
 
@@ -43,12 +43,12 @@ used by web-tooling-benchmark are:
     MIT license.
 
   - The Underscore.js distribution, located in
-    third_party/underscore-1.8.3.js and
-    third_party/underscore.min-1.8.3.js.map. This is copyrighted by
+    third_party/underscore-1.13.7.js and
+    third_party/underscore-1.13.7.min.js.map. This is copyrighted by
     Jeremy Ashkenas, and released under the terms of the MIT license.
 
   - The VueJS distribution, located in
-    third_party/vue.runtime.esm-nobuble-2.4.4.js. This is copyrighted
+    third_party/vue-3.5.18.runtime.esm-browser.js. This is copyrighted
     Yuxi (Evan) You, and released under the terms of the MIT license.
 
 These libraries have their own licenses; we recommend you read them,

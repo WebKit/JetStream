@@ -10671,11 +10671,11 @@ __webpack_require__.r(__webpack_exports__);
 
 const payloads = [
   {
-    name: "jquery-3.2.1.js",
+    name: "jquery-3.7.1.js",
     options: { sourceType: "script" }
   },
   {
-    name: "lodash.core-4.17.4.js",
+    name: "lodash.core-4.17.21.js",
     options: { sourceType: "script" }
   },
   {
@@ -10683,8 +10683,8 @@ const payloads = [
     options: { sourceType: "script" }
   },
   {
-    name: "redux.min-3.7.2.js",
-    options: { sourceType: "script" }
+    name: "redux-5.0.1.min.js",
+    options: { sourceType: "module" }
   },
   {
     name: "speedometer-es2015-test-2.0.js",
@@ -10703,11 +10703,11 @@ const payloads = [
     options: { sourceType: "script", plugins: ["jsx"] }
   },
   {
-    name: "underscore-1.8.3.js",
+    name: "underscore-1.13.7.js",
     options: { sourceType: "script" }
   },
   {
-    name: "vue.runtime.esm-nobuble-2.4.4.js",
+    name: "vue-3.5.18.runtime.esm-browser.js",
     options: { sourceType: "module" }
   }
 ];
@@ -10715,12 +10715,14 @@ const payloads = [
 function runTest(fileData) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
+    name,
     options
   }));
 
-  return testData.map(({ payload, options }) =>
+  return testData.map(({ payload, name, options }) => {
+    console.log(name);
     babylon__WEBPACK_IMPORTED_MODULE_0__.parse(payload, options)
-  );
+  });
 }
 })();
 

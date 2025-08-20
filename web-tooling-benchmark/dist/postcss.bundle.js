@@ -26987,12 +26987,12 @@ const nestedRules = `
 
 const payloads = [
   {
-    name: "bootstrap-4.0.0.css",
-    options: { from: `third_party/bootstrap-4.0.0.css`, map: false }
+    name: "bootstrap-5.3.7.css",
+    options: { from: `third_party/bootstrap-5.3.7.css`, map: false }
   },
   {
-    name: "foundation-6.4.2.css",
-    options: { from: `third_party/foundation-6.4.2.css`, map: false }
+    name: "foundation-6.9.0.css",
+    options: { from: `third_party/foundation-6.9.0.css`, map: false }
   },
   {
     name: "angular-material-20.1.6.css",

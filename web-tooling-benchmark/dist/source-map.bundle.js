@@ -7945,10 +7945,10 @@ __webpack_require__.r(__webpack_exports__);
 
 
 const payloads = [
-  "lodash.min-4.17.4.js.map",
-  "preact-8.2.5.js.map",
+  "lodash-4.17.4.min.js.map",
+  "preact-10.27.1.min.module.js.map",
   "source-map.min-0.5.7.js.map",
-  "underscore.min-1.8.3.js.map"
+  "underscore-1.13.7.min.js.map"
 ];
 
 async function runTest(fileData) {

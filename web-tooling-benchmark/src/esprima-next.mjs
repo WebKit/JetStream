@@ -5,10 +5,10 @@
 import * as esprima from "esprima-next";
 
 const payloads = [
-  "backbone-1.1.0.js",
-  "jquery-3.2.1.js",
+  "backbone-1.6.1.js",
+  "jquery-3.7.1.js",
   "mootools-core-1.6.0.js",
-  "underscore-1.8.3.js"
+  "underscore-1.13.7.js"
 ];
 
 export function runTest(fileData) {

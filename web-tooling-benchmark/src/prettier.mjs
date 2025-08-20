@@ -12,7 +12,7 @@ const payloads = [
     options: { semi: false, useTabs: false, parser: "babel" }
   },
   {
-    name: "lodash.core-4.17.4.js",
+    name: "lodash.core-4.17.21.js",
     options: { semi: true, useTabs: true, parser: "babel" }
   },
   {

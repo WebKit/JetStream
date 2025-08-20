@@ -7,8 +7,8 @@ import * as babylon from "babylon";
 
 const payloads = [
   {
-    name: "vue.runtime.esm-nobuble-2.4.4.js",
-    options: { presets: ["es2015"], sourceType: "module" }
+    name: "vue-3.5.18.runtime.esm-browser.js",
+    options: { presets: ["env"], sourceType: "module" }
   }
 ];
 
