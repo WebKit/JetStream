@@ -21,4 +21,4 @@ Modifications to the original:
 - Date constructions with an arg-array differs between browser and thus they
   are replaced by direct arguments.
 - Direct calls to validater.xzy() are replaced with validatorjs.xzy() to not
-  class with the default argument to the mock test() method.
+  conflict with the default argument to the mock test() method.
