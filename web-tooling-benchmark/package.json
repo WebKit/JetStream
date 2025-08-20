@@ -3,24 +3,10 @@
   "description": "JavaScript benchmark for common web developer workloads",
   "main": "src/cli.js",
   "scripts": {
-    "benchmark": "node dist/cli.js",
+    "benchmark": "node src/cli/cli.mjs",
     "build": "webpack",
     "test": "jest",
     "update-lock": "npm install --package-lock"
-  },
-  "lint-staged": {
-    "src/**/*.css": [
-      "prettier --write",
-      "git add"
-    ],
-    "src/**/*.js": [
-      "prettier --write",
-      "git add"
-    ],
-    "webpack.config.js": [
-      "prettier --write",
-      "git add"
-    ]
   },
   "license": "BSD-3-Clause",
   "dependencies": {

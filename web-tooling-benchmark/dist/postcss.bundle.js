@@ -26995,8 +26995,8 @@ const payloads = [
     options: { from: `third_party/foundation-6.4.2.css`, map: false }
   },
   {
-    name: "angular-material-1.1.8.css",
-    options: { from: `third_party/angular-material-1.1.8.css`, map: false }
+    name: "angular-material-20.1.6.css",
+    options: { from: `third_party/angular-material-20.1.6.css`, map: false }
   }
 ];
 

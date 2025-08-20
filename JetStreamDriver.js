@@ -2585,7 +2585,7 @@ const WPT_FILES = [
   "mootools-core-1.6.0.js",
   "bootstrap-4.0.0.css",
   "foundation-6.4.2.css",
-  "angular-material-1.1.8.css",
+  "angular-material-20.1.6.css",
   "lodash.min-4.17.4.js.map",
   "preact-8.2.5.js.map",
   "source-map.min-0.5.7.js.map",

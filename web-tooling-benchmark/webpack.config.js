@@ -4,7 +4,7 @@
 
 const path = require("path");
 const webpack = require("webpack");
-const { targetList } = require("./src/cli-flags-helper.mjs");
+const { targetList } = require("./src/cli/flags-helper.mjs");
 
 const srcDir = path.resolve(__dirname, "src");
 const distDir = path.resolve(__dirname, "dist");
