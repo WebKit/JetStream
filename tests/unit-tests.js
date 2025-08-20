@@ -128,6 +128,7 @@ ${CACHE_BUST_COMMENT}
     assertEquals(benchmark.iterationSourceCodes.length, 0);
     await benchmark.init();
     assertEquals(benchmark.iterationSourceCodes.length, 12);
+    assertEquals(new Set(benchmark.iterationSourceCodes).size, 12);
     validateIterationSources(benchmark.iterationSourceCodes);
 
     const noReuseBenchmark = new StartupBenchmark(12, 1);

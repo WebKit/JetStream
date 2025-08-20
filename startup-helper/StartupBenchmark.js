@@ -43,7 +43,7 @@ class StartupBenchmark {
   validateIterationSourceCodes() {
     if (this.iterationSourceCodes.some((each) => !each?.length))
       throw new Error(`Got invalid iterationSourceCodes`);
-    let expectedSize = this.iterationCount;
+    let expectedSize = 1;
     if (this.codeReuseCount !== 0)
       expectedSize = Math.ceil(this.iterationCount / this.codeReuseCount);
     const uniqueSources = new Set(this.iterationSourceCodes);
@@ -53,7 +53,6 @@ class StartupBenchmark {
       );
   }
   createIterationSourceCode(iteration) {
-    if (!this.codeReuseCount) return this.sourceCode;
     // Alter the code per iteration to prevent caching.
     const cacheId =
       Math.floor(iteration / this.codeReuseCount) * this.codeReuseCount;
