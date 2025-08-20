@@ -130,6 +130,14 @@ ${CACHE_BUST_COMMENT}
     assertEquals(benchmark.iterationSourceCodes.length, 12);
     validateIterationSources(benchmark.iterationSourceCodes);
 
+    const noReuseBenchmark = new StartupBenchmark(12, 1);
+    noReuseBenchmark.codeReuseCount = 0;
+    assertEquals(noReuseBenchmark.iterationSourceCodes.length, 0);
+    await noReuseBenchmark.init();
+    assertEquals(noReuseBenchmark.iterationSourceCodes.length, 12);
+    assertEquals(new Set(noReuseBenchmark.iterationSourceCodes).size, 1);
+    validateIterationSources(noReuseBenchmark.iterationSourceCodes);
+
     const reuseBenchmark = new StartupBenchmark(12, 1);
     reuseBenchmark.codeReuseCount = 3;
     assertEquals(reuseBenchmark.iterationSourceCodes.length, 0);
