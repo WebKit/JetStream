@@ -1,16 +1,16 @@
-import {default as validatorjs} from "validator";
-
-
  // Original Source: https://raw.githubusercontent.com/validatorjs/validator.js/refs/heads/master/test/validators.test.js
  // Version: https://github.com/validatorjs/validator.js/tree/13.15.15
+
+import {default as validatorjs} from "validator";
+
 
 let assertionCount = 0;
 
 function assert(condition, ...args) {
-  assertionCount++;
-  if (!condition)
-    throw new Error(`Assertion failure: ${args}`);
-}
+    assertionCount++;
+    if (!condition)
+      throw new Error(`Assertion failure: ${args}`);
+  };
 
 function describe(name, body) {
   body();
@@ -19,7 +19,6 @@ function describe(name, body) {
 function it(name, body) {
   body();
 };
-
 
 function test({validator, args=[], valid, invalid}) {
   const validatorMethod = validatorjs[validator];
@@ -33,6 +32,7 @@ function test({validator, args=[], valid, invalid}) {
 
 
 export function runTest() {
+  assertionCount = 0;
 
 describe('Validators', () => {
   it('should validate email addresses', () => {

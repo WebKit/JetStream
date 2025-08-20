@@ -1,8 +1,9 @@
 
-const EXPECTED_ASSERTION_COUNT = 1213680;
+const EXPECTED_ASSERTION_COUNT = 10114;
 
 class Benchmark {
   assertionCount = 0;
+
   runIteration() {
     this.assertionCount = ValidatorJSBenchmark.runTest();
   }

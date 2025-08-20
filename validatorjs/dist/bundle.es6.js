@@ -7440,19 +7440,19 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   runTest: () => (/* binding */ runTest)
 /* harmony export */ });
 /* harmony import */ var validator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7761);
-
-
-
  // Original Source: https://raw.githubusercontent.com/validatorjs/validator.js/refs/heads/master/test/validators.test.js
  // Version: https://github.com/validatorjs/validator.js/tree/13.15.15
+
+
+
 
 let assertionCount = 0;
 
 function assert(condition, ...args) {
-  assertionCount++;
-  if (!condition)
-    throw new Error(`Assertion failure: ${args}`);
-}
+    assertionCount++;
+    if (!condition)
+      throw new Error(`Assertion failure: ${args}`);
+  };
 
 function describe(name, body) {
   body();
@@ -7461,7 +7461,6 @@ function describe(name, body) {
 function it(name, body) {
   body();
 };
-
 
 function test({validator, args=[], valid, invalid}) {
   const validatorMethod = validator__WEBPACK_IMPORTED_MODULE_0__[validator];
@@ -7475,6 +7474,7 @@ function test({validator, args=[], valid, invalid}) {
 
 
 function runTest() {
+  assertionCount = 0;
 
 describe('Validators', () => {
   it('should validate email addresses', () => {
