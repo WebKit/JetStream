@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "node ./src/benchmark-node.cjs",
-    "clean": "rm -rf dist/* && rm -rf src/gen/*",
+    "clean": "rm -rf dist/* && rm -rf src/gen/*.cjs",
     "import": "node ./build/import-src-project.js",
     "prebuild": "npm run clean  && npm run import",
     "build": "webpack && npm run postbuild",
