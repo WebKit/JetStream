@@ -41,7 +41,7 @@ globalThis.testList ??= undefined;
 globalThis.startDelay ??= undefined;
 globalThis.shouldReport ??= false;
 globalThis.prefetchResources ??= true;
-globalThis.printGroupedBenchmarks ??= true;
+globalThis.details ??= false;
 
 function getIntParam(urlParams, key) {
     const rawValue = urlParams.get(key);
@@ -80,6 +80,8 @@ if (typeof(URLSearchParams) !== "undefined") {
         globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
     if (urlParameters.has("prefetchResources"))
         globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources");
+    if (urlParameters.has("details"))
+        globalThis.details = getBoolParam(urlParameters, "details");
 }
 
 if (!globalThis.prefetchResources)
@@ -337,9 +339,8 @@ class Driver {
         this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
 
         let text = "";
-        for (const benchmark of this.benchmarks) {
+        for (const benchmark of this.benchmarks)
             text += benchmark.prepareToRun();
-        }
 
         if (!isInBrowser)
             return;
@@ -353,8 +354,8 @@ class Driver {
         resultsTable.innerHTML = text;
 
         document.getElementById("magic").textContent = "";
-        document.addEventListener('keypress', function (e) {
-            if (e.which === 13)
+        document.addEventListener('keyup', (e) => {
+            if (e.key === "Enter")
                 JetStream.start();
         });
     }
@@ -796,8 +797,6 @@ class Benchmark {
 
         const scoreIds = this.scoreIdentifiers();
         const overallScoreId = scoreIds.pop();
-        if (isInBrowser)
-            return 
         let text =  `<div class="benchmark" id="benchmark-${this.name}">
             <h3 class="benchmark-name">${this.name} <a class="info" href="in-depth.html#${this.name}">i</a></h3>
             <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
@@ -1176,10 +1175,10 @@ class GroupedBenchmark extends Benchmark {
     
     prepareToRun() {
         let text = super.prepareToRun();
-        if (!globalThis.printGroupedBenchmarks)
-            return;
-        for (const benchmark of this.benchmarks)
-            text += benchmark.prepareToRun();
+        if (globalThis.details) {
+            for (const benchmark of this.benchmarks)
+                text += benchmark.prepareToRun();
+        }
         return text;
     }
 
@@ -1200,7 +1199,7 @@ class GroupedBenchmark extends Benchmark {
             this._state = BenchmarkState.RUNNING;
             for (benchmark of this.benchmarks) {
                 await benchmark.run();
-                if (globalThis.printGroupedBenchmarks)
+                if (globalThis.details)
                     benchmark.updateUIAfterRun();
             }
         } catch (e) {
