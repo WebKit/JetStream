@@ -1,4 +1,5 @@
 load("shell-config.js")
+load("startup-helper/StartupBenchmark.js");
 load("JetStreamDriver.js");
 
 function assertTrue(condition, message) {
@@ -100,5 +101,52 @@ function assertEquals(actual, expected, message) {
     // All subScore items are part of allScores.
     for (const name of Object.keys(subScores))
       assertTrue(name in allScores);
+  }
+})();
+
+function validateIterationSources(sources) {
+  for (const source of sources) {
+    assertTrue(typeof(source) == "string");
+    assertFalse(source.includes(CACHE_BUST_COMMENT));
+  }
+}
+
+(async function testStartupBenchmark() {
+  const benchmark = new StartupBenchmark(12, 1);
+  assertEquals(benchmark.iterationCount, 12);
+  assertEquals(benchmark.expectedCacheCommentCount, 1);
+
+  try {
+    JetStream.preload = { BUNDLE: "test-bundle.js" };
+    JetStream.getString = (file) => {
+      assertEquals(file, "test-bundle.js");
+      return `function test() { 
+${CACHE_BUST_COMMENT}
+        return 1;
+        }`;
+    }
+    assertEquals(benchmark.iterationSourceCodes.length, 0);
+    await benchmark.init();
+    assertEquals(benchmark.iterationSourceCodes.length, 12);
+    validateIterationSources(benchmark.iterationSourceCodes);
+
+    const reuseBenchmark = new StartupBenchmark(12, 1);
+    reuseBenchmark.codeReuseCount = 3;
+    assertEquals(reuseBenchmark.iterationSourceCodes.length, 0);
+    await reuseBenchmark.init();
+    assertEquals(reuseBenchmark.iterationSourceCodes.length, 12);
+    assertEquals(new Set(reuseBenchmark.iterationSourceCodes).size, 4);
+    validateIterationSources(reuseBenchmark.iterationSourceCodes);
+
+    const reuseBenchmark2 = new StartupBenchmark(12, 1);
+    reuseBenchmark2.codeReuseCount = 5;
+    assertEquals(reuseBenchmark2.iterationSourceCodes.length, 0);
+    await reuseBenchmark2.init();
+    assertEquals(reuseBenchmark2.iterationSourceCodes.length, 12);
+    assertEquals(new Set(reuseBenchmark2.iterationSourceCodes).size, 3);
+    validateIterationSources(reuseBenchmark2.iterationSourceCodes);
+  } finally {
+    JetStream.preload = undefined;
+    JetStream.getString = undefined;
   }
 })();
