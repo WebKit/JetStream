@@ -1,3 +1,5 @@
+import { parseArgs } from "node:util";
+
 export const targetList = new Set([
   "acorn",
   "babel",
@@ -9,17 +11,19 @@ export const targetList = new Set([
   "lebab",
   "postcss",
   "prettier",
-  // "rollup",
   "source-map",
   "terser",
   "typescript",
 ]);
 
 function getOnlyFlag() {
-  const onlyIndex = process.argv.indexOf("--only");
-  if (onlyIndex != -1) {
-    return process.argv[onlyIndex + 1];
-  }
+  const options = {
+    only: {
+      type: "string",
+    },
+  };
+  const { values } = parseArgs({ options });
+  return values.only;
 }
 
 export function getTarget() {

@@ -5,8 +5,6 @@
 import { getTarget } from "./flags-helper.mjs";
 import fileData from "./file-data.mjs";
 
-
-
 async function main() {
   const targets = getTarget();
   for (const target of targets) {

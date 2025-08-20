@@ -21,6 +21,7 @@ const fileNames = [
   "preact-8.2.5.js",
   "preact-10.27.1.min.module.js.map",
   "redux-5.0.1.min.js",
+  "redux-5.0.1.esm.js",
   "source-map.min-0.5.7.js.map",
   "source-map/lib/mappings.wasm",
   "speedometer-es2015-test-2.0.js",
