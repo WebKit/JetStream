@@ -1060,9 +1060,13 @@ class Benchmark {
 
     updateUIBeforeRun() {
         if (!dumpJSONResults)
-            console.log(`Running ${this.name}:`);
+            this.updateUIBeforeRunInShell();
         if (isInBrowser)
             this.updateUIBeforeRunInBrowser();
+    }
+
+    updateUIBeforeRunInShell() {
+        console.log(`Running ${this.name}:`);
     }
 
     updateUIBeforeRunInBrowser() {
@@ -1081,7 +1085,7 @@ class Benchmark {
             this.updateUIAfterRunInBrowser(scoreEntries);
         if (dumpJSONResults)
             return;
-        this.updateConsoleAfterRun(scoreEntries);
+        this.updateAfterRunInShell(scoreEntries);
     }
 
     updateUIAfterRunInBrowser(scoreEntries) {
@@ -1123,7 +1127,7 @@ class Benchmark {
         plotContainer.innerHTML = `<svg width="${width}px" height="${height}px">${circlesSVG}</svg>`;
     }
 
-    updateConsoleAfterRun(scoreEntries) {
+    updateAfterRunInShell(scoreEntries) {
         // FIXME: consider removing this mapping.
         // Rename for backwards compatibility.
         const legacyScoreNameMap = {
@@ -1182,6 +1186,17 @@ class GroupedBenchmark extends Benchmark {
         return text;
     }
 
+    updateUIBeforeRunInShell() {
+        if (!globalThis.details)
+            super.updateUIBeforeRunInShell();
+    }
+    
+    updateAfterRunInShell(scoreEntries) {
+        if (globalThis.details)
+            super.updateUIBeforeRunInShell();
+        super.updateAfterRunInShell(scoreEntries);
+    }
+
     get files() {
         let files = [];
         for (const benchmark of this.benchmarks)
@@ -1198,6 +1213,8 @@ class GroupedBenchmark extends Benchmark {
         try {
             this._state = BenchmarkState.RUNNING;
             for (benchmark of this.benchmarks) {
+                if (globalThis.details)
+                    benchmark.updateUIBeforeRun();
                 await benchmark.run();
                 if (globalThis.details)
                     benchmark.updateUIAfterRun();
