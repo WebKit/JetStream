@@ -8,12 +8,12 @@ import fileData from "./file-data.mjs";
 async function main() {
   const targets = getTarget();
   for (const target of targets) {
-    console.log(`${target}:`)
+    console.log(`${target}:`);
     const then = performance.now();
     const benchmark = await import(`../${target}.mjs`);
-    await benchmark.runTest(fileData)
+    await benchmark.runTest(fileData);
     const duration = performance.now() - then;
-    console.log(`   duration: ${duration.toFixed(2)}ms`)
+    console.log(`   duration: ${duration.toFixed(2)}ms`);
   }
 }
 

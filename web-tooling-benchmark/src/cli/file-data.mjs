@@ -34,7 +34,6 @@ const fileNames = [
   "vue-3.5.18.runtime.esm-browser.js",
 ];
 
-
 const thirdPartyDir = path.resolve(__dirname, "..", "..", "third_party");
 
 const fileData = {};
