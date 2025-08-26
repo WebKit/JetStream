@@ -1,6 +1,11 @@
-const path = require("path");
-const webpack = require("webpack");
-const TerserPlugin = require("terser-webpack-plugin");
+import path from "path";
+import webpack from "webpack";
+import TerserPlugin from "terser-webpack-plugin";
+import UnicodeEscapePlugin  from "@dapplets/unicode-escape-webpack-plugin";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function createConfig({ filename, minify }) {
   return {
@@ -24,6 +29,9 @@ function createConfig({ filename, minify }) {
         MessageChannel: [path.resolve(__dirname, "src/mock/message_channel.cjs"), "MessageChannel"],
         process: "process/browser",
         Buffer: ["buffer", "Buffer"],
+      }),
+      new UnicodeEscapePlugin({
+        test: /\.(js|jsx|ts|tsx)$/, // Escape Unicode in JavaScript and TypeScript files
       }),
     ],
     module: {
@@ -72,8 +80,8 @@ function createConfig({ filename, minify }) {
     },
     resolve: {
       fallback: {
-        "assert": require.resolve("assert/"),
-        "buffer": require.resolve("buffer/"),
+        "assert": path.resolve("assert/"),
+        "buffer": path.resolve("buffer/"),
         "canvas": false,
         "child_process": false,
         "crypto": false,
@@ -82,12 +90,12 @@ function createConfig({ filename, minify }) {
         "https": false,
         "net": false,
         "os": false,
-        "path": require.resolve("path-browserify"),
-        "stream": require.resolve("stream-browserify"),
-        "string_decoder": require.resolve("string_decoder/"),
+        "path": path.resolve("path-browserify"),
+        "stream": path.resolve("stream-browserify"),
+        "string_decoder": path.resolve("string_decoder/"),
         "tls": false,
-        "url": require.resolve("url/"),
-        "util": require.resolve("util/"),
+        "url": path.resolve("url/"),
+        "util": path.resolve("util/"),
         "vm": false,
         "zlib": false,
       }
@@ -100,7 +108,7 @@ function createConfig({ filename, minify }) {
 
 
 
-module.exports = [
+export default [
   createConfig({ filename: "bundle.min.js", minify: true }),
   createConfig({ filename: "bundle.js", minify: false })
 ];
