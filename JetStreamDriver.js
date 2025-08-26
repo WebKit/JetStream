@@ -2307,8 +2307,6 @@ let BENCHMARKS = [
             stringUnpackCode: "./worker/bomb-subtests/string-unpack-code.js",
             regexpDNA: "./worker/bomb-subtests/regexp-dna.js",
         },
-        // FIXME: Potentially fix the sources.
-        allowUtf16: true,
         tags: ["Default", "WorkerTests"],
     }),
     new AsyncBenchmark({
@@ -2555,15 +2553,11 @@ for (const test of SUNSPIDER_TESTS) {
         files: [
             `./SunSpider/${test}.js`
         ],
-        // FIXME: Potentially fix the sources.
-        allowUtf16: true,
         tags: [],
     }));
 }
 BENCHMARKS.push(new GroupedBenchmark({
     name: "Sunspider",
-    // FIXME: Potentially fix the sources.
-    allowUtf16: true,
     tags: ["Default", "SunSpider"],
 }, SUNSPIDER_BENCHMARKS))
 
