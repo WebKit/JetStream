@@ -131,7 +131,7 @@ class Importer {
   }
 }
 
-new Importer({
+const jest = new Importer({
   projectName: "jestjs-large",
   size: "large",
   repoUrl: "https://github.com/jestjs/jest.git",
@@ -168,9 +168,9 @@ new Importer({
     { dir: "../node_modules/glob/dist/esm/" },
     { dir: "../../node_modules/tempy/node_modules/type-fest/source/" }
   ],
-}).run();
+});
 
-new Importer({
+const zod = new Importer({
   projectName: "zod-medium",
   size: "medium",
   repoUrl: "https://github.com/colinhacks/zod.git",
@@ -179,10 +179,9 @@ new Importer({
   extraDirs: [
     { dir: "../node_modules/typescript/lib/", nameOnly: true },
   ],
-}).run();
+});
 
-// Import tiny-sized project sources:
-new Importer({
+const immer =new Importer({
   projectName: "immer-tiny",
   size: "tiny",
   repoUrl: "https://github.com/immerjs/immer.git",
@@ -191,4 +190,9 @@ new Importer({
   extraDirs: [
     { dir: "../node_modules/typescript/lib/", nameOnly: true },
   ],
-}).run();
+});
+
+// Skip jest since it produces a hugh in-memory FS.
+// jest.run();
+zod.run();
+immer.run();

@@ -2047,6 +2047,9 @@ let BENCHMARKS = [
             "./TypeScript/benchmark.js",
         ],
         preload: {
+            // Large test project:
+            // "tsconfig": "./TypeScript/src/gen/zod-medium/tsconfig.json",
+            // "files": "./TypeScript/src/gen/zod-medium/files.json",
             "tsconfig": "./TypeScript/src/gen/immer-tiny/tsconfig.json",
             "files": "./TypeScript/src/gen/immer-tiny/files.json",
         },
