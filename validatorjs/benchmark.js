@@ -34,7 +34,7 @@ class Benchmark {
 
   validate() {
     console.assert(
-      this.assertionCount != EXPECTED_ASSERTION_COUNT,
+      this.assertionCount === EXPECTED_ASSERTION_COUNT,
       `Expected ${EXPECTED_ASSERTION_COUNT} assertions, but got ${this.assertionCount}`
     );
   }
