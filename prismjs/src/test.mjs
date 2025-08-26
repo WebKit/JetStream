@@ -13,11 +13,11 @@ import "prismjs/components/prism-typescript.js";
 
 export function runTest(samples) {
   const results = [];
-  for (const { content, lang} of samples) {
+  for (const { content, lang } of samples) {
     const highlighted = Prism.highlight(content, Prism.languages[lang], lang);
     results.push({
-      html: highlighted
-  });
+      html: highlighted,
+    });
   }
   return results;
 }

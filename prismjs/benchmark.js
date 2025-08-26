@@ -1,40 +1,46 @@
+/*
+* Copyright (C) 2025 Apple Inc. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+* 1. Redistributions of source code must retain the above copyright
+*    notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the
+*    documentation and/or other materials provided with the distribution.
+*
+* THIS SOFTWARE IS PROVIDED BY APPLE INC. ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE INC. OR
+* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 const EXPECTED_ASSERTION_COUNT = 1213680;
 
-
-
-function quickHash(str) {
-  let hash = 5381;
-  let i = str.length;
-  while (i > 0) {
-    hash = (hash * 33) ^ (str.charCodeAt(i) | 0);
-    i-= 919;
-  }
-  return hash | 0;
-}
-
-const CACHE_BUST_COMMENT = "/*ThouShaltNotCache*/";
-const CACHE_BUST_COMMENT_RE = new RegExp(`\n${RegExp.escape(CACHE_BUST_COMMENT)}\n`, "g");
-
-
-class Benchmark {
-    // How many times (separate iterations) should we reuse the source code.
-  // Use 0 to skip.
-  CODE_REUSE_COUNT = 1;
-  iterationCount = 0;
-  iteration = 0;
-  sourceCode;
-  sourceHash = 0
-  iterationSourceCodes = [];
-
+class Benchmark extends StartupBenchmark {
   lastResult;
+  totalHash = 0xdeadbeef;
   samples = [];
   
   constructor(iterationCount) {
-    this.iterationCount = iterationCount
+    super({
+      iterationCount,
+      expectedCacheCommentCount: 71,
+      sourceCodeReuseCount: 1,
+    });
   }
 
   async init() {
     await Promise.all([
+      super.init(),
       this.loadData("cpp", JetStream.preload.SAMPLE_CPP, -1086372285),
       this.loadData("css", JetStream.preload.SAMPLE_CSS, 1173668337),
       this.loadData("markup", JetStream.preload.SAMPLE_HTML, -270772291),
@@ -44,46 +50,27 @@ class Benchmark {
       this.loadData("json", JetStream.preload.SAMPLE_JSON, 5859883),
       this.loadData("typescript", JetStream.preload.SAMPLE_TS, 133251625),
     ]);
-    this.sourceCode = await JetStream.getString(JetStream.preload.BUNDLE);
-    const cacheCommentCount = this.sourceCode.match(CACHE_BUST_COMMENT_RE).length;
-    const EXPECTED_CACHE_COMMENT_COUNT = 71;
-    console.assert(EXPECTED_CACHE_COMMENT_COUNT  ==cacheCommentCount, `Invalid cache comment count ${cacheCommentCount} expected ${EXPECTED_CACHE_COMMENT_COUNT}.`);
-    for (let i = 0; i < this.iterationCount; i++)
-      this.iterationSourceCodes[i] = this.prepareCode(i);
   }
 
   async loadData(lang, file, hash) {
-    const sample = { lang, hash  };
+    const sample = { lang, hash };
     // Push eagerly to have deterministic order.
     this.samples.push(sample);
     sample.content = await JetStream.getString(file);
     // Warm up quickHash and force good string representation.
-    quickHash(sample.content);
+    this.quickHash(sample.content);
     console.assert(sample.content.length > 0);
-  }
-
-  prepareCode(iteration) {
-    if (!this.CODE_REUSE_COUNT)
-      return this.sourceCode;
-    // Alter the code per iteration to prevent caching.
-    const cacheId = Math.floor(iteration / this.CODE_REUSE_COUNT);
-    const previousSourceCode = this.iterationSourceCodes[cacheId];
-    if (previousSourceCode)
-      return previousSourceCode
-    const sourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${cacheId}*/`);
-    // Ensure efficient string representation.
-    this.sourceHash = quickHash(sourceCode);
-    return sourceCode;
   }
 
   runIteration(iteration) {
     // Module is loaded into PrismJSBenchmark
     let PrismJSBenchmark;
     eval(this.iterationSourceCodes[iteration])
-
     this.lastResult = PrismJSBenchmark.runTest(this.samples);
+    
     for (const result of this.lastResult) {
-      result.hash = quickHash(result.html);
+      result.hash = this.quickHash(result.html);
+      this.totalHash ^= result.hash;
     }
   }
 

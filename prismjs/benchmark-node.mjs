@@ -18,9 +18,9 @@ const samples = [
   { file: "data/sample.ts", lang: "typescript" },
 ];
 
-const samplesWithContent = samples.map(sample => {
-    const content = fs.readFileSync(path.join(__dirname, sample.file), "utf8");
-    return { ...sample, content };
+const samplesWithContent = samples.map((sample) => {
+  const content = fs.readFileSync(path.join(__dirname, sample.file), "utf8");
+  return { ...sample, content };
 });
 
 const startTime = process.hrtime.bigint();
@@ -30,7 +30,9 @@ const endTime = process.hrtime.bigint();
 const duration = Number(endTime - startTime) / 1e6; // milliseconds
 
 for (const result of results) {
-    console.log(`Output size: ${result.html.length} characters`);
+  console.log(`Output size: ${result.html.length} characters`);
 }
 
-console.log(`\nTotal highlighting time for all files: ${duration.toFixed(2)}ms`);
+console.log(
+  `\nTotal highlighting time for all files: ${duration.toFixed(2)}ms`
+);

@@ -1827,7 +1827,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "prismjs-startup",
         files: [
-            "./prismjs/dist/bundle.es6.min.js",
+            "./startup-helper/StartupBenchmark.js",
             "./prismjs/benchmark.js",
         ],
         preload: {
