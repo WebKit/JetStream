@@ -1960,7 +1960,6 @@ let BENCHMARKS = [
         iterations: 4,
         worstCaseCount: 1,
         deterministicRandom: true,
-        allowUtf16: true,
         tags: ["BigIntNoble"],
     }),
     new AsyncBenchmark({
@@ -1971,7 +1970,6 @@ let BENCHMARKS = [
             "./bigint/noble-benchmark.js",
         ],
         deterministicRandom: true,
-        allowUtf16: true,
         tags: ["BigIntNoble"],
     }),
     new AsyncBenchmark({
@@ -1983,7 +1981,6 @@ let BENCHMARKS = [
         ],
         iterations: 30,
         deterministicRandom: true,
-        allowUtf16: true,
         tags: ["Default", "BigIntNoble"],
     }),
     new DefaultBenchmark({
