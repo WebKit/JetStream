@@ -113,7 +113,7 @@ function assertEquals(actual, expected, message) {
   function checkFile(benchmarkName, file, type) {
       if (!jsFileRegex.test(file))
           return;
-      const content = readFile(file);
+      const content = read(file);
       const match = content.match(twoByteCharsRegex);
       if (!match)
           return;
