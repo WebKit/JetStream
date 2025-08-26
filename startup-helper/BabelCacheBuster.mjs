@@ -1,7 +1,7 @@
 // Babel plugin that adds CACHE_BUST_COMMENT to every function body.
 const CACHE_BUST_COMMENT = "ThouShaltNotCache";
 
-module.exports = function ({ types: t }) {
+export default function({ types: t }) {
   return {
     visitor: {
       Function(path) {
