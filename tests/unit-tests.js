@@ -121,7 +121,6 @@ function validateIterationSources(sources) {
   }
 }
 
-
 (async function testStartupBenchmark() {
   try {
     JetStream.preload = { BUNDLE: "test-bundle.js" };
@@ -138,7 +137,6 @@ ${CACHE_BUST_COMMENT}
     JetStream.getString = undefined;
   }
 })();
-
 
 async function testStartupBenchmarkInnerTests() {
   const benchmark = new StartupBenchmark({
@@ -190,7 +188,6 @@ async function testStartupBenchmarkInnerTests() {
   assertEquals(new Set(reuseBenchmark2.iterationSourceCodes).size, 3);
   validateIterationSources(reuseBenchmark2.iterationSourceCodes);
 }
-
 
 (function testStartupBenchmarkThrow() {
   assertThrows(

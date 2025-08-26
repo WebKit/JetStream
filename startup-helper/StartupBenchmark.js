@@ -72,9 +72,7 @@ class StartupBenchmark {
   validateSourceCacheComments(cacheCommentCount) {
     console.assert(
       cacheCommentCount === this.expectedCacheCommentCount,
-      `Invalid cache comment count ${cacheCommentCount} expected ${
-        this.expectedCacheCommentCount
-      }.`
+      `Invalid cache comment count ${cacheCommentCount} expected ${this.expectedCacheCommentCount}.`
     );
   }
 
@@ -83,9 +81,7 @@ class StartupBenchmark {
       throw new Error(`Got invalid iterationSourceCodes`);
     let expectedSize = 1;
     if (this.sourceCodeReuseCount !== 0)
-      expectedSize = Math.ceil(
-        this.iterationCount / this.sourceCodeReuseCount
-      );
+      expectedSize = Math.ceil(this.iterationCount / this.sourceCodeReuseCount);
     const uniqueSources = new Set(this.iterationSourceCodes);
     if (uniqueSources.size != expectedSize)
       throw new Error(
