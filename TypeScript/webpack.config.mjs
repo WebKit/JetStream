@@ -9,10 +9,10 @@ const commonConfig = {
   mode: "production",
   devtool: "source-map",
   target: "web",
-  entry: path.resolve(__dirname, "src/test.cjs"),
+  entry: path.resolve(__dirname, "src/test.mjs"),
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "typescript-compile-test.js",
+    filename: "bundle.js",
     library: {
       name: "TypeScriptCompileTest",
       type: "globalThis",

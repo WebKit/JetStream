@@ -89,16 +89,13 @@ class Importer {
   }
 
   writeSrcFileData() {
-    const filesDataPath = path.join(this.outputDir, "src_file_data.cjs");
+    const filesDataPath = path.join(this.outputDir, "files.json");
     fs.writeFileSync(
-      filesDataPath, `// Generated src file data from existing node modules and
-// ${this.repoUrl}
-// See LICENSEs in the sources.
-module.exports = ${JSON.stringify(this.srcFileData, null, 2)};
- `
+      filesDataPath,
+      JSON.stringify(this.srcFileData, null, 2)
     );
     const stats = fs.statSync(filesDataPath);
-    const fileSizeInKiB = (stats.size / 1024) | 0;  
+    const fileSizeInKiB = (stats.size / 1024) | 0;
     console.info(`Exported ${this.projectName}`);
     console.info(`   File Contents: ${path.relative(process.cwd(), filesDataPath)}`);
     console.info(`   Total Size:    ${fileSizeInKiB} KiB`);
@@ -107,12 +104,10 @@ module.exports = ${JSON.stringify(this.srcFileData, null, 2)};
   writeTsConfig() {
     const tsconfigInputPath = path.join(this.repoDir, "tsconfig.json");
     const mergedTsconfig = this.loadAndMergeTsconfig(tsconfigInputPath);
-    const tsconfigOutputPath = path.join(this.outputDir, "src_tsconfig.cjs");
+    const tsconfigOutputPath = path.join(this.outputDir, "tsconfig.json");
     fs.writeFileSync(
-      tsconfigOutputPath, `// Exported from ${this.repoUrl}
-// See LICENSEs in the sources.
-module.exports = ${JSON.stringify(mergedTsconfig, null, 2)};
-`
+      tsconfigOutputPath,
+      JSON.stringify(mergedTsconfig, null, 2)
     );
   }
 

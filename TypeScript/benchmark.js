@@ -27,7 +27,15 @@
 console.log = () => {};
 
 class Benchmark {
+  tsConfig;
+  fileData;
+
+  async init() {
+    this.tsConfig = JSON.parse(await JetStream.getString(JetStream.preload.tsconfig));
+    this.fileData = JSON.parse(await JetStream.getString(JetStream.preload.files));
+  }
+
   runIteration() {
-    TypeScriptCompileTest.compileTest();
+    TypeScriptCompileTest.compileTest(this.tsConfig, this.fileData);
   }
 }

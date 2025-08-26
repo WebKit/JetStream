@@ -2039,13 +2039,17 @@ let BENCHMARKS = [
         ],
         tags: ["Default", "ClassFields"],
     }),
-    new DefaultBenchmark({
+    new AsyncBenchmark({
         name: "typescript-lib",
         files: [
             "./TypeScript/src/mock/sys.js",
-            "./TypeScript/dist/typescript-compile-test.js",
+            "./TypeScript/dist/bundle.js",
             "./TypeScript/benchmark.js",
         ],
+        preload: {
+            "tsconfig": "./TypeScript/src/gen/immer-tiny/tsconfig.json",
+            "files": "./TypeScript/src/gen/immer-tiny/files.json",
+        },
         iterations: 3,
         worstCaseCount: 2,
         tags: ["Default", "typescript"],
