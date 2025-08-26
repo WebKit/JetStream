@@ -6,56 +6,86 @@ const CACHE_BUST_COMMENT_RE = new RegExp(
 
 class StartupBenchmark {
   // Total iterations for this benchmark.
-  iterationCount = 0;
+  #iterationCount = 0;
   // Original source code.
-  sourceCode;
-  // quickHahs(this.sourceCode) for use in custom validate() methods.
-  sourceHash = 0;
-  // Number of no-cache comments in the original sourceCode.
-  expectedCacheCommentCount = 0;
+  #sourceCode;
+  // quickHahs(this.#sourceCode) for use in custom validate() methods.
+  #sourceHash = 0;
+  // Number of no-cache comments in the original #sourceCode.
+  #expectedCacheCommentCount = 0;
   // How many times (separate iterations) should we reuse the source code.
-  // Use 0 to skip and only use a single sourceCode string.
-  sourceCodeReuseCount = 1;
-  // SourceCode for each iteration, number of unique sources is controlled
+  // Use 0 to skip and only use a single #sourceCode string.
+  #sourceCodeReuseCount = 1;
+  // #sourceCode for each iteration, number of unique sources is controlled
   // by codeReuseCount;
-  iterationSourceCodes = [];
+  #iterationSourceCodes = [];
 
-  constructor(
-    {iterationCount,  expectedCacheCommentCount, sourceCodeReuseCount = 1 } = {}
-  ) {
-    this.iterationCount = iterationCount;
-    console.assert(this.iterationCount > 0)
-    this.expectedCacheCommentCount = expectedCacheCommentCount;
-    console.assert(this.expectedCacheCommentCount > 0)
-    this.sourceCodeReuseCount = sourceCodeReuseCount;
-    console.assert(this.sourceCodeReuseCount >= 0);
+  constructor({
+    iterationCount,
+    expectedCacheCommentCount,
+    sourceCodeReuseCount = 1,
+  } = {}) {
+    console.assert(iterationCount > 0);
+    this.#iterationCount = iterationCount;
+    console.assert(expectedCacheCommentCount > 0);
+    this.#expectedCacheCommentCount = expectedCacheCommentCount;
+    console.assert(sourceCodeReuseCount >= 0);
+    this.#sourceCodeReuseCount = sourceCodeReuseCount;
+  }
+
+  get iterationCount() {
+    return this.#iterationCount;
+  }
+
+  get sourceCode() {
+    return this.#sourceCode;
+  }
+
+  get sourceHash() {
+    return this.#sourceHash;
+  }
+
+  get expectedCacheCommentCount() {
+    return this.#expectedCacheCommentCount;
+  }
+
+  get sourceCodeReuseCount() {
+    return this.#sourceCodeReuseCount;
+  }
+
+  get iterationSourceCodes() {
+    return this.#iterationSourceCodes;
   }
 
   async init() {
-    this.sourceCode = await JetStream.getString(JetStream.preload.BUNDLE);
+    this.#sourceCode = await JetStream.getString(JetStream.preload.BUNDLE);
     const cacheCommentCount = this.sourceCode.match(
       CACHE_BUST_COMMENT_RE
     ).length;
-    this.sourceHash = this.quickHash(this.sourceCode);
+    this.#sourceHash = this.quickHash(this.sourceCode);
     this.validateSourceCacheComments(cacheCommentCount);
     for (let i = 0; i < this.iterationCount; i++)
-      this.iterationSourceCodes[i] = this.createIterationSourceCode(i);
+      this.#iterationSourceCodes[i] = this.createIterationSourceCode(i);
     this.validateIterationSourceCodes();
   }
 
   validateSourceCacheComments(cacheCommentCount) {
     console.assert(
       cacheCommentCount === this.expectedCacheCommentCount,
-      `Invalid cache comment count ${cacheCommentCount} expected ${this.expectedCacheCommentCount}.`
+      `Invalid cache comment count ${cacheCommentCount} expected ${
+        this.expectedCacheCommentCount
+      }.`
     );
   }
 
   validateIterationSourceCodes() {
-    if (this.iterationSourceCodes.some((each) => !each?.length))
+    if (this.#iterationSourceCodes.some((each) => !each?.length))
       throw new Error(`Got invalid iterationSourceCodes`);
     let expectedSize = 1;
     if (this.sourceCodeReuseCount !== 0)
-      expectedSize = Math.ceil(this.iterationCount / this.sourceCodeReuseCount);
+      expectedSize = Math.ceil(
+        this.iterationCount / this.sourceCodeReuseCount
+      );
     const uniqueSources = new Set(this.iterationSourceCodes);
     if (uniqueSources.size != expectedSize)
       throw new Error(

@@ -121,14 +121,8 @@ function validateIterationSources(sources) {
   }
 }
 
-(async function testStartupBenchmark() {
-  const benchmark = new StartupBenchmark({
-    iterationCount: 12,
-    expectedCacheCommentCount: 1,
-  });
-  assertEquals(benchmark.iterationCount, 12);
-  assertEquals(benchmark.expectedCacheCommentCount, 1);
 
+(async function testStartupBenchmark() {
   try {
     JetStream.preload = { BUNDLE: "test-bundle.js" };
     JetStream.getString = (file) => {
@@ -138,49 +132,65 @@ ${CACHE_BUST_COMMENT}
         return 1;
         }`;
     };
-    assertEquals(benchmark.iterationSourceCodes.length, 0);
-    await benchmark.init();
-    assertEquals(benchmark.iterationSourceCodes.length, 12);
-    assertEquals(new Set(benchmark.iterationSourceCodes).size, 12);
-    validateIterationSources(benchmark.iterationSourceCodes);
-
-    const noReuseBenchmark = new StartupBenchmark({
-      iterationCount: 12,
-      expectedCacheCommentCount: 1,
-    });
-    noReuseBenchmark.sourceCodeReuseCount = 0;
-    assertEquals(noReuseBenchmark.iterationSourceCodes.length, 0);
-    await noReuseBenchmark.init();
-    assertEquals(noReuseBenchmark.iterationSourceCodes.length, 12);
-    assertEquals(new Set(noReuseBenchmark.iterationSourceCodes).size, 1);
-    validateIterationSources(noReuseBenchmark.iterationSourceCodes);
-
-    const reuseBenchmark = new StartupBenchmark({
-      iterationCount: 12,
-      expectedCacheCommentCount: 1,
-    });
-    reuseBenchmark.sourceCodeReuseCount = 3;
-    assertEquals(reuseBenchmark.iterationSourceCodes.length, 0);
-    await reuseBenchmark.init();
-    assertEquals(reuseBenchmark.iterationSourceCodes.length, 12);
-    assertEquals(new Set(reuseBenchmark.iterationSourceCodes).size, 4);
-    validateIterationSources(reuseBenchmark.iterationSourceCodes);
-
-    const reuseBenchmark2 = new StartupBenchmark({
-      iterationCount: 12,
-      expectedCacheCommentCount: 1,
-    });
-    reuseBenchmark2.sourceCodeReuseCount = 5;
-    assertEquals(reuseBenchmark2.iterationSourceCodes.length, 0);
-    await reuseBenchmark2.init();
-    assertEquals(reuseBenchmark2.iterationSourceCodes.length, 12);
-    assertEquals(new Set(reuseBenchmark2.iterationSourceCodes).size, 3);
-    validateIterationSources(reuseBenchmark2.iterationSourceCodes);
+    await testStartupBenchmarkInnerTests();
   } finally {
     JetStream.preload = undefined;
     JetStream.getString = undefined;
   }
 })();
+
+
+async function testStartupBenchmarkInnerTests() {
+  const benchmark = new StartupBenchmark({
+    iterationCount: 12,
+    expectedCacheCommentCount: 1,
+  });
+  assertEquals(benchmark.iterationCount, 12);
+  assertEquals(benchmark.expectedCacheCommentCount, 1);
+  assertEquals(benchmark.iterationSourceCodes.length, 0);
+  assertEquals(benchmark.sourceCode, undefined);
+  assertEquals(benchmark.sourceHash, 0);
+  await benchmark.init();
+  assertEquals(benchmark.sourceHash, 177573);
+  assertEquals(benchmark.sourceCode.length, 68);
+  assertEquals(benchmark.iterationSourceCodes.length, 12);
+  assertEquals(new Set(benchmark.iterationSourceCodes).size, 12);
+  validateIterationSources(benchmark.iterationSourceCodes);
+
+  const noReuseBenchmark = new StartupBenchmark({
+    iterationCount: 12,
+    expectedCacheCommentCount: 1,
+    sourceCodeReuseCount: 0,
+  });
+  assertEquals(noReuseBenchmark.iterationSourceCodes.length, 0);
+  await noReuseBenchmark.init();
+  assertEquals(noReuseBenchmark.iterationSourceCodes.length, 12);
+  assertEquals(new Set(noReuseBenchmark.iterationSourceCodes).size, 1);
+  validateIterationSources(noReuseBenchmark.iterationSourceCodes);
+
+  const reuseBenchmark = new StartupBenchmark({
+    iterationCount: 12,
+    expectedCacheCommentCount: 1,
+    sourceCodeReuseCount: 3,
+  });
+  assertEquals(reuseBenchmark.iterationSourceCodes.length, 0);
+  await reuseBenchmark.init();
+  assertEquals(reuseBenchmark.iterationSourceCodes.length, 12);
+  assertEquals(new Set(reuseBenchmark.iterationSourceCodes).size, 4);
+  validateIterationSources(reuseBenchmark.iterationSourceCodes);
+
+  const reuseBenchmark2 = new StartupBenchmark({
+    iterationCount: 12,
+    expectedCacheCommentCount: 1,
+    sourceCodeReuseCount: 5,
+  });
+  assertEquals(reuseBenchmark2.iterationSourceCodes.length, 0);
+  await reuseBenchmark2.init();
+  assertEquals(reuseBenchmark2.iterationSourceCodes.length, 12);
+  assertEquals(new Set(reuseBenchmark2.iterationSourceCodes).size, 3);
+  validateIterationSources(reuseBenchmark2.iterationSourceCodes);
+}
+
 
 (function testStartupBenchmarkThrow() {
   assertThrows(
