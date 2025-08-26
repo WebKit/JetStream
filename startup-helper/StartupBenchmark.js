@@ -5,20 +5,30 @@ const CACHE_BUST_COMMENT_RE = new RegExp(
 );
 
 class StartupBenchmark {
-  // How many times (separate iterations) should we reuse the source code.
-  // Use 0 to skip.
-  codeReuseCount = 1;
+  // Total iterations for this benchmark.
   iterationCount = 0;
+  // Original source code.
   sourceCode;
+  // quickHahs(this.sourceCode) for use in custom validate() methods.
   sourceHash = 0;
+  // Number of no-cache comments in the original sourceCode.
   expectedCacheCommentCount = 0;
-
+  // How many times (separate iterations) should we reuse the source code.
+  // Use 0 to skip and only use a single sourceCode string.
+  sourceCodeReuseCount = 1;
+  // SourceCode for each iteration, number of unique sources is controlled
+  // by codeReuseCount;
   iterationSourceCodes = [];
 
-  constructor(iterationCount, expectedCacheCommentCount) {
+  constructor(
+    {iterationCount,  expectedCacheCommentCount, sourceCodeReuseCount = 1 } = {}
+  ) {
     this.iterationCount = iterationCount;
+    console.assert(this.iterationCount > 0)
     this.expectedCacheCommentCount = expectedCacheCommentCount;
-    console.assert(expectedCacheCommentCount > 0);
+    console.assert(this.expectedCacheCommentCount > 0)
+    this.sourceCodeReuseCount = sourceCodeReuseCount;
+    console.assert(this.sourceCodeReuseCount >= 0);
   }
 
   async init() {
@@ -44,18 +54,20 @@ class StartupBenchmark {
     if (this.iterationSourceCodes.some((each) => !each?.length))
       throw new Error(`Got invalid iterationSourceCodes`);
     let expectedSize = 1;
-    if (this.codeReuseCount !== 0)
-      expectedSize = Math.ceil(this.iterationCount / this.codeReuseCount);
+    if (this.sourceCodeReuseCount !== 0)
+      expectedSize = Math.ceil(this.iterationCount / this.sourceCodeReuseCount);
     const uniqueSources = new Set(this.iterationSourceCodes);
     if (uniqueSources.size != expectedSize)
       throw new Error(
         `Expected ${expectedSize} unique sources, but got ${uniqueSources.size}.`
       );
   }
+
   createIterationSourceCode(iteration) {
     // Alter the code per iteration to prevent caching.
     const cacheId =
-      Math.floor(iteration / this.codeReuseCount) * this.codeReuseCount;
+      Math.floor(iteration / this.sourceCodeReuseCount) *
+      this.sourceCodeReuseCount;
     // Reuse existing sources if this.codeReuseCount > 1:
     if (cacheId < this.iterationSourceCodes.length)
       return this.iterationSourceCodes[cacheId];
