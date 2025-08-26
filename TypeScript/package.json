@@ -15,6 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@dapplets/unicode-escape-webpack-plugin": "^0.1.1",
     "@types/node": "^24.2.0",
     "ansi-styles": "^6.2.1",
     "glob": "^11.0.3",
