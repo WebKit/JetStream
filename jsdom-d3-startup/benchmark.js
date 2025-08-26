@@ -1,62 +1,55 @@
+/*
+* Copyright (C) 2025 Apple Inc. All rights reserved.
+*
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+* 1. Redistributions of source code must retain the above copyright
+*    notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the
+*    documentation and/or other materials provided with the distribution.
+*
+* THIS SOFTWARE IS PROVIDED BY APPLE INC. ``AS IS'' AND ANY
+* EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+* PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL APPLE INC. OR
+* CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+* PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+* PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY
+* OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+* OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
+
 // Load D3 and data loading utilities for d8
-
-function quickHash(str) {
-    let hash = 5381;
-    let i = str.length;
-    while (i > 0) {
-        hash = (hash * 33) ^ (str.charCodeAt(i) | 0);
-        i -= 919;
-    }
-    return hash | 0;
-}
-
-const CACHE_BUST_COMMENT = "/*ThouShaltNotCache*/";
-const CACHE_BUST_COMMENT_RE = new RegExp(`\n${RegExp.escape(CACHE_BUST_COMMENT)}\n`, "g");
 
 const EXPECTED_LAST_RESULT_LENGTH = 691366;
 const EXPECTED_LAST_RESULT_HASH = 144487595;
 
 globalThis.clearTimeout = () => { };
 
-class Benchmark {
-    measureStartup = true;
-
-    sourceCode = "";
-    sourceHash = 0;
-    iterationSourceCodes = [];
-    lastResult = "";
+class Benchmark extends StartupBenchmark {
+    lastResult;
+    totalHash = 0xdeadbeef;
     currentIteration = 0;
 
     constructor(iterations) {
-        this.iterations = iterations;
+        super({
+            iterationCount: iterations,
+            expectedCacheCommentCount: 10028,
+            sourceCodeReuseCount: 2,
+         });
     }
 
-    assert(test, message) {
-        if (!test) {
-            throw new Error(message);
-        }
-    }
-
-    async init(verbose = 0) {
-        this.sourceCode = await JetStream.getString(JetStream.preload.SOURCE_CODE);
-        for (let i = 0; i < this.iterations; i++)
-            this.iterationSourceCodes[i] = this.prepareCode(i);
-
+    async init() {
+        await super.init();
         this.airportsCsvString = (await JetStream.getString(JetStream.preload.AIRPORTS));
-        this.assert(this.airportsCsvString.length == 145493, `Expected this.airportsCsvString.length to be 141490 but got ${this.airportsCsvString.length}`);
+        console.assert(this.airportsCsvString.length == 145493, `Expected this.airportsCsvString.length to be 141490 but got ${this.airportsCsvString.length}`);
         this.usDataJsonString = await JetStream.getString(JetStream.preload.US_DATA);
-        this.assert(this.usDataJsonString.length == 2880996, `Expected this.usData.length to be 2880996 but got ${this.usDataJsonString.length}`);
+        console.assert(this.usDataJsonString.length == 2880996, `Expected this.usData.length to be 2880996 but got ${this.usDataJsonString.length}`);
         this.usData = JSON.parse(this.usDataJsonString);
-    }
-
-    prepareCode(iteration) {
-        if (!this.measureStartup)
-            return this.sourceCode;
-        // Alter the code per iteration to prevent caching.
-        const iterationSourceCode = this.sourceCode.replaceAll(CACHE_BUST_COMMENT_RE, `/*${iteration}*/`);
-        // Warm up hash function.
-        this.sourceHash = quickHash(iterationSourceCode);
-        return iterationSourceCode;
     }
 
     runIteration() {
@@ -67,10 +60,9 @@ class Benchmark {
         let D3Test;
         eval(iterationSourceCode);
         const html = D3Test.runTest(this.airportsCsvString, this.usData);
-        this.lastResult = {
-            html,
-            htmlHash: quickHash(html),
-        };
+        const htmlHash = this.quickHash(html);
+        this.lastResult = { html, htmlHash };
+        this.totalHash ^= this.lastResult.htmlHash;
         this.currentIteration++;
     }
 

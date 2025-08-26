@@ -44,7 +44,7 @@ function createConfig({ filename, minify }) {
           use: {
             loader: "babel-loader",
             options: {
-              plugins: [path.resolve(__dirname, "build/cache-buster-comment-plugin.cjs")],
+              plugins: [ "../startup-helper/BabelCacheBuster.mjs" ],
             },
           },
         },

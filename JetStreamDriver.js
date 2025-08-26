@@ -2027,12 +2027,13 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "jsdom-d3-startup",
         files: [
+            "./startup-helper/StartupBenchmark.js",
             "./jsdom-d3-startup/benchmark.js",
         ],
         preload: {
             // Unminified sources for profiling.
-            // SOURCE_CODE: "./jsdom-d3-startup/dist/bundle.js",
-            SOURCE_CODE: "./jsdom-d3-startup/dist/bundle.min.js",
+            // BUNDLE: "./jsdom-d3-startup/dist/bundle.js",
+            BUNDLE: "./jsdom-d3-startup/dist/bundle.min.js",
             US_DATA: "./jsdom-d3-startup/data/counties-albers-10m.json",
             AIRPORTS: "./jsdom-d3-startup/data/airports.csv",
         },
