@@ -105,11 +105,11 @@ if(void 0!==Prism&&"undefined"!=typeof document){Element.prototype.matches||(Ele
 /*ThouShaltNotCache*/
 env.selector+=", "+SELECTOR}),Prism.hooks.add("before-sanity-check",function(env){
 /*ThouShaltNotCache*/
-var pre=env.element;if(pre.matches(SELECTOR)){env.code="",pre.setAttribute("data-src-status","loading");var code=pre.appendChild(document.createElement("CODE"));code.textContent="Loading…";var src=pre.getAttribute("data-src"),language=env.language;if("none"===language){var extension=(/\.(\w+)$/.exec(src)||[,"none"])[1];language=EXTENSIONS[extension]||extension}Prism.util.setLanguage(code,language),Prism.util.setLanguage(pre,language);var autoloader=Prism.plugins.autoloader;autoloader&&autoloader.loadLanguages(language),function(src,success,error){
+var pre=env.element;if(pre.matches(SELECTOR)){env.code="",pre.setAttribute("data-src-status","loading");var code=pre.appendChild(document.createElement("CODE"));code.textContent="Loading\u2026";var src=pre.getAttribute("data-src"),language=env.language;if("none"===language){var extension=(/\.(\w+)$/.exec(src)||[,"none"])[1];language=EXTENSIONS[extension]||extension}Prism.util.setLanguage(code,language),Prism.util.setLanguage(pre,language);var autoloader=Prism.plugins.autoloader;autoloader&&autoloader.loadLanguages(language),function(src,success,error){
 /*ThouShaltNotCache*/
 var xhr=new XMLHttpRequest;xhr.open("GET",src,!0),xhr.onreadystatechange=function(){
 /*ThouShaltNotCache*/
-4==xhr.readyState&&(xhr.status<400&&xhr.responseText?success(xhr.responseText):xhr.status>=400?error("✖ Error "+xhr.status+" while fetching file: "+xhr.statusText):error("✖ Error: File does not exist or is empty"))},xhr.send(null)}(src,function(text){
+4==xhr.readyState&&(xhr.status<400&&xhr.responseText?success(xhr.responseText):xhr.status>=400?error("\u2716 Error "+xhr.status+" while fetching file: "+xhr.statusText):error("\u2716 Error: File does not exist or is empty"))},xhr.send(null)}(src,function(text){
 /*ThouShaltNotCache*/
 pre.setAttribute("data-src-status","loaded");var range=function(range){
 /*ThouShaltNotCache*/

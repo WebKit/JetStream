@@ -2,6 +2,7 @@ import path from "path";
 import { fileURLToPath } from "url";
 import TerserPlugin from "terser-webpack-plugin";
 import CacheBusterCommentPlugin from "../startup-helper/BabelCacheBuster.mjs";
+import UnicodeEscapePlugin from "@dapplets/unicode-escape-webpack-plugin";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -34,7 +35,11 @@ function config({ filename, minify, target }) {
         },
       ],
     },
-    plugins: [],
+    plugins: [
+      new UnicodeEscapePlugin({
+        test: /\.(js|jsx|ts|tsx)$/, // Escape Unicode in JavaScript and TypeScript files
+      }),
+    ],
     resolve: {
       fallback: {},
     },
