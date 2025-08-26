@@ -711,6 +711,7 @@ class Benchmark {
         this.tags = this.processTags(plan.tags)
         this.iterations = getIterationCount(plan);
         this.isAsync = !!plan.isAsync;
+        this.allowUtf16 = !!plan.allowUtf16;
         this.scripts = null;
         this.preloads = null;
         this.results = [];
@@ -1663,6 +1664,7 @@ let BENCHMARKS = [
             babylonBlob: "./ARES-6/Babylon/babylon-blob.js",
         },
         tags: ["Default", "ARES"],
+        allowUtf16: true,
     }),
     // CDJS
     new DefaultBenchmark({
@@ -1958,6 +1960,7 @@ let BENCHMARKS = [
         iterations: 4,
         worstCaseCount: 1,
         deterministicRandom: true,
+        allowUtf16: true,
         tags: ["BigIntNoble"],
     }),
     new AsyncBenchmark({
@@ -1968,6 +1971,7 @@ let BENCHMARKS = [
             "./bigint/noble-benchmark.js",
         ],
         deterministicRandom: true,
+        allowUtf16: true,
         tags: ["BigIntNoble"],
     }),
     new AsyncBenchmark({
@@ -1979,6 +1983,7 @@ let BENCHMARKS = [
         ],
         iterations: 30,
         deterministicRandom: true,
+        allowUtf16: true,
         tags: ["Default", "BigIntNoble"],
     }),
     new DefaultBenchmark({
@@ -2229,6 +2234,7 @@ let BENCHMARKS = [
         async: true,
         deterministicRandom: true,
         exposeBrowserTest: true,
+        allowUtf16: true,
         tags: ["Wasm"],
     }),
     new WasmLegacyBenchmark({
@@ -2250,6 +2256,7 @@ let BENCHMARKS = [
         async: true,
         deterministicRandom: true,
         exposeBrowserTest: true,
+        allowUtf16: true,
         tags: ["Wasm"],
     }),
     new WasmEMCCBenchmark({
@@ -2264,6 +2271,7 @@ let BENCHMARKS = [
         iterations: 30,
         worstCaseCount: 3,
         deterministicRandom: true,
+        allowUtf16: true,
         tags: ["Default", "Wasm"],
     }),
     // WorkerTests
@@ -2302,6 +2310,8 @@ let BENCHMARKS = [
             stringUnpackCode: "./worker/bomb-subtests/string-unpack-code.js",
             regexpDNA: "./worker/bomb-subtests/regexp-dna.js",
         },
+        // FIXME: Potentially fix the sources.
+        allowUtf16: true,
         tags: ["Default", "WorkerTests"],
     }),
     new AsyncBenchmark({
@@ -2548,11 +2558,15 @@ for (const test of SUNSPIDER_TESTS) {
         files: [
             `./SunSpider/${test}.js`
         ],
+        // FIXME: Potentially fix the sources.
+        allowUtf16: true,
         tags: [],
     }));
 }
 BENCHMARKS.push(new GroupedBenchmark({
     name: "Sunspider",
+    // FIXME: Potentially fix the sources.
+    allowUtf16: true,
     tags: ["Default", "SunSpider"],
 }, SUNSPIDER_BENCHMARKS))
 
@@ -2577,6 +2591,7 @@ for (const name of WTB_TESTS) {
         ],
         iterations: 5,
         worstCaseCount: 1,
+        allowUtf16: true,
         tags: ["Default", "WTB"],
     }));
 }
