@@ -1,7 +1,11 @@
-const path = require("path");
-const webpack = require("webpack");
-const TerserPlugin = require("terser-webpack-plugin");
-const UnicodeEscapePlugin = require("@dapplets/unicode-escape-webpack-plugin");
+import path from "path";
+import webpack from "webpack";
+import TerserPlugin from "terser-webpack-plugin";
+import UnicodeEscapePlugin from "@dapplets/unicode-escape-webpack-plugin";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 function createConfig({ filename, minify }) {
   return {
@@ -62,21 +66,21 @@ function createConfig({ filename, minify }) {
     },
     resolve: {
       fallback: {
-        "assert": require.resolve("assert/"),
-        "buffer": require.resolve("buffer/"),
+        "assert": "assert/",
+        "buffer": "buffer/",
         "canvas": false,
         "child_process": false,
         "crypto": false,
         "fs": false,
-        "http": require.resolve("stream-http"),
+        "http": "stream-http",
         "https": false,
         "net": false,
-        "os": require.resolve("os-browserify/browser"),
-        "path": require.resolve("path-browserify"),
-        "stream": require.resolve("stream-browserify"),
+        "os": "os-browserify/browser",
+        "path": "path-browserify",
+        "stream": "stream-browserify",
         "tls": false,
-        "url": require.resolve("url/"),
-        "util": require.resolve("util/"),
+        "url": "url/",
+        "util": "util/",
         "vm": false, 
         "zlib": false, 
       },
@@ -87,7 +91,7 @@ function createConfig({ filename, minify }) {
   };
 };
 
-module.exports = [
+export default [
   createConfig({ filename: "bundle.min.js", minify: true }),
   createConfig({ filename: "bundle.js", minify: false })
 ];

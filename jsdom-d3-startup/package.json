@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "test": "node benchmark-node.cjs",
+    "test": "node benchmark-node.mjs",
     "prebuild": "rm -rf dist/*",
     "build": "webpack",
     "build:dev": "npm run prebuild && webpack --mode development"
