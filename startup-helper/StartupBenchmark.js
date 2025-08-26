@@ -25,11 +25,20 @@ class StartupBenchmark {
     expectedCacheCommentCount,
     sourceCodeReuseCount = 1,
   } = {}) {
-    console.assert(iterationCount > 0);
+    console.assert(
+      iterationCount > 0,
+      `Expected iterationCount to be positive, but got ${iterationCount}`
+    );
     this.#iterationCount = iterationCount;
-    console.assert(expectedCacheCommentCount > 0);
+    console.assert(
+      expectedCacheCommentCount > 0,
+      `Expected expectedCacheCommentCount to be positive, but got ${expectedCacheCommentCount}`
+    );
     this.#expectedCacheCommentCount = expectedCacheCommentCount;
-    console.assert(sourceCodeReuseCount >= 0);
+    console.assert(
+      sourceCodeReuseCount >= 0,
+      `Expected sourceCodeReuseCount to be non-negative, but got ${sourceCodeReuseCount}`
+    );
     this.#sourceCodeReuseCount = sourceCodeReuseCount;
   }
 
