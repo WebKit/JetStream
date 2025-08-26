@@ -2515,7 +2515,7 @@ let BENCHMARKS = [
     }),
     // .NET
     new AsyncBenchmark({
-        name: "dotnet-interp",
+        name: "dotnet-interp-wasm",
         files: [
             "./wasm/dotnet/interp.js",
             "./wasm/dotnet/benchmark.js",
@@ -2526,7 +2526,7 @@ let BENCHMARKS = [
         tags: ["Default", "Wasm", "dotnet"],
     }),
     new AsyncBenchmark({
-        name: "dotnet-aot",
+        name: "dotnet-aot-wasm",
         files: [
             "./wasm/dotnet/aot.js",
             "./wasm/dotnet/benchmark.js",
