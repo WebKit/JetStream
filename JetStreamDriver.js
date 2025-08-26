@@ -711,6 +711,7 @@ class Benchmark {
         this.tags = this.processTags(plan.tags)
         this.iterations = getIterationCount(plan);
         this.isAsync = !!plan.isAsync;
+        this.allowUtf16 = !!plan.allowUtf16;
         this.scripts = null;
         this.preloads = null;
         this.results = [];
@@ -1663,6 +1664,7 @@ let BENCHMARKS = [
             babylonBlob: "./ARES-6/Babylon/babylon-blob.js",
         },
         tags: ["Default", "ARES"],
+        allowUtf16: true,
     }),
     // CDJS
     new DefaultBenchmark({
@@ -2251,6 +2253,7 @@ let BENCHMARKS = [
         async: true,
         deterministicRandom: true,
         exposeBrowserTest: true,
+        allowUtf16: true,
         tags: ["Wasm"],
     }),
     new WasmLegacyBenchmark({
@@ -2272,6 +2275,7 @@ let BENCHMARKS = [
         async: true,
         deterministicRandom: true,
         exposeBrowserTest: true,
+        allowUtf16: true,
         tags: ["Wasm"],
     }),
     new WasmEMCCBenchmark({
@@ -2286,6 +2290,7 @@ let BENCHMARKS = [
         iterations: 30,
         worstCaseCount: 3,
         deterministicRandom: true,
+        allowUtf16: true,
         tags: ["Default", "Wasm"],
     }),
     // WorkerTests
@@ -2599,6 +2604,7 @@ for (const name of WTB_TESTS) {
         ],
         iterations: 5,
         worstCaseCount: 1,
+        allowUtf16: true,
         tags: ["Default", "WTB"],
     }));
 }
