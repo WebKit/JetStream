@@ -1,7 +1,9 @@
-const path = require("path");
-const webpack = require("webpack");
-const TerserPlugin = require("terser-webpack-plugin");
-const CacheBusterCommentPlugin = require("./build/cache-buster-comment-plugin.cjs");
+import path from "path";
+import { fileURLToPath } from "url";
+import TerserPlugin from "terser-webpack-plugin";
+import CacheBusterCommentPlugin from "../startup-helper/BabelCacheBuster.mjs";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function config({ filename, minify, target }) {
   return {
@@ -52,7 +54,7 @@ function config({ filename, minify, target }) {
   };
 }
 
-module.exports = [
+export default [
   config({ filename: "bundle.es6.min.js", minify: true, target: "es6" }),
   config({ filename: "bundle.es6.js", minify: false, target: "es6" }),
   config({ filename: "bundle.es5.min.js", minify: true, target: "es5" }),
