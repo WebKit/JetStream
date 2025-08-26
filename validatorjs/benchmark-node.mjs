@@ -1,5 +1,4 @@
-import { runTest } from "./src/test.mjs"
-
+import { runTest } from "./src/test.mjs";
 
 const then = performance.now();
 runTest();
