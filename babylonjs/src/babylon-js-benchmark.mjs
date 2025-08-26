@@ -12,7 +12,7 @@ export function runTest(frames = 10) {
   }
   return {
     classNames,
-    cameraRotationLength: scene.cameras[0].rotation.length()
+    cameraRotationLength: scene.cameras[0].rotation.length(),
   };
 }
 
@@ -53,7 +53,7 @@ export async function runComplexScene(
   const classNames = Object.values(BABYLON).map((cls) => cls.name);
   BABYLON.Logger.LogLevels = BABYLON.Logger.NoneLogLevel;
   const engine = new BABYLON.NullEngine({
-    deterministicLockstep: true
+    deterministicLockstep: true,
   });
   const scene = await createComplexScene(
     engine,
@@ -68,7 +68,7 @@ export async function runComplexScene(
   // Leak state to the outside.
   return {
     classNames,
-    cameraRotationLength: scene.cameras[0].rotation.length()
+    cameraRotationLength: scene.cameras[0].rotation.length(),
   };
 }
 

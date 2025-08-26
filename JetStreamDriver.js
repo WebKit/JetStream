@@ -2274,21 +2274,23 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "babylonjs-startup-es5",
         files: [
+            "./startup-helper/StartupBenchmark.js",
             "./babylonjs/benchmark/startup.js",
         ],
         preload: {
-            BUNDLE_BLOB: "./babylonjs/dist/bundle.es5.min.js",
+            BUNDLE: "./babylonjs/dist/bundle.es5.min.js",
         },
-        tags: ["Default", "startup", "class", "es5"],
+        tags: ["startup", "class", "es5"],
         iterations: 10,
     }),
     new AsyncBenchmark({
         name: "babylonjs-startup-es6",
         files: [
+            "./startup-helper/StartupBenchmark.js",
             "./babylonjs/benchmark/startup.js",
         ],
         preload: {
-            BUNDLE_BLOB: "./babylonjs/dist/bundle.es6.min.js",
+            BUNDLE: "./babylonjs/dist/bundle.es6.min.js",
         },
         tags: ["Default", "startup", "class", "es6"],
         iterations: 10,
@@ -2306,7 +2308,7 @@ let BENCHMARKS = [
             PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
             CANNON_BLOB: "./babylonjs/data/cannon.glb",
         },
-        tags: ["Default", "scene", "es6"],
+        tags: ["scene", "es5"],
         iterations: 5,
     }),
     new AsyncBenchmark({
