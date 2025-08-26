@@ -114,6 +114,45 @@ function assertThrows(message, func) {
   }
 })();
 
+(function checkUtf16Sources() {
+  // Test that only explicitly UTF16-enabled benchmarks can have sources
+  // with non-8-byte characters.
+  const twoByteCharsRegex = /[^\x00-\xFF]/g;
+  const jsFileRegex = /\.(js|mjs)$/;
+
+  function checkFile(benchmarkName, file, type) {
+      if (!jsFileRegex.test(file))
+          return;
+      const content = read(file);
+      const match = content.match(twoByteCharsRegex);
+      if (!match)
+          return;
+      const uniqueMatches = Array.from(new Set(match));
+      const offendingChars = uniqueMatches.map(char => {
+          const hex = char.charCodeAt(0).toString(16).padStart(4, "0");
+          return `\n        - \\u${hex}: '${char}'`;
+      }).join("");
+      throw new Error(
+        `Benchmark '${benchmarkName}' has two-byte characters in ${type} '${file}':\n` +
+        `    Offending characters: ${offendingChars}`);
+  }
+
+  for (const benchmark of BENCHMARKS) {
+    if (benchmark.allowUtf16)
+        continue;
+
+    for (const file of benchmark.files) {
+        checkFile(benchmark.name, file, "file");
+    }
+
+    if (benchmark.plan.preload) {
+        for (const [name, file] of Object.entries(benchmark.plan.preload)) {
+            checkFile(benchmark.name, file, `preload.${name}`);
+        }
+    }
+  }
+})();
+
 function validateIterationSources(sources) {
   for (const source of sources) {
     assertTrue(typeof source == "string");
