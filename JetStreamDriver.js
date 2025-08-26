@@ -2565,7 +2565,7 @@ const WTB_TESTS = [
     "chai",
     "espree",
     "esprima-next",
-    "lebab",
+    // "lebab",
     "postcss",
     "prettier",
     "source-map",
@@ -2607,7 +2607,7 @@ for (const name of WTB_TESTS) {
             "./web-tooling-benchmark/benchmark.js",
         ],
         preload: {
-            SCRIPT_BUNDLE: `./web-tooling-benchmark/dist/${name}.bundle.js`,
+            BUNDLE: `./web-tooling-benchmark/dist/${name}.bundle.js`,
             ...WPT_FILES,
         },
         iterations: 15,
