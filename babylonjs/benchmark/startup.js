@@ -27,35 +27,36 @@
 
 class Benchmark extends StartupBenchmark {
   lastResult = {};
+  iteration = 0;
 
-  constructor(iterationCount) {
+  constructor({iterationCount, expectedCacheCommentCount}) {
     super({
       iterationCount,
-      codeReuseCount: 2
-
-    })
+      codeReuseCount: 2,
+      expectedCacheCommentCount,
+    });
   }
-  
+
   runIteration() {
-    let sourceCode = this.iterationSourceCodes[this.iteration];
+    const sourceCode = this.iterationSourceCodes[this.iteration];
     if (!sourceCode)
       throw new Error(`Could not find source for iteration ${this.iteration}`);
     // Module in sourceCode it assigned to the ClassStartupTest variable.
     let BabylonJSBenchmark;
 
-    let initStart = performance.now();
-    const res = eval(sourceCode);
-    const runStart = performance.now();
+    // let initStart = performance.now();
+    eval(sourceCode);
+    // const runStart = performance.now();
 
-    const {classNames, cameraRotationLength} = BabylonJSBenchmark.runTest(30);
+    const { classNames, cameraRotationLength } = BabylonJSBenchmark.runTest(30);
     this.lastResult = {
       classNames,
       cameraRotationLength,
     };
-    const end = performance.now();
-    const loadTime = runStart - initStart;
-    const runTime = end - runStart;
-    // For local debugging: 
+    // const end = performance.now();
+    // const loadTime = runStart - initStart;
+    // const runTime = end - runStart;
+    // For local debugging:
     // print(`Iteration ${this.iteration}:`);
     // print(`  Load time: ${loadTime.toFixed(2)}ms`);
     // print(`  Render time: ${runTime.toFixed(2)}ms`);
@@ -63,8 +64,16 @@ class Benchmark extends StartupBenchmark {
   }
 
   validate() {
-    this.expect("this.lastResult.classNames.length", this.lastResult.classNames.length, 2135);
-    this.expect("this.lastResult.cameraRotationLength", Math.round(this.lastResult.cameraRotationLength * 1000), 464);
+    this.expect(
+      "this.lastResult.classNames.length",
+      this.lastResult.classNames.length,
+      2135
+    );
+    this.expect(
+      "this.lastResult.cameraRotationLength",
+      Math.round(this.lastResult.cameraRotationLength * 1000),
+      464
+    );
   }
 
   expect(name, value, expected) {

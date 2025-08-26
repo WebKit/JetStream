@@ -740,9 +740,16 @@ class Benchmark {
         return tags.some((tag) => this.tags.has(tag.toLowerCase()));
     }
 
+    get benchmarkArguments() {
+        return {
+            ...this.plan.arguments,
+            iterationCount: this.iterations,
+        };
+    }
+
     get runnerCode() {
         return `{
-            const benchmark = new Benchmark(${this.iterations});
+            const benchmark = new Benchmark(${JSON.stringify(this.benchmarkArguments)});
             const results = [];
             const benchmarkName = "${this.name}";
 
@@ -1320,7 +1327,7 @@ class AsyncBenchmark extends DefaultBenchmark {
     get runnerCode() {
         return `
         async function doRun() {
-            const benchmark = new Benchmark(${this.iterations});
+            const benchmark = new Benchmark(${JSON.stringify(this.benchmarkArguments)});
             await benchmark.init?.();
             const results = [];
             const benchmarkName = "${this.name}";
@@ -2280,7 +2287,10 @@ let BENCHMARKS = [
         preload: {
             BUNDLE: "./babylonjs/dist/bundle.es5.min.js",
         },
-        tags: ["startup", "class", "es5"],
+        arguments: {
+            expectedCacheCommentCount: 21238,
+        },
+        tags: ["startup", "class", "es5", "babylonjs"],
         iterations: 10,
     }),
     new AsyncBenchmark({
@@ -2292,7 +2302,10 @@ let BENCHMARKS = [
         preload: {
             BUNDLE: "./babylonjs/dist/bundle.es6.min.js",
         },
-        tags: ["Default", "startup", "class", "es6"],
+        arguments: {
+            expectedCacheCommentCount: 21230,
+        },
+        tags: ["Default", "startup", "class", "es6", "babylonjs"],
         iterations: 10,
     }),
     new AsyncBenchmark({
