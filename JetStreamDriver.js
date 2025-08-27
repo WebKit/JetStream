@@ -88,25 +88,11 @@ if (!globalThis.prefetchResources)
 this.currentResolve = null;
 this.currentReject = null;
 
-let showScoreDetails = false;
-let categoryScores = null;
-
 function displayCategoryScores() {
-    if (!categoryScores)
-        return;
+    document.body.classList.add("details");
 
-    let scoreDetails = `<div class="benchmark benchmark-done">`;
-    for (let [category, scores] of categoryScores) {
-        scoreDetails += `<span class="result">
-                <span>${uiFriendlyScore(geomeanScore(scores))}</span>
-                <label>${category}</label>
-            </span>`;
-    }
-    scoreDetails += "</div>";
-    let summaryElement = document.getElementById("result-summary");
-    summaryElement.innerHTML += scoreDetails;
 
-    categoryScores = null;
+    // categoryScores = null;
 }
 
 function getIterationCount(plan) {
@@ -132,19 +118,23 @@ function getWorstCaseCount(plan) {
 if (isInBrowser) {
     document.onkeydown = (keyboardEvent) => {
         const key = keyboardEvent.key;
-        if (key === "d" || key === "D") {
-            showScoreDetails = true;
+        if (key === "d" || key === "D")
             displayCategoryScores();
-        }
     };
 }
 
-function mean(values) {
+function sum(values) {
     console.assert(values instanceof Array);
     let sum = 0;
     for (let x of values)
         sum += x;
-    return sum / values.length;
+    return sum;
+}
+
+
+function mean(values) {
+    const totalSum = sum(values)
+    return totalSum / values.length;
 }
 
 function geomeanScore(values) {
@@ -186,7 +176,7 @@ function uiFriendlyScore(num) {
 }
 
 function uiFriendlyDuration(time) {
-    return `${time.toFixed(3)} ms`;
+    return `${time.toFixed(2)} ms`;
 }
 
 // TODO: Cleanup / remove / merge. This is only used for caching loads in the
@@ -288,15 +278,23 @@ class Driver {
             allScores.push(score);
         }
 
-        categoryScores = new Map;
+        const categoryScores = new Map();
+        const categoryTimes = new Map();
         for (const benchmark of this.benchmarks) {
             for (let category of Object.keys(benchmark.subScores()))
                 categoryScores.set(category, []);
+            for (let category of Object.keys(benchmark.subTimes()))
+                categoryTimes.set(category, []);
         }
 
         for (const benchmark of this.benchmarks) {
             for (let [category, value] of Object.entries(benchmark.subScores())) {
                 const arr = categoryScores.get(category);
+                console.assert(value > 0, `Invalid ${benchmark.name} ${category} score: ${value}`);
+                arr.push(value);
+            }
+            for (let [category, value] of Object.entries(benchmark.subTimes())) {
+                const arr = categoryTimes.get(category);
                 console.assert(value > 0, `Invalid ${benchmark.name} ${category} score: ${value}`);
                 arr.push(value);
             }
@@ -306,13 +304,26 @@ class Driver {
         console.assert(totalScore > 0, `Invalid total score: ${totalScore}`);
 
         if (isInBrowser) {
+            let summaryHtml = `<div class="score">${uiFriendlyScore(totalScore)}</div>
+                    <label>Score</label>`;
+            summaryHtml += `<div class="benchmark benchmark-done">`;
+            for (let [category, scores] of categoryScores) {
+                summaryHtml += `<span class="result detail">
+                        <span>${uiFriendlyScore(geomeanScore(scores))}</span>
+                        <label>${category}</label>
+                    </span>`;
+            }
+            for (let [category, times] of categoryTimes) {
+                summaryHtml += `<span class="result detail">
+                        <span>${uiFriendlyDuration(geomeanScore(times))}</span>
+                        <label>${category}</label>
+                    </span>`;
+            }
+            summaryHtml += "</div>";
             const summaryElement = document.getElementById("result-summary");
             summaryElement.classList.add("done");
-            summaryElement.innerHTML = `<div class="score">${uiFriendlyScore(totalScore)}</div>
-                    <label>Score</label>`;
+            summaryElement.innerHTML = summaryHtml;
             summaryElement.onclick = displayCategoryScores;
-            if (showScoreDetails)
-                displayCategoryScores();
             statusElement.innerHTML = "";
         } else if (!dumpJSONResults) {
             console.log("\n");
@@ -335,32 +346,36 @@ class Driver {
     prepareToRun() {
         this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
 
+        if (!isInBrowser)
+            return;
+
         let text = "";
         for (const benchmark of this.benchmarks) {
-            const description = Object.keys(benchmark.subScores());
-            description.push("Score");
+            const scoreDescription = Object.keys(benchmark.allScores());
+            const timeDescription = Object.keys(benchmark.allTimes());
 
             const scoreIds = benchmark.scoreIdentifiers();
             const overallScoreId = scoreIds.pop();
+            const timeIds = benchmark.timeIdentifiers();
 
-            if (isInBrowser) {
-                text +=
-                    `<div class="benchmark" id="benchmark-${benchmark.name}">
-                    <h3 class="benchmark-name">${benchmark.name} <a class="info" href="in-depth.html#${benchmark.name}">i</a></h3>
-                    <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
-                    <h4 class="plot" id="plot-${benchmark.name}">&nbsp;</h4>
-                    <p>`;
-                for (let i = 0; i < scoreIds.length; i++) {
-                    const scoreId = scoreIds[i];
-                    const label = description[i];
-                    text += `<span class="result"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`
-                }
-                text += `</p></div>`;
+            text +=
+                `<div class="benchmark" id="benchmark-${benchmark.name}">
+                <h3 class="benchmark-name">${benchmark.name} <a class="info" href="in-depth.html#${benchmark.name}">i</a></h3>
+                <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
+                <h4 class="plot" id="plot-${benchmark.name}">&nbsp;</h4>
+                <p>`;
+            for (let i = 0; i < scoreIds.length; i++) {
+                const scoreId = scoreIds[i];
+                const label = scoreDescription[i];
+                text += `<span class="result score"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`
             }
+            for (let i = 0; i < timeIds.length; i++) {
+                const timeId = timeIds[i];
+                const label = timeDescription[i];
+                text += `<span class="result detail"><span id="${timeId}">&nbsp;</span><label>${label}</label></span>`
+            }
+            text += `</p></div>`;
         }
-
-        if (!isInBrowser)
-            return;
 
         for (let f = 0; f < 5; f++)
             text += `<div class="benchmark fill"></div>`;
@@ -383,12 +398,13 @@ class Driver {
         if (!isInBrowser)
             return;
 
-        for (const id of benchmark.scoreIdentifiers()) {
+        for (const id of benchmark.scoreIdentifiers())
             document.getElementById(id).innerHTML = "error";
-            const benchmarkResultsUI = document.getElementById(`benchmark-${benchmark.name}`);
-            benchmarkResultsUI.classList.remove("benchmark-running");
-            benchmarkResultsUI.classList.add("benchmark-error");
-        }
+        for (const id of benchmark.timeIdentifiers())
+            document.getElementById(id).innerHTML = "error";
+        const benchmarkResultsUI = document.getElementById(`benchmark-${benchmark.name}`);
+        benchmarkResultsUI.classList.remove("benchmark-running");
+        benchmarkResultsUI.classList.add("benchmark-error");
     }
 
     pushError(name, error) {
@@ -777,7 +793,20 @@ class Benchmark {
         return geomeanScore(subScores);
     }
 
+    get totalTime() {
+        const subTimes = Object.values(this.subTimes());
+        return sum(subTimes);
+    }
+
+    get wallTime() {
+        return this.endTime - this.startTime;
+    }
+
     subScores() {
+        throw new Error("Subclasses need to implement this");
+    }
+
+    subTimes() {
         throw new Error("Subclasses need to implement this");
     }
 
@@ -785,6 +814,13 @@ class Benchmark {
         const allScores = this.subScores();
         allScores["Score"] = this.score;
         return allScores;
+    }
+
+    allTimes() {
+        const allTimes = this.subTimes();
+        allTimes["Total"] = this.totalTime;
+         allTimes["Wall-Time"] = this.wallTime;
+        return allTimes;
     }
 
     get prerunCode() { return null; }
@@ -1056,6 +1092,15 @@ class Benchmark {
         return `results-cell-${this.name}-${scoreName}`;
     }
 
+    timeIdentifiers() {
+        const ids = Object.keys(this.allTimes()).map(name => this.timeIdentifier(name));
+        return ids;
+    }
+
+    timeIdentifier(scoreName) {
+        return `results-cell-${this.name}-${scoreName}-time`;
+    }    
+
     updateUIBeforeRun() {
         if (!dumpJSONResults)
             console.log(`Running ${this.name}:`);
@@ -1071,24 +1116,29 @@ class Benchmark {
 
         for (const id of this.scoreIdentifiers())
             document.getElementById(id).innerHTML = "...";
+        for (const id of this.timeIdentifiers())
+            document.getElementById(id).innerHTML = "...";
     }
 
     updateUIAfterRun() {
         const scoreEntries = Object.entries(this.allScores());
+        const timeEntries = Object.entries(this.allTimes());
         if (isInBrowser)
-            this.updateUIAfterRunInBrowser(scoreEntries);
+            this.updateUIAfterRunInBrowser(scoreEntries, timeEntries);
         if (dumpJSONResults)
             return;
-        this.updateConsoleAfterRun(scoreEntries);
+        this.updateConsoleAfterRun(scoreEntries, timeEntries);
     }
 
-    updateUIAfterRunInBrowser(scoreEntries) {
+    updateUIAfterRunInBrowser(scoreEntries, timeEntries) {
         const benchmarkResultsUI = document.getElementById(`benchmark-${this.name}`);
         benchmarkResultsUI.classList.remove("benchmark-running");
         benchmarkResultsUI.classList.add("benchmark-done");
 
         for (const [name, value] of scoreEntries)
             document.getElementById(this.scoreIdentifier(name)).innerHTML = uiFriendlyScore(value);
+        for (const [name, value] of timeEntries)
+            document.getElementById(this.timeIdentifier(name)).innerHTML = uiFriendlyDuration(value);
 
         this.renderScatterPlot();
     }
@@ -1225,6 +1275,22 @@ class GroupedBenchmark extends Benchmark {
             results[subScore] = geomeanScore(results[subScore]);
         return results;
     }
+
+    subTimes() {
+        const results = {};
+
+        for (const benchmark of this.benchmarks) {
+            let times = benchmark.subTimes();
+            for (let subTime in times) {
+                results[subTime] ??= [];
+                results[subTime].push(times[subTime]);
+            }
+        }
+
+        for (let subTimes in results)
+            results[subTimes] = sum(results[subTimes]);
+        return results;
+    }
 };
 
 class DefaultBenchmark extends Benchmark {
@@ -1267,6 +1333,14 @@ class DefaultBenchmark extends Benchmark {
             "First": this.firstIterationScore,
             "Worst": this.worstScore,
             "Average": this.averageScore,
+        };
+    }
+
+    subTimes() {
+        return {
+            "First": this.firstIterationTime,
+            "Worst": this.worstTime,
+            "Average": this.averageTime,
         };
     }
 }
@@ -1433,6 +1507,13 @@ class WSLBenchmark extends Benchmark {
         }`;
     }
 
+    subTimes() {
+        return {
+            "Stdlib": this.stdlibTime,
+            "MainRun": this.mainRunTime,
+        };
+    }
+
     subScores() {
         return {
             "Stdlib": this.stdlibScore,
@@ -1568,6 +1649,13 @@ class WasmLegacyBenchmark extends Benchmark {
         return {
             "Startup": this.startupScore,
             "Runtime": this.runScore,
+        };
+    }
+
+    subTimes() {
+        return {
+            "Startup": this.startupTime,
+            "Runtime": this.runTim,
         };
     }
 };
