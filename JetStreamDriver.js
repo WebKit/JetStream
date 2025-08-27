@@ -371,8 +371,8 @@ class Driver {
         resultsTable.innerHTML = text;
 
         document.getElementById("magic").textContent = "";
-        document.addEventListener('keypress', function (e) {
-            if (e.which === 13)
+        document.addEventListener('keypress', (e) => {
+            if (e.key === "Enter")
                 JetStream.start();
         });
     }
