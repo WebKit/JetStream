@@ -740,9 +740,16 @@ class Benchmark {
         return tags.some((tag) => this.tags.has(tag.toLowerCase()));
     }
 
+    get benchmarkArguments() {
+        return {
+            ...this.plan.arguments,
+            iterationCount: this.iterations,
+        };
+    }
+
     get runnerCode() {
         return `{
-            const benchmark = new Benchmark(${this.iterations});
+            const benchmark = new Benchmark(${JSON.stringify(this.benchmarkArguments)});
             const results = [];
             const benchmarkName = "${this.name}";
 
@@ -1404,7 +1411,7 @@ class WSLBenchmark extends Benchmark {
 
     get runnerCode() {
         return `{
-            const benchmark = new Benchmark();
+            const benchmark = new Benchmark(${JSON.stringify(this.benchmarkArguments)});
             const benchmarkName = "${this.name}";
 
             const results = [];
