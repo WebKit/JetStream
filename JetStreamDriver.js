@@ -1826,6 +1826,28 @@ let BENCHMARKS = [
         deterministicRandom: true,
         tags: ["Default", "Octane"],
     }),
+    new AsyncBenchmark({
+        name: "prismjs-startup",
+        files: [
+            "./startup-helper/StartupBenchmark.js",
+            "./prismjs/benchmark.js",
+        ],
+        preload: {
+            // Use non-minified bundle for better local profiling.
+            // BUNDLE: "./prismjs/dist/bundle.es5.js",
+            BUNDLE: "./prismjs/dist/bundle.es5.min.js",
+            SAMPLE_CPP: "./prismjs/data/sample.cpp",
+            SAMPLE_CSS: "./prismjs/data/sample.css",
+            SAMPLE_HTML: "./prismjs/data/sample.html",
+            SAMPLE_JS: "./prismjs/data/sample.js",
+            SAMPLE_JSON: "./prismjs/data/sample.json",
+            SAMPLE_MD: "./prismjs/data/sample.md",
+            SAMPLE_PY: "./prismjs/data/sample.py",
+            SAMPLE_SQL: "./prismjs/data/sample.sql",
+            SAMPLE_TS: "./prismjs/data/sample.TS",
+        },
+        tags: ["Default", "parser", "regexp", "startup"],
+    }),
     // RexBench
     new DefaultBenchmark({
         name: "FlightPlanner",
