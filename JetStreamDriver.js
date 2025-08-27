@@ -295,7 +295,7 @@ class Driver {
             }
             for (let [category, value] of Object.entries(benchmark.subTimes())) {
                 const arr = categoryTimes.get(category);
-                console.assert(value > 0, `Invalid ${benchmark.name} ${category} score: ${value}`);
+                console.assert(value > 0, `Invalid ${benchmark.name} ${category} time: ${value}`);
                 arr.push(value);
             }
         }
@@ -1655,7 +1655,7 @@ class WasmLegacyBenchmark extends Benchmark {
     subTimes() {
         return {
             "Startup": this.startupTime,
-            "Runtime": this.runTim,
+            "Runtime": this.runTime,
         };
     }
 };
