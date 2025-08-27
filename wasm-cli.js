@@ -38,6 +38,8 @@ testList = [
   "Dart-flute-todomvc-wasm",
   "zlib-wasm",
   "Kotlin-compose-wasm",
+  "transformersjs-bert-wasm",
+  "transformersjs-whisper-wasm",
 ];
 
 // Reuse the full CLI runner, just with the subset of Wasm line items above.

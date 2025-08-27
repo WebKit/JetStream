@@ -18,7 +18,7 @@ class TextEncoder {
     return Uint8Array.from(string, (char) => {
       let byte = char.codePointAt(0);
       if (byte > 0x7f)
-        throw new Error("TextEncoder polyfill only supports ASCII");
+        throw new Error("TextEncoder polyfill only supports ASCII, got: " + char);
       return byte;
     });
   }
@@ -27,7 +27,7 @@ class TextDecoder {
   decode(array) {
     for (let byte of array) {
       if (byte > 0x7f)
-        throw new Error("TextDecoder polyfill only supports ASCII");
+        throw new Error("TextDecoder polyfill only supports ASCII, got: " + byte);
     }
     return String.fromCharCode.apply(null, array);
   }
