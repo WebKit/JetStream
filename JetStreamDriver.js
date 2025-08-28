@@ -823,7 +823,7 @@ class Benchmark {
         if (this.plan.preload) {
             let preloadCode = "";
             for (let [ variableName, blobURLOrPath ] of this.preloads)
-                preloadCode += `JetStream.preload.${variableName} = "${blobURLOrPath}";\n`;
+                preloadCode += `JetStream.preload[${JSON.stringify(variableName)}] = "${blobURLOrPath}";\n`;
             scripts.add(preloadCode);
         }
 
@@ -2527,7 +2527,7 @@ let BENCHMARKS = [
         iterations: 15,
         worstCaseCount: 2,
         tags: ["Default", "Wasm", "dotnet"],
-    })
+    }),
 ];
 
 
@@ -2564,24 +2564,58 @@ BENCHMARKS.push(new GroupedBenchmark({
 // WTB (Web Tooling Benchmark) tests
 const WTB_TESTS = [
     "acorn",
+    "babel",
+    "babel-minify",
     "babylon",
     "chai",
-    "coffeescript",
     "espree",
-    "jshint",
-    "lebab",
-    "prepack",
-    "uglify-js",
+    "esprima-next",
+    // "lebab",
+    "postcss",
+    "prettier",
+    "source-map",
 ];
+const WPT_FILES = [
+  "angular-material-20.1.6.css",
+  "backbone-1.6.1.js",
+  "bootstrap-5.3.7.css",
+  "foundation-6.9.0.css",
+  "jquery-3.7.1.js",
+  "lodash.core-4.17.21.js",
+  "lodash-4.17.4.min.js.map",
+  "mootools-core-1.6.0.js",
+  "preact-8.2.5.js",
+  "preact-10.27.1.min.module.js.map",
+  "redux-5.0.1.min.js",
+  "redux-5.0.1.esm.js",
+  "source-map.min-0.5.7.js.map",
+  "source-map/lib/mappings.wasm",
+  "speedometer-es2015-test-2.0.js",
+  "todomvc/react/app.jsx",
+  "todomvc/react/footer.jsx",
+  "todomvc/react/todoItem.jsx",
+  "todomvc/typescript-angular.ts",
+  "underscore-1.13.7.js",
+  "underscore-1.13.7.min.js.map",
+  "vue-3.5.18.runtime.esm-browser.js",
+].reduce((acc, file) => {
+        acc[file] = `./web-tooling-benchmark/third_party/${file}`;
+        return acc
+}, Object.create(null));
+
+
 for (const name of WTB_TESTS) {
-    BENCHMARKS.push(new DefaultBenchmark({
+    BENCHMARKS.push(new AsyncBenchmark({
         name: `${name}-wtb`,
         files: [
-            (isInBrowser ? "./web-tooling-benchmark/browser.js" : "./web-tooling-benchmark/cli.js"),
-            `./web-tooling-benchmark/${name}.js`,
+            `./web-tooling-benchmark/dist/${name}.bundle.js`,
+            "./web-tooling-benchmark/benchmark.js",
         ],
-        iterations: 5,
-        worstCaseCount: 1,
+        preload: {
+            BUNDLE: `./web-tooling-benchmark/dist/${name}.bundle.js`,
+            ...WPT_FILES,
+        },
+        iterations: 15,
         allowUtf16: true,
         tags: ["Default", "WTB"],
     }));
