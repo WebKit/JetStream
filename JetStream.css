@@ -314,6 +314,9 @@ a.button {
     justify-content: space-around;
     animation: fadein 500ms ease-out forwards;
     opacity: 0;
+    overflow-y: auto; 
+    height: auto;
+    max-height: 80vh;
 }
 
 .benchmark {
@@ -325,7 +328,8 @@ a.button {
     color: var(--text-color-very-subtle);
     font-size: 1.6rem;
     margin: 0 1.6rem 3rem 0;
-
+    scroll-margin-top: 20vh;
+    scroll-margin-bottom: 20vh;
 }
 
 .benchmark h4,
@@ -359,9 +363,6 @@ a.button {
     background-color: transparent;
     background-image: none;
     -webkit-touch-callout: revert;
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
     user-select: text;
 }
 
