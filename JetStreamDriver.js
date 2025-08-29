@@ -81,6 +81,10 @@ if (typeof(URLSearchParams) !== "undefined") {
         globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources");
 }
 
+if (!isInBrowser) {
+    load("wasm-zlib.js");
+}
+
 if (!globalThis.prefetchResources)
     console.warn("Disabling resource prefetching!");
 
@@ -189,6 +193,47 @@ function uiFriendlyDuration(time) {
     return `${time.toFixed(3)} ms`;
 }
 
+// Files can be zlib compressed to reduce the download size. We don't use http
+// compression because we support running from the shell and don't want to
+// require a complicated server setup.
+//
+// zlib was chosen because we already have it in tree for the wasm-zlib test.
+function isCompressed(name) {
+    return name.endsWith(".z");
+}
+
+// Fallback for shell environments without TextDecoder. This only handles valid
+// UTF-8, invalid buffers will lead to unexpected results.
+function decodeUTF8(int8Array) {
+    let result = '';
+    let i = 0;
+    while (i < int8Array.length) {
+        let byte1 = int8Array[i++];
+        if (byte1 < 0x80) {
+            // 1-byte sequence (ASCII)
+            result += String.fromCharCode(byte1);
+        } else if ((byte1 & 0xE0) === 0xC0) {
+            // 2-byte sequence
+            let byte2 = int8Array[i++];
+            result += String.fromCharCode(((byte1 & 0x1F) << 6) | (byte2 & 0x3F));
+        } else if ((byte1 & 0xF0) === 0xE0) {
+            // 3-byte sequence
+            let byte2 = int8Array[i++];
+            let byte3 = int8Array[i++];
+            result += String.fromCharCode(((byte1 & 0x0F) << 12) | ((byte2 & 0x3F) << 6) | (byte3 & 0x3F));
+        } else if ((byte1 & 0xF8) === 0xF0) {
+            // 4-byte sequence (needs surrogate pairs)
+            let byte2 = int8Array[i++];
+            let byte3 = int8Array[i++];
+            let byte4 = int8Array[i++];
+            let codePoint = ((byte1 & 0x07) << 18) | ((byte2 & 0x3F) << 12) | ((byte3 & 0x3F) << 6) | (byte4 & 0x3F);
+            codePoint -= 0x10000;
+            result += String.fromCharCode(0xD800 + (codePoint >> 10), 0xDC00 + (codePoint & 0x3FF));
+        }
+    }
+    return result;
+}
+
 // TODO: Cleanup / remove / merge. This is only used for caching loads in the
 // non-browser setting. In the browser we use exclusively `loadCache`, 
 // `loadBlob`, `doLoadBlob`, `prefetchResourcesForBrowser` etc., see below.
@@ -201,14 +246,25 @@ class ShellFileLoader {
     // share common code.
     load(url) {
         console.assert(!isInBrowser);
-        if (!globalThis.prefetchResources)
+
+        // If we aren't supposed to prefetch this and don't need to decompress it,
+        // then return code snippet that will load the url on-demand.
+        let compressed = isCompressed(url);
+        if (!compressed && !globalThis.prefetchResources)
             return `load("${url}");`
 
         if (this.requests.has(url)) {
             return this.requests.get(url);
         }
 
-        const contents = readFile(url);
+        let contents;
+        if (isCompressed(url)) {
+            let bytes = new Int8Array(read(url, "binary"));
+            bytes = zlib.decompress(bytes);
+            contents = decodeUTF8(bytes);
+        } else {
+            contents = readFile(url);
+        }
         this.requests.set(url, contents);
         return contents;
     }
@@ -260,10 +316,14 @@ class Driver {
             performance.mark("update-ui");
             benchmark.updateUIAfterRun();
 
-            if (isInBrowser && globalThis.prefetchResources) {
+            if (isInBrowser) {
                 const cache = JetStream.blobDataCache;
                 for (const file of benchmark.files) {
                     const blobData = cache[file];
+                    // If we didn't prefetch this resource, then no need to free it
+                    if (!blobData.blob) {
+                        continue
+                    }
                     blobData.refCount--;
                     if (!blobData.refCount)
                         cache[file] = undefined;
@@ -415,6 +475,7 @@ class Driver {
 
     async prefetchResources() {
         if (!isInBrowser) {
+            await zlib.initialize();
             for (const benchmark of this.benchmarks)
                 benchmark.prefetchResourcesForShell();
             return;
@@ -629,6 +690,11 @@ class Scripts {
 }
 
 class ShellScripts extends Scripts {
+    constructor() {
+        super();
+        this.blobs = [];
+    }
+
     run() {
         let globalObject;
         let realm;
@@ -655,11 +721,21 @@ class ShellScripts extends Scripts {
             currentReject
         };
 
+        // Store shellBlobs on JetStreamBlobs so that getBinary can find them.
+        globalObject.JetStreamBlobs = {};
+        for (const [name, value] of this.blobs) {
+            globalObject.JetStreamBlobs[name] = value;
+        }
+
         globalObject.performance ??= performance;
         for (const script of this.scripts)
             globalObject.loadString(script);
 
         return isD8 ? realm : globalObject;
+    }
+
+    addBlobs(blobs) {
+        this.blobs.push(...blobs);
     }
 
     add(text) {
@@ -694,7 +770,6 @@ class BrowserScripts extends Scripts {
         return magicFrame;
     }
 
-
     add(text) {
         this.scripts.push(`<script>${text}</script>`);
     }
@@ -714,6 +789,7 @@ class Benchmark {
         this.allowUtf16 = !!plan.allowUtf16;
         this.scripts = null;
         this.preloads = null;
+        this.shellBlobs = null;
         this.results = [];
         this._state = BenchmarkState.READY;
     }
@@ -820,10 +896,14 @@ class Benchmark {
         if (!!this.plan.exposeBrowserTest)
             scripts.addBrowserTest();
 
+        if (this.shellBlobs) {
+            scripts.addBlobs(this.shellBlobs);
+        }
         if (this.plan.preload) {
             let preloadCode = "";
-            for (let [ variableName, blobURLOrPath ] of this.preloads)
+            for (let [ variableName, blobURLOrPath ] of this.preloads) {
                 preloadCode += `JetStream.preload.${variableName} = "${blobURLOrPath}";\n`;
+            }
             scripts.add(preloadCode);
         }
 
@@ -838,7 +918,7 @@ class Benchmark {
         } else {
             const cache = JetStream.blobDataCache;
             for (const file of this.plan.files) {
-                scripts.addWithURL(globalThis.prefetchResources ? cache[file].blobURL : file);
+                scripts.addWithURL(cache[file].blobURL);
             }
         }
 
@@ -889,10 +969,15 @@ class Benchmark {
 
     async doLoadBlob(resource) {
         const blobData = JetStream.blobDataCache[resource];
-        if (!globalThis.prefetchResources) {
+
+        // If we aren't supposed to prefetch this and don't need to decompress it,
+        // then set the blobURL to just be the resource URL.
+        const compressed = isCompressed(resource);
+        if (!compressed && !globalThis.prefetchResources) {
             blobData.blobURL = resource;
             return blobData;
         }
+
         let response;
         let tries = 3;
         while (tries--) {
@@ -908,7 +993,15 @@ class Benchmark {
                 continue;
             throw new Error("Fetch failed");
         }
-        const blob = await response.blob();
+
+        // If we need to decompress this, then run it through a decompression
+        // stream.
+        if (compressed) {
+            const stream = response.body.pipeThrough(new DecompressionStream('deflate'))
+            response = new Response(stream);
+        }
+
+        let blob = await response.blob();
         blobData.blob = blob;
         blobData.blobURL = URL.createObjectURL(blob);
         return blobData;
@@ -1044,7 +1137,26 @@ class Benchmark {
         this.scripts = this.plan.files.map(file => shellFileLoader.load(file));
 
         console.assert(this.preloads === null, "This initialization should be called only once.");
-        this.preloads = Object.entries(this.plan.preload ?? {});
+        this.preloads = [];
+        this.shellBlobs = [];
+        for (let name of Object.getOwnPropertyNames(this.plan.preload)) {
+            let file = this.plan.preload[name];
+
+            const compressed = isCompressed(file);
+            if (compressed || globalThis.prefetchResources) {
+                let bytes = new Int8Array(read(file, "binary"));
+                if (compressed) {
+                    bytes = zlib.decompress(bytes);
+                }
+                // Add a `blob` prefix to the file name so that `getBinary`
+                // knows to look for a blob in JetStreamBlobs (setup by
+                // ShellScripts).
+                file = `blob://${name}`;
+                this.shellBlobs.push([file, bytes]);
+            }
+
+            this.preloads.push([name, file]);
+        }
     }
 
     scoreIdentifiers() {
@@ -1161,7 +1273,7 @@ class GroupedBenchmark extends Benchmark {
             await benchmark.prefetchResourcesForBrowser();
     }
 
-    async retryPrefetchResourcesForBrowser() {
+    async retryjForBrowser() {
         for (const benchmark of this.benchmarks)
             await benchmark.retryPrefetchResourcesForBrowser();
     }
@@ -1296,6 +1408,9 @@ class AsyncBenchmark extends DefaultBenchmark {
         } else {
             str += `
                 JetStream.getBinary = async function(path) {
+                    if (path.startsWith("blob://")) {
+                        return JetStreamBlobs[path];
+                    }
                     return new Int8Array(read(path, "binary"));
                 };
 
@@ -1578,23 +1693,23 @@ function dotnetPreloads(type)
         dotnetUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.js`,
         dotnetNativeUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.native.js`,
         dotnetRuntimeUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.runtime.js`,
-        wasmBinaryUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.native.wasm`,
+        wasmBinaryUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.native.wasm.z`,
         icuCustomUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/icudt_CJK.dat`,
-        dllCollectionsConcurrentUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Collections.Concurrent.wasm`,
-        dllCollectionsUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Collections.wasm`,
-        dllComponentModelPrimitivesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ComponentModel.Primitives.wasm`,
-        dllComponentModelTypeConverterUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ComponentModel.TypeConverter.wasm`,
-        dllDrawingPrimitivesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Drawing.Primitives.wasm`,
-        dllDrawingUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Drawing.wasm`,
-        dllIOPipelinesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.IO.Pipelines.wasm`,
-        dllLinqUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Linq.wasm`,
-        dllMemoryUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Memory.wasm`,
-        dllObjectModelUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ObjectModel.wasm`,
-        dllPrivateCorelibUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Private.CoreLib.wasm`,
-        dllRuntimeInteropServicesJavaScriptUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Runtime.InteropServices.JavaScript.wasm`,
-        dllTextEncodingsWebUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Text.Encodings.Web.wasm`,
-        dllTextJsonUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Text.Json.wasm`,
-        dllAppUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.wasm`,
+        dllCollectionsConcurrentUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Collections.Concurrent.wasm.z`,
+        dllCollectionsUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Collections.wasm.z`,
+        dllComponentModelPrimitivesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ComponentModel.Primitives.wasm.z`,
+        dllComponentModelTypeConverterUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ComponentModel.TypeConverter.wasm.z`,
+        dllDrawingPrimitivesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Drawing.Primitives.wasm.z`,
+        dllDrawingUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Drawing.wasm.z`,
+        dllIOPipelinesUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.IO.Pipelines.wasm.z`,
+        dllLinqUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Linq.wasm.z`,
+        dllMemoryUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Memory.wasm.z`,
+        dllObjectModelUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.ObjectModel.wasm.z`,
+        dllPrivateCorelibUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Private.CoreLib.wasm.z`,
+        dllRuntimeInteropServicesJavaScriptUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Runtime.InteropServices.JavaScript.wasm.z`,
+        dllTextEncodingsWebUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Text.Encodings.Web.wasm.z`,
+        dllTextJsonUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/System.Text.Json.wasm.z`,
+        dllAppUrl: `./wasm/dotnet/build-${type}/wwwroot/_framework/dotnet.wasm.z`,
     }
 }
 
@@ -2093,7 +2208,7 @@ let BENCHMARKS = [
             "./wasm/HashSet/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/HashSet/build/HashSet.wasm",
+            wasmBinary: "./wasm/HashSet/build/HashSet.wasm.z",
         },
         iterations: 50,
         // No longer run by-default: We have more realistic Wasm workloads by
@@ -2107,7 +2222,7 @@ let BENCHMARKS = [
             "./wasm/TSF/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/TSF/build/tsf.wasm",
+            wasmBinary: "./wasm/TSF/build/tsf.wasm.z",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -2119,7 +2234,7 @@ let BENCHMARKS = [
             "./wasm/quicksort/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/quicksort/build/quicksort.wasm",
+            wasmBinary: "./wasm/quicksort/build/quicksort.wasm.z",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -2131,7 +2246,7 @@ let BENCHMARKS = [
             "./wasm/gcc-loops/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/gcc-loops/build/gcc-loops.wasm",
+            wasmBinary: "./wasm/gcc-loops/build/gcc-loops.wasm.z",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -2143,7 +2258,7 @@ let BENCHMARKS = [
             "./wasm/richards/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/richards/build/richards.wasm",
+            wasmBinary: "./wasm/richards/build/richards.wasm.z",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -2155,7 +2270,7 @@ let BENCHMARKS = [
             "./sqlite3/build/jswasm/speedtest1.js",
         ],
         preload: {
-            wasmBinary: "./sqlite3/build/jswasm/speedtest1.wasm",
+            wasmBinary: "./sqlite3/build/jswasm/speedtest1.wasm.z",
         },
         iterations: 30,
         worstCaseCount: 2,
@@ -2168,7 +2283,7 @@ let BENCHMARKS = [
         ],
         preload: {
             jsModule: "./Dart/build/flute.complex.dart2wasm.mjs",
-            wasmBinary: "./Dart/build/flute.complex.dart2wasm.wasm",
+            wasmBinary: "./Dart/build/flute.complex.dart2wasm.wasm.z",
         },
         iterations: 15,
         worstCaseCount: 2,
@@ -2186,7 +2301,7 @@ let BENCHMARKS = [
         ],
         preload: {
             jsModule: "./Dart/build/flute.todomvc.dart2wasm.mjs",
-            wasmBinary: "./Dart/build/flute.todomvc.dart2wasm.wasm",
+            wasmBinary: "./Dart/build/flute.todomvc.dart2wasm.wasm.z",
         },
         iterations: 30,
         worstCaseCount: 2,
@@ -2199,9 +2314,9 @@ let BENCHMARKS = [
         ],
         preload: {
             skikoJsModule: "./Kotlin-compose/build/skiko.mjs",
-            skikoWasmBinary: "./Kotlin-compose/build/skiko.wasm",
+            skikoWasmBinary: "./Kotlin-compose/build/skiko.wasm.z",
             composeJsModule: "./Kotlin-compose/build/compose-benchmarks-benchmarks.uninstantiated.mjs",
-            composeWasmBinary: "./Kotlin-compose/build/compose-benchmarks-benchmarks.wasm",
+            composeWasmBinary: "./Kotlin-compose/build/compose-benchmarks-benchmarks.wasm.z",
             inputImageCompose: "./Kotlin-compose/build/compose-multiplatform.png",
             inputImageCat: "./Kotlin-compose/build/example1_cat.jpg",
             inputImageComposeCommunity: "./Kotlin-compose/build/example1_compose-community-primary.png",
@@ -2226,7 +2341,7 @@ let BENCHMARKS = [
             "./wasm/tfjs-benchmark.js",
         ],
         preload: {
-            tfjsBackendWasmBlob: "./wasm/tfjs-backend-wasm.wasm",
+            tfjsBackendWasmBlob: "./wasm/tfjs-backend-wasm.wasm.z",
         },
         async: true,
         deterministicRandom: true,
@@ -2248,7 +2363,7 @@ let BENCHMARKS = [
             "./wasm/tfjs-benchmark.js",
         ],
         preload: {
-            tfjsBackendWasmSimdBlob: "./wasm/tfjs-backend-wasm-simd.wasm",
+            tfjsBackendWasmSimdBlob: "./wasm/tfjs-backend-wasm-simd.wasm.z",
         },
         async: true,
         deterministicRandom: true,
@@ -2263,7 +2378,7 @@ let BENCHMARKS = [
             "./wasm/argon2/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/argon2/build/argon2.wasm",
+            wasmBinary: "./wasm/argon2/build/argon2.wasm.z",
         },
         iterations: 30,
         worstCaseCount: 3,
@@ -2485,7 +2600,7 @@ let BENCHMARKS = [
             "./8bitbench/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./8bitbench/build/rust/pkg/emu_bench_bg.wasm",
+            wasmBinary: "./8bitbench/build/rust/pkg/emu_bench_bg.wasm.z",
             romBinary: "./8bitbench/build/assets/program.bin",
         },
         iterations: 15,
@@ -2500,7 +2615,7 @@ let BENCHMARKS = [
             "./wasm/zlib/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/zlib/build/zlib.wasm",
+            wasmBinary: "./wasm/zlib/build/zlib.wasm.z",
         },
         iterations: 40,
         tags: ["Default", "Wasm"],
