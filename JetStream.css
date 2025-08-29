@@ -54,8 +54,8 @@ body {
     display: flex;
     flex-direction: column;
     gap: var(--gap);
+    margin: 0;
     font-size: 1.6rem;
-    margin: 0 var(--gap) 0 var(--gap);
     font-weight: 400;
     line-height: 1.4;
     background-repeat: no-repeat;
@@ -76,6 +76,8 @@ main {
     display: flex;
     flex-direction: column;
     gap: var(--gap);
+    margin: 0 auto;
+    padding: 0 var(--gap);
     max-width: 1180px;
     text-align: center;
     flex: 1;
@@ -153,6 +155,7 @@ article,
 h1 {
     color: var(--text-color-primary);
     text-align: center;
+    margin-bottom: 0;
 }
 
 
@@ -318,6 +321,8 @@ a.button {
     opacity: 0;
     overflow-y: auto;
     flex: 1;
+    padding-bottom: var(--gap);
+    box-sizing: border-box;
 }
 
 .benchmark {
