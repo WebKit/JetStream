@@ -362,9 +362,6 @@ class Driver {
         if (!isInBrowser)
             return;
 
-        for (let f = 0; f < 5; f++)
-            text += `<div class="benchmark fill"></div>`;
-
         const timestamp = performance.now();
         document.getElementById('jetstreams').style.backgroundImage = `url('jetstreams.svg?${timestamp}')`;
         const resultsTable = document.getElementById("results");
@@ -1064,10 +1061,9 @@ class Benchmark {
     }
 
     updateUIBeforeRunInBrowser() {
-        const containerUI = document.getElementById("results");
         const resultsBenchmarkUI = document.getElementById(`benchmark-${this.name}`);
-        containerUI.insertBefore(resultsBenchmarkUI, containerUI.firstChild);
         resultsBenchmarkUI.classList.add("benchmark-running");
+        resultsBenchmarkUI.scrollIntoView({ block: "nearest" });
 
         for (const id of this.scoreIdentifiers())
             document.getElementById(id).innerHTML = "...";

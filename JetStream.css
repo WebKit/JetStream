@@ -39,6 +39,8 @@
     --benchmark-heading-color: rgb(183, 183, 183);
     --benchmark-error-text-color: #ff8686;
     --benchmark-done-result-color: #4A4A4A;
+    --gap: 3rem;
+    --width: 200px;
 }
 
 html,
@@ -46,9 +48,13 @@ svg text {
     font-family: "Helvetica Neue", Helvetica, Verdana, sans-serif;
     font-size: 62.5%;
     font-synthesis: none;
+    height: 100vh;
 }
 
 body {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
     margin: 0;
     font-size: 1.6rem;
     font-weight: 400;
@@ -58,7 +64,18 @@ body {
     background-size: 100vw;
     padding-bottom: 0px;
     background-image: url('clouds.svg');
+    overflow-y: hidden;
+    height: 100%;
 }
+
+.overflow-scroll {
+    overflow-y: auto;
+}
+
+.overflow-visible {
+    overflow: visible;
+}
+
 
 ::selection {
     background-color: var(--color-primary);
@@ -66,24 +83,29 @@ body {
 }
 
 main {
-    display: block;
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+    margin: 0 auto;
+    padding: 0 var(--gap);
     max-width: 1180px;
-    margin: auto;
     text-align: center;
+    flex: 1;
+    overflow: hidden;
+}
+
+main p {
+    margin: 0;
 }
 
 img {
-    -webkit-user-select: none;
     -webkit-user-drag: none;
+    user-select: none;
 }
 
 .logo {
     box-sizing: border-box;
     width: 100%;
-    -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
     perspective: 600;
 }
@@ -127,11 +149,6 @@ img {
     text-align: center;
 }
 
-.summary+.summary {
-    padding-top: 5px;
-    margin-top: 5px;
-}
-
 .summary:empty {
     display: none;
 }
@@ -139,15 +156,21 @@ img {
 article,
 .summary {
     max-width: 70rem;
-    margin: 0 auto 1rem;
+    margin: 0 auto 0 auto;
     opacity: 0;
     animation: fadein 0.5s ease-in-out forwards;
     animation-delay: 200ms;
 }
 
+article {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap);
+}
 h1 {
     color: var(--text-color-primary);
     text-align: center;
+    margin-bottom: 0;
 }
 
 
@@ -170,7 +193,6 @@ h6 {
 p {
     text-align: left;
     color: var(--text-color-secondary);
-    margin: 0 0 3rem 0;
 }
 
 h5,
@@ -204,10 +226,6 @@ a:active {
     color: var(--link-hover-color);
 }
 
-#status {
-    margin: 2rem 0rem;
-}
-
 #status label,
 a.button {
     display: inline-block;
@@ -219,11 +237,10 @@ a.button {
     color: var(--text-color-inverse);
     border: 1px solid var(--button-color-primary);
     border-radius: 2px;
-    padding: 0.3rem 9rem 0.5rem;
+    padding: 0.3rem 0.3rem 0.5rem;
+    text-align: center;
+    width: var(--width);
     -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 }
 
@@ -253,9 +270,6 @@ a.button {
     -webkit-background-clip: text;
     background-repeat: no-repeat;
     -webkit-touch-callout: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
     user-select: none;
 }
 
@@ -312,20 +326,26 @@ a.button {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-around;
+    gap: var(--gap);
+    margin: 0 calc(var(--gap) * -1) 0 calc(-var(--gap) * -1);
     animation: fadein 500ms ease-out forwards;
     opacity: 0;
+    overflow-y: auto;
+    flex: 1;
+    padding-bottom: var(--gap);
+    box-sizing: border-box;
 }
 
 .benchmark {
     position: relative;
     flex: 1;
     max-width: 20%;
-    min-width: 200px;
+    min-width: var(--width);
     text-align: left;
     color: var(--text-color-very-subtle);
     font-size: 1.6rem;
-    margin: 0 1.6rem 3rem 0;
-
+    scroll-margin-top: 20vh;
+    scroll-margin-bottom: 20vh;
 }
 
 .benchmark h4,
@@ -359,9 +379,6 @@ a.button {
     background-color: transparent;
     background-image: none;
     -webkit-touch-callout: revert;
-    -webkit-user-select: text;
-    -moz-user-select: text;
-    -ms-user-select: text;
     user-select: text;
 }
 
@@ -544,16 +561,5 @@ dt:target {
 
     #jetstreams {
         background-size: 200%;
-    }
-
-
-    article,
-    .summary {
-        padding-top: 10rem;
-        margin: 0 1rem;
-    }
-
-    a.button {
-        padding: 0.3rem 6rem 0.5rem;
     }
 }
