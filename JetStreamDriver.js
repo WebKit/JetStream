@@ -2527,7 +2527,20 @@ let BENCHMARKS = [
         iterations: 15,
         worstCaseCount: 2,
         tags: ["Default", "Wasm", "dotnet"],
-    })
+    }),
+    // J2CL
+    new AsyncBenchmark({
+        name: "j2cl-box2d-wasm",
+        files: [
+            "./wasm/j2cl-box2d/benchmark.js",
+            "./wasm/j2cl-box2d/build/Box2dBenchmark_j2wasm_entry.js",
+        ],
+        preload: {
+            wasmBinary: "./wasm/j2cl-box2d/build/Box2dBenchmark_j2wasm_binary.wasm",
+        },
+        iterations: 40,
+        tags: ["Default", "Wasm"],
+    }),
 ];
 
 
