@@ -2378,7 +2378,7 @@ let BENCHMARKS = [
             "./wasm/argon2/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/argon2/build/argon2.wasm",
+            wasmBinary: "./wasm/argon2/build/argon2.wasm.z",
         },
         iterations: 30,
         worstCaseCount: 3,
