@@ -131,6 +131,9 @@ class Params {
         return parsedValue;
     }
 
+    get isDefault() {
+      return this === DefaultJetStreamParams;
+    }
 }
 
 const DefaultJetStreamParams = new Params();

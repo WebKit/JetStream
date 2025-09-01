@@ -121,7 +121,7 @@ load("./params.js");
 
 
 async function runJetStream() {
-    if (JetStreamParams !== DefaultJetStreamParams) {
+    if (!JetStreamParams.isDefault) {
         console.warn(`Using non standard params: ${JSON.stringify(JetStreamParams, null, 2)}`)
     }
     try {
