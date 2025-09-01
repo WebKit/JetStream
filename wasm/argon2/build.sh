@@ -39,5 +39,7 @@ emcc -o build/argon2.js \
     -Iinclude \
     ${SOURCES[@]} | tee -a "$BUILD_LOG"
 
+python3 ../../compress.py --rm ./build/argon2.wasm
+
 echo "Building done" | tee -a "$BUILD_LOG"
 ls -lth build/
