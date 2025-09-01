@@ -30,18 +30,6 @@ const measureTotalTimeAsSubtest = false; // Once we move to preloading all resou
 const defaultIterationCount = 120;
 const defaultWorstCaseCount = 4;
 
-globalThis.performance ??= Date;
-globalThis.RAMification ??= false;
-globalThis.testIterationCount ??= undefined;
-globalThis.testIterationCountMap ??= new Map();
-globalThis.testWorstCaseCount ??= undefined;
-globalThis.testWorstCaseCountMap ??= new Map();
-globalThis.dumpJSONResults ??= false;
-globalThis.testList ??= undefined;
-globalThis.startDelay ??= undefined;
-globalThis.shouldReport ??= false;
-globalThis.prefetchResources ??= true;
-
 if (!JetStreamParams.prefetchResources)
     console.warn("Disabling resource prefetching!");
 
@@ -71,20 +59,20 @@ function displayCategoryScores() {
 }
 
 function getIterationCount(plan) {
-    if (testIterationCountMap.has(plan.name))
-        return testIterationCountMap.get(plan.name);
-    if (globalThis.testIterationCount)
-        return globalThis.testIterationCount;
+    if (JetStreamParams.testIterationCountMap.has(plan.name))
+        return JetStreamParams.testIterationCountMap.get(plan.name);
+    if (JetStreamParams.testIterationCount)
+        return JetStreamParams.testIterationCount;
     if (plan.iterations)
         return plan.iterations;
     return defaultIterationCount;
 }
 
 function getWorstCaseCount(plan) {
-    if (testWorstCaseCountMap.has(plan.name))
-        return testWorstCaseCountMap.get(plan.name);
-    if (globalThis.testWorstCaseCount)
-        return globalThis.testWorstCaseCount;
+    if (JetStreamParams.testWorstCaseCountMap.has(plan.name))
+        return JetStreamParams.testWorstCaseCountMap.get(plan.name);
+    if (JetStreamParams.testWorstCaseCount)
+        return JetStreamParams.testWorstCaseCount;
     if (plan.worstCaseCount)
         return plan.worstCaseCount;
     return defaultWorstCaseCount;
@@ -162,7 +150,7 @@ class ShellFileLoader {
     // share common code.
     load(url) {
         console.assert(!isInBrowser);
-        if (!globalThis.prefetchResources)
+        if (!JetStreamParams.prefetchResources)
             return `load("${url}");`
 
         if (this.requests.has(url)) {
@@ -201,7 +189,7 @@ class Driver {
         if (isInBrowser) {
             statusElement = document.getElementById("status");
             statusElement.innerHTML = `<label>Running...</label>`;
-        } else if (!dumpJSONResults)
+        } else if (!JetStreamParams.dumpJSONResults)
             console.log("Starting JetStream3");
 
         performance.mark("update-ui-start");
@@ -221,7 +209,7 @@ class Driver {
             performance.mark("update-ui");
             benchmark.updateUIAfterRun();
 
-            if (isInBrowser && globalThis.prefetchResources) {
+            if (isInBrowser && JetStreamParams.prefetchResources) {
                 const cache = JetStream.blobDataCache;
                 for (const file of benchmark.files) {
                     const blobData = cache[file];
@@ -237,7 +225,7 @@ class Driver {
         if (measureTotalTimeAsSubtest) {
             if (isInBrowser)
                 document.getElementById("benchmark-total-time-score").innerHTML = uiFriendlyNumber(totalTime);
-            else if (!dumpJSONResults)
+            else if (!JetStreamParams.dumpJSONResults)
                 console.log("Total time:", uiFriendlyNumber(totalTime));
             allScores.push(totalTime);
         }
@@ -275,7 +263,7 @@ class Driver {
             if (showScoreDetails)
                 displayCategoryScores();
             statusElement.innerHTML = "";
-        } else if (!dumpJSONResults) {
+        } else if (!JetStreamParams.dumpJSONResults) {
             console.log("\n");
             for (let [category, scores] of categoryScores)
                 console.log(`${category}: ${uiFriendlyScore(geomeanScore(scores))}`);
@@ -365,8 +353,8 @@ class Driver {
         this.isReady = true;
         if (isInBrowser) {
             globalThis.dispatchEvent(new Event("JetStreamReady"));
-            if (typeof(globalThis.startDelay) !== "undefined") {
-                setTimeout(() => this.start(), globalThis.startDelay);
+            if (typeof(JetStreamParams.startDelay) !== "undefined") {
+                setTimeout(() => this.start(), JetStreamParams.startDelay);
             }
         }
     }
@@ -471,7 +459,7 @@ class Driver {
 
     dumpJSONResultsIfNeeded()
     {
-        if (dumpJSONResults) {
+        if (JetStreamParams.dumpJSONResults) {
             console.log("\n");
             console.log(this.resultsJSON());
             console.log("\n");
@@ -490,7 +478,7 @@ class Driver {
         if (!isInBrowser)
             return;
 
-        if (!globalThis.shouldReport)
+        if (!JetStreamParams.shouldReport)
             return;
 
         const content = this.resultsJSON();
@@ -752,8 +740,8 @@ class Benchmark {
         if (this.plan.deterministicRandom)
             code += `Math.random.__resetSeed();`;
 
-        if (globalThis.customPreIterationCode)
-            code += customPreIterationCode;
+        if (JetStreamParams.customPreIterationCode)
+            code += JetStreamParams.customPreIterationCode;
 
         return code;
     }
@@ -761,8 +749,8 @@ class Benchmark {
     get postIterationCode() {
         let code = "";
 
-        if (globalThis.customPostIterationCode)
-            code += customPostIterationCode;
+        if (JetStreamParams.customPostIterationCode)
+            code += JetStreamParams.customPostIterationCode;
 
         return code;
     }
@@ -796,7 +784,7 @@ class Benchmark {
         } else {
             const cache = JetStream.blobDataCache;
             for (const file of this.plan.files) {
-                scripts.addWithURL(globalThis.prefetchResources ? cache[file].blobURL : file);
+                scripts.addWithURL(JetStreamParams.prefetchResources ? cache[file].blobURL : file);
             }
         }
 
@@ -810,7 +798,7 @@ class Benchmark {
         performance.mark(this.name);
         this.startTime = performance.now();
 
-        if (RAMification)
+        if (JetStreamParams.RAMification)
             resetMemoryPeak();
 
         let magicFrame;
@@ -830,7 +818,7 @@ class Benchmark {
         this.endTime = performance.now();
         performance.measure(this.name, this.name);
 
-        if (RAMification) {
+        if (JetStreamParams.RAMification) {
             const memoryFootprint = MemoryFootprint();
             this.currentFootprint = memoryFootprint.current;
             this.peakFootprint = memoryFootprint.peak;
@@ -847,7 +835,7 @@ class Benchmark {
 
     async doLoadBlob(resource) {
         const blobData = JetStream.blobDataCache[resource];
-        if (!globalThis.prefetchResources) {
+        if (!JetStreamParams.prefetchResources) {
             blobData.blobURL = resource;
             return blobData;
         }
@@ -1015,7 +1003,7 @@ class Benchmark {
     }
 
     updateUIBeforeRun() {
-        if (!dumpJSONResults)
+        if (!JetStreamParams.dumpJSONResults)
             console.log(`Running ${this.name}:`);
         if (isInBrowser)
             this.updateUIBeforeRunInBrowser();
@@ -1034,7 +1022,7 @@ class Benchmark {
         const scoreEntries = Object.entries(this.allScores());
         if (isInBrowser)
             this.updateUIAfterRunInBrowser(scoreEntries);
-        if (dumpJSONResults)
+        if (JetStreamParams.dumpJSONResults)
             return;
         this.updateConsoleAfterRun(scoreEntries);
     }
@@ -1093,7 +1081,7 @@ class Benchmark {
                 name = legacyScoreNameMap[name];
              console.log(`    ${name}:`, uiFriendlyScore(value));
         }
-        if (RAMification) {
+        if (JetStreamParams.RAMification) {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
@@ -2616,8 +2604,8 @@ const defaultDisabledTags = [];
 if (!isInBrowser)
     defaultDisabledTags.push("WorkerTests");
 
-if (globalThis.testList?.length) {
-    benchmarks = processTestList(globalThis.testList);
+if (JetStreamParams.testList.length) {
+    benchmarks = processTestList(JetStreamParams.testList);
 } else {
     benchmarks = findBenchmarksByTag("Default", defaultDisabledTags)
 }

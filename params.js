@@ -38,9 +38,17 @@ class Params {
     testWorstCaseCount = undefined;
     prefetchResources = true;
 
-    constructor(searchParams = undefined) {
-        if (searchParams)
-            this._copyFromSearchParams(searchParams);
+    RAMification = false;
+    dumpJSONResults = false;
+    testIterationCountMap = new Map();
+    testWorstCaseCountMap = new Map();
+
+    customPreIterationCode = undefined;
+    customPostIterationCode = undefined;
+
+    constructor(sourceParams = undefined) {
+        if (sourceParams)
+            this._copyFromSearchParams(sourceParams);
         if (!this.developerMode) {
             Object.freeze(this.viewport);
             Object.freeze(this);
@@ -54,124 +62,75 @@ class Params {
         return parseInt(number);
     }
 
-    _copyFromSearchParams(searchParams) {
-        this.startAutomatically = this._parseBooleanParam(searchParams, "startAutomatically");
-        this.developerMode = this._parseBooleanParam(searchParams, "developerMode");
-        this.shouldReport = this._parseBooleanParam(searchParams, "report");
-        this.prefetchResources = this._parseBooleanParam(searchParams, "prefetchResources");
+    _copyFromSearchParams(sourceParams) {
+        this.startAutomatically = this._parseBooleanParam(sourceParams, "startAutomatically");
+        this.developerMode = this._parseBooleanParam(sourceParams, "developerMode");
+        this.shouldReport = this._parseBooleanParam(sourceParams, "report");
+        this.prefetchResources = this._parseBooleanParam(sourceParams, "prefetchResources");
+        this.RAMification = this._parseBooleanParam(sourceParams, "RAMification");
+        this.dumpJSONResults = this._parseBooleanParam(sourceParams, "dumpJSONResults");
 
-         this.startDelay = this._parseIntParam(searchParams, "startDelay", 0);
+        this.customPreIterationCode = this._parseStringParam(sourceParams, "customPreIterationCode");
+        this.customPostIterationCode = this._parseStringParam(sourceParams, "customPostIterationCode");
+
+         this.startDelay = this._parseIntParam(sourceParams, "startDelay", 0);
         if (this.shouldReport && !this.startDelay)
             this.startDelay = 4000;
 
         for (const paramKey of ["tag", "tags", "test", "tests"])
-          this.testList = this._parseTestListParam(searchParams, paramKey);
+          this.testList = this._parseTestListParam(sourceParams, paramKey);
 
-        this.testIterationCount = this._parseIntParam(searchParams, "iterationCount", 1);
-        this.testWorstCaseCount = this._parseIntParam(searchParams, "worstCaseCount", 1);
+        this.testIterationCount = this._parseIntParam(sourceParams, "iterationCount", 1);
+        this.testWorstCaseCount = this._parseIntParam(sourceParams, "worstCaseCount", 1);
 
-        const unused = Array.from(searchParams.keys());
+        const unused = Array.from(sourceParams.keys());
         if (unused.length > 0)
             console.error("Got unused search params", unused);
     }
 
-    _parseTestListParam(searchParams, key) {
-        if (this.testList?.length)
-            throw new Error(`Overriding previous testList=${this.testList.join()} with ${key} url-parameter.`);
-        const value = searchParams.getAll(key);
-        searchParams.delete(key);
+    _parseTestListParam(sourceParams, key) {
+        if (!sourceParams.has(key))
+          return this.testList;
+        let testList = [];
+        if (sourceParams?.getAll)
+          testList = sourceParams?.getAll(key);
+        else {
+          // fallback for cli sourceParams which is just a Map;
+          testList = sourceParams.get(key).split(",");
+        }
+        sourceParams.delete(key);
+        if (this.testList.length > 0 && testList.length > 0)
+            throw new Error(`Overriding previous testList='${this.testList.join()}' with ${key} url-parameter.`);
+        return testList;
+    }
+
+    _parseStringParam(sourceParams, paramKey) {
+        if (!sourceParams.has(paramKey))
+            return DefaultJetStreamParams[paramKey];
+        const value = sourceParams.get(paramKey);
+        sourceParams.delete(paramKey);
         return value;
     }
 
-    _parseBooleanParam(searchParams, paramKey) {
-        if (!searchParams.has(paramKey))
+    _parseBooleanParam(sourceParams, paramKey) {
+        if (!sourceParams.has(paramKey))
             return DefaultJetStreamParams[paramKey];
-        const value = searchParams.get(paramKey).toLowerCase();
-        searchParams.delete(paramKey);
+        const value = sourceParams.get(paramKey).toLowerCase();
+        sourceParams.delete(paramKey);
         return !(value === "false" || value === "0");
     }
 
-    _parseIntParam(searchParams, paramKey, minValue) {
-        if (!searchParams.has(paramKey))
+    _parseIntParam(sourceParams, paramKey, minValue) {
+        if (!sourceParams.has(paramKey))
             return DefaultJetStreamParams[paramKey];
 
-        const parsedValue = this._parseInt(searchParams.get(paramKey), paramKey);
+        const parsedValue = this._parseInt(sourceParams.get(paramKey), paramKey);
         if (parsedValue < minValue)
             throw new Error(`Invalid ${paramKey} param: '${parsedValue}', value must be >= ${minValue}.`);
-        searchParams.delete(paramKey);
+        sourceParams.delete(paramKey);
         return parsedValue;
     }
 
-    _parseTags(searchParams) {
-        if (!searchParams.has("tags"))
-            return DefaultJetStreamParams.tags;
-        if (this.suites.length)
-            throw new Error("'suites' and 'tags' cannot be used together.");
-        const tags = searchParams.get("tags").split(",");
-        searchParams.delete("tags");
-        return tags;
-    }
-
-    _parseEnumParam(searchParams, paramKey, enumArray) {
-        if (!searchParams.has(paramKey))
-            return DefaultJetStreamParams[paramKey];
-        const value = searchParams.get(paramKey);
-        if (!enumArray.includes(value))
-            throw new Error(`Got invalid ${paramKey}: '${value}', choices are ${enumArray}`);
-        searchParams.delete(paramKey);
-        return value;
-    }
-
-    _parseShuffleSeed(searchParams) {
-        if (!searchParams.has("shuffleSeed"))
-            return DefaultJetStreamParams.shuffleSeed;
-        let shuffleSeed = searchParams.get("shuffleSeed");
-        if (shuffleSeed !== "off") {
-            if (shuffleSeed === "generate") {
-                shuffleSeed = Math.floor((Math.random() * 1) << 16);
-                console.log(`Generated a random suite order seed: ${shuffleSeed}`);
-            } else {
-                shuffleSeed = parseInt(shuffleSeed);
-            }
-            if (!Number.isInteger(shuffleSeed))
-                throw new Error(`Invalid shuffle seed: '${shuffleSeed}', must be either 'off', 'generate' or an integer.`);
-        }
-        searchParams.delete("shuffleSeed");
-        return shuffleSeed;
-    }
-
-
-    toCompleteSearchParamsObject() {
-        return this.toSearchParamsObject(false);
-    }
-
-    toSearchParamsObject(filter = true) {
-        const rawUrlParams = { __proto__: null };
-        for (const [key, value] of Object.entries(this)) {
-            // Skip over default values.
-            if (filter && value === DefaultJetStreamParams[key])
-                continue;
-            rawUrlParams[key] = value;
-        }
-
-        if (this.viewport.width !== DefaultJetStreamParams.viewport.width || this.viewport.height !== DefaultJetStreamParams.viewport.height)
-            rawUrlParams.viewport = `${this.viewport.width}x${this.viewport.height}`;
-
-        if (this.suites.length) {
-            rawUrlParams.suites = this.suites.join(",");
-        } else if (this.tags.length) {
-            if (!(this.tags.length === 1 && this.tags[0] === "default"))
-                rawUrlParams.tags = this.tags.join(",");
-        } else {
-            rawUrlParams.suites = "";
-        }
-
-        return new URLSearchParams(rawUrlParams);
-    }
-
-    toSearchParams() {
-        return this.toSearchParamsObject().toString();
-    }
 }
 
 const DefaultJetStreamParams = new Params();
