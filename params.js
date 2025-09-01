@@ -26,12 +26,18 @@
 */
 
 
-class JetStreamParams {
-  // Enable a detailed developer menu to change the current Params.
-  developerMode = false;
-  startAutomatically = false;
+class Params {
+    // Enable a detailed developer menu to change the current Params.
+    developerMode = false;
+    startAutomatically = false;
+    shouldReport = false;
+    startDelay = undefined;
 
-  developerMode 
+    testList = [];
+    testIterationCount = undefined;
+    testWorstCaseCount = undefined;
+    prefetchResources = true;
+
     constructor(searchParams = undefined) {
         if (searchParams)
             this._copyFromSearchParams(searchParams);
@@ -49,49 +55,56 @@ class JetStreamParams {
     }
 
     _copyFromSearchParams(searchParams) {
-        this.viewport = this._parseViewport(searchParams);
+        this.startAutomatically = this._parseBooleanParam(searchParams, "startAutomatically");
+        this.developerMode = this._parseBooleanParam(searchParams, "developerMode");
+        this.shouldReport = this._parseBooleanParam(searchParams, "report");
+        this.prefetchResources = this._parseBooleanParam(searchParams, "prefetchResources");
+
+         this.startDelay = this._parseIntParam(searchParams, "startDelay", 0);
+        if (this.shouldReport && !this.startDelay)
+            this.startDelay = 4000;
+
+        for (const paramKey of ["tag", "tags", "test", "tests"])
+          this.testList = this._parseTestListParam(searchParams, paramKey);
+
+        this.testIterationCount = this._parseIntParam(searchParams, "iterationCount", 1);
+        this.testWorstCaseCount = this._parseIntParam(searchParams, "worstCaseCount", 1);
 
         const unused = Array.from(searchParams.keys());
         if (unused.length > 0)
             console.error("Got unused search params", unused);
     }
 
+    _parseTestListParam(searchParams, key) {
+        if (this.testList?.length)
+            throw new Error(`Overriding previous testList=${this.testList.join()} with ${key} url-parameter.`);
+        const value = searchParams.getAll(key);
+        searchParams.delete(key);
+        return value;
+    }
+
     _parseBooleanParam(searchParams, paramKey) {
         if (!searchParams.has(paramKey))
-            return false;
+            return DefaultJetStreamParams[paramKey];
+        const value = searchParams.get(paramKey).toLowerCase();
         searchParams.delete(paramKey);
-        return true;
+        return !(value === "false" || value === "0");
     }
 
     _parseIntParam(searchParams, paramKey, minValue) {
         if (!searchParams.has(paramKey))
-            return defaultParams[paramKey];
+            return DefaultJetStreamParams[paramKey];
 
-        const parsedValue = this._parseInt(searchParams.get(paramKey), "waitBeforeSync");
+        const parsedValue = this._parseInt(searchParams.get(paramKey), paramKey);
         if (parsedValue < minValue)
             throw new Error(`Invalid ${paramKey} param: '${parsedValue}', value must be >= ${minValue}.`);
         searchParams.delete(paramKey);
         return parsedValue;
     }
 
-    _parseSuites(searchParams) {
-        if (searchParams.has("suite") || searchParams.has("suites")) {
-            if (searchParams.has("suite") && searchParams.has("suites"))
-                throw new Error("Params 'suite' and 'suites' can not be used together.");
-            const value = searchParams.get("suite") || searchParams.get("suites");
-            const suites = value.split(",");
-            if (suites.length === 0)
-                throw new Error("No suites selected");
-            searchParams.delete("suite");
-            searchParams.delete("suites");
-            return suites;
-        }
-        return defaultParams.suites;
-    }
-
     _parseTags(searchParams) {
         if (!searchParams.has("tags"))
-            return defaultParams.tags;
+            return DefaultJetStreamParams.tags;
         if (this.suites.length)
             throw new Error("'suites' and 'tags' cannot be used together.");
         const tags = searchParams.get("tags").split(",");
@@ -101,7 +114,7 @@ class JetStreamParams {
 
     _parseEnumParam(searchParams, paramKey, enumArray) {
         if (!searchParams.has(paramKey))
-            return defaultParams[paramKey];
+            return DefaultJetStreamParams[paramKey];
         const value = searchParams.get(paramKey);
         if (!enumArray.includes(value))
             throw new Error(`Got invalid ${paramKey}: '${value}', choices are ${enumArray}`);
@@ -111,7 +124,7 @@ class JetStreamParams {
 
     _parseShuffleSeed(searchParams) {
         if (!searchParams.has("shuffleSeed"))
-            return defaultParams.shuffleSeed;
+            return DefaultJetStreamParams.shuffleSeed;
         let shuffleSeed = searchParams.get("shuffleSeed");
         if (shuffleSeed !== "off") {
             if (shuffleSeed === "generate") {
@@ -136,12 +149,12 @@ class JetStreamParams {
         const rawUrlParams = { __proto__: null };
         for (const [key, value] of Object.entries(this)) {
             // Skip over default values.
-            if (filter && value === defaultParams[key])
+            if (filter && value === DefaultJetStreamParams[key])
                 continue;
             rawUrlParams[key] = value;
         }
 
-        if (this.viewport.width !== defaultParams.viewport.width || this.viewport.height !== defaultParams.viewport.height)
+        if (this.viewport.width !== DefaultJetStreamParams.viewport.width || this.viewport.height !== DefaultJetStreamParams.viewport.height)
             rawUrlParams.viewport = `${this.viewport.width}x${this.viewport.height}`;
 
         if (this.suites.length) {
@@ -161,7 +174,13 @@ class JetStreamParams {
     }
 }
 
-export const defaultParams = new JetStreamParams();
-
-let maybeCustomParams = defaultParams;
-export const params = maybeCustomParams;
+const DefaultJetStreamParams = new Params();
+let maybeCustomParams = DefaultJetStreamParams;
+if (globalThis?.JetStreamParamsSource) {
+    try {
+        maybeCustomParams = new Params(globalThis?.JetStreamParamsSource);
+    } catch (e) {
+        console.error("Invalid Params", e, "\nUsing defaults as fallback:", maybeCustomParams);
+    }
+}
+const JetStreamParams = maybeCustomParams;

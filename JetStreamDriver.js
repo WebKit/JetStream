@@ -42,46 +42,7 @@ globalThis.startDelay ??= undefined;
 globalThis.shouldReport ??= false;
 globalThis.prefetchResources ??= true;
 
-function getIntParam(urlParams, key) {
-    const rawValue = urlParams.get(key);
-    const value = parseInt(rawValue);
-    if (value <= 0)
-        throw new Error(`Expected positive value for ${key}, but got ${rawValue}`);
-    return value;
-}
-
-function getBoolParam(urlParams, key) {
-    const rawValue = urlParams.get(key).toLowerCase()
-    return !(rawValue === "false" || rawValue === "0")
- }
-
-function getTestListParam(urlParams, key) {
-    if (globalThis.testList?.length)
-        throw new Error(`Overriding previous testList=${globalThis.testList.join()} with ${key} url-parameter.`);
-    return urlParams.getAll(key);
-}
-
-if (typeof(URLSearchParams) !== "undefined") {
-    const urlParameters = new URLSearchParams(window.location.search);
-    if (urlParameters.has("report"))
-        globalThis.shouldReport = urlParameters.get("report").toLowerCase() == "true";
-    if (urlParameters.has("startDelay"))
-        globalThis.startDelay = getIntParam(urlParameters, "startDelay");
-    if (globalThis.shouldReport && !globalThis.startDelay)
-        globalThis.startDelay = 4000;
-    if (urlParameters.has("tag"))
-        globalThis.testList = getTestListParam(urlParameters, "tag");
-    if (urlParameters.has("test"))
-        globalThis.testList = getTestListParam(urlParameters, "test");
-    if (urlParameters.has("iterationCount"))
-        globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
-    if (urlParameters.has("worstCaseCount"))
-        globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
-    if (urlParameters.has("prefetchResources"))
-        globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources");
-}
-
-if (!globalThis.prefetchResources)
+if (!JetStreamParams.prefetchResources)
     console.warn("Disabling resource prefetching!");
 
 // Used for the promise representing the current benchmark run.
