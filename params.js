@@ -26,7 +26,7 @@
 */
 
 
-export class Params {
+class JetStreamParams {
   // Enable a detailed developer menu to change the current Params.
   developerMode = false;
   startAutomatically = false;
@@ -161,7 +161,7 @@ export class Params {
     }
 }
 
-export const defaultParams = new Params();
+export const defaultParams = new JetStreamParams();
 
 let maybeCustomParams = defaultParams;
 export const params = maybeCustomParams;
