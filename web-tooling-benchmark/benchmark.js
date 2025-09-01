@@ -28,10 +28,6 @@
 class Benchmark {
   files = Object.create(null);
 
-  constructor(iterations) {
-    this.iterations = iterations;
-  }
-
   async init() {
     let WTBenchmark;
     await this.loadAllFiles(JetStream.preload);
