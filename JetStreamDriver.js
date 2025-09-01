@@ -2562,19 +2562,20 @@ BENCHMARKS.push(new GroupedBenchmark({
 }, SUNSPIDER_BENCHMARKS))
 
 // WTB (Web Tooling Benchmark) tests
-const WTB_TESTS = [
-    "acorn",
-    "babel",
-    "babel-minify",
-    "babylon",
-    "chai",
-    "espree",
-    "esprima-next",
-    // "lebab",
-    "postcss",
-    "prettier",
-    "source-map",
-];
+const WTB_TESTS = {
+    "acorn": true,
+    "babel": true,
+    "babel-minify": true,
+    "babylon": true,
+    "chai": true,
+    "espree": true,
+    "esprima-next": true,
+    // Disabled: Converting ES5 code to ES6+ is no longer a realistic scenario.
+    "lebab": false, 
+    "postcss": true,
+    "prettier": true,
+    "source-map": true,
+};
 const WPT_FILES = [
   "angular-material-20.1.6.css",
   "backbone-1.6.1.js",
@@ -2604,7 +2605,10 @@ const WPT_FILES = [
 }, Object.create(null));
 
 
-for (const name of WTB_TESTS) {
+for (const [name, enabled] of Object.entries(WTB_TESTS)) {
+    const tags =  ["WTB"];
+    if (enabled)
+        tags.push("Default");
     BENCHMARKS.push(new AsyncBenchmark({
         name: `${name}-wtb`,
         files: [
@@ -2616,8 +2620,9 @@ for (const name of WTB_TESTS) {
             ...WPT_FILES,
         },
         iterations: 15,
+        worstCaseCount: 2,
         allowUtf16: true,
-        tags: ["Default", "WTB"],
+        tags: tags,
     }));
 }
 
