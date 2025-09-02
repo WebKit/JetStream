@@ -26,23 +26,19 @@ function createConfig({ es6, filename, minify }) {
     module: {
       rules: [
         {
-          test: /\.m?js$/,
-          exclude: /(node_modules|bower_components)/,
+          test: /\.[cm]?js$/,
           use: {
             loader: "babel-loader",
             options: {
-              presets: ["@babel/preset-env"],
-              plugins: [CacheBusterPlugin],
-            },
-          },
-        },
-        {
-          test: /\.c?js$/,
-          include: /node_modules/,
-          use: {
-            loader: "babel-loader",
-            options: {
-              plugins: [CacheBusterPlugin],
+              presets: [
+                [
+                  "@babel/preset-env",
+                  { targets: es6 ? "defaults" : "ie 11" },
+                ],
+              ],
+              plugins: [
+                CacheBusterPlugin,
+              ],
             },
           },
         },
@@ -59,11 +55,12 @@ function createConfig({ es6, filename, minify }) {
     optimization: {
       minimizer: [
         new TerserPlugin({
+          extractComments: false,
           terserOptions: {
             mangle: minify,
             format: {
               // Keep this comment for cache-busting.
-              comments: /ThouShaltNotCache/i,
+              comments: /@preserve|@license|@cc_on|ThouShaltNotCache/i,
             },
           },
         }),
@@ -103,12 +100,12 @@ export default (env, argv) => {
     createConfig({
       es6: true,
       filename: "bundle.es6.min.js",
-      minify: false,
+      minify: true,
     }),
     createConfig({
       es6: false,
       filename: "bundle.es5.min.js",
-      minify: false,
+      minify: true,
     }),
   ];
 };
