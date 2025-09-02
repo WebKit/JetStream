@@ -8,6 +8,14 @@ import CacheBusterPlugin from "../startup-helper/BabelCacheBuster.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 function createConfig({ es6, filename, minify }) {
+  let babelPlugins = []
+  let babelTargets = { chrome: "100" }
+  if (!es6) {
+    // enable loose class definitions for es5 (e.g. with prototype assignments)
+    babelPlugins = [["@babel/plugin-transform-classes", { loose: true }],];
+    // Use a reasonably ok pre-es6 classes browser.
+    babelTargets = { chrome: "40" };
+  }
   return {
     entry: "./src/babylon-js-benchmark.mjs",
     mode: "production",
@@ -33,11 +41,11 @@ function createConfig({ es6, filename, minify }) {
               presets: [
                 [
                   "@babel/preset-env",
-                  { targets: es6 ? "defaults" : "ie 11" },
+                  { targets: babelTargets},
                 ],
               ],
               plugins: [
-                CacheBusterPlugin,
+                CacheBusterPlugin, ...babel_plugins
               ],
             },
           },
