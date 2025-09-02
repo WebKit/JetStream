@@ -1125,25 +1125,14 @@ class Benchmark {
     }
 
     updateConsoleAfterRun(scoreEntries) {
-        // FIXME: consider removing this mapping.
-        // Rename for backwards compatibility.
-        const legacyScoreNameMap = {
-            __proto__: null,
-            "First": "Startup",
-            "Worst": "Worst Case",
-            "MainRun": "Tests",
-            "Runtime": "Run time",
-        };
         for (let [name, value] of scoreEntries) {
-            if (name in legacyScoreNameMap)
-                name = legacyScoreNameMap[name];
              console.log(`    ${name}:`, uiFriendlyScore(value));
         }
         if (RAMification) {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
+        console.log("    Wall-Time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 };
 
