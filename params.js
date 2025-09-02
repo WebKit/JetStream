@@ -49,17 +49,8 @@ class Params {
     constructor(sourceParams = undefined) {
         if (sourceParams)
             this._copyFromSearchParams(sourceParams);
-        if (!this.developerMode) {
-            Object.freeze(this.viewport);
+        if (!this.developerMode)
             Object.freeze(this);
-        }
-    }
-
-    _parseInt(value, errorMessage) {
-        const number = Number(value);
-        if (!Number.isInteger(number) && errorMessage)
-            throw new Error(`Invalid ${errorMessage} param: '${value}', expected int.`);
-        return parseInt(number);
     }
 
     _copyFromSearchParams(sourceParams) {
@@ -85,16 +76,16 @@ class Params {
 
         const unused = Array.from(sourceParams.keys());
         if (unused.length > 0)
-            console.error("Got unused search params", unused);
+            console.error("Got unused source params", unused);
     }
 
     _parseTestListParam(sourceParams, key) {
         if (!sourceParams.has(key))
           return this.testList;
         let testList = [];
-        if (sourceParams?.getAll)
+        if (sourceParams?.getAll) {
           testList = sourceParams?.getAll(key);
-        else {
+        } else {
           // fallback for cli sourceParams which is just a Map;
           testList = sourceParams.get(key).split(",");
         }
@@ -129,6 +120,13 @@ class Params {
             throw new Error(`Invalid ${paramKey} param: '${parsedValue}', value must be >= ${minValue}.`);
         sourceParams.delete(paramKey);
         return parsedValue;
+    }
+
+    _parseInt(value, errorMessage) {
+        const number = Number(value);
+        if (!Number.isInteger(number) && errorMessage)
+            throw new Error(`Invalid ${errorMessage} param: '${value}', expected int.`);
+        return parseInt(number);
     }
 
     get isDefault() {

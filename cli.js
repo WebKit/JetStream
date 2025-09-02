@@ -64,7 +64,6 @@ const CLI_PARAMS = {
     help: "Start the benchmark automatically.",
     param: "startAutomatically",
   },
-  "developer-mode": { help: "Enable developer mode.", param: "developerMode" },
   report: { help: "Report results to a server.", param: "shouldReport" },
   "start-delay": {
     help: "Delay before starting the benchmark.",
@@ -148,7 +147,9 @@ function help(message=undefined) {
         console.log(`    --${flag.padEnd(20)} ${help}`);
     console.log("");
 
-    
+    // If we had an early bailout during flag parsing we won't have 
+    // JetStreamDriver.js loaded yet and thus none of the helper globals here
+    // have been defined yet.
     if (typeof benchmarksByTag !== "undefined") {
         console.log("Available tags:");
         const tagNames = Array.from(benchmarksByTag.keys()).sort();
