@@ -1,0 +1,14 @@
+node_modules
+**/dist
+package-lock.json
+
+# Un-ignore top-level files                                                                                     │
+!/*   
+
+# For now exclude all existing workloads
+**/*.html
+**/*.js
+
+!**/benchmark.js
+!**/src/*
+!**/build/*
