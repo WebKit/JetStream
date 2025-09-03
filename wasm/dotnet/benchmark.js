@@ -128,11 +128,16 @@ class Benchmark {
         this.api = await this.dotnet.withModuleConfig({ locateFile: e => e }).withConfig(config).create();
         this.exports = await this.api.getAssemblyExports("dotnet.dll");
 
+
+        // This drives the workload size for BenchTasks half of the test.
+        this.benchTasksBatchSize = dotnetFlavor === "aot" ? 50 : 10;
+
+        // These drive the workload size for RayTrace half of the test.
         this.hardwareConcurrency = 1;
-        this.sceneWidth = dotnetFlavor === "aot" ? 300 : 150;
-        this.sceneHeight = dotnetFlavor === "aot" ? 200 : 100;
+        this.sceneWidth = dotnetFlavor === "aot" ? 100 : 50;
+        this.sceneHeight = dotnetFlavor === "aot" ? 100 : 50;
     }
     async runIteration() {
-        await this.exports.Interop.RunIteration(this.sceneWidth, this.sceneHeight, this.hardwareConcurrency);
+        await this.exports.Interop.RunIteration(this.benchTasksBatchSize, this.sceneWidth, this.sceneHeight, this.hardwareConcurrency);
     }
 }
