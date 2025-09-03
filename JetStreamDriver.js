@@ -128,7 +128,6 @@ function sum(values) {
     return sum;
 }
 
-
 function mean(values) {
     const totalSum = sum(values)
     return totalSum / values.length;
@@ -379,9 +378,9 @@ class Driver {
             const scoreDescription = Object.keys(benchmark.allScores());
             const timeDescription = Object.keys(benchmark.allTimes());
 
-            const scoreIds = benchmark.scoreIdentifiers();
+            const scoreIds = benchmark.allScoreIdentifiers();
             const overallScoreId = scoreIds.pop();
-            const timeIds = benchmark.timeIdentifiers();
+            const timeIds = benchmark.allTimeIdentifiers();
 
             text +=
                 `<div class="benchmark" id="benchmark-${benchmark.name}">
@@ -424,9 +423,9 @@ class Driver {
         if (!isInBrowser)
             return;
 
-        for (const id of benchmark.scoreIdentifiers())
+        for (const id of benchmark.allScoreIdentifiers())
             document.getElementById(id).innerHTML = "error";
-        for (const id of benchmark.timeIdentifiers())
+        for (const id of benchmark.allTimeIdentifiers())
             document.getElementById(id).innerHTML = "error";
         const benchmarkResultsUI = document.getElementById(`benchmark-${benchmark.name}`);
         benchmarkResultsUI.classList.remove("benchmark-running");
@@ -1116,7 +1115,7 @@ class Benchmark {
         this.preloads = Object.entries(this.plan.preload ?? {});
     }
 
-    scoreIdentifiers() {
+    allScoreIdentifiers() {
         const ids = Object.keys(this.allScores()).map(name => this.scoreIdentifier(name));
         return ids;
     }
@@ -1125,7 +1124,7 @@ class Benchmark {
         return `results-cell-${this.name}-${scoreName}`;
     }
 
-    timeIdentifiers() {
+    allTimeIdentifiers() {
         const ids = Object.keys(this.allTimes()).map(name => this.timeIdentifier(name));
         return ids;
     }
@@ -1146,33 +1145,49 @@ class Benchmark {
         resultsBenchmarkUI.classList.add("benchmark-running");
         resultsBenchmarkUI.scrollIntoView({ block: "nearest" });
 
-        for (const id of this.scoreIdentifiers())
+        for (const id of this.allScoreIdentifiers())
             document.getElementById(id).innerHTML = "...";
-        for (const id of this.timeIdentifiers())
+        for (const id of this.allTimeIdentifiers())
             document.getElementById(id).innerHTML = "...";
     }
 
     updateUIAfterRun() {
-        const scoreEntries = Object.entries(this.allScores());
-        const timeEntries = Object.entries(this.allTimes());
         if (isInBrowser)
-            this.updateUIAfterRunInBrowser(scoreEntries, timeEntries);
+            this.updateUIAfterRunInBrowser();
         if (dumpJSONResults)
             return;
-        this.updateConsoleAfterRun(scoreEntries, timeEntries);
+        this.updateConsoleAfterRun();
     }
 
-    updateUIAfterRunInBrowser(scoreEntries, timeEntries) {
+    updateUIAfterRunInBrowser() {
         const benchmarkResultsUI = document.getElementById(`benchmark-${this.name}`);
         benchmarkResultsUI.classList.remove("benchmark-running");
         benchmarkResultsUI.classList.add("benchmark-done");
 
-        for (const [name, value] of scoreEntries)
+        for (const [name, value] of Object.entries(this.allScores()))
             document.getElementById(this.scoreIdentifier(name)).innerHTML = uiFriendlyScore(value);
-        for (const [name, value] of timeEntries)
+        for (const [name, value] of Object.entries(this.allTimes()))
             document.getElementById(this.timeIdentifier(name)).innerHTML = uiFriendlyDuration(value);
 
         this.renderScatterPlot();
+    }
+
+    updateConsoleAfterRun() {
+        for (let [name, value] of Object.entries(this.allScores())) {
+            console.log(
+                shellFriendlyLabel(`    ${name}`), 
+                shellFriendlyScore(value));
+        }
+        for (let [name, value] of Object.entries(this.allTimes())) {
+            console.log(
+                shellFriendlyLabel(`    ${name}-Time`),
+                shellFriendlyDuration(value));
+        }
+        if (RAMification) {
+            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
+            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
+        }
+        console.log("");
     }
 
     renderScatterPlot() {
@@ -1201,24 +1216,6 @@ class Benchmark {
             circlesSVG += `<circle cx="${cx}" cy="${cy}" r="${radius}"><title>${title}</title></circle>`;
         }
         plotContainer.innerHTML = `<svg width="${width}px" height="${height}px">${circlesSVG}</svg>`;
-    }
-
-    updateConsoleAfterRun(scoreEntries, timeEntries) {
-        for (let [name, value] of scoreEntries) {
-            console.log(
-                shellFriendlyLabel(`    ${name}`), 
-                shellFriendlyScore(value));
-        }
-        for (let [name, value] of timeEntries) {
-            console.log(
-                shellFriendlyLabel(`    ${name}-Time`),
-                shellFriendlyDuration(value));
-        }
-        if (RAMification) {
-            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
-            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
-        }
-        console.log("");
     }
 };
 
