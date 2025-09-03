@@ -1312,7 +1312,7 @@ class AsyncBenchmark extends DefaultBenchmark {
     get runnerCode() {
         return `
         async function doRun() {
-            const benchmark = new Benchmark(${this.iterations});
+            const benchmark = new Benchmark(${JSON.stringify(this.benchmarkArguments)});
             await benchmark.init?.();
             const results = [];
             const benchmarkName = "${this.name}";
@@ -2522,6 +2522,37 @@ let BENCHMARKS = [
         tags: ["Default", "Wasm", "dotnet"],
     }),
 ];
+
+
+const INTL_TESTS = [
+    "DateTimeFormat",
+    "ListFormat",
+    "RelativeTimeFormat",
+    "NumberFormat",
+    "PluralRules",
+];
+const INTL_BENCHMARKS = [];
+for (const test of INTL_TESTS) {
+    const benchmark = new AsyncBenchmark({
+        name: `${test}-intl`,
+        files: [
+            "./intl/src/helper.js",
+            `./intl/src/${test}.js`,
+            "./intl/benchmark.js",
+        ],
+        iterations: 2,
+        worstCaseCount: 1,
+        deterministicRandom: true,
+        tags: ["Javascript", "intl"],
+    });
+    INTL_BENCHMARKS.push(benchmark);
+}
+BENCHMARKS.push(
+    new GroupedBenchmark({
+            name: "intl",
+            tags: ["Javascript", "intl"],
+        }, INTL_BENCHMARKS));
+
 
 
 // SunSpider tests
