@@ -1,18 +1,25 @@
-# Ignore all subdirs
-*/*
+.*
 node_modules
-packages.json
+package-lock.json
+dist
+build
+*bundle*.js
 
-# Un-ignore top-level files
-!/*
+/Octane/*
+/ARES-6/*
+/cdjs/*
+/8bitbench/*
+/class-fields/*
+/code-load/*
+/SunSpider
+/SeaMonster
+/WSL
+/worker/bomb-subtests
 
-# For now exclude all existing workloads
-**/*.html
-**/*.js
+/RexBench/*
+!/RexBench/benchmark.js
+!/RexBench/*/benchmark.js
 
-!**/benchmark.js
-!**/src/*
-
-# Ignore generated and third-party files
-*/**/build/
-*/third_party/
+!benchmark.js
+!*/benchmark.js
+!/**/*.md

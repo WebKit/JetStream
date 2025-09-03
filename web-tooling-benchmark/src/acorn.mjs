@@ -40,7 +40,11 @@ const payloads = [
   },
 ];
 
-export function runTest(fileData) {
+export function runTest(
+  fileData
+
+
+) {
   const testData = payloads.map(({ name, options }) => ({
     payload: fileData[name],
     name: name,
