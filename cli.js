@@ -58,6 +58,8 @@ if ("--ramification" in cliFlags)
     globalThis.RAMification = true;
 if ("--no-prefetch" in cliFlags)
     globalThis.prefetchResources = false;
+if ("--group-details" in cliFlags)
+    globalThis.details = true;
 if (cliArgs.length)
     globalThis.testList = cliArgs;
 
