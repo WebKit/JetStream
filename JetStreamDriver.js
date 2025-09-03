@@ -339,7 +339,7 @@ class Driver {
             summaryElement.onclick = displayCategoryScores;
             statusElement.innerHTML = "";
         } else if (!dumpJSONResults) {
-            console.log("\n");
+            console.log("");
             for (let [category, scores] of categoryScores) {
                 console.log(
                     shellFriendlyLabel(category),
@@ -353,6 +353,7 @@ class Driver {
             console.log("");
             console.log(shellFriendlyLabel("Total Score:"), shellFriendlyScore(totalScore));
             console.log(shellFriendlyLabel("Total Time:"), shellFriendlyDuration(totalTime));
+            console.log("");
         }
 
         this.reportScoreToRunBenchmarkRunner();
