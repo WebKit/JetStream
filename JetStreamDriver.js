@@ -90,9 +90,6 @@ this.currentReject = null;
 
 function displayCategoryScores() {
     document.body.classList.add("details");
-
-
-    // categoryScores = null;
 }
 
 function getIterationCount(plan) {
@@ -178,6 +175,22 @@ function uiFriendlyScore(num) {
 function uiFriendlyDuration(time) {
     return `${time.toFixed(2)} ms`;
 }
+
+
+function shellFriendlyLabel(label) {
+    const namePadding = 19;
+    return `${label}:`.padEnd(namePadding);
+}
+
+const valuePadding = 10;
+function shellFriendlyDuration(time) {
+    return `${uiFriendlyDuration(time)}`.padStart(valuePadding);
+}
+
+function shellFriendlyScore(time) {
+    return `${uiFriendlyScore(time)}   `.padStart(valuePadding);
+}
+
 
 // TODO: Cleanup / remove / merge. This is only used for caching loads in the
 // non-browser setting. In the browser we use exclusively `loadCache`, 
@@ -327,13 +340,19 @@ class Driver {
             statusElement.innerHTML = "";
         } else if (!dumpJSONResults) {
             console.log("\n");
-            for (let [category, scores] of categoryScores)
-                console.log(`${category}: ${uiFriendlyScore(geomeanScore(scores))}`);
-            for (let [category, times] of categoryTimes)
-                console.log(`${category}-Time: ${uiFriendlyDuration(geomeanScore(times))}`);
+            for (let [category, scores] of categoryScores) {
+                console.log(
+                    shellFriendlyLabel(category),
+                    shellFriendlyScore(geomeanScore(scores)));
+            }
+            for (let [category, times] of categoryTimes) {
+                console.log(
+                    shellFriendlyLabel(`${category}-Time:`),
+                    shellFriendlyDuration(geomeanScore(times)));
+            }
             console.log("");
-            console.log("Total Score: ", uiFriendlyScore(totalScore));
-            console.log("Total Time: ", uiFriendlyDuration(totalTime));
+            console.log(shellFriendlyLabel("Total Score:"), shellFriendlyScore(totalScore));
+            console.log(shellFriendlyLabel("Total Time:"), shellFriendlyDuration(totalTime));
         }
 
         this.reportScoreToRunBenchmarkRunner();
@@ -1182,18 +1201,15 @@ class Benchmark {
     }
 
     updateConsoleAfterRun(scoreEntries, timeEntries) {
-        const namePadding = 19;
-        const durationUnitPadding = "   ";
-        const valuePadding = 10;
         for (let [name, value] of scoreEntries) {
             console.log(
-                `    ${name}:`.padEnd(namePadding), 
-                (uiFriendlyScore(value) + durationUnitPadding).padStart(valuePadding));
+                shellFriendlyLabel(`    ${name}`), 
+                shellFriendlyScore(value));
         }
         for (let [name, value] of timeEntries) {
             console.log(
-                `    ${name}-Time:`.padEnd(namePadding),
-                uiFriendlyDuration(value).padStart(valuePadding));
+                shellFriendlyLabel(`    ${name}-Time`),
+                shellFriendlyDuration(value));
         }
         if (RAMification) {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
