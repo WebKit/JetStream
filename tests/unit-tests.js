@@ -1,4 +1,5 @@
 load("shell-config.js");
+load("params.js");
 load("startup-helper/StartupBenchmark.js");
 load("JetStreamDriver.js");
 
