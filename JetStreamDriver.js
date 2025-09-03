@@ -402,9 +402,6 @@ class Driver {
             text += `</p></div>`;
         }
 
-        for (let f = 0; f < 5; f++)
-            text += `<div class="benchmark fill"></div>`;
-
         const timestamp = performance.now();
         document.getElementById('jetstreams').style.backgroundImage = `url('jetstreams.svg?${timestamp}')`;
         const resultsTable = document.getElementById("results");
