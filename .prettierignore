@@ -15,9 +15,12 @@ build
 /SeaMonster
 /WSL
 /worker/bomb-subtests
+wasm/dotnet/build-*
 
+# Ignore everything in RexBench, then selectively un-ignore.
 /RexBench/*
-!/RexBench/benchmark.js
+!/RexBench/*/
+/RexBench/*/*
 !/RexBench/*/benchmark.js
 
 !benchmark.js
