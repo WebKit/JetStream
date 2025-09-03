@@ -1860,6 +1860,17 @@ let BENCHMARKS = [
         exposeBrowserTest: true,
         tags: ["Default", "RexBench"],
     }),
+    new DefaultBenchmark({
+        name: "validatorjs",
+        files: [
+            // Use the unminified version for easier local profiling.
+            // "./validatorjs/dist/bundle.es6.js",
+            "./validatorjs/dist/bundle.es6.min.js",
+            "./validatorjs/benchmark.js",
+        ],
+        allowUtf16: true,
+        tags: ["Default", "regexp"],
+    }),
     // Simple
     new DefaultBenchmark({
         name: "hash-map",
