@@ -322,15 +322,16 @@ class Driver {
             summaryHtml += `<div class="benchmark benchmark-done">`;
             for (let [category, scores] of categoryScores) {
                 summaryHtml += `<span class="result detail">
-                        <span>${uiFriendlyScore(geomeanScore(scores))}</span>
-                        <label>${category}</label>
-                    </span>`;
+                                    <span>${uiFriendlyScore(geomeanScore(scores))}</span>
+                                    <label>${category}</label>
+                                </span>`;
             }
+            summaryHtml += "<br/>";
             for (let [category, times] of categoryTimes) {
                 summaryHtml += `<span class="result detail">
-                        <span>${uiFriendlyDuration(geomeanScore(times))}</span>
-                        <label>${category}</label>
-                    </span>`;
+                                    <span>${uiFriendlyDuration(geomeanScore(times))}</span>
+                                    <label>${category}</label>
+                                </span>`;
             }
             summaryHtml += "</div>";
             const summaryElement = document.getElementById("result-summary");
@@ -393,6 +394,7 @@ class Driver {
                 const label = scoreDescription[i];
                 text += `<span class="result score"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`
             }
+            text += "<br/>";
             for (let i = 0; i < timeIds.length; i++) {
                 const timeId = timeIds[i];
                 const label = timeDescription[i];
