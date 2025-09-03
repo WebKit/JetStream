@@ -19,6 +19,7 @@
         "compress": "node utils/compress.mjs",
         "lint:check": "eslint **/*.{js,mjs,jsx,ts,tsx}",
         "pretty:check": "prettier --check ./",
+        "pretty:format": "prettier --write ./",
         "format:check": "npm run pretty:check && npm run lint:check",
         "test:chrome": "node tests/run.mjs --browser chrome",
         "test:firefox": "node tests/run.mjs --browser firefox",
