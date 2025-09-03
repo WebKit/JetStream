@@ -116,25 +116,36 @@ function base64ToString(data) {
     return result;
 }
 
-var str = "";
+function workload() {  
+    var str = "";
 
-for ( var i = 0; i < 8192; i++ )
+    for ( var i = 0; i < 8192; i++ )
         str += String.fromCharCode( (25 * Math.random()) + 97 );
 
-for ( var i = 8192; i <= 16384; i *= 2 ) {
+    for ( var i = 8192; i <= 16384; i *= 2 ) {
+        var base64;
 
-    var base64;
+        base64 = toBase64(str);
+        var encoded = base64ToString(base64);
+        if (encoded != str)
+            throw "ERROR: bad result: expected " + str + " but got " + encoded;
 
-    base64 = toBase64(str);
-    var encoded = base64ToString(base64);
-    if (encoded != str)
-        throw "ERROR: bad result: expected " + str + " but got " + encoded;
+        // Double the string
+        str += str;
+    }
 
-    // Double the string
-    str += str;
+    postMessage("done");
+    close();
 }
 
-toBinaryTable = null;
-
-postMessage("done");
-close();
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");
