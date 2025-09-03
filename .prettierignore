@@ -1,9 +1,10 @@
+# Ignore all subdirs
+*/*
 node_modules
-**/dist
-package-lock.json
+packages.json
 
-# Un-ignore top-level files                                                                                     │
-!/*   
+# Un-ignore top-level files
+!/*
 
 # For now exclude all existing workloads
 **/*.html
@@ -11,4 +12,7 @@ package-lock.json
 
 !**/benchmark.js
 !**/src/*
-!**/build/*
+
+# Ignore generated and third-party files
+*/**/build/
+*/third_party/
