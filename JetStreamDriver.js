@@ -335,15 +335,10 @@ class Driver {
         }
     }
 
-    prepareToRun() {
-        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
-
+    prepareBrowserUI() {
         let text = "";
         for (const benchmark of this.benchmarks)
-            text += benchmark.prepareToRun();
-
-        if (!isInBrowser)
-            return;
+            text += benchmark.prepareBrowserUI();
 
         const timestamp = performance.now();
         document.getElementById('jetstreams').style.backgroundImage = `url('jetstreams.svg?${timestamp}')`;
@@ -383,7 +378,9 @@ class Driver {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
         await this.prefetchResources();
-        this.prepareToRun();
+        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+        if (isInBrowser)
+            this.prepareBrowserUI();
         this.isReady = true;
         if (isInBrowser) {
             globalThis.dispatchEvent(new Event("JetStreamReady"));
@@ -796,13 +793,13 @@ class Benchmark {
         return code;
     }
 
-    prepareToRun() {
+    prepareBrowserUI() {
         const description = Object.keys(this.subScores());
         description.push("Score");
 
         const scoreIds = this.scoreIdentifiers();
         const overallScoreId = scoreIds.pop();
-        let text =  `<div class="benchmark" id="benchmark-${this.name}">
+        let text = `<div class="benchmark" id="benchmark-${this.name}">
             <h3 class="benchmark-name">${this.name} <a class="info" href="in-depth.html#${this.name}">i</a></h3>
             <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
             <h4 class="plot" id="plot-${this.name}">&nbsp;</h4>
@@ -1089,7 +1086,7 @@ class Benchmark {
             this.updateUIAfterRunInBrowser(scoreEntries);
         if (dumpJSONResults)
             return;
-        this.updateAfterRunInShell(scoreEntries);
+        this.updateConsoleAfterRun(scoreEntries);
     }
 
     updateUIAfterRunInBrowser(scoreEntries) {
@@ -1131,7 +1128,7 @@ class Benchmark {
         plotContainer.innerHTML = `<svg width="${width}px" height="${height}px">${circlesSVG}</svg>`;
     }
 
-    updateAfterRunInShell(scoreEntries) {
+    updateConsoleAfterRun(scoreEntries) {
         // FIXME: consider removing this mapping.
         // Rename for backwards compatibility.
         const legacyScoreNameMap = {
@@ -1181,11 +1178,11 @@ class GroupedBenchmark extends Benchmark {
             benchmark.prefetchResourcesForShell();
     }
     
-    prepareToRun() {
-        let text = super.prepareToRun();
+    prepareBrowserUI() {
+        let text = super.prepareBrowserUI();
         if (globalThis.details) {
             for (const benchmark of this.benchmarks)
-                text += benchmark.prepareToRun();
+                text += benchmark.prepareBrowserUI();
         }
         return text;
     }
@@ -1195,10 +1192,10 @@ class GroupedBenchmark extends Benchmark {
             super.updateUIBeforeRunInShell();
     }
     
-    updateAfterRunInShell(scoreEntries) {
+    updateConsoleAfterRun(scoreEntries) {
         if (globalThis.details)
             super.updateUIBeforeRunInShell();
-        super.updateAfterRunInShell(scoreEntries);
+        super.updateConsoleAfterRun(scoreEntries);
     }
 
     get files() {
