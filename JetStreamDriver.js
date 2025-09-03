@@ -329,7 +329,11 @@ class Driver {
             console.log("\n");
             for (let [category, scores] of categoryScores)
                 console.log(`${category}: ${uiFriendlyScore(geomeanScore(scores))}`);
-            console.log("\nTotal Score: ", uiFriendlyScore(totalScore), "\n");
+            for (let [category, times] of categoryTimes)
+                console.log(`${category}-Time: ${uiFriendlyDuration(geomeanScore(times))}`);
+            console.log("");
+            console.log("Total Score: ", uiFriendlyScore(totalScore));
+            console.log("Total Time: ", uiFriendlyDuration(totalTime));
         }
 
         this.reportScoreToRunBenchmarkRunner();
@@ -825,8 +829,8 @@ class Benchmark {
 
     allTimes() {
         const allTimes = this.subTimes();
+        allTimes["Wall"] = this.wallTime;
         allTimes["Total"] = this.totalTime;
-         allTimes["Wall-Time"] = this.wallTime;
         return allTimes;
     }
 
@@ -1177,15 +1181,25 @@ class Benchmark {
         plotContainer.innerHTML = `<svg width="${width}px" height="${height}px">${circlesSVG}</svg>`;
     }
 
-    updateConsoleAfterRun(scoreEntries) {
+    updateConsoleAfterRun(scoreEntries, timeEntries) {
+        const namePadding = 19;
+        const durationUnitPadding = "   ";
+        const valuePadding = 10;
         for (let [name, value] of scoreEntries) {
-             console.log(`    ${name}:`, uiFriendlyScore(value));
+            console.log(
+                `    ${name}:`.padEnd(namePadding), 
+                (uiFriendlyScore(value) + durationUnitPadding).padStart(valuePadding));
+        }
+        for (let [name, value] of timeEntries) {
+            console.log(
+                `    ${name}-Time:`.padEnd(namePadding),
+                uiFriendlyDuration(value).padStart(valuePadding));
         }
         if (RAMification) {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        console.log("    Wall-Time:", uiFriendlyDuration(this.endTime - this.startTime));
+        console.log("");
     }
 };
 
