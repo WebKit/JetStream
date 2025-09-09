@@ -22,7 +22,7 @@ static partial class Interop
     ];
 
     [JSExport]
-    public static async Task RunIteration(int sceneWidth, int sceneHeight, int hardwareConcurrency)
+    public static async Task RunIteration(int benchTasksBatchSize, int sceneWidth, int sceneHeight, int hardwareConcurrency)
     {
         // BenchTasks
         for (int i = 0; i < tasks.Length; i++)
@@ -30,7 +30,7 @@ static partial class Interop
             var task = tasks[i];
             for (int j = 0; j < task.Measurements.Length; j++)
             {
-                await task.RunBatch(i);
+                await task.RunBatch(i, benchTasksBatchSize);
             }
         }
 
