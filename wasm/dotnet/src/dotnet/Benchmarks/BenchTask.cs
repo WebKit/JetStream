@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices.JavaScript;
 
 public abstract class BenchTask
 {
@@ -14,6 +15,7 @@ public abstract class BenchTask
 
     public virtual bool BrowserOnly => false;
 
+    // FIXME: Deleting this breaks dotnet-interp with an out of memory error. No idea why...
     public virtual int BatchSize => 100;
 
     public async Task RunInitialSamples(int measurementIdx)
@@ -22,11 +24,11 @@ public abstract class BenchTask
         await measurement.RunInitialSamples();
     }
     
-    public async Task RunBatch(int measurementIdx)
+    public async Task RunBatch(int measurementIdx, int batchSize)
     {
         var measurement = Measurements[measurementIdx];
         await measurement.BeforeBatch();
-        await measurement.RunBatch(BatchSize);
+        await measurement.RunBatch(batchSize);
         await measurement.AfterBatch();
     }
 

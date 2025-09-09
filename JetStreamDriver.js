@@ -1125,25 +1125,14 @@ class Benchmark {
     }
 
     updateConsoleAfterRun(scoreEntries) {
-        // FIXME: consider removing this mapping.
-        // Rename for backwards compatibility.
-        const legacyScoreNameMap = {
-            __proto__: null,
-            "First": "Startup",
-            "Worst": "Worst Case",
-            "MainRun": "Tests",
-            "Runtime": "Run time",
-        };
         for (let [name, value] of scoreEntries) {
-            if (name in legacyScoreNameMap)
-                name = legacyScoreNameMap[name];
              console.log(`    ${name}:`, uiFriendlyScore(value));
         }
         if (RAMification) {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
+        console.log("    Wall-Time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 };
 
@@ -2167,6 +2156,7 @@ let BENCHMARKS = [
     new WasmEMCCBenchmark({
         name: "sqlite3-wasm",
         files: [
+            "./polyfills/fast-text-encoding/1.0.3/text.js",
             "./sqlite3/benchmark.js",
             "./sqlite3/build/jswasm/speedtest1.js",
         ],
@@ -2496,7 +2486,7 @@ let BENCHMARKS = [
     new WasmEMCCBenchmark({
         name: "8bitbench-wasm",
         files: [
-            "./8bitbench/build/lib/fast-text-encoding-1.0.3/text.js",
+            "./polyfills/fast-text-encoding/1.0.3/text.js",
             "./8bitbench/build/rust/pkg/emu_bench.js",
             "./8bitbench/benchmark.js",
         ],
