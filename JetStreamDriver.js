@@ -1947,7 +1947,7 @@ let BENCHMARKS = [
         name: "FlightPlanner",
         files: [
             "./RexBench/FlightPlanner/airways.js",
-            "./RexBench/FlightPlanner/waypoints.js",
+            "./RexBench/FlightPlanner/waypoints.js.z",
             "./RexBench/FlightPlanner/flight_planner.js",
             "./RexBench/FlightPlanner/expectations.js",
             "./RexBench/FlightPlanner/benchmark.js",
@@ -2048,7 +2048,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "json-stringify-inspector",
         files: [
-            "./SeaMonster/inspector-json-payload.js",
+            "./SeaMonster/inspector-json-payload.js.z",
             "./SeaMonster/json-stringify-inspector.js",
         ],
         iterations: 20,
@@ -2058,7 +2058,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "json-parse-inspector",
         files: [
-            "./SeaMonster/inspector-json-payload.js",
+            "./SeaMonster/inspector-json-payload.js.z",
             "./SeaMonster/json-parse-inspector.js",
         ],
         iterations: 20,
