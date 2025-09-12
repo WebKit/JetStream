@@ -1,0 +1,17 @@
+{
+  "name": "mobx",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "node ./benchmark-node.mjs",
+    "build": "webpack"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "babel-loader": "^10.0.0",
+    "mobx": "^6.13.7",
+    "webpack-cli": "^6.0.1"
+  }
+}
