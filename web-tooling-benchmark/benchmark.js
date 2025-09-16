@@ -38,8 +38,6 @@ class Benchmark {
   async loadAllFiles(preload) {
     const loadPromises = Object.entries(preload).map(
       async ([name, url]) => {
-        console.log(name);
-        console.log(url);
         if (name.endsWith(".wasm")) {
           let buffer = (await JetStream.getBinary(url)).buffer;
           if (!(buffer instanceof ArrayBuffer)) {
