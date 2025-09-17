@@ -30,118 +30,7 @@ const measureTotalTimeAsSubtest = false; // Once we move to preloading all resou
 const defaultIterationCount = 120;
 const defaultWorstCaseCount = 4;
 
-<<<<<<< HEAD
-globalThis.performance ??= Date;
-globalThis.RAMification ??= false;
-globalThis.testIterationCount ??= undefined;
-globalThis.testIterationCountMap ??= new Map();
-globalThis.testWorstCaseCount ??= undefined;
-globalThis.testWorstCaseCountMap ??= new Map();
-globalThis.dumpJSONResults ??= false;
-globalThis.testList ??= undefined;
-globalThis.startDelay ??= undefined;
-globalThis.shouldReport ??= false;
-globalThis.prefetchResources ??= true;
-globalThis.details ??= false;
-
-function getIntParam(urlParams, key) {
-    const rawValue = urlParams.get(key);
-    const value = parseInt(rawValue);
-    if (value <= 0)
-        throw new Error(`Expected positive value for ${key}, but got ${rawValue}`);
-    return value;
-}
-
-function getBoolParam(urlParams, key) {
-    const rawValue = urlParams.get(key).toLowerCase()
-    return !(rawValue === "false" || rawValue === "0")
- }
-
-function getTestListParam(urlParams, key) {
-    if (globalThis.testList?.length)
-        throw new Error(`Overriding previous testList=${globalThis.testList.join()} with ${key} url-parameter.`);
-    return urlParams.getAll(key);
-}
-
-if (typeof(URLSearchParams) !== "undefined") {
-    const urlParameters = new URLSearchParams(window.location.search);
-    if (urlParameters.has("report"))
-        globalThis.shouldReport = urlParameters.get("report").toLowerCase() == "true";
-    if (urlParameters.has("startDelay"))
-        globalThis.startDelay = getIntParam(urlParameters, "startDelay");
-    if (globalThis.shouldReport && !globalThis.startDelay)
-        globalThis.startDelay = 4000;
-    if (urlParameters.has("tag"))
-        globalThis.testList = getTestListParam(urlParameters, "tag");
-    if (urlParameters.has("test"))
-        globalThis.testList = getTestListParam(urlParameters, "test");
-    if (urlParameters.has("iterationCount"))
-        globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
-    if (urlParameters.has("worstCaseCount"))
-        globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
-    if (urlParameters.has("prefetchResources"))
-        globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources");
-    if (urlParameters.has("details"))
-        globalThis.details = getBoolParam(urlParameters, "details");
-}
-
-if (!globalThis.prefetchResources)
-||||||| 724cf7c
-globalThis.performance ??= Date;
-globalThis.RAMification ??= false;
-globalThis.testIterationCount ??= undefined;
-globalThis.testIterationCountMap ??= new Map();
-globalThis.testWorstCaseCount ??= undefined;
-globalThis.testWorstCaseCountMap ??= new Map();
-globalThis.dumpJSONResults ??= false;
-globalThis.testList ??= undefined;
-globalThis.startDelay ??= undefined;
-globalThis.shouldReport ??= false;
-globalThis.prefetchResources ??= true;
-
-function getIntParam(urlParams, key) {
-    const rawValue = urlParams.get(key);
-    const value = parseInt(rawValue);
-    if (value <= 0)
-        throw new Error(`Expected positive value for ${key}, but got ${rawValue}`);
-    return value;
-}
-
-function getBoolParam(urlParams, key) {
-    const rawValue = urlParams.get(key).toLowerCase()
-    return !(rawValue === "false" || rawValue === "0")
- }
-
-function getTestListParam(urlParams, key) {
-    if (globalThis.testList?.length)
-        throw new Error(`Overriding previous testList=${globalThis.testList.join()} with ${key} url-parameter.`);
-    return urlParams.getAll(key);
-}
-
-if (typeof(URLSearchParams) !== "undefined") {
-    const urlParameters = new URLSearchParams(window.location.search);
-    if (urlParameters.has("report"))
-        globalThis.shouldReport = urlParameters.get("report").toLowerCase() == "true";
-    if (urlParameters.has("startDelay"))
-        globalThis.startDelay = getIntParam(urlParameters, "startDelay");
-    if (globalThis.shouldReport && !globalThis.startDelay)
-        globalThis.startDelay = 4000;
-    if (urlParameters.has("tag"))
-        globalThis.testList = getTestListParam(urlParameters, "tag");
-    if (urlParameters.has("test"))
-        globalThis.testList = getTestListParam(urlParameters, "test");
-    if (urlParameters.has("iterationCount"))
-        globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
-    if (urlParameters.has("worstCaseCount"))
-        globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
-    if (urlParameters.has("prefetchResources"))
-        globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources");
-}
-
-if (!globalThis.prefetchResources)
-=======
 if (!JetStreamParams.prefetchResources)
->>>>>>> main
     console.warn("Disabling resource prefetching!");
 
 // Used for the promise representing the current benchmark run.
@@ -395,7 +284,7 @@ class Driver {
     prepareBrowserUI() {
         let text = "";
         for (const benchmark of this.benchmarks)
-            text += benchmark.prepareBrowserUI();
+            text += benchmark.renderHTML();
 
         const timestamp = performance.now();
         document.getElementById('jetstreams').style.backgroundImage = `url('jetstreams.svg?${timestamp}')`;
@@ -851,7 +740,7 @@ class Benchmark {
         return code;
     }
 
-    prepareBrowserUI() {
+    renderHTML() {
         const description = Object.keys(this.subScores());
         description.push("Score");
 
@@ -1120,12 +1009,12 @@ class Benchmark {
 
     updateUIBeforeRun() {
         if (!JetStreamParams.dumpJSONResults)
-            this.updateUIBeforeRunInShell();
+            this.updateConsoleBeforeRun();
         if (isInBrowser)
             this.updateUIBeforeRunInBrowser();
     }
 
-    updateUIBeforeRunInShell() {
+    updateConsoleBeforeRun() {
         console.log(`Running ${this.name}:`);
     }
 
@@ -1225,23 +1114,23 @@ class GroupedBenchmark extends Benchmark {
             benchmark.prefetchResourcesForShell();
     }
     
-    prepareBrowserUI() {
-        let text = super.prepareBrowserUI();
-        if (globalThis.details) {
+    renderHTML() {
+        let text = super.renderHTML();
+        if (JetStreamParams.groupDetails) {
             for (const benchmark of this.benchmarks)
-                text += benchmark.prepareBrowserUI();
+                text += benchmark.renderHTML();
         }
         return text;
     }
 
-    updateUIBeforeRunInShell() {
-        if (!globalThis.details)
-            super.updateUIBeforeRunInShell();
+    updateConsoleBeforeRun() {
+        if (!JetStreamParams.groupDetails)
+            super.updateConsoleBeforeRun();
     }
     
     updateConsoleAfterRun(scoreEntries) {
-        if (globalThis.details)
-            super.updateUIBeforeRunInShell();
+        if (JetStreamParams.groupDetails)
+            super.updateConsoleBeforeRun();
         super.updateConsoleAfterRun(scoreEntries);
     }
 
@@ -1261,10 +1150,10 @@ class GroupedBenchmark extends Benchmark {
         try {
             this._state = BenchmarkState.RUNNING;
             for (benchmark of this.benchmarks) {
-                if (globalThis.details)
+                if (JetStreamParams.groupDetails)
                     benchmark.updateUIBeforeRun();
                 await benchmark.run();
-                if (globalThis.details)
+                if (JetStreamParams.groupDetails)
                     benchmark.updateUIAfterRun();
             }
         } catch (e) {

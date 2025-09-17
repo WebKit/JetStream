@@ -52,6 +52,10 @@ const CLI_PARAMS = {
     help: "Do not prefetch resources. Will add network overhead to measurements!",
     param: "prefetchResources",
   },
+  "group-details": {
+    help: "Display detailed group items",
+    param: "groupDetails",
+  },
   test: {
     help: "Run a specific test or comma-separated list of tests.",
     param: "test",
@@ -106,39 +110,6 @@ function parseCliFlag(argument) {
     cliParams.set(CLI_PARAMS[flagName].param, value);
 }
 
-<<<<<<< HEAD
-if ("--iteration-count" in cliFlags)
-    globalThis.testIterationCount = getIntFlag(cliFlags, "--iteration-count");
-if ("--worst-case-count" in cliFlags)
-    globalThis.testWorstCaseCount = getIntFlag(cliFlags, "--worst-case-count");
-if ("--dump-json-results" in cliFlags)
-    globalThis.dumpJSONResults = true;
-if (typeof runMode !== "undefined" && runMode == "RAMification")
-    globalThis.RAMification = true;
-if ("--ramification" in cliFlags)
-    globalThis.RAMification = true;
-if ("--no-prefetch" in cliFlags)
-    globalThis.prefetchResources = false;
-if ("--group-details" in cliFlags)
-    globalThis.details = true;
-if (cliArgs.length)
-    globalThis.testList = cliArgs;
-||||||| 724cf7c
-if ("--iteration-count" in cliFlags)
-    globalThis.testIterationCount = getIntFlag(cliFlags, "--iteration-count");
-if ("--worst-case-count" in cliFlags)
-    globalThis.testWorstCaseCount = getIntFlag(cliFlags, "--worst-case-count");
-if ("--dump-json-results" in cliFlags)
-    globalThis.dumpJSONResults = true;
-if (typeof runMode !== "undefined" && runMode == "RAMification")
-    globalThis.RAMification = true;
-if ("--ramification" in cliFlags)
-    globalThis.RAMification = true;
-if ("--no-prefetch" in cliFlags)
-    globalThis.prefetchResources = false;
-if (cliArgs.length)
-    globalThis.testList = cliArgs;
-=======
 
 if (cliArgs.length) {
     let tests = cliParams.has("test") ? cliParams.get("tests").split(",") : []
@@ -149,8 +120,9 @@ if (cliArgs.length) {
 if (cliParams.size) 
     globalThis.JetStreamParamsSource = cliParams;
 
+console.log(Array.from(cliParams.entries()))
+
 load("./params.js");
->>>>>>> main
 
 
 async function runJetStream() {
