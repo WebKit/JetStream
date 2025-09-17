@@ -38,6 +38,9 @@ class Params {
     testWorstCaseCount = undefined;
     prefetchResources = true;
 
+    // Display group details.
+    groupDetails = false
+
     RAMification = false;
     dumpJSONResults = false;
     testIterationCountMap = new Map();
@@ -60,11 +63,12 @@ class Params {
         this.prefetchResources = this._parseBooleanParam(sourceParams, "prefetchResources");
         this.RAMification = this._parseBooleanParam(sourceParams, "RAMification");
         this.dumpJSONResults = this._parseBooleanParam(sourceParams, "dumpJSONResults");
+        this.groupDetails = this._parseBooleanParam(sourceParams, "groupDetails");
 
         this.customPreIterationCode = this._parseStringParam(sourceParams, "customPreIterationCode");
         this.customPostIterationCode = this._parseStringParam(sourceParams, "customPostIterationCode");
 
-         this.startDelay = this._parseIntParam(sourceParams, "startDelay", 0);
+        this.startDelay = this._parseIntParam(sourceParams, "startDelay", 0);
         if (this.shouldReport && !this.startDelay)
             this.startDelay = 4000;
 

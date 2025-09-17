@@ -281,35 +281,10 @@ class Driver {
         }
     }
 
-    prepareToRun() {
-        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
-
+    prepareBrowserUI() {
         let text = "";
-        for (const benchmark of this.benchmarks) {
-            const description = Object.keys(benchmark.subScores());
-            description.push("Score");
-
-            const scoreIds = benchmark.scoreIdentifiers();
-            const overallScoreId = scoreIds.pop();
-
-            if (isInBrowser) {
-                text +=
-                    `<div class="benchmark" id="benchmark-${benchmark.name}">
-                    <h3 class="benchmark-name">${benchmark.name} <a class="info" href="in-depth.html#${benchmark.name}">i</a></h3>
-                    <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
-                    <h4 class="plot" id="plot-${benchmark.name}">&nbsp;</h4>
-                    <p>`;
-                for (let i = 0; i < scoreIds.length; i++) {
-                    const scoreId = scoreIds[i];
-                    const label = description[i];
-                    text += `<span class="result"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`
-                }
-                text += `</p></div>`;
-            }
-        }
-
-        if (!isInBrowser)
-            return;
+        for (const benchmark of this.benchmarks)
+            text += benchmark.renderHTML();
 
         const timestamp = performance.now();
         document.getElementById('jetstreams').style.backgroundImage = `url('jetstreams.svg?${timestamp}')`;
@@ -349,7 +324,9 @@ class Driver {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
         await this.prefetchResources();
-        this.prepareToRun();
+        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+        if (isInBrowser)
+            this.prepareBrowserUI();
         this.isReady = true;
         if (isInBrowser) {
             globalThis.dispatchEvent(new Event("JetStreamReady"));
@@ -763,6 +740,26 @@ class Benchmark {
         return code;
     }
 
+    renderHTML() {
+        const description = Object.keys(this.subScores());
+        description.push("Score");
+
+        const scoreIds = this.scoreIdentifiers();
+        const overallScoreId = scoreIds.pop();
+        let text = `<div class="benchmark" id="benchmark-${this.name}">
+            <h3 class="benchmark-name">${this.name} <a class="info" href="in-depth.html#${this.name}">i</a></h3>
+            <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
+            <h4 class="plot" id="plot-${this.name}">&nbsp;</h4>
+            <p>`;
+        for (let i = 0; i < scoreIds.length; i++) {
+            const scoreId = scoreIds[i];
+            const label = description[i];
+            text += `<span class="result"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`
+        }
+        text += `</p></div>`;
+        return text;
+    }
+
     async run() {
         if (this.isDone)
             throw new Error(`Cannot run Benchmark ${this.name} twice`);
@@ -1012,9 +1009,13 @@ class Benchmark {
 
     updateUIBeforeRun() {
         if (!JetStreamParams.dumpJSONResults)
-            console.log(`Running ${this.name}:`);
+            this.updateConsoleBeforeRun();
         if (isInBrowser)
             this.updateUIBeforeRunInBrowser();
+    }
+
+    updateConsoleBeforeRun() {
+        console.log(`Running ${this.name}:`);
     }
 
     updateUIBeforeRunInBrowser() {
@@ -1112,6 +1113,26 @@ class GroupedBenchmark extends Benchmark {
         for (const benchmark of this.benchmarks)
             benchmark.prefetchResourcesForShell();
     }
+    
+    renderHTML() {
+        let text = super.renderHTML();
+        if (JetStreamParams.groupDetails) {
+            for (const benchmark of this.benchmarks)
+                text += benchmark.renderHTML();
+        }
+        return text;
+    }
+
+    updateConsoleBeforeRun() {
+        if (!JetStreamParams.groupDetails)
+            super.updateConsoleBeforeRun();
+    }
+    
+    updateConsoleAfterRun(scoreEntries) {
+        if (JetStreamParams.groupDetails)
+            super.updateConsoleBeforeRun();
+        super.updateConsoleAfterRun(scoreEntries);
+    }
 
     get files() {
         let files = [];
@@ -1128,8 +1149,13 @@ class GroupedBenchmark extends Benchmark {
         let benchmark;
         try {
             this._state = BenchmarkState.RUNNING;
-            for (benchmark of this.benchmarks)
+            for (benchmark of this.benchmarks) {
+                if (JetStreamParams.groupDetails)
+                    benchmark.updateUIBeforeRun();
                 await benchmark.run();
+                if (JetStreamParams.groupDetails)
+                    benchmark.updateUIAfterRun();
+            }
         } catch (e) {
             this._state = BenchmarkState.ERROR;
             console.log(`Error in runCode of grouped benchmark ${benchmark.name}: `, e);

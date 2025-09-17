@@ -52,6 +52,10 @@ const CLI_PARAMS = {
     help: "Do not prefetch resources. Will add network overhead to measurements!",
     param: "prefetchResources",
   },
+  "group-details": {
+    help: "Display detailed group items",
+    param: "groupDetails",
+  },
   test: {
     help: "Run a specific test or comma-separated list of tests.",
     param: "test",
@@ -115,6 +119,8 @@ if (cliArgs.length) {
 
 if (cliParams.size) 
     globalThis.JetStreamParamsSource = cliParams;
+
+console.log(Array.from(cliParams.entries()))
 
 load("./params.js");
 
