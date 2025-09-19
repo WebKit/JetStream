@@ -1757,7 +1757,7 @@ let BENCHMARKS = [
         tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
-        name: "typescript",
+        name: "typescript-octane",
         files: [
             "./Octane/typescript-compiler.js",
             "./Octane/typescript-input.js",
@@ -1766,7 +1766,7 @@ let BENCHMARKS = [
         iterations: 15,
         worstCaseCount: 2,
         deterministicRandom: true,
-        tags: ["Default", "Octane"],
+        tags: ["Default", "Octane", "typescript"],
     }),
     // RexBench
     new DefaultBenchmark({
@@ -1995,6 +1995,24 @@ let BENCHMARKS = [
             "./class-fields/raytrace-private-class-fields.js",
         ],
         tags: ["Default", "ClassFields"],
+    }),
+    new AsyncBenchmark({
+        name: "typescript-lib",
+        files: [
+            "./TypeScript/src/mock/sys.js",
+            "./TypeScript/dist/bundle.js",
+            "./TypeScript/benchmark.js",
+        ],
+        preload: {
+            // Large test project:
+            // "tsconfig": "./TypeScript/src/gen/zod-medium/tsconfig.json",
+            // "files": "./TypeScript/src/gen/zod-medium/files.json",
+            "tsconfig": "./TypeScript/src/gen/immer-tiny/tsconfig.json",
+            "files": "./TypeScript/src/gen/immer-tiny/files.json",
+        },
+        iterations: 3,
+        worstCaseCount: 2,
+        tags: ["Default", "typescript"],
     }),
     // Generators
     new AsyncBenchmark({
