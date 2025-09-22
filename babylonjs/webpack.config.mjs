@@ -45,7 +45,7 @@ function createConfig({ es6, filename, minify }) {
                 ],
               ],
               plugins: [
-                CacheBusterPlugin, ...babel_plugins
+                CacheBusterPlugin, ...babelPlugins
               ],
             },
           },
