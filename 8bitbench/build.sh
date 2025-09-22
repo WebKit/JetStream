@@ -41,7 +41,6 @@ popd
 
 echo "Copying files from 8bitbench/ into build/" | tee -a "$BUILD_LOG"
 mkdir -p build/{lib/fast-text-encoding-1.0.3/,rust/pkg/,assets/}
-cp 8bitbench/lib/fast-text-encoding-1.0.3/text.js build/lib/fast-text-encoding-1.0.3/
 cp 8bitbench/rust/pkg/{emu_bench.js,emu_bench_bg.wasm} build/rust/pkg
 cp 8bitbench/assets/tutorial/full_game.bin build/assets/program.bin
 
