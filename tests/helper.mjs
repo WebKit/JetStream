@@ -31,6 +31,16 @@ export function logError(...args) {
   }
 }
 
+export function logCommand(...args) {
+  const cmd = args.join(" ");
+  if (GITHUB_ACTIONS_OUTPUT) {
+    core.notice(styleText("blue", cmd));
+  } else {
+    console.log(styleText("blue", cmd));
+  }
+}
+
+
 export async function logGroup(name, body) {
   if (GITHUB_ACTIONS_OUTPUT) {
     core.startGroup(name);
@@ -83,15 +93,11 @@ export async function runTest(label, testFunction) {
 }
 
 
-
 export async function sh(binary, ...args) {
   const cmd = `${binary} ${args.join(" ")}`;
-  if (GITHUB_ACTIONS_OUTPUT) {
+  if (GITHUB_ACTIONS_OUTPUT)
     core.startGroup(binary);
-    core.notice(styleText("blue", cmd));
-  } else {
-    console.log(styleText("blue", cmd));
-  }
+  logCommand(cmd);
   try {
     return await spawnCaptureStdout(binary, args);
   } catch(e) {

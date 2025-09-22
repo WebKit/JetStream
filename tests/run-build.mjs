@@ -5,7 +5,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import path from "path";
 
-import { logError, printHelp, runTest, sh } from "./helper.mjs";
+import { logError, logCommand, printHelp, runTest, sh } from "./helper.mjs";
 
 const optionDefinitions = [
   { name: "help", alias: "h", description: "Print this help text." },
@@ -45,11 +45,13 @@ async function runBuilds() {
         }
 
         const dir = path.dirname(file);
-        const testName = `Building ${dir}`;
+        const relativeDir = path.relative(SRC_DIR, dir);
+        const testName = `Building ${relativeDir}`;
         
         const buildTask = async () => {
             const oldCWD = process.cwd();
             try {
+                logCommand("cd", dir);
                 process.chdir(dir);
                 await sh("npm", "ci");
                 await sh("npm", "run", "build");

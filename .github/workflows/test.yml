@@ -10,8 +10,8 @@ on:
     workflow_dispatch:
 
 jobs:
-    build:
-        name: Build
+    test:
+        name: Test
         runs-on: macos-latest
         env:
             GITHUB_ACTIONS_OUTPUT: ""
@@ -49,3 +49,8 @@ jobs:
               run: |
                   echo "Running in $BROWSER"
                   npm run test:${{ matrix.browser }}
+
+            - name: Run Build
+              run: |
+                  echo "Running in $BROWSER"
+                  npm run test:build
