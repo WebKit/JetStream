@@ -132,6 +132,17 @@ class Params {
     get isDefault() {
       return this === DefaultJetStreamParams;
     }
+
+    get nonDefaultParams() {
+        const diff = Object.create(null);
+        console.log(Object.entries(this))
+        for (const [key, value] in Object.entries(this)) {
+            if (value != DefaultJetStreamParams[key]) {
+                diff[key] = value;
+            }
+        }
+        return diff;
+    }
 }
 
 const DefaultJetStreamParams = new Params();
