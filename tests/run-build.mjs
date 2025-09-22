@@ -55,7 +55,7 @@ async function runBuilds() {
                 await sh("npm", "run", "build");
             } finally {
                 process.chdir(oldCWD);
-                await sh("git", "reset", "--hard");
+                // await sh("git", "reset", "--hard");
             }
         };
         

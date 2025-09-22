@@ -93,33 +93,30 @@ export async function sh(binary, ...args) {
     console.log(styleText("blue", cmd));
   }
   try {
-    const result = await spawnCaptureStdout(binary, args, SPAWN_OPTIONS);
-    if (result.status || result.error) {
-      logError(result.error);
-      throw new Error(`Shell CMD failed: ${binary} ${args.join(" ")}`);
-    }
-    return result;
+    return await spawnCaptureStdout(binary, args);
+  } catch(e) {
+    logError(e.stdoutString);
+    throw e;
   } finally {
     if (GITHUB_ACTIONS_OUTPUT)
       core.endGroup();
   }
 }
 
+const SPAWN_OPTIONS =  Object.freeze({ 
+  stdio: ["inherit", "pipe", "inherit"]
+});
 
-const SPAWN_OPTIONS =  { 
-  stdio: ["inherit", "inherit", "inherit"]
-};
-
-
-async function spawnCaptureStdout(binary, args) {
-  const childProcess = spawn(binary, args);
+async function spawnCaptureStdout(binary, args, options={}) {
+  options = Object.assign(options, SPAWN_OPTIONS);
+  const childProcess = spawn(binary, args, options);
   childProcess.stdout.pipe(process.stdout);
   return new Promise((resolve, reject) => {
     childProcess.stdoutString = "";
     childProcess.stdio[1].on("data", (data) => {
       childProcess.stdoutString += data.toString();
     });
-    childProcess.on('close', (code) => {
+    childProcess.on("close", (code) => {
       if (code === 0) {
         resolve(childProcess);
       } else {
@@ -131,6 +128,6 @@ async function spawnCaptureStdout(binary, args) {
         reject(error);
       }
     });
-    childProcess.on('error', reject);
+    childProcess.on("error", reject);
   })
 }
