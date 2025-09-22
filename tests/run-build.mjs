@@ -1,12 +1,23 @@
+#! /usr/bin/env node
 
-import { exec as exec_callback } from 'child_process';
+import commandLineArgs from "command-line-args";
+import fs from "fs";
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
-import { promisify } from 'util';
-import fs from fs;
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const root = join(__dirname, '..');
+import { logError, printHelp, runTest, sh } from "./helper.mjs";
+
+const optionDefinitions = [
+  { name: "help", alias: "h", description: "Print this help text." },
+];
+
+const options = commandLineArgs(optionDefinitions);
+
+if ("help" in options)
+  printHelp(optionDefinitions);
+
+const FILE_PATH = fileURLToPath(import.meta.url);
+const SRC_DIR = path.dirname(path.dirname(FILE_PATH));
 
 async function findPackageJsonFiles(dir, accumulator=[]) {
     const dirEntries = await fs.readdir(dir, { withFileTypes: true });
@@ -24,32 +35,33 @@ async function findPackageJsonFiles(dir, accumulator=[]) {
     return accumulator;
 }
 
-async function main() {
-    const packageJsonFiles = await findPackageJsonFiles(root);
+async function runBuilds() {
+    const packageJsonFiles = await findPackageJsonFiles(SRC_DIR);
+    let success = true;
+
     for (const file of packageJsonFiles) {
-        const content = await readFile(file, 'utf-8');
+        const content = await fs.readFile(file, 'utf-8');
         const packageJson = JSON.parse(content);
-        if (packageJson.scripts && packageJson.scripts.build) {
-            const dir = dirname(file);
-            console.log(`Found build script in ${dir}`);
-            try {
-                console.log(`Running "npm install" in ${dir}...`);
-                await exec('npm install', { cwd: dir });
-                console.log(`Running "npm run build" in ${dir}...`);
-                await exec('npm run build', { cwd: dir });
-                console.log(`Successfully built ${packageJson.name}`);
-                console.log('Resetting repository...');
-                await exec('git reset --hard');
-                console.log('Repository reset.');
-            } catch (e) {
-                console.error(`Failed to build ${packageJson.name}: ${e}`);
-                process.exit(1);
-            }
+        if (!packageJson.scripts?.build) {
+            continue;
         }
+
+        const dir = dirname(file);
+        const testName = `Building ${packageJson.name || dir}`;
+        
+        const buildTask = async () => {
+            await sh('npm', 'install', '--prefix', dir);
+            await sh('npm', 'run', 'build', '--prefix', dir);
+            await sh('git', 'reset', '--hard');
+        };
+        
+        success &&= await runTest(testName, buildTask);
+    }
+
+    if (!success) {
+        logError("One or more builds failed.");
+        process.exit(1);
     }
 }
 
-main().catch(e => {
-    console.error(e);
-    process.exit(1);
-});
+setImmediate(runBuilds);
