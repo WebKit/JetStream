@@ -1,6 +1,7 @@
-import { styleText } from "node:util";
 import core from "@actions/core";
+import { spawn } from "child_process";
 import commandLineUsage from "command-line-usage";
+import { styleText } from "node:util";
 
 export const GITHUB_ACTIONS_OUTPUT = "GITHUB_ACTIONS_OUTPUT" in process.env;
 
@@ -79,4 +80,57 @@ export async function runTest(label, testFunction) {
       return false;
     }
     return true;
+}
+
+
+
+export async function sh(binary, ...args) {
+  const cmd = `${binary} ${args.join(" ")}`;
+  if (GITHUB_ACTIONS_OUTPUT) {
+    core.startGroup(binary);
+    core.notice(styleText("blue", cmd));
+  } else {
+    console.log(styleText("blue", cmd));
+  }
+  try {
+    const result = await spawnCaptureStdout(binary, args, SPAWN_OPTIONS);
+    if (result.status || result.error) {
+      logError(result.error);
+      throw new Error(`Shell CMD failed: ${binary} ${args.join(" ")}`);
+    }
+    return result;
+  } finally {
+    if (GITHUB_ACTIONS_OUTPUT)
+      core.endGroup();
+  }
+}
+
+
+const SPAWN_OPTIONS =  { 
+  stdio: ["inherit", "inherit", "inherit"]
+};
+
+
+async function spawnCaptureStdout(binary, args) {
+  const childProcess = spawn(binary, args);
+  childProcess.stdout.pipe(process.stdout);
+  return new Promise((resolve, reject) => {
+    childProcess.stdoutString = "";
+    childProcess.stdio[1].on("data", (data) => {
+      childProcess.stdoutString += data.toString();
+    });
+    childProcess.on('close', (code) => {
+      if (code === 0) {
+        resolve(childProcess);
+      } else {
+        // Reject the Promise with an Error on failure
+        const error = new Error(`Command failed with exit code ${code}: ${binary} ${args.join(" ")}`);
+        error.process = childProcess;
+        error.stdout = childProcess.stdoutString;
+        error.exitCode = code;
+        reject(error);
+      }
+    });
+    childProcess.on('error', reject);
+  })
 }
