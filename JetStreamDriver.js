@@ -126,7 +126,7 @@ function uiFriendlyDuration(time) {
 
 
 function shellFriendlyLabel(label) {
-    const namePadding = 19;
+    const namePadding = 30;
     return `${label}:`.padEnd(namePadding);
 }
 
@@ -136,7 +136,7 @@ function shellFriendlyDuration(time) {
 }
 
 function shellFriendlyScore(time) {
-    return `${uiFriendlyScore(time)}   `.padStart(valuePadding);
+    return `${uiFriendlyScore(time)} # `.padStart(valuePadding);
 }
 
 
@@ -228,7 +228,7 @@ class Driver {
             if (isInBrowser)
                 document.getElementById("benchmark-total-time-score").innerHTML = uiFriendlyNumber(totalTime);
             else if (!JetStreamParams.dumpJSONResults)
-                console.log("Total time:", uiFriendlyNumber(totalTime));
+                console.log("Total-Time:", uiFriendlyNumber(totalTime));
             allScores.push(totalTime);
         }
 
@@ -300,8 +300,8 @@ class Driver {
                     shellFriendlyDuration(geomeanScore(times)));
             }
             console.log("");
-            console.log(shellFriendlyLabel("Total Score:"), shellFriendlyScore(totalScore));
-            console.log(shellFriendlyLabel("Total Time:"), shellFriendlyDuration(totalTime));
+            console.log(shellFriendlyLabel("Total-Score:"), shellFriendlyScore(totalScore));
+            console.log(shellFriendlyLabel("Total-Time:"), shellFriendlyDuration(totalTime));
             console.log("");
         }
 
@@ -1121,21 +1121,23 @@ class Benchmark {
 
     updateConsoleAfterRun() {
         for (let [name, value] of Object.entries(this.allScores())) {
-            console.log(
-                shellFriendlyLabel(`    ${name}`), 
-                shellFriendlyScore(value));
+            this.logMetric(name, shellFriendlyScore(value));
         }
         for (let [name, value] of Object.entries(this.allTimes())) {
-            console.log(
-                shellFriendlyLabel(`    ${name}-Time`),
-                shellFriendlyDuration(value));
+            this.logMetric(`${name}-Time`, shellFriendlyDuration(value));
         }
         if (JetStreamParams.RAMification) {
-            console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
-            console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
+            this.logMetric("Current Footprint", uiFriendlyNumber(this.currentFootprint));
+            this.logMetric("Peak Footprint", uiFriendlyNumber(this.peakFootprint));
         }
         console.log("");
     }
+
+    logMetric(name, value) {
+        console.log(
+            shellFriendlyLabel(`${this.name} ${name}`),
+            value);
+    }    
 
     renderScatterPlot() {
         const plotContainer = document.getElementById(`plot-${this.name}`);
