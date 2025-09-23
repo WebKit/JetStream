@@ -1818,7 +1818,6 @@ let BENCHMARKS = [
             "./validatorjs/dist/bundle.es6.min.js",
             "./validatorjs/benchmark.js",
         ],
-        allowUtf16: true,
         tags: ["Default", "regexp"],
     }),
     // Simple

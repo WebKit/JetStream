@@ -8,6 +8,7 @@
     "build": "webpack"
   },
   "dependencies": {
+    "@dapplets/unicode-escape-webpack-plugin": "^0.1.1",
     "buffer": "^6.0.3",
     "process": "^0.11.10",
     "validator": "^13.15.15",
