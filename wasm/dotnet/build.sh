@@ -1,9 +1,14 @@
 #! /bin/sh
 
-# Expects to have .NET SDK 9.0.3xx,
-# downloadable from using https://aka.ms/dotnet/9.0.3xx/daily/dotnet-sdk-win-x64.zip or https://aka.ms/dotnet/9.0.3xx/daily/dotnet-sdk-linux-x64.tar.gz
-# Then run (on macOS and probably Linux this requires sudo) idk how it works on Windows.
-# `sudo dotnet workload install wasm-tools`
+# Expects to have .NET SDK 9.0.3xx with `wasm-tools` installed.
+# Installation options:
+# A) Download and manually install from https://aka.ms/dotnet/9.0.3xx/daily/dotnet-sdk-win-x64.zip or https://aka.ms/dotnet/9.0.3xx/daily/dotnet-sdk-linux-x64.tar.gz
+# B) "Scripted install" as described in
+# https://learn.microsoft.com/en-us/dotnet/core/install/linux-scripted-manual#scripted-install:
+#   `wget https://dot.net/v1/dotnet-install.sh -O dotnet-install.sh && chmod +x ./dotnet-install.sh`, then
+#   `./dotnet-install.sh --channel 9.0` (You must provide the 9.0 channel, otherwise it will install 8.0).
+# Finally `sudo dotnet workload install wasm-tools` (without sudo for a user
+# installation of dotnet, e.g., with option B above).
 
 rm -r ./build-interp ./build-aot build.log
 

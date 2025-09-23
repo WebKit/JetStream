@@ -15,9 +15,6 @@ public abstract class BenchTask
 
     public virtual bool BrowserOnly => false;
 
-    // FIXME: Deleting this breaks dotnet-interp with an out of memory error. No idea why...
-    public virtual int BatchSize => 100;
-
     public async Task RunInitialSamples(int measurementIdx)
     {
         var measurement = Measurements[measurementIdx];
