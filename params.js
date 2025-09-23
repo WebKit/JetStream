@@ -25,6 +25,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const defaultEmptyMap = Object.freeze({});
 
 class Params {
     // Enable a detailed developer menu to change the current Params.
@@ -40,8 +41,11 @@ class Params {
 
     RAMification = false;
     dumpJSONResults = false;
-    testIterationCountMap = new Map();
-    testWorstCaseCountMap = new Map();
+    // Override iteration and worst-case counts per workload.
+    // Example:
+    //   testIterationCountMap = { "acorn-wtb": 5 };
+    testIterationCountMap = defaultEmptyMap;
+    testWorstCaseCountMap = defaultEmptyMap;
 
     customPreIterationCode = undefined;
     customPostIterationCode = undefined;
@@ -135,8 +139,7 @@ class Params {
 
     get nonDefaultParams() {
         const diff = Object.create(null);
-        console.log(Object.entries(this))
-        for (const [key, value] in Object.entries(this)) {
+        for (const [key, value] of Object.entries(this)) {
             if (value != DefaultJetStreamParams[key]) {
                 diff[key] = value;
             }
