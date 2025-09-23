@@ -288,7 +288,6 @@ class Driver {
             summaryElement.onclick = displayCategoryScores;
             statusElement.innerHTML = "";
         } else if (!JetStreamParams.dumpJSONResults) {
-            console.log("");
             console.log("Total:");
             for (let [category, scores] of categoryScores) {
                 console.log(
