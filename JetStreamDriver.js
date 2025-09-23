@@ -289,19 +289,20 @@ class Driver {
             statusElement.innerHTML = "";
         } else if (!JetStreamParams.dumpJSONResults) {
             console.log("");
+            console.log("Total:");
             for (let [category, scores] of categoryScores) {
                 console.log(
-                    shellFriendlyLabel(category),
+                    shellFriendlyLabel(`${category}-Score`),
                     shellFriendlyScore(geomeanScore(scores)));
             }
             for (let [category, times] of categoryTimes) {
                 console.log(
-                    shellFriendlyLabel(`${category}-Time:`),
+                    shellFriendlyLabel(`${category}-Time`),
                     shellFriendlyDuration(geomeanScore(times)));
             }
             console.log("");
-            console.log(shellFriendlyLabel("Total-Score:"), shellFriendlyScore(totalScore));
-            console.log(shellFriendlyLabel("Total-Time:"), shellFriendlyDuration(totalTime));
+            console.log(shellFriendlyLabel("Total-Score"), shellFriendlyScore(totalScore));
+            console.log(shellFriendlyLabel("Total-Time"), shellFriendlyDuration(totalTime));
             console.log("");
         }
 
