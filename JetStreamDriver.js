@@ -1121,6 +1121,9 @@ class Benchmark {
 
     updateConsoleAfterRun() {
         for (let [name, value] of Object.entries(this.allScores())) {
+            if (!name.endsWith("Score"))
+                name = `${name}-Score`;
+
             this.logMetric(name, shellFriendlyScore(value));
         }
         for (let [name, value] of Object.entries(this.allTimes())) {
