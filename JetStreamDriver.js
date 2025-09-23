@@ -56,7 +56,7 @@ function getWorstCaseCount(plan) {
         return JetStreamParams.testWorstCaseCountMap.get(plan.name);
     if (JetStreamParams.testWorstCaseCount)
         return JetStreamParams.testWorstCaseCount;
-    if (plan.worstCaseCount)
+    if (plan.worstCaseCount !== undefined)
         return plan.worstCaseCount;
     return defaultWorstCaseCount;
 }
@@ -1278,8 +1278,9 @@ class DefaultBenchmark extends Benchmark {
         this.worstScore = null;
         this.averageTime = null;
         this.averageScore = null;
-
-        console.assert(this.iterations > this.worstCaseCount);
+        if (this.worstCaseCount)
+            console.assert(this.iterations > this.worstCaseCount);
+        console.assert(this.worstCaseCount >= 0);
     }
 
     processResults(results) {
@@ -1293,21 +1294,24 @@ class DefaultBenchmark extends Benchmark {
         for (let i = 0; i + 1 < results.length; ++i)
             console.assert(results[i] >= results[i + 1]);
 
-        const worstCase = [];
-        for (let i = 0; i < this.worstCaseCount; ++i)
-            worstCase.push(results[i]);
-        this.worstTime = mean(worstCase);
-        this.worstScore = toScore(this.worstTime);
+        if (this.worstCaseCount) {
+            const worstCase = [];
+            for (let i = 0; i < this.worstCaseCount; ++i)
+                worstCase.push(results[i]);
+            this.worstTime = mean(worstCase);
+            this.worstScore = toScore(this.worstTime);
+        }
         this.averageTime = mean(results);
         this.averageScore = toScore(this.averageTime);
     }
 
     subScores() {
-        return {
-            "First": this.firstIterationScore,
-            "Worst": this.worstScore,
-            "Average": this.averageScore,
-        };
+        const scores = { "First": this.firstIterationScore }
+        if (this.worstCaseCount)
+            scores["Worst"] = this.worstScore;
+        if (this.iterations > 1)
+            scores["Average"] = this.averageScore;
+        return scores;
     }
 
     subTimes() {
@@ -1877,7 +1881,7 @@ let BENCHMARKS = [
         tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
-        name: "typescript",
+        name: "typescript-octane",
         files: [
             "./Octane/typescript-compiler.js",
             "./Octane/typescript-input.js",
@@ -1886,7 +1890,7 @@ let BENCHMARKS = [
         iterations: 15,
         worstCaseCount: 2,
         deterministicRandom: true,
-        tags: ["Default", "Octane"],
+        tags: ["Octane", "typescript"],
     }),
     // RexBench
     new DefaultBenchmark({
@@ -2115,6 +2119,24 @@ let BENCHMARKS = [
             "./class-fields/raytrace-private-class-fields.js",
         ],
         tags: ["Default", "ClassFields"],
+    }),
+    new AsyncBenchmark({
+        name: "typescript-lib",
+        files: [
+            "./TypeScript/src/mock/sys.js",
+            "./TypeScript/dist/bundle.js",
+            "./TypeScript/benchmark.js",
+        ],
+        preload: {
+            // Large test project:
+            // "tsconfig": "./TypeScript/src/gen/zod-medium/tsconfig.json",
+            // "files": "./TypeScript/src/gen/zod-medium/files.json",
+            "tsconfig": "./TypeScript/src/gen/immer-tiny/tsconfig.json",
+            "files": "./TypeScript/src/gen/immer-tiny/files.json",
+        },
+        iterations: 1,
+        worstCaseCount: 0,
+        tags: ["Default", "typescript"],
     }),
     // Generators
     new AsyncBenchmark({
