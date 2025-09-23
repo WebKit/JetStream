@@ -126,7 +126,7 @@ function uiFriendlyDuration(time) {
 
 
 function shellFriendlyLabel(label) {
-    const namePadding = 30;
+    const namePadding = 40;
     return `${label}:`.padEnd(namePadding);
 }
 
@@ -1315,11 +1315,14 @@ class DefaultBenchmark extends Benchmark {
     }
 
     subTimes() {
-        return {
+        const times = {
             "First": this.firstIterationTime,
-            "Worst": this.worstTime,
-            "Average": this.averageTime,
         };
+        if (this.worstCaseCount)
+            times["Worst"] = this.worstTime;
+        if (this.iterations > 1)
+            times["Average"] = this.averageTime;
+        return times;
     }
 }
 
