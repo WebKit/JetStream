@@ -34,7 +34,7 @@ class Benchmark {
   sourceHash = 0
   iterationSourceCodes = [];
 
-  constructor(iterationCount) {
+  constructor({ iterationCount }) {
     this.iterationCount = iterationCount
   }
 
