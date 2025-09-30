@@ -73,8 +73,8 @@ class Params {
         for (const paramKey of ["tag", "tags", "test", "tests"])
             this.testList = this._parseTestListParam(sourceParams, paramKey);
 
-        this.testIterationCount = this._parseIntParam(sourceParams, "iterationCount", 1);
-        this.testWorstCaseCount = this._parseIntParam(sourceParams, "worstCaseCount", 1);
+        this.testIterationCount = this._parseIntParam(sourceParams, "testIterationCount", 1);
+        this.testWorstCaseCount = this._parseIntParam(sourceParams, "testWorstCaseCount", 1);
 
         const unused = Array.from(sourceParams.keys());
         if (unused.length > 0)
@@ -128,7 +128,7 @@ class Params {
         const number = Number(value);
         if (!Number.isInteger(number) && errorMessage)
             throw new Error(`Invalid ${errorMessage} param: '${value}', expected int.`);
-        return parseInt(number);
+        return number;
     }
 
     get isDefault() {
