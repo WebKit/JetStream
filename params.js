@@ -43,6 +43,7 @@ class Params {
 
     RAMification = false;
     dumpJSONResults = false;
+    dumpTestList = false;
     testIterationCountMap = new Map();
     testWorstCaseCountMap = new Map();
 
@@ -64,6 +65,7 @@ class Params {
         this.RAMification = this._parseBooleanParam(sourceParams, "RAMification");
         this.dumpJSONResults = this._parseBooleanParam(sourceParams, "dumpJSONResults");
         this.groupDetails = this._parseBooleanParam(sourceParams, "groupDetails");
+        this.dumpTestList = this._parseBooleanParam(sourceParams, "dumpTestList");
 
         this.customPreIterationCode = this._parseStringParam(sourceParams, "customPreIterationCode");
         this.customPostIterationCode = this._parseStringParam(sourceParams, "customPostIterationCode");
@@ -73,7 +75,7 @@ class Params {
             this.startDelay = 4000;
 
         for (const paramKey of ["tag", "tags", "test", "tests"])
-          this.testList = this._parseTestListParam(sourceParams, paramKey);
+            this.testList = this._parseTestListParam(sourceParams, paramKey);
 
         this.testIterationCount = this._parseIntParam(sourceParams, "iterationCount", 1);
         this.testWorstCaseCount = this._parseIntParam(sourceParams, "worstCaseCount", 1);
@@ -85,13 +87,13 @@ class Params {
 
     _parseTestListParam(sourceParams, key) {
         if (!sourceParams.has(key))
-          return this.testList;
+            return this.testList;
         let testList = [];
         if (sourceParams?.getAll) {
-          testList = sourceParams?.getAll(key);
+            testList = sourceParams?.getAll(key);
         } else {
-          // fallback for cli sourceParams which is just a Map;
-          testList = sourceParams.get(key).split(",");
+            // fallback for cli sourceParams which is just a Map;
+            testList = sourceParams.get(key).split(",");
         }
         sourceParams.delete(key);
         if (this.testList.length > 0 && testList.length > 0)
