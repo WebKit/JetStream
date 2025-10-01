@@ -120,8 +120,6 @@ if (cliArgs.length) {
 if (cliParams.size) 
     globalThis.JetStreamParamsSource = cliParams;
 
-console.log(Array.from(cliParams.entries()))
-
 load("./params.js");
 
 
