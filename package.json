@@ -44,5 +44,8 @@
         "local-web-server": "^5.4.0",
         "prettier": "^2.8.3",
         "selenium-webdriver": "^4.35.0"
+    },
+    "dependencies": {
+        "@dapplets/unicode-escape-webpack-plugin": "^0.1.1"
     }
 }
