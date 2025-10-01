@@ -61,7 +61,7 @@ class Params {
     _copyFromSearchParams(sourceParams) {
         this.startAutomatically = this._parseBooleanParam(sourceParams, "startAutomatically");
         this.developerMode = this._parseBooleanParam(sourceParams, "developerMode");
-        this.shouldReport = this._parseBooleanParam(sourceParams, "report");
+        this.shouldReport = this._parseBooleanParam(sourceParams, "shouldReport");
         this.prefetchResources = this._parseBooleanParam(sourceParams, "prefetchResources");
         this.RAMification = this._parseBooleanParam(sourceParams, "RAMification");
         this.dumpJSONResults = this._parseBooleanParam(sourceParams, "dumpJSONResults");
