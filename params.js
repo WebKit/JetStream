@@ -142,7 +142,7 @@ class Params {
     get nonDefaultParams() {
         const diff = Object.create(null);
         for (const [key, value] of Object.entries(this)) {
-            if (value != DefaultJetStreamParams[key]) {
+            if (value !== DefaultJetStreamParams[key]) {
                 diff[key] = value;
             }
         }
