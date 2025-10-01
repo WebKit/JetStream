@@ -41,6 +41,7 @@ class Params {
 
     RAMification = false;
     dumpJSONResults = false;
+    dumpTestList = false;
     // Override iteration and worst-case counts per workload.
     // Example:
     //   testIterationCountMap = { "acorn-wtb": 5 };
@@ -64,16 +65,17 @@ class Params {
         this.prefetchResources = this._parseBooleanParam(sourceParams, "prefetchResources");
         this.RAMification = this._parseBooleanParam(sourceParams, "RAMification");
         this.dumpJSONResults = this._parseBooleanParam(sourceParams, "dumpJSONResults");
+        this.dumpTestList = this._parseBooleanParam(sourceParams, "dumpTestList");
 
         this.customPreIterationCode = this._parseStringParam(sourceParams, "customPreIterationCode");
         this.customPostIterationCode = this._parseStringParam(sourceParams, "customPostIterationCode");
 
-         this.startDelay = this._parseIntParam(sourceParams, "startDelay", 0);
+        this.startDelay = this._parseIntParam(sourceParams, "startDelay", 0);
         if (this.shouldReport && !this.startDelay)
             this.startDelay = 4000;
 
         for (const paramKey of ["tag", "tags", "test", "tests"])
-          this.testList = this._parseTestListParam(sourceParams, paramKey);
+            this.testList = this._parseTestListParam(sourceParams, paramKey);
 
         this.testIterationCount = this._parseIntParam(sourceParams, "iterationCount", 1);
         this.testWorstCaseCount = this._parseIntParam(sourceParams, "worstCaseCount", 1);
@@ -85,13 +87,13 @@ class Params {
 
     _parseTestListParam(sourceParams, key) {
         if (!sourceParams.has(key))
-          return this.testList;
+            return this.testList;
         let testList = [];
         if (sourceParams?.getAll) {
-          testList = sourceParams?.getAll(key);
+            testList = sourceParams?.getAll(key);
         } else {
-          // fallback for cli sourceParams which is just a Map;
-          testList = sourceParams.get(key).split(",");
+            // fallback for cli sourceParams which is just a Map;
+            testList = sourceParams.get(key).split(",");
         }
         sourceParams.delete(key);
         if (this.testList.length > 0 && testList.length > 0)
