@@ -1772,28 +1772,6 @@ let BENCHMARKS = [
         deterministicRandom: true,
         tags: ["Octane", "typescript"],
     }),
-    new AsyncBenchmark({
-        name: "prismjs-startup",
-        files: [
-            "./startup-helper/StartupBenchmark.js",
-            "./prismjs/benchmark.js",
-        ],
-        preload: {
-            // Use non-minified bundle for better local profiling.
-            // BUNDLE: "./prismjs/dist/bundle.es5.js",
-            BUNDLE: "./prismjs/dist/bundle.es5.min.js",
-            SAMPLE_CPP: "./prismjs/data/sample.cpp",
-            SAMPLE_CSS: "./prismjs/data/sample.css",
-            SAMPLE_HTML: "./prismjs/data/sample.html",
-            SAMPLE_JS: "./prismjs/data/sample.js",
-            SAMPLE_JSON: "./prismjs/data/sample.json",
-            SAMPLE_MD: "./prismjs/data/sample.md",
-            SAMPLE_PY: "./prismjs/data/sample.py",
-            SAMPLE_SQL: "./prismjs/data/sample.sql",
-            SAMPLE_TS: "./prismjs/data/sample.TS",
-        },
-        tags: ["Default", "parser", "regexp", "startup"],
-    }),
     // RexBench
     new DefaultBenchmark({
         name: "FlightPlanner",
@@ -2597,6 +2575,47 @@ let BENCHMARKS = [
     }),
 ];
 
+
+const PRISM_JS_FILES = [
+    "./startup-helper/StartupBenchmark.js",
+    "./prismjs/benchmark.js",
+];
+const PRISM_JS_PRELOADS = {
+    SAMPLE_CPP: "./prismjs/data/sample.cpp",
+    SAMPLE_CSS: "./prismjs/data/sample.css",
+    SAMPLE_HTML: "./prismjs/data/sample.html",
+    SAMPLE_JS: "./prismjs/data/sample.js",
+    SAMPLE_JSON: "./prismjs/data/sample.json",
+    SAMPLE_MD: "./prismjs/data/sample.md",
+    SAMPLE_PY: "./prismjs/data/sample.py",
+    SAMPLE_SQL: "./prismjs/data/sample.sql",
+    SAMPLE_TS: "./prismjs/data/sample.TS",
+};
+const PRISM_JS_TAGS = ["parser", "regexp", "startup", "prismjs"];
+BENCHMARKS.push(
+    new AsyncBenchmark({
+        name: "prismjs-startup-es6",
+        files: PRISM_JS_FILES,
+        preload: {
+            // Use non-minified bundle for better local profiling.
+            // BUNDLE: "./prismjs/dist/bundle.es6.js",
+            BUNDLE: "./prismjs/dist/bundle.es6.min.js",
+            ...PRISM_JS_PRELOADS,
+        },
+        tags: ["Default", ...PRISM_JS_TAGS, "es6"],
+    }),
+    new AsyncBenchmark({
+        name: "prismjs-startup-es5",
+        files: PRISM_JS_FILES,
+        preload: {
+            // Use non-minified bundle for better local profiling.
+            // BUNDLE: "./prismjs/dist/bundle.es5.js",
+            BUNDLE: "./prismjs/dist/bundle.es5.min.js",
+            ...PRISM_JS_PRELOADS,
+        },
+        tags: [...PRISM_JS_TAGS, "es5"],
+    }),
+);
 
 const INTL_TESTS = [
     "DateTimeFormat",

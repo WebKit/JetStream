@@ -30,7 +30,7 @@ class Benchmark extends StartupBenchmark {
   totalHash = 0xdeadbeef;
   samples = [];
 
-  constructor(iterationCount) {
+  constructor({iterationCount}) {
     super({
       iterationCount,
       expectedCacheCommentCount: 71,
