@@ -52,6 +52,10 @@ const CLI_PARAMS = {
     help: "Do not prefetch resources. Will add network overhead to measurements!",
     param: "prefetchResources",
   },
+  "group-details": {
+    help: "Display detailed group items",
+    param: "groupDetails",
+  },
   test: {
     help: "Run a specific test or comma-separated list of tests.",
     param: "test",
@@ -121,7 +125,8 @@ load("./params.js");
 
 async function runJetStream() {
     if (!JetStreamParams.isDefault) {
-        console.warn(`Using non standard params: ${JSON.stringify(JetStreamParams, null, 2)}`)
+        const paramsDiff = JetStreamParams.nonDefaultParams;
+        console.warn(`Using non standard params: ${JSON.stringify(paramsDiff, null, 2)}`)
     }
     try {
         await JetStream.initialize();

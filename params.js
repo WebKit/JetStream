@@ -25,6 +25,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+const defaultEmptyMap = Object.freeze({});
 
 class Params {
     // Enable a detailed developer menu to change the current Params.
@@ -38,10 +39,17 @@ class Params {
     testWorstCaseCount = undefined;
     prefetchResources = true;
 
+    // Display group details.
+    groupDetails = false
+
     RAMification = false;
     dumpJSONResults = false;
-    testIterationCountMap = new Map();
-    testWorstCaseCountMap = new Map();
+    dumpTestList = false;
+    // Override iteration and worst-case counts per workload.
+    // Example:
+    //   testIterationCountMap = { "acorn-wtb": 5 };
+    testIterationCountMap = defaultEmptyMap;
+    testWorstCaseCountMap = defaultEmptyMap;
 
     customPreIterationCode = undefined;
     customPostIterationCode = undefined;
@@ -56,20 +64,22 @@ class Params {
     _copyFromSearchParams(sourceParams) {
         this.startAutomatically = this._parseBooleanParam(sourceParams, "startAutomatically");
         this.developerMode = this._parseBooleanParam(sourceParams, "developerMode");
-        this.shouldReport = this._parseBooleanParam(sourceParams, "report");
+        this.shouldReport = this._parseBooleanParam(sourceParams, "shouldReport");
         this.prefetchResources = this._parseBooleanParam(sourceParams, "prefetchResources");
         this.RAMification = this._parseBooleanParam(sourceParams, "RAMification");
         this.dumpJSONResults = this._parseBooleanParam(sourceParams, "dumpJSONResults");
+        this.groupDetails = this._parseBooleanParam(sourceParams, "groupDetails");
+        this.dumpTestList = this._parseBooleanParam(sourceParams, "dumpTestList");
 
         this.customPreIterationCode = this._parseStringParam(sourceParams, "customPreIterationCode");
         this.customPostIterationCode = this._parseStringParam(sourceParams, "customPostIterationCode");
 
-         this.startDelay = this._parseIntParam(sourceParams, "startDelay", 0);
+        this.startDelay = this._parseIntParam(sourceParams, "startDelay", 0);
         if (this.shouldReport && !this.startDelay)
             this.startDelay = 4000;
 
         for (const paramKey of ["tag", "tags", "test", "tests"])
-          this.testList = this._parseTestListParam(sourceParams, paramKey);
+            this.testList = this._parseTestListParam(sourceParams, paramKey);
 
         this.testIterationCount = this._parseIntParam(sourceParams, "iterationCount", 1);
         this.testWorstCaseCount = this._parseIntParam(sourceParams, "worstCaseCount", 1);
@@ -81,13 +91,13 @@ class Params {
 
     _parseTestListParam(sourceParams, key) {
         if (!sourceParams.has(key))
-          return this.testList;
+            return this.testList;
         let testList = [];
         if (sourceParams?.getAll) {
-          testList = sourceParams?.getAll(key);
+            testList = sourceParams?.getAll(key);
         } else {
-          // fallback for cli sourceParams which is just a Map;
-          testList = sourceParams.get(key).split(",");
+            // fallback for cli sourceParams which is just a Map;
+            testList = sourceParams.get(key).split(",");
         }
         sourceParams.delete(key);
         if (this.testList.length > 0 && testList.length > 0)
@@ -131,6 +141,16 @@ class Params {
 
     get isDefault() {
       return this === DefaultJetStreamParams;
+    }
+
+    get nonDefaultParams() {
+        const diff = Object.create(null);
+        for (const [key, value] of Object.entries(this)) {
+            if (value !== DefaultJetStreamParams[key]) {
+                diff[key] = value;
+            }
+        }
+        return diff;
     }
 }
 

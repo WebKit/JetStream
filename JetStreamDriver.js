@@ -42,8 +42,8 @@ function displayCategoryScores() {
 }
 
 function getIterationCount(plan) {
-    if (JetStreamParams.testIterationCountMap.has(plan.name))
-        return JetStreamParams.testIterationCountMap.get(plan.name);
+    if (plan.name in JetStreamParams.testIterationCountMap)
+        return JetStreamParams.testIterationCountMap[plan.name];
     if (JetStreamParams.testIterationCount)
         return JetStreamParams.testIterationCount;
     if (plan.iterations)
@@ -52,8 +52,8 @@ function getIterationCount(plan) {
 }
 
 function getWorstCaseCount(plan) {
-    if (JetStreamParams.testWorstCaseCountMap.has(plan.name))
-        return JetStreamParams.testWorstCaseCountMap.get(plan.name);
+    if (plan.name in JetStreamParams.testWorstCaseCountMap)
+        return JetStreamParams.testWorstCaseCountMap[plan.name];
     if (JetStreamParams.testWorstCaseCount)
         return JetStreamParams.testWorstCaseCount;
     if (plan.worstCaseCount !== undefined)
@@ -316,40 +316,10 @@ class Driver {
         }
     }
 
-    prepareToRun() {
-        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
-
-        if (!isInBrowser)
-            return;
-
+    prepareBrowserUI() {
         let text = "";
-        for (const benchmark of this.benchmarks) {
-            const scoreDescription = Object.keys(benchmark.allScores());
-            const timeDescription = Object.keys(benchmark.allTimes());
-
-            const scoreIds = benchmark.allScoreIdentifiers();
-            const overallScoreId = scoreIds.pop();
-            const timeIds = benchmark.allTimeIdentifiers();
-
-            text +=
-                `<div class="benchmark" id="benchmark-${benchmark.name}">
-                <h3 class="benchmark-name">${benchmark.name} <a class="info" href="in-depth.html#${benchmark.name}">i</a></h3>
-                <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
-                <h4 class="plot" id="plot-${benchmark.name}">&nbsp;</h4>
-                <p>`;
-            for (let i = 0; i < scoreIds.length; i++) {
-                const scoreId = scoreIds[i];
-                const label = scoreDescription[i];
-                text += `<span class="result score"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`
-            }
-            text += "<br/>";
-            for (let i = 0; i < timeIds.length; i++) {
-                const timeId = timeIds[i];
-                const label = timeDescription[i];
-                text += `<span class="result detail"><span id="${timeId}">&nbsp;</span><label>${label}</label></span>`
-            }
-            text += `</p></div>`;
-        }
+        for (const benchmark of this.benchmarks)
+            text += benchmark.renderHTML();
 
         const timestamp = performance.now();
         document.getElementById('jetstreams').style.backgroundImage = `url('jetstreams.svg?${timestamp}')`;
@@ -390,7 +360,9 @@ class Driver {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
         await this.prefetchResources();
-        this.prepareToRun();
+        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+        if (isInBrowser)
+            this.prepareBrowserUI();
         this.isReady = true;
         if (isInBrowser) {
             globalThis.dispatchEvent(new Event("JetStreamReady"));
@@ -824,6 +796,33 @@ class Benchmark {
         return code;
     }
 
+    renderHTML() {
+        const scoreDescription = Object.keys(this.allScores());
+        const timeDescription = Object.keys(this.allTimes());
+
+        const scoreIds = this.allScoreIdentifiers();
+        const overallScoreId = scoreIds.pop();
+        const timeIds = this.allTimeIdentifiers();
+        let text = `<div class="benchmark" id="benchmark-${this.name}">
+            <h3 class="benchmark-name">${this.name} <a class="info" href="in-depth.html#${this.name}">i</a></h3>
+            <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
+            <h4 class="plot" id="plot-${this.name}">&nbsp;</h4>
+            <p>`;
+        for (let i = 0; i < scoreIds.length; i++) {
+            const scoreId = scoreIds[i];
+            const label = scoreDescription[i];
+            text += `<span class="result"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`;
+        }
+        text += "<br/>";
+        for (let i = 0; i < timeIds.length; i++) {
+            const timeId = timeIds[i];
+            const label = timeDescription[i];
+            text += `<span class="result detail"><span id="${timeId}">&nbsp;</span><label>${label}</label></span>`;
+        }
+        text += `</p></div>`;
+        return text;
+    }
+
     async run() {
         if (this.isDone)
             throw new Error(`Cannot run Benchmark ${this.name} twice`);
@@ -1082,9 +1081,13 @@ class Benchmark {
 
     updateUIBeforeRun() {
         if (!JetStreamParams.dumpJSONResults)
-            console.log(`Running ${this.name}:`);
+            this.updateConsoleBeforeRun();
         if (isInBrowser)
             this.updateUIBeforeRunInBrowser();
+    }
+
+    updateConsoleBeforeRun() {
+        console.log(`Running ${this.name}:`);
     }
 
     updateUIBeforeRunInBrowser() {
@@ -1197,6 +1200,26 @@ class GroupedBenchmark extends Benchmark {
         for (const benchmark of this.benchmarks)
             benchmark.prefetchResourcesForShell();
     }
+    
+    renderHTML() {
+        let text = super.renderHTML();
+        if (JetStreamParams.groupDetails) {
+            for (const benchmark of this.benchmarks)
+                text += benchmark.renderHTML();
+        }
+        return text;
+    }
+
+    updateConsoleBeforeRun() {
+        if (!JetStreamParams.groupDetails)
+            super.updateConsoleBeforeRun();
+    }
+    
+    updateConsoleAfterRun(scoreEntries) {
+        if (JetStreamParams.groupDetails)
+            super.updateConsoleBeforeRun();
+        super.updateConsoleAfterRun(scoreEntries);
+    }
 
     get files() {
         let files = [];
@@ -1213,8 +1236,13 @@ class GroupedBenchmark extends Benchmark {
         let benchmark;
         try {
             this._state = BenchmarkState.RUNNING;
-            for (benchmark of this.benchmarks)
+            for (benchmark of this.benchmarks) {
+                if (JetStreamParams.groupDetails)
+                    benchmark.updateUIBeforeRun();
                 await benchmark.run();
+                if (JetStreamParams.groupDetails)
+                    benchmark.updateUIAfterRun();
+            }
         } catch (e) {
             this._state = BenchmarkState.ERROR;
             console.log(`Error in runCode of grouped benchmark ${benchmark.name}: `, e);
@@ -1939,6 +1967,16 @@ let BENCHMARKS = [
         // FIXME: UniPoker should not access isInBrowser.
         exposeBrowserTest: true,
         tags: ["Default", "RexBench"],
+    }),
+    new DefaultBenchmark({
+        name: "validatorjs",
+        files: [
+            // Use the unminified version for easier local profiling.
+            // "./validatorjs/dist/bundle.es6.js",
+            "./validatorjs/dist/bundle.es6.min.js",
+            "./validatorjs/benchmark.js",
+        ],
+        tags: ["Default", "regexp"],
     }),
     // Simple
     new DefaultBenchmark({
@@ -2701,6 +2739,47 @@ let BENCHMARKS = [
     }),
 ];
 
+
+const PRISM_JS_FILES = [
+    "./startup-helper/StartupBenchmark.js",
+    "./prismjs/benchmark.js",
+];
+const PRISM_JS_PRELOADS = {
+    SAMPLE_CPP: "./prismjs/data/sample.cpp",
+    SAMPLE_CSS: "./prismjs/data/sample.css",
+    SAMPLE_HTML: "./prismjs/data/sample.html",
+    SAMPLE_JS: "./prismjs/data/sample.js",
+    SAMPLE_JSON: "./prismjs/data/sample.json",
+    SAMPLE_MD: "./prismjs/data/sample.md",
+    SAMPLE_PY: "./prismjs/data/sample.py",
+    SAMPLE_SQL: "./prismjs/data/sample.sql",
+    SAMPLE_TS: "./prismjs/data/sample.TS",
+};
+const PRISM_JS_TAGS = ["parser", "regexp", "startup", "prismjs"];
+BENCHMARKS.push(
+    new AsyncBenchmark({
+        name: "prismjs-startup-es6",
+        files: PRISM_JS_FILES,
+        preload: {
+            // Use non-minified bundle for better local profiling.
+            // BUNDLE: "./prismjs/dist/bundle.es6.js",
+            BUNDLE: "./prismjs/dist/bundle.es6.min.js",
+            ...PRISM_JS_PRELOADS,
+        },
+        tags: ["Default", ...PRISM_JS_TAGS, "es6"],
+    }),
+    new AsyncBenchmark({
+        name: "prismjs-startup-es5",
+        files: PRISM_JS_FILES,
+        preload: {
+            // Use non-minified bundle for better local profiling.
+            // BUNDLE: "./prismjs/dist/bundle.es5.js",
+            BUNDLE: "./prismjs/dist/bundle.es5.min.js",
+            ...PRISM_JS_PRELOADS,
+        },
+        tags: [...PRISM_JS_TAGS, "es5"],
+    }),
+);
 
 const INTL_TESTS = [
     "DateTimeFormat",
