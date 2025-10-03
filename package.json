@@ -17,6 +17,7 @@
     "scripts": {
         "server": "node tests/server.mjs",
         "compress": "node utils/compress.mjs",
+        "decompress": "node utils/compress.mjs -d -k",
         "lint:check": "eslint **/*.{js,mjs,jsx,ts,tsx}",
         "pretty:check": "prettier --check ./",
         "format:check": "npm run pretty:check && npm run lint:check",
