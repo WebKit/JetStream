@@ -39,7 +39,15 @@ class Benchmark {
     const loadPromises = Object.entries(preload).map(
       async ([name, url]) => {
         if (name.endsWith(".wasm")) {
-          this.files[name] = (await JetStream.getBinary(url)).buffer;
+          const buffer = (await JetStream.getBinary(url)).buffer;
+          if (!(buffer instanceof ArrayBuffer)) {
+            // The returned array buffer is from a different global when
+            // prefetching resources and running in the shell. This is fine,
+            // except for the source map code doing an instanceof
+            // check that fails for the prototype being in a different realm.
+            Object.setPrototypeOf(buffer, ArrayBuffer.prototype);
+          }
+          this.files[name] = buffer;
         } else {
           this.files[name] = await JetStream.getString(url);
         }

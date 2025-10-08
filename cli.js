@@ -68,7 +68,7 @@ const CLI_PARAMS = {
     help: "Start the benchmark automatically.",
     param: "startAutomatically",
   },
-  report: { help: "Report results to a server.", param: "shouldReport" },
+  report: { help: "Report results to a server.", param: "report" },
   "start-delay": {
     help: "Delay before starting the benchmark.",
     param: "startDelay",

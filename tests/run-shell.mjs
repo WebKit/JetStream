@@ -109,7 +109,7 @@ async function runTests() {
     let success = true;
     success &&= await runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
     success &&= await runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
-    success &&= await runCLITest("Run Tag No Prefetch", shellBinary, "proxy", "--no-prefetch");
+    success &&= await runCLITest("Run Tag No Prefetch", shellBinary, "proxy", "argon2-wasm", "--no-prefetch");
     success &&= await runCLITest("Run Grouped with Details", shellBinary, "SunSpider", "--group-details");
     success &&= await runCLITest("Run Disabled Suite", shellBinary, "disabled");
     success &&= await runCLITest("Run Default Suite",  shellBinary);

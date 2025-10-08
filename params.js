@@ -31,7 +31,7 @@ class Params {
     // Enable a detailed developer menu to change the current Params.
     developerMode = false;
     startAutomatically = false;
-    shouldReport = false;
+    report = false;
     startDelay = undefined;
 
     testList = [];
@@ -64,7 +64,7 @@ class Params {
     _copyFromSearchParams(sourceParams) {
         this.startAutomatically = this._parseBooleanParam(sourceParams, "startAutomatically");
         this.developerMode = this._parseBooleanParam(sourceParams, "developerMode");
-        this.shouldReport = this._parseBooleanParam(sourceParams, "shouldReport");
+        this.report = this._parseBooleanParam(sourceParams, "report");
         this.prefetchResources = this._parseBooleanParam(sourceParams, "prefetchResources");
         this.RAMification = this._parseBooleanParam(sourceParams, "RAMification");
         this.dumpJSONResults = this._parseBooleanParam(sourceParams, "dumpJSONResults");
@@ -75,7 +75,7 @@ class Params {
         this.customPostIterationCode = this._parseStringParam(sourceParams, "customPostIterationCode");
 
         this.startDelay = this._parseIntParam(sourceParams, "startDelay", 0);
-        if (this.shouldReport && !this.startDelay)
+        if (this.report && !this.startDelay)
             this.startDelay = 4000;
 
         for (const paramKey of ["tag", "tags", "test", "tests"])
