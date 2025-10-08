@@ -13,7 +13,7 @@ function parseCommandLineArgs() {
         { name: 'decompress', alias: 'd', type: Boolean, description: 'Decompress files (default: compress).' },
         { name: 'keep', alias: 'k', type: Boolean, description: 'Keep input files after processing (default: delete).' },
         { name: 'help', alias: 'h', type: Boolean, description: 'Print this usage guide.' },
-        { name: 'quiet', alias: 'q', type: Boolean, description: 'Print this usage guide.' },
+        { name: 'quiet', alias: 'q', type: Boolean, description: 'Quite output, only print errors.' },
         { name: 'globs', type: String, multiple: true, defaultOption: true, description: 'Glob patterns of files to process.' },
     ];
     const options = commandLineArgs(optionDefinitions);
