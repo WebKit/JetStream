@@ -93,8 +93,9 @@ function decompress(inputData) {
 async function* globsToFiles(globs) {
     let files = new Set();
     console.assert(globs.length > 0);
+    const globtions =  { nodir: true, ignore: '**/node_modules/**' };
     for (const glob of globs) {
-        for await (const file of globIterate(glob, { nodir: true })) {    
+        for await (const file of globIterate(glob, globtions)) {    
             if (files.has(file))
                 continue;
             files.add(file)
