@@ -1,6 +1,6 @@
 import commandLineArgs from 'command-line-args';
 import commandLineUsage from 'command-line-usage';
-import { globSync } from 'glob';
+import { globSync, globIterate } from 'glob';
 import zlib from 'zlib';
 import fs from 'fs';
 import path from 'path';
@@ -90,26 +90,29 @@ function decompress(inputData) {
     return decompressedData;
 }
 
-function globsToFiles(globs) {
-    let files = [];
+async function* globsToFiles(globs) {
+    let files = new Set();
     console.assert(globs.length > 0);
     for (const glob of globs) {
-        const matches = globSync(glob, { nodir: true });
-        files = files.concat(matches);
+        for await (const file of globIterate(glob, { nodir: true })) {    
+            if (files.has(file))
+                continue;
+            files.add(file)
+            yield file;
+        }
     }
-    files = Array.from(new Set(files)).sort();
-    return files;
 }
 
-function processFiles(files, isDecompress, keep) {
+async function processFiles(filesGenerator, isDecompress, keep) {
     const verb = isDecompress ? 'decompress' : 'compress';
-    log(`Found ${files.length} files to ${verb}` + (files.length ? ':' : '.'));
+    const files = [];
 
     // For printing overall statistics at the end.
     let totalInputSize = 0;
     let totalOutputSize = 0;
 
-    for (const inputFilename of files) {
+    for await (const inputFilename of filesGenerator) {
+        files.push(inputFilename);
         try {
             log(inputFilename);
             let outputFilename;
@@ -147,6 +150,7 @@ function processFiles(files, isDecompress, keep) {
     }
 
     if (files.length > 1) {
+        log(`Found ${files.length} files to ${verb}` + (files.length ? ':' : '.'));
         if (isDecompress) {
             const totalExpansionRatio = calculateExpansionRatio(totalInputSize, totalOutputSize);
             log(`Total compressed sizes:   ${String(totalInputSize).padStart(9)} bytes`);
