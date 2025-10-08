@@ -18,6 +18,7 @@
     "@babel/node": "^7.28.0",
     "@babel/preset-env": "^7.28.0",
     "@babel/preset-react": "^7.27.1",
+    "@dapplets/unicode-escape-webpack-plugin": "^0.1.1",
     "assert": "^2.1.0",
     "babel-loader": "^10.0.0",
     "babel-node": "^0.0.1-security",
