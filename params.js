@@ -94,7 +94,9 @@ class Params {
             return this.testList;
         let testList = [];
         if (sourceParams?.getAll) {
-            testList = sourceParams?.getAll(key);
+            for (const param of sourceParams?.getAll(key)) {
+                testList.push(...param.split(","));
+            }
         } else {
             // fallback for cli sourceParams which is just a Map;
             testList = sourceParams.get(key).split(",");
