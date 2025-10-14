@@ -75,8 +75,12 @@ class Params {
         this.customPostIterationCode = this._parseStringParam(sourceParams, "customPostIterationCode");
 
         this.startDelay = this._parseIntParam(sourceParams, "startDelay", 0);
-        if (this.report && !this.startDelay)
-            this.startDelay = 4000;
+        if (!this.startDelay) {
+            if (this.report)
+                 this.startDelay = 4000;
+            if (this.startAutomatically)
+                 this.startDelay = 100;
+        }
 
         for (const paramKey of ["tag", "tags", "test", "tests"])
             this.testList = this._parseTestListParam(sourceParams, paramKey);
