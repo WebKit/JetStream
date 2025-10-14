@@ -3,36 +3,6 @@
     <style>
         .line {
             mix-blend-mode: multiply;
-            stroke-dasharray: 2680;
-            stroke-dashoffset: 2680;
-            animation: dash 1.1s ease-in forwards;
-            animation-delay: 400ms;
-        }
-
-        .line.second {
-            animation-delay: 500ms;
-            animation-duration: 900ms;
-        }
-
-        .line.third {
-            animation-delay: 600ms;
-            animation-duration: 800ms;
-        }
-
-        .line.fourth {
-            animation-delay: 700ms;
-            animation-duration: 700ms;
-        }
-
-        .line.fifth {
-            animation-delay: 800ms;
-            animation-duration: 600ms;
-        }
-
-        @keyframes dash {
-            to {
-                stroke-dashoffset: 0;
-            }
         }
     </style>
     <g fill="none" fill-rule="evenodd" opacity=".8" stroke-dasharray="2680" stroke-linecap="square" stroke="#B9EAFF" stroke-width="5">

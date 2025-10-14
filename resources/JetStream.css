@@ -60,11 +60,7 @@ body {
     font-size: 1.6rem;
     font-weight: 400;
     line-height: 1.4;
-    background-repeat: no-repeat;
-    background-position: center -5vw;
-    background-size: 100vw;
     padding-bottom: 0px;
-    background-image: url("clouds.svg");
     overflow-y: hidden;
     height: 100%;
 }
@@ -180,8 +176,6 @@ img {
     background-size: contain;
     background-image: url("JetStreamNxLogo.svg");
     color: transparent;
-    animation: swingin 350ms ease-out forwards;
-    will-change: transform, opacity;
     height: 75px;
 }
 
@@ -220,9 +214,6 @@ article,
 .summary {
     max-width: 70rem;
     margin: 0 auto 0 auto;
-    opacity: 0;
-    animation: fadein 0.5s ease-in-out forwards;
-    animation-delay: 200ms;
 }
 
 article {
