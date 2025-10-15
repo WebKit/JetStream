@@ -60,6 +60,11 @@ body {
     font-size: 1.6rem;
     font-weight: 400;
     line-height: 1.4;
+    background-repeat: no-repeat;
+    background-position: center -5vw;
+    background-size: 100vw;
+    padding-bottom: 0px;
+    background-image: url('clouds.svg');
     padding-bottom: 0px;
     overflow-y: hidden;
     height: 100%;
