@@ -35,9 +35,9 @@ class Benchmark extends StartupBenchmark {
     totalHash = 0xdeadbeef;
     currentIteration = 0;
 
-    constructor(iterations) {
+    constructor({iterationCount}) {
         super({
-            iterationCount: iterations,
+            iterationCount,
             expectedCacheCommentCount: 10028,
             sourceCodeReuseCount: 2,
          });
