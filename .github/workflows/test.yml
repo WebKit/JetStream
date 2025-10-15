@@ -39,6 +39,9 @@ jobs:
             - name: Install Node Packages
               run: npm ci
 
+            - name: Decompress compressed files
+              run: npm run decompress
+
             - name: Cache jsvu Binaries 
               uses: actions/cache@v4
               with:

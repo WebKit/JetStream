@@ -30,59 +30,18 @@ const measureTotalTimeAsSubtest = false; // Once we move to preloading all resou
 const defaultIterationCount = 120;
 const defaultWorstCaseCount = 4;
 
-globalThis.performance ??= Date;
-globalThis.RAMification ??= false;
-globalThis.testIterationCount ??= undefined;
-globalThis.testIterationCountMap ??= new Map();
-globalThis.testWorstCaseCount ??= undefined;
-globalThis.testWorstCaseCountMap ??= new Map();
-globalThis.dumpJSONResults ??= false;
-globalThis.testList ??= undefined;
-globalThis.startDelay ??= undefined;
-globalThis.shouldReport ??= false;
-globalThis.prefetchResources ??= true;
+if (!JetStreamParams.prefetchResources)
+    console.warn("Disabling resource prefetching! All compressed files must have been decompressed using `npm run decompress`");
 
-function getIntParam(urlParams, key) {
-    const rawValue = urlParams.get(key);
-    const value = parseInt(rawValue);
-    if (value <= 0)
-        throw new Error(`Expected positive value for ${key}, but got ${rawValue}`);
-    return value;
+if (!isInBrowser && JetStreamParams.prefetchResources) {
+    // Use the wasm compiled zlib as a polyfill when decompression stream is
+    // not available in JS shells.
+    load("./wasm/zlib/shell.js");
+
+    // Load a polyfill for TextEncoder/TextDecoder in shells. Used when
+    // decompressing a prefetched resource and converting it to text.
+    load("./polyfills/fast-text-encoding/1.0.3/text.js");
 }
-
-function getBoolParam(urlParams, key) {
-    const rawValue = urlParams.get(key).toLowerCase()
-    return !(rawValue === "false" || rawValue === "0")
- }
-
-function getTestListParam(urlParams, key) {
-    if (globalThis.testList?.length)
-        throw new Error(`Overriding previous testList=${globalThis.testList.join()} with ${key} url-parameter.`);
-    return urlParams.getAll(key);
-}
-
-if (typeof(URLSearchParams) !== "undefined") {
-    const urlParameters = new URLSearchParams(window.location.search);
-    if (urlParameters.has("report"))
-        globalThis.shouldReport = urlParameters.get("report").toLowerCase() == "true";
-    if (urlParameters.has("startDelay"))
-        globalThis.startDelay = getIntParam(urlParameters, "startDelay");
-    if (globalThis.shouldReport && !globalThis.startDelay)
-        globalThis.startDelay = 4000;
-    if (urlParameters.has("tag"))
-        globalThis.testList = getTestListParam(urlParameters, "tag");
-    if (urlParameters.has("test"))
-        globalThis.testList = getTestListParam(urlParameters, "test");
-    if (urlParameters.has("iterationCount"))
-        globalThis.testIterationCount = getIntParam(urlParameters, "iterationCount");
-    if (urlParameters.has("worstCaseCount"))
-        globalThis.testWorstCaseCount = getIntParam(urlParameters, "worstCaseCount");
-    if (urlParameters.has("prefetchResources"))
-        globalThis.prefetchResources = getBoolParam(urlParameters, "prefetchResources");
-}
-
-if (!globalThis.prefetchResources)
-    console.warn("Disabling resource prefetching!");
 
 // Used for the promise representing the current benchmark run.
 this.currentResolve = null;
@@ -110,21 +69,21 @@ function displayCategoryScores() {
 }
 
 function getIterationCount(plan) {
-    if (testIterationCountMap.has(plan.name))
-        return testIterationCountMap.get(plan.name);
-    if (globalThis.testIterationCount)
-        return globalThis.testIterationCount;
+    if (plan.name in JetStreamParams.testIterationCountMap)
+        return JetStreamParams.testIterationCountMap[plan.name];
+    if (JetStreamParams.testIterationCount)
+        return JetStreamParams.testIterationCount;
     if (plan.iterations)
         return plan.iterations;
     return defaultIterationCount;
 }
 
 function getWorstCaseCount(plan) {
-    if (testWorstCaseCountMap.has(plan.name))
-        return testWorstCaseCountMap.get(plan.name);
-    if (globalThis.testWorstCaseCount)
-        return globalThis.testWorstCaseCount;
-    if (plan.worstCaseCount)
+    if (plan.name in JetStreamParams.testWorstCaseCountMap)
+        return JetStreamParams.testWorstCaseCountMap[plan.name];
+    if (JetStreamParams.testWorstCaseCount)
+        return JetStreamParams.testWorstCaseCount;
+    if (plan.worstCaseCount !== undefined)
         return plan.worstCaseCount;
     return defaultWorstCaseCount;
 }
@@ -189,6 +148,20 @@ function uiFriendlyDuration(time) {
     return `${time.toFixed(3)} ms`;
 }
 
+// Files can be zlib compressed to reduce the size of the JetStream source code.
+// We don't use http compression because we support running from the shell and
+// don't want to require a complicated server setup.
+//
+// zlib was chosen because we already have it in tree for the wasm-zlib test.
+function isCompressed(name) {
+    return name.endsWith(".z");
+}
+
+function uncompressedName(name) {
+    console.assert(isCompressed(name));
+    return name.slice(0, -2);
+}
+
 // TODO: Cleanup / remove / merge. This is only used for caching loads in the
 // non-browser setting. In the browser we use exclusively `loadCache`, 
 // `loadBlob`, `doLoadBlob`, `prefetchResourcesForBrowser` etc., see below.
@@ -201,14 +174,28 @@ class ShellFileLoader {
     // share common code.
     load(url) {
         console.assert(!isInBrowser);
-        if (!globalThis.prefetchResources)
+
+        let compressed = isCompressed(url);
+        if (compressed && !JetStreamParams.prefetchResources) {
+            url = uncompressedName(url);
+        }
+
+        // If we aren't supposed to prefetch this then return code snippet that will load the url on-demand.
+        if (!JetStreamParams.prefetchResources)
             return `load("${url}");`
 
         if (this.requests.has(url)) {
             return this.requests.get(url);
         }
 
-        const contents = readFile(url);
+        let contents;
+        if (compressed) {
+            const compressedBytes = new Int8Array(read(url, "binary"));
+            const decompressedBytes = zlib.decompress(compressedBytes);
+            contents = new TextDecoder().decode(decompressedBytes);
+        } else {
+            contents = readFile(url);
+        }
         this.requests.set(url, contents);
         return contents;
     }
@@ -240,7 +227,7 @@ class Driver {
         if (isInBrowser) {
             statusElement = document.getElementById("status");
             statusElement.innerHTML = `<label>Running...</label>`;
-        } else if (!dumpJSONResults)
+        } else if (!JetStreamParams.dumpJSONResults)
             console.log("Starting JetStream3");
 
         performance.mark("update-ui-start");
@@ -260,10 +247,14 @@ class Driver {
             performance.mark("update-ui");
             benchmark.updateUIAfterRun();
 
-            if (isInBrowser && globalThis.prefetchResources) {
+            if (isInBrowser) {
                 const cache = JetStream.blobDataCache;
                 for (const file of benchmark.files) {
                     const blobData = cache[file];
+                    // If we didn't prefetch this resource, then no need to free it
+                    if (!blobData.blob) {
+                        continue
+                    }
                     blobData.refCount--;
                     if (!blobData.refCount)
                         cache[file] = undefined;
@@ -276,7 +267,7 @@ class Driver {
         if (measureTotalTimeAsSubtest) {
             if (isInBrowser)
                 document.getElementById("benchmark-total-time-score").innerHTML = uiFriendlyNumber(totalTime);
-            else if (!dumpJSONResults)
+            else if (!JetStreamParams.dumpJSONResults)
                 console.log("Total time:", uiFriendlyNumber(totalTime));
             allScores.push(totalTime);
         }
@@ -314,7 +305,7 @@ class Driver {
             if (showScoreDetails)
                 displayCategoryScores();
             statusElement.innerHTML = "";
-        } else if (!dumpJSONResults) {
+        } else if (!JetStreamParams.dumpJSONResults) {
             console.log("\n");
             for (let [category, scores] of categoryScores)
                 console.log(`${category}: ${uiFriendlyScore(geomeanScore(scores))}`);
@@ -332,35 +323,10 @@ class Driver {
         }
     }
 
-    prepareToRun() {
-        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
-
+    prepareBrowserUI() {
         let text = "";
-        for (const benchmark of this.benchmarks) {
-            const description = Object.keys(benchmark.subScores());
-            description.push("Score");
-
-            const scoreIds = benchmark.scoreIdentifiers();
-            const overallScoreId = scoreIds.pop();
-
-            if (isInBrowser) {
-                text +=
-                    `<div class="benchmark" id="benchmark-${benchmark.name}">
-                    <h3 class="benchmark-name">${benchmark.name} <a class="info" href="in-depth.html#${benchmark.name}">i</a></h3>
-                    <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
-                    <h4 class="plot" id="plot-${benchmark.name}">&nbsp;</h4>
-                    <p>`;
-                for (let i = 0; i < scoreIds.length; i++) {
-                    const scoreId = scoreIds[i];
-                    const label = description[i];
-                    text += `<span class="result"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`
-                }
-                text += `</p></div>`;
-            }
-        }
-
-        if (!isInBrowser)
-            return;
+        for (const benchmark of this.benchmarks)
+            text += benchmark.renderHTML();
 
         const timestamp = performance.now();
         document.getElementById('jetstreams').style.backgroundImage = `url('jetstreams.svg?${timestamp}')`;
@@ -400,18 +366,23 @@ class Driver {
         if (isInBrowser)
             window.addEventListener("error", (e) => this.pushError("driver startup", e.error));
         await this.prefetchResources();
-        this.prepareToRun();
+        this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
+        if (isInBrowser)
+            this.prepareBrowserUI();
         this.isReady = true;
         if (isInBrowser) {
             globalThis.dispatchEvent(new Event("JetStreamReady"));
-            if (typeof(globalThis.startDelay) !== "undefined") {
-                setTimeout(() => this.start(), globalThis.startDelay);
+            if (typeof(JetStreamParams.startDelay) !== "undefined") {
+                setTimeout(() => this.start(), JetStreamParams.startDelay);
             }
         }
     }
 
     async prefetchResources() {
         if (!isInBrowser) {
+            if (JetStreamParams.prefetchResources) {
+                await zlib.initialize();
+            }
             for (const benchmark of this.benchmarks)
                 benchmark.prefetchResourcesForShell();
             return;
@@ -510,7 +481,7 @@ class Driver {
 
     dumpJSONResultsIfNeeded()
     {
-        if (dumpJSONResults) {
+        if (JetStreamParams.dumpJSONResults) {
             console.log("\n");
             console.log(this.resultsJSON());
             console.log("\n");
@@ -529,7 +500,7 @@ class Driver {
         if (!isInBrowser)
             return;
 
-        if (!globalThis.shouldReport)
+        if (!JetStreamParams.report)
             return;
 
         const content = this.resultsJSON();
@@ -576,6 +547,7 @@ class Scripts {
         this.add(`
             performance.mark ??= function(name) { return { name }};
             performance.measure ??= function() {};
+            performance.timeOrigin ??= performance.now();
         `);
     }
 
@@ -626,6 +598,11 @@ class Scripts {
 }
 
 class ShellScripts extends Scripts {
+    constructor() {
+        super();
+        this.prefetchedResources = Object.create(null);;
+    }
+
     run() {
         let globalObject;
         let realm;
@@ -652,11 +629,30 @@ class ShellScripts extends Scripts {
             currentReject
         };
 
+        // Pass the prefetched resources to the benchmark global.
+        if (JetStreamParams.prefetchResources) {
+            // Pass the 'TextDecoder' polyfill into the benchmark global. Don't
+            // use 'TextDecoder' as that will get picked up in the kotlin test
+            // without full support.
+            globalObject.ShellTextDecoder = TextDecoder;
+            // Store shellPrefetchedResources on ShellPrefetchedResources so that
+            // getBinary and getString can find them.
+            globalObject.ShellPrefetchedResources = this.prefetchedResources;
+        } else {
+            console.assert(Object.values(this.prefetchedResources).length === 0, "Unexpected prefetched resources");
+        }
+
         globalObject.performance ??= performance;
         for (const script of this.scripts)
             globalObject.loadString(script);
 
         return isD8 ? realm : globalObject;
+    }
+
+    addPrefetchedResources(prefetchedResources) {
+        for (let [file, bytes] of Object.entries(prefetchedResources)) {
+            this.prefetchedResources[file] = bytes;
+        }
     }
 
     add(text) {
@@ -691,7 +687,6 @@ class BrowserScripts extends Scripts {
         return magicFrame;
     }
 
-
     add(text) {
         this.scripts.push(`<script>${text}</script>`);
     }
@@ -711,6 +706,7 @@ class Benchmark {
         this.allowUtf16 = !!plan.allowUtf16;
         this.scripts = null;
         this.preloads = null;
+        this.shellPrefetchedResources = null;
         this.results = [];
         this._state = BenchmarkState.READY;
     }
@@ -798,8 +794,8 @@ class Benchmark {
         if (this.plan.deterministicRandom)
             code += `Math.random.__resetSeed();`;
 
-        if (globalThis.customPreIterationCode)
-            code += customPreIterationCode;
+        if (JetStreamParams.customPreIterationCode)
+            code += JetStreamParams.customPreIterationCode;
 
         return code;
     }
@@ -807,10 +803,30 @@ class Benchmark {
     get postIterationCode() {
         let code = "";
 
-        if (globalThis.customPostIterationCode)
-            code += customPostIterationCode;
+        if (JetStreamParams.customPostIterationCode)
+            code += JetStreamParams.customPostIterationCode;
 
         return code;
+    }
+
+    renderHTML() {
+        const description = Object.keys(this.subScores());
+        description.push("Score");
+
+        const scoreIds = this.scoreIdentifiers();
+        const overallScoreId = scoreIds.pop();
+        let text = `<div class="benchmark" id="benchmark-${this.name}">
+            <h3 class="benchmark-name">${this.name} <a class="info" href="in-depth.html#${this.name}">i</a></h3>
+            <h4 class="score" id="${overallScoreId}">&nbsp;</h4>
+            <h4 class="plot" id="plot-${this.name}">&nbsp;</h4>
+            <p>`;
+        for (let i = 0; i < scoreIds.length; i++) {
+            const scoreId = scoreIds[i];
+            const label = description[i];
+            text += `<span class="result"><span id="${scoreId}">&nbsp;</span><label>${label}</label></span>`
+        }
+        text += `</p></div>`;
+        return text;
     }
 
     async run() {
@@ -824,6 +840,9 @@ class Benchmark {
         if (!!this.plan.exposeBrowserTest)
             scripts.addBrowserTest();
 
+        if (this.shellPrefetchedResources) {
+            scripts.addPrefetchedResources(this.shellPrefetchedResources);
+        }
         if (this.plan.preload) {
             let preloadCode = "";
             for (let [ variableName, blobURLOrPath ] of this.preloads)
@@ -842,7 +861,7 @@ class Benchmark {
         } else {
             const cache = JetStream.blobDataCache;
             for (const file of this.plan.files) {
-                scripts.addWithURL(globalThis.prefetchResources ? cache[file].blobURL : file);
+                scripts.addWithURL(cache[file].blobURL);
             }
         }
 
@@ -856,7 +875,7 @@ class Benchmark {
         performance.mark(this.name);
         this.startTime = performance.now();
 
-        if (RAMification)
+        if (JetStreamParams.RAMification)
             resetMemoryPeak();
 
         let magicFrame;
@@ -876,7 +895,7 @@ class Benchmark {
         this.endTime = performance.now();
         performance.measure(this.name, this.name);
 
-        if (RAMification) {
+        if (JetStreamParams.RAMification) {
             const memoryFootprint = MemoryFootprint();
             this.currentFootprint = memoryFootprint.current;
             this.peakFootprint = memoryFootprint.peak;
@@ -893,10 +912,19 @@ class Benchmark {
 
     async doLoadBlob(resource) {
         const blobData = JetStream.blobDataCache[resource];
-        if (!globalThis.prefetchResources) {
+
+        const compressed = isCompressed(resource);
+        if (compressed && !JetStreamParams.prefetchResources) {
+            resource = uncompressedName(resource);
+        }
+
+        // If we aren't supposed to prefetch this then set the blobURL to just
+        // be the resource URL.
+        if (!JetStreamParams.prefetchResources) {
             blobData.blobURL = resource;
             return blobData;
         }
+
         let response;
         let tries = 3;
         while (tries--) {
@@ -912,7 +940,15 @@ class Benchmark {
                 continue;
             throw new Error("Fetch failed");
         }
-        const blob = await response.blob();
+
+        // If we need to decompress this, then run it through a decompression
+        // stream.
+        if (compressed) {
+            const stream = response.body.pipeThrough(new DecompressionStream("deflate"))
+            response = new Response(stream);
+        }
+
+        let blob = await response.blob();
         blobData.blob = blob;
         blobData.blobURL = URL.createObjectURL(blob);
         return blobData;
@@ -1048,7 +1084,27 @@ class Benchmark {
         this.scripts = this.plan.files.map(file => shellFileLoader.load(file));
 
         console.assert(this.preloads === null, "This initialization should be called only once.");
-        this.preloads = Object.entries(this.plan.preload ?? {});
+        this.preloads = [];
+        this.shellPrefetchedResources = Object.create(null);
+        if (!this.plan.preload) {
+            return;
+        }
+        for (let [name, file] of Object.entries(this.plan.preload)) {
+            const compressed = isCompressed(file);
+            if (compressed && !JetStreamParams.prefetchResources) {
+                file = uncompressedName(file);
+            }
+
+            if (JetStreamParams.prefetchResources) {
+                let bytes = new Int8Array(read(file, "binary"));
+                if (compressed) {
+                    bytes = zlib.decompress(bytes);
+                }
+                this.shellPrefetchedResources[file] = bytes;
+            }
+
+            this.preloads.push([name, file]);
+        }
     }
 
     scoreIdentifiers() {
@@ -1061,10 +1117,14 @@ class Benchmark {
     }
 
     updateUIBeforeRun() {
-        if (!dumpJSONResults)
-            console.log(`Running ${this.name}:`);
+        if (!JetStreamParams.dumpJSONResults)
+            this.updateConsoleBeforeRun();
         if (isInBrowser)
             this.updateUIBeforeRunInBrowser();
+    }
+
+    updateConsoleBeforeRun() {
+        console.log(`Running ${this.name}:`);
     }
 
     updateUIBeforeRunInBrowser() {
@@ -1080,7 +1140,7 @@ class Benchmark {
         const scoreEntries = Object.entries(this.allScores());
         if (isInBrowser)
             this.updateUIAfterRunInBrowser(scoreEntries);
-        if (dumpJSONResults)
+        if (JetStreamParams.dumpJSONResults)
             return;
         this.updateConsoleAfterRun(scoreEntries);
     }
@@ -1125,25 +1185,14 @@ class Benchmark {
     }
 
     updateConsoleAfterRun(scoreEntries) {
-        // FIXME: consider removing this mapping.
-        // Rename for backwards compatibility.
-        const legacyScoreNameMap = {
-            __proto__: null,
-            "First": "Startup",
-            "Worst": "Worst Case",
-            "MainRun": "Tests",
-            "Runtime": "Run time",
-        };
         for (let [name, value] of scoreEntries) {
-            if (name in legacyScoreNameMap)
-                name = legacyScoreNameMap[name];
              console.log(`    ${name}:`, uiFriendlyScore(value));
         }
-        if (RAMification) {
+        if (JetStreamParams.RAMification) {
             console.log("    Current Footprint:", uiFriendlyNumber(this.currentFootprint));
             console.log("    Peak Footprint:", uiFriendlyNumber(this.peakFootprint));
         }
-        console.log("    Wall time:", uiFriendlyDuration(this.endTime - this.startTime));
+        console.log("    Wall-Time:", uiFriendlyDuration(this.endTime - this.startTime));
     }
 };
 
@@ -1173,6 +1222,26 @@ class GroupedBenchmark extends Benchmark {
         for (const benchmark of this.benchmarks)
             benchmark.prefetchResourcesForShell();
     }
+    
+    renderHTML() {
+        let text = super.renderHTML();
+        if (JetStreamParams.groupDetails) {
+            for (const benchmark of this.benchmarks)
+                text += benchmark.renderHTML();
+        }
+        return text;
+    }
+
+    updateConsoleBeforeRun() {
+        if (!JetStreamParams.groupDetails)
+            super.updateConsoleBeforeRun();
+    }
+    
+    updateConsoleAfterRun(scoreEntries) {
+        if (JetStreamParams.groupDetails)
+            super.updateConsoleBeforeRun();
+        super.updateConsoleAfterRun(scoreEntries);
+    }
 
     get files() {
         let files = [];
@@ -1189,8 +1258,13 @@ class GroupedBenchmark extends Benchmark {
         let benchmark;
         try {
             this._state = BenchmarkState.RUNNING;
-            for (benchmark of this.benchmarks)
+            for (benchmark of this.benchmarks) {
+                if (JetStreamParams.groupDetails)
+                    benchmark.updateUIBeforeRun();
                 await benchmark.run();
+                if (JetStreamParams.groupDetails)
+                    benchmark.updateUIAfterRun();
+            }
         } catch (e) {
             this._state = BenchmarkState.ERROR;
             console.log(`Error in runCode of grouped benchmark ${benchmark.name}: `, e);
@@ -1241,8 +1315,9 @@ class DefaultBenchmark extends Benchmark {
         this.worstScore = null;
         this.averageTime = null;
         this.averageScore = null;
-
-        console.assert(this.iterations > this.worstCaseCount);
+        if (this.worstCaseCount)
+            console.assert(this.iterations > this.worstCaseCount);
+        console.assert(this.worstCaseCount >= 0);
     }
 
     processResults(results) {
@@ -1256,21 +1331,24 @@ class DefaultBenchmark extends Benchmark {
         for (let i = 0; i + 1 < results.length; ++i)
             console.assert(results[i] >= results[i + 1]);
 
-        const worstCase = [];
-        for (let i = 0; i < this.worstCaseCount; ++i)
-            worstCase.push(results[i]);
-        this.worstTime = mean(worstCase);
-        this.worstScore = toScore(this.worstTime);
+        if (this.worstCaseCount) {
+            const worstCase = [];
+            for (let i = 0; i < this.worstCaseCount; ++i)
+                worstCase.push(results[i]);
+            this.worstTime = mean(worstCase);
+            this.worstScore = toScore(this.worstTime);
+        }
         this.averageTime = mean(results);
         this.averageScore = toScore(this.averageTime);
     }
 
     subScores() {
-        return {
-            "First": this.firstIterationScore,
-            "Worst": this.worstScore,
-            "Average": this.averageScore,
-        };
+        const scores = { "First": this.firstIterationScore }
+        if (this.worstCaseCount)
+            scores["Worst"] = this.worstScore;
+        if (this.iterations > 1)
+            scores["Average"] = this.averageScore;
+        return scores;
     }
 }
 
@@ -1299,15 +1377,23 @@ class AsyncBenchmark extends DefaultBenchmark {
         } else {
             str += `
                 JetStream.getBinary = async function(path) {
+                    if ("ShellPrefetchedResources" in globalThis) {
+                        return ShellPrefetchedResources[path];
+                    }
                     return new Int8Array(read(path, "binary"));
                 };
 
                 JetStream.getString = async function(path) {
+                    if ("ShellPrefetchedResources" in globalThis) {
+                        return new ShellTextDecoder().decode(ShellPrefetchedResources[path]);
+                    }
                     return read(path);
                 };
 
                 JetStream.dynamicImport = async function(path) {
                     try {
+                        // TODO: this skips the prefetched resources, but I'm
+                        // not sure of a way around that.
                         return await import(path);
                     } catch (e) {
                         // In shells, relative imports require different paths, so try with and
@@ -1323,7 +1409,7 @@ class AsyncBenchmark extends DefaultBenchmark {
     get runnerCode() {
         return `
         async function doRun() {
-            const benchmark = new Benchmark(${this.iterations});
+            const benchmark = new Benchmark(${JSON.stringify(this.benchmarkArguments)});
             await benchmark.init?.();
             const results = [];
             const benchmarkName = "${this.name}";
@@ -1524,7 +1610,11 @@ class WasmLegacyBenchmark extends Benchmark {
             `;
         } else {
             str += `
-            Module[key] = new Int8Array(read(path, "binary"));
+            if (ShellPrefetchedResources) {
+                Module[key] = ShellPrefetchedResources[path];
+            } else {
+                Module[key] = new Int8Array(read(path, "binary"));
+            }
             if (andThen == doRun) {
                 globalObject.read = (...args) => {
                     console.log("should not be inside read: ", ...args);
@@ -1818,7 +1908,7 @@ let BENCHMARKS = [
         tags: ["Default", "Octane"],
     }),
     new DefaultBenchmark({
-        name: "typescript",
+        name: "typescript-octane",
         files: [
             "./Octane/typescript-compiler.js",
             "./Octane/typescript-input.js",
@@ -1827,14 +1917,14 @@ let BENCHMARKS = [
         iterations: 15,
         worstCaseCount: 2,
         deterministicRandom: true,
-        tags: ["Default", "Octane"],
+        tags: ["Octane", "typescript"],
     }),
     // RexBench
     new DefaultBenchmark({
         name: "FlightPlanner",
         files: [
             "./RexBench/FlightPlanner/airways.js",
-            "./RexBench/FlightPlanner/waypoints.js",
+            "./RexBench/FlightPlanner/waypoints.js.z",
             "./RexBench/FlightPlanner/flight_planner.js",
             "./RexBench/FlightPlanner/expectations.js",
             "./RexBench/FlightPlanner/benchmark.js",
@@ -1870,6 +1960,16 @@ let BENCHMARKS = [
         // FIXME: UniPoker should not access isInBrowser.
         exposeBrowserTest: true,
         tags: ["Default", "RexBench"],
+    }),
+    new DefaultBenchmark({
+        name: "validatorjs",
+        files: [
+            // Use the unminified version for easier local profiling.
+            // "./validatorjs/dist/bundle.es6.js",
+            "./validatorjs/dist/bundle.es6.min.js",
+            "./validatorjs/benchmark.js",
+        ],
+        tags: ["Default", "regexp"],
     }),
     // Simple
     new DefaultBenchmark({
@@ -1935,7 +2035,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "json-stringify-inspector",
         files: [
-            "./SeaMonster/inspector-json-payload.js",
+            "./SeaMonster/inspector-json-payload.js.z",
             "./SeaMonster/json-stringify-inspector.js",
         ],
         iterations: 20,
@@ -1945,7 +2045,7 @@ let BENCHMARKS = [
     new DefaultBenchmark({
         name: "json-parse-inspector",
         files: [
-            "./SeaMonster/inspector-json-payload.js",
+            "./SeaMonster/inspector-json-payload.js.z",
             "./SeaMonster/json-parse-inspector.js",
         ],
         iterations: 20,
@@ -2046,6 +2146,19 @@ let BENCHMARKS = [
         iterations: 10,
         worstCaseCount: 4,
     }),
+    new AsyncBenchmark({
+        name: "web-ssr",
+        files: [
+            "./web-ssr/benchmark.js",
+        ],
+        preload: {
+            // Debug Sources for nicer profiling.
+            // BUNDLE_BLOB: "./web-ssr/dist/bundle.js",
+            BUNDLE_BLOB: "./web-ssr/dist/bundle.min.js",
+        },
+        tags: ["Default", "web", "ssr"],
+        iterations: 30,
+    }),
     // Class fields
     new DefaultBenchmark({
         name: "raytrace-public-class-fields",
@@ -2060,6 +2173,24 @@ let BENCHMARKS = [
             "./class-fields/raytrace-private-class-fields.js",
         ],
         tags: ["Default", "ClassFields"],
+    }),
+    new AsyncBenchmark({
+        name: "typescript-lib",
+        files: [
+            "./TypeScript/src/mock/sys.js",
+            "./TypeScript/dist/bundle.js",
+            "./TypeScript/benchmark.js",
+        ],
+        preload: {
+            // Large test project:
+            // "tsconfig": "./TypeScript/src/gen/zod-medium/tsconfig.json",
+            // "files": "./TypeScript/src/gen/zod-medium/files.json",
+            "tsconfig": "./TypeScript/src/gen/immer-tiny/tsconfig.json",
+            "files": "./TypeScript/src/gen/immer-tiny/files.json",
+        },
+        iterations: 1,
+        worstCaseCount: 0,
+        tags: ["Default", "typescript"],
     }),
     // Generators
     new AsyncBenchmark({
@@ -2121,18 +2252,6 @@ let BENCHMARKS = [
         tags: ["Wasm"],
     }),
     new WasmEMCCBenchmark({
-        name: "tsf-wasm",
-        files: [
-            "./wasm/TSF/build/tsf.js",
-            "./wasm/TSF/benchmark.js",
-        ],
-        preload: {
-            wasmBinary: "./wasm/TSF/build/tsf.wasm",
-        },
-        iterations: 50,
-        tags: ["Default", "Wasm"],
-    }),
-    new WasmEMCCBenchmark({
         name: "quicksort-wasm",
         files: [
             "./wasm/quicksort/build/quicksort.js",
@@ -2142,7 +2261,9 @@ let BENCHMARKS = [
             wasmBinary: "./wasm/quicksort/build/quicksort.wasm",
         },
         iterations: 50,
-        tags: ["Default", "Wasm"],
+        // No longer run by-default: We have more realistic Wasm workloads by
+        // now, and it was a small microbenchmark.
+        tags: ["Wasm"],
     }),
     new WasmEMCCBenchmark({
         name: "gcc-loops-wasm",
@@ -2152,6 +2273,20 @@ let BENCHMARKS = [
         ],
         preload: {
             wasmBinary: "./wasm/gcc-loops/build/gcc-loops.wasm",
+        },
+        iterations: 50,
+        // No longer run by-default: We have more realistic Wasm workloads by
+        // now, and it was a small microbenchmark.
+        tags: ["Wasm"],
+    }),
+    new WasmEMCCBenchmark({
+        name: "tsf-wasm",
+        files: [
+            "./wasm/TSF/build/tsf.js",
+            "./wasm/TSF/benchmark.js",
+        ],
+        preload: {
+            wasmBinary: "./wasm/TSF/build/tsf.wasm",
         },
         iterations: 50,
         tags: ["Default", "Wasm"],
@@ -2171,6 +2306,7 @@ let BENCHMARKS = [
     new WasmEMCCBenchmark({
         name: "sqlite3-wasm",
         files: [
+            "./polyfills/fast-text-encoding/1.0.3/text.js",
             "./sqlite3/benchmark.js",
             "./sqlite3/build/jswasm/speedtest1.js",
         ],
@@ -2232,6 +2368,56 @@ let BENCHMARKS = [
         worstCaseCount: 2,
         tags: ["Default", "Wasm"],
     }),
+    new AsyncBenchmark({
+        name: "transformersjs-bert-wasm",
+        files: [
+            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./transformersjs/benchmark.js",
+            "./transformersjs/task-bert.js",
+        ],
+        preload: {
+            transformersJsModule: "./transformersjs/build/transformers.js",
+            
+            onnxJsModule: "./transformersjs/build/onnxruntime-web/ort-wasm-simd-threaded.mjs",
+            onnxWasmBinary: "./transformersjs/build/onnxruntime-web/ort-wasm-simd-threaded.wasm",
+
+            modelWeights: "./transformersjs/build/models/Xenova/distilbert-base-uncased-finetuned-sst-2-english/onnx/model_uint8.onnx",
+            modelConfig: "./transformersjs/build/models/Xenova/distilbert-base-uncased-finetuned-sst-2-english/config.json",
+            modelTokenizer: "./transformersjs/build/models/Xenova/distilbert-base-uncased-finetuned-sst-2-english/tokenizer.json",
+            modelTokenizerConfig: "./transformersjs/build/models/Xenova/distilbert-base-uncased-finetuned-sst-2-english/tokenizer_config.json",
+        },
+        iterations: 30,
+        allowUtf16: true,
+        tags: ["Default", "Wasm", "transformersjs"],
+    }),
+    new AsyncBenchmark({
+        name: "transformersjs-whisper-wasm",
+        files: [
+            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./transformersjs/benchmark.js",
+            "./transformersjs/task-whisper.js",
+        ],
+        preload: {
+            transformersJsModule: "./transformersjs/build/transformers.js",
+            
+            onnxJsModule: "./transformersjs/build/onnxruntime-web/ort-wasm-simd-threaded.mjs",
+            onnxWasmBinary: "./transformersjs/build/onnxruntime-web/ort-wasm-simd-threaded.wasm",
+
+            modelEncoderWeights: "./transformersjs/build/models/Xenova/whisper-tiny.en/onnx/encoder_model_quantized.onnx",
+            modelDecoderWeights: "./transformersjs/build/models/Xenova/whisper-tiny.en/onnx/decoder_model_merged_quantized.onnx",
+            modelConfig: "./transformersjs/build/models/Xenova/whisper-tiny.en/config.json",
+            modelTokenizer: "./transformersjs/build/models/Xenova/whisper-tiny.en/tokenizer.json",
+            modelTokenizerConfig: "./transformersjs/build/models/Xenova/whisper-tiny.en/tokenizer_config.json",
+            modelPreprocessorConfig: "./transformersjs/build/models/Xenova/whisper-tiny.en/preprocessor_config.json",
+            modelGenerationConfig: "./transformersjs/build/models/Xenova/whisper-tiny.en/generation_config.json",
+
+            inputFile: "./transformersjs/build/inputs/jfk.raw",
+        },
+        iterations: 5,
+        worstCaseCount: 1,
+        allowUtf16: true,
+        tags: ["Default", "Wasm", "transformersjs"],
+    }),
     new WasmLegacyBenchmark({
         name: "tfjs-wasm",
         files: [
@@ -2283,7 +2469,7 @@ let BENCHMARKS = [
             "./wasm/argon2/benchmark.js",
         ],
         preload: {
-            wasmBinary: "./wasm/argon2/build/argon2.wasm",
+            wasmBinary: "./wasm/argon2/build/argon2.wasm.z",
         },
         iterations: 30,
         worstCaseCount: 3,
@@ -2500,7 +2686,7 @@ let BENCHMARKS = [
     new WasmEMCCBenchmark({
         name: "8bitbench-wasm",
         files: [
-            "./8bitbench/build/lib/fast-text-encoding-1.0.3/text.js",
+            "./polyfills/fast-text-encoding/1.0.3/text.js",
             "./8bitbench/build/rust/pkg/emu_bench.js",
             "./8bitbench/benchmark.js",
         ],
@@ -2548,7 +2734,92 @@ let BENCHMARKS = [
         worstCaseCount: 2,
         tags: ["Default", "Wasm", "dotnet"],
     }),
+    // J2CL
+    new AsyncBenchmark({
+        name: "j2cl-box2d-wasm",
+        files: [
+            "./wasm/j2cl-box2d/benchmark.js",
+            "./wasm/j2cl-box2d/build/Box2dBenchmark_j2wasm_entry.js",
+        ],
+        preload: {
+            wasmBinary: "./wasm/j2cl-box2d/build/Box2dBenchmark_j2wasm_binary.wasm",
+        },
+        iterations: 40,
+        tags: ["Default", "Wasm"],
+    }),
 ];
+
+
+const PRISM_JS_FILES = [
+    "./startup-helper/StartupBenchmark.js",
+    "./prismjs/benchmark.js",
+];
+const PRISM_JS_PRELOADS = {
+    SAMPLE_CPP: "./prismjs/data/sample.cpp",
+    SAMPLE_CSS: "./prismjs/data/sample.css",
+    SAMPLE_HTML: "./prismjs/data/sample.html",
+    SAMPLE_JS: "./prismjs/data/sample.js",
+    SAMPLE_JSON: "./prismjs/data/sample.json",
+    SAMPLE_MD: "./prismjs/data/sample.md",
+    SAMPLE_PY: "./prismjs/data/sample.py",
+    SAMPLE_SQL: "./prismjs/data/sample.sql",
+    SAMPLE_TS: "./prismjs/data/sample.TS",
+};
+const PRISM_JS_TAGS = ["parser", "regexp", "startup", "prismjs"];
+BENCHMARKS.push(
+    new AsyncBenchmark({
+        name: "prismjs-startup-es6",
+        files: PRISM_JS_FILES,
+        preload: {
+            // Use non-minified bundle for better local profiling.
+            // BUNDLE: "./prismjs/dist/bundle.es6.js",
+            BUNDLE: "./prismjs/dist/bundle.es6.min.js",
+            ...PRISM_JS_PRELOADS,
+        },
+        tags: ["Default", ...PRISM_JS_TAGS, "es6"],
+    }),
+    new AsyncBenchmark({
+        name: "prismjs-startup-es5",
+        files: PRISM_JS_FILES,
+        preload: {
+            // Use non-minified bundle for better local profiling.
+            // BUNDLE: "./prismjs/dist/bundle.es5.js",
+            BUNDLE: "./prismjs/dist/bundle.es5.min.js",
+            ...PRISM_JS_PRELOADS,
+        },
+        tags: [...PRISM_JS_TAGS, "es5"],
+    }),
+);
+
+const INTL_TESTS = [
+    "DateTimeFormat",
+    "ListFormat",
+    "RelativeTimeFormat",
+    "NumberFormat",
+    "PluralRules",
+];
+const INTL_BENCHMARKS = [];
+for (const test of INTL_TESTS) {
+    const benchmark = new AsyncBenchmark({
+        name: `${test}-intl`,
+        files: [
+            "./intl/src/helper.js",
+            `./intl/src/${test}.js`,
+            "./intl/benchmark.js",
+        ],
+        iterations: 2,
+        worstCaseCount: 1,
+        deterministicRandom: true,
+        tags: ["Javascript", "intl"],
+    });
+    INTL_BENCHMARKS.push(benchmark);
+}
+BENCHMARKS.push(
+    new GroupedBenchmark({
+            name: "intl",
+            tags: ["Javascript", "intl"],
+        }, INTL_BENCHMARKS));
+
 
 
 // SunSpider tests
@@ -2718,8 +2989,8 @@ const defaultDisabledTags = [];
 if (!isInBrowser)
     defaultDisabledTags.push("WorkerTests");
 
-if (globalThis.testList?.length) {
-    benchmarks = processTestList(globalThis.testList);
+if (JetStreamParams.testList.length) {
+    benchmarks = processTestList(JetStreamParams.testList);
 } else {
     benchmarks = findBenchmarksByTag("Default", defaultDisabledTags)
 }
