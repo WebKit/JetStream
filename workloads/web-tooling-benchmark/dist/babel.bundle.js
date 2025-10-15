@@ -1,13 +1,13 @@
 /******/ (() => { // webpackBootstrap
-/******/ 	var __webpack_modules__ = ({
-
-/***/ "./node_modules/@babel/standalone/babel.js":
-/*!*************************************************!*\
-  !*** ./node_modules/@babel/standalone/babel.js ***!
-  \*************************************************/
+/******/ 	var __webpack_modules__ = ([
+/* 0 */,
+/* 1 */,
+/* 2 */,
+/* 3 */,
+/* 4 */
 /***/ (function(__unused_webpack_module, exports, __webpack_require__) {
 
-/* provided dependency */ var TextDecoder = __webpack_require__(/*! text-encoder */ "./node_modules/text-encoder/index.js")["TextDecoder"];
+/* provided dependency */ var TextDecoder = __webpack_require__(5)["TextDecoder"];
 (function (global, factory) {
    true ? factory(exports) :
   0;
@@ -133395,11 +133395,73 @@
 
 
 /***/ }),
+/* 5 */
+/***/ ((module) => {
 
-/***/ "./node_modules/babylon/lib/index.js":
-/*!*******************************************!*\
-  !*** ./node_modules/babylon/lib/index.js ***!
-  \*******************************************/
+var utf8Encodings = [
+  'utf8',
+  'utf-8',
+  'unicode-1-1-utf-8'
+];
+
+function TextEncoder(encoding) {
+  if (utf8Encodings.indexOf(encoding) < 0 && typeof encoding !== 'undefined' && encoding != null) {
+    throw new RangeError('Invalid encoding type. Only utf-8 is supported');
+  } else {
+    this.encoding = 'utf-8';
+    this.encode = function(str) {
+      if (typeof str !== 'string') {
+        throw new TypeError('passed argument must be of tye string');
+      }
+      var binstr = unescape(encodeURIComponent(str)),
+        arr = new Uint8Array(binstr.length);
+      const split = binstr.split('');
+      for (let i = 0; i < split.length; i++) {
+        arr[i] = split[i].charCodeAt(0);
+      }
+      return arr;
+    };
+  }
+}
+
+function TextDecoder(encoding) {
+  if (utf8Encodings.indexOf(encoding) < 0 && typeof encoding !== 'undefined' && encoding != null) {
+    throw new RangeError('Invalid encoding type. Only utf-8 is supported');
+  }
+  else {
+    this.encoding = 'utf-8';
+    this.decode = function (view, options) {
+      if (typeof view === 'undefined') {
+        return '';
+      }
+
+      var stream = (typeof options !== 'undefined' && stream in options) ? options.stream : false;
+      if (typeof stream !== 'boolean') {
+        throw new TypeError('stream option must be boolean');
+      }
+
+      if (!ArrayBuffer.isView(view)) {
+        throw new TypeError('passed argument must be an array buffer view');
+      } else {
+        var arr = new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
+          charArr = new Array(arr.length);
+        for (let i = 0; i < arr.length; i++) {
+          charArr[i] = String.fromCharCode(arr[i]);
+        }
+        return decodeURIComponent(escape(charArr.join('')));
+      }
+    }
+  }
+}
+
+module.exports = {
+  TextEncoder,
+  TextDecoder,
+};
+
+
+/***/ }),
+/* 6 */
 /***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
@@ -143989,79 +144051,8 @@ exports.parseExpression = parseExpression;
 exports.tokTypes = types;
 
 
-/***/ }),
-
-/***/ "./node_modules/text-encoder/index.js":
-/*!********************************************!*\
-  !*** ./node_modules/text-encoder/index.js ***!
-  \********************************************/
-/***/ ((module) => {
-
-var utf8Encodings = [
-  'utf8',
-  'utf-8',
-  'unicode-1-1-utf-8'
-];
-
-function TextEncoder(encoding) {
-  if (utf8Encodings.indexOf(encoding) < 0 && typeof encoding !== 'undefined' && encoding != null) {
-    throw new RangeError('Invalid encoding type. Only utf-8 is supported');
-  } else {
-    this.encoding = 'utf-8';
-    this.encode = function(str) {
-      if (typeof str !== 'string') {
-        throw new TypeError('passed argument must be of tye string');
-      }
-      var binstr = unescape(encodeURIComponent(str)),
-        arr = new Uint8Array(binstr.length);
-      const split = binstr.split('');
-      for (let i = 0; i < split.length; i++) {
-        arr[i] = split[i].charCodeAt(0);
-      }
-      return arr;
-    };
-  }
-}
-
-function TextDecoder(encoding) {
-  if (utf8Encodings.indexOf(encoding) < 0 && typeof encoding !== 'undefined' && encoding != null) {
-    throw new RangeError('Invalid encoding type. Only utf-8 is supported');
-  }
-  else {
-    this.encoding = 'utf-8';
-    this.decode = function (view, options) {
-      if (typeof view === 'undefined') {
-        return '';
-      }
-
-      var stream = (typeof options !== 'undefined' && stream in options) ? options.stream : false;
-      if (typeof stream !== 'boolean') {
-        throw new TypeError('stream option must be boolean');
-      }
-
-      if (!ArrayBuffer.isView(view)) {
-        throw new TypeError('passed argument must be an array buffer view');
-      } else {
-        var arr = new Uint8Array(view.buffer, view.byteOffset, view.byteLength),
-          charArr = new Array(arr.length);
-        for (let i = 0; i < arr.length; i++) {
-          charArr[i] = String.fromCharCode(arr[i]);
-        }
-        return decodeURIComponent(escape(charArr.join('')));
-      }
-    }
-  }
-}
-
-module.exports = {
-  TextEncoder,
-  TextDecoder,
-};
-
-
 /***/ })
-
-/******/ 	});
+/******/ 	]);
 /************************************************************************/
 /******/ 	// The module cache
 /******/ 	var __webpack_module_cache__ = {};
@@ -144133,15 +144124,12 @@ var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
 "use strict";
-/*!***********************!*\
-  !*** ./src/babel.mjs ***!
-  \***********************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   runTest: () => (/* binding */ runTest)
 /* harmony export */ });
-/* harmony import */ var _babel_standalone__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/standalone */ "./node_modules/@babel/standalone/babel.js");
-/* harmony import */ var babylon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! babylon */ "./node_modules/babylon/lib/index.js");
+/* harmony import */ var _babel_standalone__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4);
+/* harmony import */ var babylon__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6);
 // Copyright 2017 the V8 project authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -144177,6 +144165,6 @@ function runTest(fileData) {
 
 })();
 
+self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
-//# sourceMappingURL=babel.bundle.js.map

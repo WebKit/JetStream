@@ -2,10 +2,7 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./node_modules/babylon/lib/index.js":
-/*!*******************************************!*\
-  !*** ./node_modules/babylon/lib/index.js ***!
-  \*******************************************/
+/***/ 6:
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -10655,14 +10652,11 @@ exports.tokTypes = types;
 var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
-/*!*************************!*\
-  !*** ./src/babylon.mjs ***!
-  \*************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   runTest: () => (/* binding */ runTest)
 /* harmony export */ });
-/* harmony import */ var babylon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! babylon */ "./node_modules/babylon/lib/index.js");
+/* harmony import */ var babylon__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6);
 // Copyright 2017 the V8 project authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -10726,6 +10720,6 @@ function runTest(fileData) {
 
 })();
 
+self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
-//# sourceMappingURL=babylon.bundle.js.map

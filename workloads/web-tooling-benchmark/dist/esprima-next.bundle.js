@@ -2,10 +2,7 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./node_modules/esprima-next/dist/esprima.js":
-/*!***************************************************!*\
-  !*** ./node_modules/esprima-next/dist/esprima.js ***!
-  \***************************************************/
+/***/ 583:
 /***/ ((__unused_webpack___webpack_module__, __webpack_exports__, __webpack_require__) => {
 
 __webpack_require__.r(__webpack_exports__);
@@ -7869,14 +7866,11 @@ var esprima_default = {
 var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
 (() => {
-/*!******************************!*\
-  !*** ./src/esprima-next.mjs ***!
-  \******************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   runTest: () => (/* binding */ runTest)
 /* harmony export */ });
-/* harmony import */ var esprima_next__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! esprima-next */ "./node_modules/esprima-next/dist/esprima.js");
+/* harmony import */ var esprima_next__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(583);
 // Copyright 2017 the V8 project authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -7903,6 +7897,6 @@ function runTest(fileData) {
 
 })();
 
+self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
-//# sourceMappingURL=esprima-next.bundle.js.map

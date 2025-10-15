@@ -1,10 +1,7 @@
 /******/ (() => { // webpackBootstrap
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./node_modules/process/browser.js":
-/*!*****************************************!*\
-  !*** ./node_modules/process/browser.js ***!
-  \*****************************************/
+/***/ 37:
 /***/ ((module) => {
 
 // shim for using process in browser
@@ -195,33 +192,12 @@ process.umask = function() { return 0; };
 
 /***/ }),
 
-/***/ "./node_modules/typescript/lib sync recursive":
-/*!*******************************************!*\
-  !*** ./node_modules/typescript/lib/ sync ***!
-  \*******************************************/
-/***/ ((module) => {
-
-function webpackEmptyContext(req) {
-	var e = new Error("Cannot find module '" + req + "'");
-	e.code = 'MODULE_NOT_FOUND';
-	throw e;
-}
-webpackEmptyContext.keys = () => ([]);
-webpackEmptyContext.resolve = webpackEmptyContext;
-webpackEmptyContext.id = "./node_modules/typescript/lib sync recursive";
-module.exports = webpackEmptyContext;
-
-/***/ }),
-
-/***/ "./node_modules/typescript/lib/typescript.js":
-/*!***************************************************!*\
-  !*** ./node_modules/typescript/lib/typescript.js ***!
-  \***************************************************/
+/***/ 1046:
 /***/ ((module, __unused_webpack_exports, __webpack_require__) => {
 
 var __filename = "/index.js";
 var __dirname = "/";
-/* provided dependency */ var process = __webpack_require__(/*! process/browser.js */ "./node_modules/process/browser.js");
+/* provided dependency */ var process = __webpack_require__(37);
 /*! *****************************************************************************
 Copyright (c) Microsoft Corporation. All rights reserved.
 Licensed under the Apache License, Version 2.0 (the "License"); you may not use
@@ -5306,7 +5282,7 @@ function formatComparator(comparator) {
 function tryGetPerformance() {
   if (isNodeLikeSystem()) {
     try {
-      const { performance: performance2 } = __webpack_require__(/*! perf_hooks */ "?07ec");
+      const { performance: performance2 } = __webpack_require__(1047);
       if (performance2) {
         return {
           shouldWriteNativeEvents: false,
@@ -5488,7 +5464,7 @@ var tracingEnabled;
     Debug.assert(!tracing, "Tracing already started");
     if (fs === void 0) {
       try {
-        fs = __webpack_require__(/*! fs */ "?2e60");
+        fs = __webpack_require__(1048);
       } catch (e) {
         throw new Error(`tracing requires having fs
 (original error: ${e.message || e})`);
@@ -8486,12 +8462,12 @@ var sys = (() => {
   const byteOrderMarkIndicator = "\uFEFF";
   function getNodeSystem() {
     const nativePattern = /^native |^\([^)]+\)$|^(?:internal[\\/]|[\w\s]+(?:\.js)?$)/;
-    const _fs = __webpack_require__(/*! fs */ "?2e60");
-    const _path = __webpack_require__(/*! path */ "?3711");
-    const _os = __webpack_require__(/*! os */ "?c37c");
+    const _fs = __webpack_require__(1048);
+    const _path = __webpack_require__(1049);
+    const _os = __webpack_require__(1050);
     let _crypto;
     try {
-      _crypto = __webpack_require__(/*! crypto */ "?d829");
+      _crypto = __webpack_require__(1051);
     } catch {
       _crypto = void 0;
     }
@@ -8597,7 +8573,7 @@ var sys = (() => {
       debugMode: !!process.env.NODE_INSPECTOR_IPC || !!process.env.VSCODE_INSPECTOR_OPTIONS || some(process.execArgv, (arg) => /^--(?:inspect|debug)(?:-brk)?(?:=\d+)?$/i.test(arg)) || !!process.recordreplay,
       tryEnableSourceMapsForHost() {
         try {
-          (__webpack_require__(/*! source-map-support */ "?5d40").install)();
+          (__webpack_require__(1052).install)();
         } catch {
         }
       },
@@ -8618,7 +8594,7 @@ var sys = (() => {
       require: (baseDir, moduleName) => {
         try {
           const modulePath = resolveJSModule(moduleName, baseDir, nodeSystem);
-          return { module: __webpack_require__("./node_modules/typescript/lib sync recursive")(modulePath), modulePath, error: void 0 };
+          return { module: __webpack_require__(1053)(modulePath), modulePath, error: void 0 };
         } catch (error2) {
           return { module: void 0, modulePath: void 0, error: error2 };
         }
@@ -8637,7 +8613,7 @@ var sys = (() => {
         cb();
         return false;
       }
-      const inspector = __webpack_require__(/*! inspector */ "?e316");
+      const inspector = __webpack_require__(1054);
       if (!inspector || !inspector.Session) {
         cb();
         return false;
@@ -198231,70 +198207,64 @@ if (typeof console !== "undefined") {
 
 /***/ }),
 
-/***/ "?07ec":
-/*!****************************!*\
-  !*** perf_hooks (ignored) ***!
-  \****************************/
+/***/ 1047:
 /***/ (() => {
 
 /* (ignored) */
 
 /***/ }),
 
-/***/ "?2e60":
-/*!********************!*\
-  !*** fs (ignored) ***!
-  \********************/
+/***/ 1048:
 /***/ (() => {
 
 /* (ignored) */
 
 /***/ }),
 
-/***/ "?3711":
-/*!**********************!*\
-  !*** path (ignored) ***!
-  \**********************/
+/***/ 1049:
 /***/ (() => {
 
 /* (ignored) */
 
 /***/ }),
 
-/***/ "?5d40":
-/*!************************************!*\
-  !*** source-map-support (ignored) ***!
-  \************************************/
+/***/ 1050:
 /***/ (() => {
 
 /* (ignored) */
 
 /***/ }),
 
-/***/ "?c37c":
-/*!********************!*\
-  !*** os (ignored) ***!
-  \********************/
+/***/ 1051:
 /***/ (() => {
 
 /* (ignored) */
 
 /***/ }),
 
-/***/ "?d829":
-/*!************************!*\
-  !*** crypto (ignored) ***!
-  \************************/
+/***/ 1052:
 /***/ (() => {
 
 /* (ignored) */
 
 /***/ }),
 
-/***/ "?e316":
-/*!***************************!*\
-  !*** inspector (ignored) ***!
-  \***************************/
+/***/ 1053:
+/***/ ((module) => {
+
+function webpackEmptyContext(req) {
+	var e = new Error("Cannot find module '" + req + "'");
+	e.code = 'MODULE_NOT_FOUND';
+	throw e;
+}
+webpackEmptyContext.keys = () => ([]);
+webpackEmptyContext.resolve = webpackEmptyContext;
+webpackEmptyContext.id = 1053;
+module.exports = webpackEmptyContext;
+
+/***/ }),
+
+/***/ 1054:
 /***/ (() => {
 
 /* (ignored) */
@@ -198373,14 +198343,11 @@ var __webpack_exports__ = {};
 // This entry needs to be wrapped in an IIFE because it needs to be in strict mode.
 (() => {
 "use strict";
-/*!****************************!*\
-  !*** ./src/typescript.mjs ***!
-  \****************************/
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   runTest: () => (/* binding */ runTest)
 /* harmony export */ });
-/* harmony import */ var typescript__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! typescript */ "./node_modules/typescript/lib/typescript.js");
+/* harmony import */ var typescript__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1046);
 // Copyright 2017 the V8 project authors. All rights reserved.
 // Use of this source code is governed by a BSD-style license that can be
 // found in the LICENSE file.
@@ -198423,6 +198390,6 @@ function runTest(fileData) {
 
 })();
 
+self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
-//# sourceMappingURL=typescript.bundle.js.map
