@@ -198423,6 +198423,6 @@ function runTest(fileData) {
 
 })();
 
-self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
+//# sourceMappingURL=typescript.bundle.js.map

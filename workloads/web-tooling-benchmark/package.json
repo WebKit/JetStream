@@ -6,7 +6,8 @@
     "benchmark": "node src/cli/cli.mjs",
     "clean": "rm -rf dist/*",
     "prebuild": "npm run clean",
-    "build": "webpack",
+    "build": "webpack --progress",
+    "build-dev": "webpack --progress",
     "test": "jest",
     "update-lock": "npm install --package-lock"
   },

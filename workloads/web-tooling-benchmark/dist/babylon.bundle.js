@@ -10726,6 +10726,6 @@ function runTest(fileData) {
 
 })();
 
-self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
+//# sourceMappingURL=babylon.bundle.js.map

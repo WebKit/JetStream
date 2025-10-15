@@ -7976,6 +7976,6 @@ async function runTest(fileData) {
 
 })();
 
-self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
+//# sourceMappingURL=source-map.bundle.js.map

@@ -14832,6 +14832,6 @@ function runTest(fileData) {
 
 })();
 
-self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
+//# sourceMappingURL=espree.bundle.js.map

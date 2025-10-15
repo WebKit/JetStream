@@ -15905,6 +15905,6 @@ function runTest(fileData) {
 
 })();
 
-self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
+//# sourceMappingURL=chai.bundle.js.map

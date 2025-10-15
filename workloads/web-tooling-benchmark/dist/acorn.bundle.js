@@ -6867,6 +6867,6 @@ function runTest(fileData) {
 
 })();
 
-self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
+//# sourceMappingURL=acorn.bundle.js.map

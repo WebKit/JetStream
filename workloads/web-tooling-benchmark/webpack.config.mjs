@@ -33,6 +33,7 @@ export default async (env) => {
   const baseConfig = {
     entry: entries,
     target: ["web", "es6"],
+    devtool: "source-map",
     resolve: {
       alias: {
         url: require.resolve("whatwg-url"),
@@ -70,28 +71,38 @@ export default async (env) => {
     ],
   };
 
-  const prodConfig = {
-    ...baseConfig,
-    output: {
-      path: distDir,
-      filename: "[name].bundle.js",
-      library: {
-        name: "WTBenchmark",
-        type: "global",
-      },
-      //libraryTarget: "assign",
-      chunkFormat: "commonjs",
-    },
-    mode: "development",
-    devtool: false,
-  };
-  const devConfig = {
+  return [
+    {
       ...baseConfig,
       output: {
         path: distDir,
-        filename: "[name].min.js"
+        filename: "[name].bundle.min.js",
+        library: {
+          name: "WTBenchmark",
+          type: "global",
+        },
+        //libraryTarget: "assign",
+        chunkFormat: "commonjs",
       },
-      mode: "production"
-  };
-  return [ prodConfig ];
+      mode: "production",
+      optimization: {
+        minimize: true,
+      },
+    },
+    {
+      ...baseConfig,
+      output: {
+        path: distDir,
+        filename: "[name].bundle.js",
+        library: {
+          name: "WTBenchmark",
+          type: "global",
+        },
+      },
+      optimization: {
+        minimize: false,
+      },
+      mode: "development"
+    }
+  ];
 };

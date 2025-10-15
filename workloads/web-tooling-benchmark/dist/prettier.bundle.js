@@ -258,6 +258,6 @@ async function runTest(fileData) {
 
 })();
 
-self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
+//# sourceMappingURL=prettier.bundle.js.map

@@ -36242,6 +36242,6 @@ async function runTest(fileData) {
 
 })();
 
-self.WTBenchmark = __webpack_exports__;
 /******/ })()
 ;
+//# sourceMappingURL=terser.bundle.js.map
