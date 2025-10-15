@@ -1,9 +1,11 @@
 // console.log = () => {};
 
+globalThis.setTimeout = (callback, timeout) => callback();
+globalThis.requestAnimationFrame = (callback) => callback();
+
 // JetStream benchmark.
 class Benchmark {
   iterationCount = 0;
-  lastResult = {};
   preloaded = {
     fortData: null,
     cannonData: null,
@@ -32,15 +34,16 @@ class Benchmark {
       this.preloaded.particlesJson,
       100
     );
-    this.lastResult = {
+    const lastResult = {
       classNames,
       cameraRotationLength
     };
+    this.validateIteration(lastResult);
   }
 
-  validate() {
-    this.expect("this.lastResult.classNames.length", this.lastResult.classNames.length, 2135);
-    this.expect("this.lastResult.cameraRotationLength", this.lastResult.cameraRotationLength, 0);
+  validateIteration(lastResult) {
+    this.expect("this.lastResult.classNames.length", lastResult.classNames.length, 2135);
+    this.expect("this.lastResult.cameraRotationLength", lastResult.cameraRotationLength, 0);
   }
 
   expect(name, value, expected) {

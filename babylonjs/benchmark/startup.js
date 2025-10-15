@@ -26,7 +26,6 @@
 // console.log = () => {};
 
 class Benchmark extends StartupBenchmark {
-  lastResult = {};
   iteration = 0;
 
   constructor({iterationCount, expectedCacheCommentCount}) {
@@ -49,10 +48,11 @@ class Benchmark extends StartupBenchmark {
     // const runStart = performance.now();
 
     const { classNames, cameraRotationLength } = BabylonJSBenchmark.runTest(30);
-    this.lastResult = {
+    const lastResult = {
       classNames,
       cameraRotationLength,
     };
+    this.validateIteration(lastResult)
     // const end = performance.now();
     // const loadTime = runStart - initStart;
     // const runTime = end - runStart;
@@ -63,15 +63,15 @@ class Benchmark extends StartupBenchmark {
     this.iteration++;
   }
 
-  validate() {
+  validateIteration(lastResult) {
     this.expect(
       "this.lastResult.classNames.length",
-      this.lastResult.classNames.length,
+      lastResult.classNames.length,
       2135
     );
     this.expect(
       "this.lastResult.cameraRotationLength",
-      Math.round(this.lastResult.cameraRotationLength * 1000),
+      Math.round(lastResult.cameraRotationLength * 1000),
       464
     );
   }

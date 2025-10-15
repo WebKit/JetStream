@@ -3,7 +3,7 @@ import "@babylonjs/loaders";
 import Ammo from "ammojs-typed";
 
 export function runTest(frames = 10) {
-  const classNames = Object.values(BABYLON).map((cls) => cls.name);
+  const classNames = Object.keys(BABYLON);
   BABYLON.Logger.LogLevels = BABYLON.Logger.NoneLogLevel;
   const engine = new BABYLON.NullEngine();
   const scene = createScene(engine);
@@ -50,7 +50,7 @@ export async function runComplexScene(
   particleData,
   frames = 10
 ) {
-  const classNames = Object.values(BABYLON).map((cls) => cls.name);
+  const classNames = Object.keys(BABYLON);
   BABYLON.Logger.LogLevels = BABYLON.Logger.NoneLogLevel;
   const engine = new BABYLON.NullEngine({
     deterministicLockstep: true,

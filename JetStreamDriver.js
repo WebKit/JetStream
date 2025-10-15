@@ -2470,7 +2470,7 @@ let BENCHMARKS = [
             BUNDLE: "./babylonjs/dist/bundle.es5.min.js",
         },
         arguments: {
-            expectedCacheCommentCount: 23990,
+            expectedCacheCommentCount: 23988,
         },
         tags: ["startup", "class", "es5", "babylonjs"],
         iterations: 10,
