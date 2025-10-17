@@ -2746,7 +2746,7 @@ const PRISM_JS_PRELOADS = {
     SAMPLE_MD: "./prismjs/data/sample.md",
     SAMPLE_PY: "./prismjs/data/sample.py",
     SAMPLE_SQL: "./prismjs/data/sample.sql",
-    SAMPLE_TS: "./prismjs/data/sample.TS",
+    SAMPLE_TS: "./prismjs/data/sample.ts",
 };
 const PRISM_JS_TAGS = ["parser", "regexp", "startup", "prismjs"];
 BENCHMARKS.push(
