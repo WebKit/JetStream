@@ -2781,6 +2781,7 @@ const INTL_TESTS = [
     "NumberFormat",
     "PluralRules",
 ];
+const INTL_TAGS = ["js", "internationalization"]
 const INTL_BENCHMARKS = [];
 for (const test of INTL_TESTS) {
     const benchmark = new AsyncBenchmark({
@@ -2793,14 +2794,14 @@ for (const test of INTL_TESTS) {
         iterations: 2,
         worstCaseCount: 1,
         deterministicRandom: true,
-        tags: ["js", "internationalization"],
+        tags: INTL_TAGS,
     });
     INTL_BENCHMARKS.push(benchmark);
 }
 BENCHMARKS.push(
     new GroupedBenchmark({
             name: "intl",
-            tags: ["js", "internationalization"],
+            tags: INTL_TAGS,
         }, INTL_BENCHMARKS));
 
 
