@@ -225,7 +225,7 @@ class Benchmark {
         this.height = 450;
         this.radius = 15;
 
-        const rand = (function() {
+        const randUint32 = (function() {
             let seed = 49734321;
             return function() {
                 // Robert Jenkins' 32 bit integer hash function.
@@ -235,13 +235,13 @@ class Benchmark {
                 seed = ((seed + 0xd3a2646c) ^ (seed << 9))   & 0xffffffff;
                 seed = ((seed + 0xfd7046c5) + (seed << 3))   & 0xffffffff;
                 seed = ((seed ^ 0xb55a4f09) ^ (seed >>> 16)) & 0xffffffff;
-                return (seed & 0xfffffff) / 0x10000000;
+                return (seed & 0xfffffff);
             };
         })();
 
         const buffer = new Uint32Array(this.width * this.height);
         for (let i = 0; i < buffer.length; ++i)
-            buffer[i] = rand();
+            buffer[i] = randUint32();
 
         this.buffer = buffer;
     }
