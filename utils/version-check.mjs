@@ -21,7 +21,6 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -40,6 +39,8 @@ const requiredMajor = parseInt(match[1]);
 const currentMajor = parseInt(process.versions.node.split(".")[0]);
 
 if (currentMajor < requiredMajor) {
-  console.error(`❌ Error: Node.js v${requiredMajor} or higher require. expected: "${nodeEngine}", current: ${process.version}).`);
-  process.exit(1);
+    console.error(
+        `❌ Error: Node.js v${requiredMajor} or higher require. expected: "${nodeEngine}", current: ${process.version}).`
+    );
+    process.exit(1);
 }
