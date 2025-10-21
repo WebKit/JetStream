@@ -40,6 +40,6 @@ const requiredMajor = parseInt(match[1]);
 const currentMajor = parseInt(process.versions.node.split(".")[0]);
 
 if (currentMajor < requiredMajor) {
-  console.error(`❌ Error: Node.js v${requiredMajor} or higher require. expected: "${nodeEngine}", current: ${process.version}).`;
+  console.error(`❌ Error: Node.js v${requiredMajor} or higher require. expected: "${nodeEngine}", current: ${process.version}).`);
   process.exit(1);
 }
