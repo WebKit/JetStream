@@ -1884,7 +1884,7 @@ let BENCHMARKS = [
         tags: ["default", "js",  "Octane"],
     }),
     new DefaultBenchmark({
-        name: "octane-regexp",
+        name: "regexp-octane",
         files: [
             "./Octane/regexp.js",
         ],
