@@ -85,13 +85,7 @@ function arrayBufferToBase64(buffer) {
 }
 
 function base64ToArrayBuffer(base64) {
-    var binary_string = atob(base64);
-    var len = binary_string.length;
-    var bytes = new Uint8Array(len);
-    for (var i = 0; i < len; i++) {
-        bytes[i] = binary_string.charCodeAt(i);
-    }
-    return bytes.buffer;
+    return Uint8Array.fromBase64(base64).buffer;
 }
 
 function equal(buf1, buf2) {
