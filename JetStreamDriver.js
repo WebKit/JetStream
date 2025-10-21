@@ -134,19 +134,18 @@ function uiFriendlyDuration(time) {
     return `${time.toFixed(2)} ms`;
 }
 
-
+const LABEL_PADDING = 45;
 function shellFriendlyLabel(label) {
-    const namePadding = 40;
-    return `${label}:`.padEnd(namePadding);
+    return `${label}`.padEnd(LABEL_PADDING);
 }
 
-const valuePadding = 10;
+const VALUE_PADDING = 11;
 function shellFriendlyDuration(time) {
-    return `${uiFriendlyDuration(time)}`.padStart(valuePadding);
+    return `${uiFriendlyDuration(time)} `.padStart(VALUE_PADDING);
 }
 
 function shellFriendlyScore(time) {
-    return `${uiFriendlyScore(time)} # `.padStart(valuePadding);
+    return `${uiFriendlyScore(time)} pts`.padStart(VALUE_PADDING);
 }
 
 
