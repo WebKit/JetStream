@@ -54,7 +54,7 @@ async function runBuilds() {
         return changedDirs.has(dir);
     });
     logInfo(`Found ${filteredPackageJsonFiles.length} package.json files to build`);
-    logInfo(process.env);
+    logInfo(JSON.stringify(process.env));
     logInfo(filteredPackageJsonFiles);
 
     for (const file of filteredPackageJsonFiles) {
