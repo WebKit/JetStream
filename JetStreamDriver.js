@@ -2268,8 +2268,8 @@ let BENCHMARKS = [
             AIRPORTS: "./jsdom-d3-startup/data/airports.csv",
         },
         tags: ["d3", "startup", "jsdom"],
-        iterations: 10,
-        worstCaseCount: 4,
+        iterations: 15,
+        worstCaseCount: 2,
     }),
     new AsyncBenchmark({
         name: "web-ssr",

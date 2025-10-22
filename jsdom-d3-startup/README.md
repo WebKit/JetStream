@@ -11,7 +11,7 @@ It uses jsdom to simulate a browser environment for D3 to render to an SVG eleme
 ## Setup
 ```bash
 # Install node deps from package-lock.json
-npm ci; 
+npm ci --include=dev; 
 # Bundle sources to dist/*.
 npm run build
 # Use build:dev for non-minified sources.
