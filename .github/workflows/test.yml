@@ -52,8 +52,7 @@ jobs:
 
     build:
         name: Build
-        needs: test
-        runs-on: macos-latest
+        runs-on: ubuntu-latest
         steps:
             - name: Checkout Branch
               uses: actions/checkout@v4
