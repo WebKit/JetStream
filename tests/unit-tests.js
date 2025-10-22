@@ -28,7 +28,7 @@ function assertThrows(message, func) {
   } catch (e) {
     didThrow = true;
   }
-  assertTrue(didThrow, message);
+  assertTrue(didThrow, `Test did not throw: ${message}`);
 }
 
 (function testTagsAreLowerCaseStrings() {
@@ -275,4 +275,21 @@ async function testStartupBenchmarkInnerTests() {
       new StartupBenchmark({ iterationCount: 1, expectedCacheCommentCount: 0 });
     }
   );
+})();
+
+
+(function testParseIterationCount() {
+  assertThrows("Cannot parse negative iterationCounts", 
+    () => {
+      const sourceParams = new Map(Object.entries({ iterationCount: -123, }));
+      new Params(sourceParams);
+    });
+  assertThrows("Cannot parse multiple iterationCounts", 
+    () => {
+      const sourceParams = new Map(Object.entries({ iterationCount: 123, testIterationCount: 10 }));
+      new Params(sourceParams);
+    });
+  let sourceParams = new Map(Object.entries({ iterationCount: 123 }));
+  let params = new Params(sourceParams);
+  assertEquals(params.testIterationCount, 123);
 })();
