@@ -310,7 +310,7 @@ async function testStartupBenchmarkInnerTests() {
   const sourceParams = new Map(Object.entries({ developerMode: "true" }));
   const params = new Params(sourceParams);
   assertFalse(params.isDefault);
-  const nonDefaults =params.nonDefaultParams 
+  const nonDefaults = params.nonDefaultParams;
   assertEquals(Object.entries(nonDefaults).length, 1);
   assertEquals(nonDefaults.developerMode, true);
 })();
@@ -320,7 +320,7 @@ async function testStartupBenchmarkInnerTests() {
   const sourceParams = new Map(Object.entries({ iterationCount: 123, test: "wasm,js"}));
   const params = new Params(sourceParams);
   assertFalse(params.isDefault);
-  const nonDefaults =params.nonDefaultParams 
+  const nonDefaults = params.nonDefaultParams;
   assertEquals(Object.entries(nonDefaults).length, 2);
   assertEquals(nonDefaults.testIterationCount, 123);
   assertEquals(JSON.stringify(nonDefaults.testList), JSON.stringify(["wasm", "js"]));
