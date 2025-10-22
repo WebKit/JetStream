@@ -5,11 +5,14 @@ import zlib from 'zlib';
 import fs from 'fs';
 import path from 'path';
 
+let log = console.log
+
 function parseCommandLineArgs() {
     const optionDefinitions = [
         { name: 'decompress', alias: 'd', type: Boolean, description: 'Decompress files (default: compress).' },
         { name: 'keep', alias: 'k', type: Boolean, description: 'Keep input files after processing (default: delete).' },
         { name: 'help', alias: 'h', type: Boolean, description: 'Print this usage guide.' },
+         { name: 'quiet', alias: 'q', type: Boolean, description: 'Quite output, only print errors.' },
         { name: 'globs', type: String, multiple: true, defaultOption: true, description: 'Glob patterns of files to process.' },
     ];
     const options = commandLineArgs(optionDefinitions);
@@ -32,10 +35,14 @@ function parseCommandLineArgs() {
         process.exit(0);
     }
 
+    if (options.quiet) {
+        log = () => {};
+    }
+
     if (options.globs === undefined) {
         if (options.decompress) {
             const defaultGlob = '**/*.z';
-            console.log(`No input glob pattern given, using default: ${defaultGlob}`);
+            log(`No input glob pattern given, using default: ${defaultGlob}`);
             options.globs = [defaultGlob];
         } else {
             // For compression, require the user to specify explicit input file patterns.
@@ -61,9 +68,9 @@ function compress(inputData) {
     const originalSize = inputData.length;
     const compressedSize = compressedData.length;
     const compressionRatio = calculateCompressionRatio(originalSize, compressedSize);
-    console.log(`  Original size:   ${String(originalSize).padStart(8)} bytes`);
-    console.log(`  Compressed size: ${String(compressedSize).padStart(8)} bytes`);
-    console.log(`  Compression ratio:  ${compressionRatio.toFixed(2).padStart(8)}%`);
+    log(`  Original size:   ${String(originalSize).padStart(8)} bytes`);
+    log(`  Compressed size: ${String(compressedSize).padStart(8)} bytes`);
+    log(`  Compression ratio:  ${compressionRatio.toFixed(2).padStart(8)}%`);
 
     return compressedData;
 }
@@ -74,18 +81,19 @@ function decompress(inputData) {
     const compressedSize = inputData.length;
     const decompressedSize = decompressedData.length;
     const expansionRatio = calculateExpansionRatio(compressedSize, decompressedSize);
-    console.log(`  Compressed size:   ${String(compressedSize).padStart(8)} bytes`);
-    console.log(`  Decompressed size: ${String(decompressedSize).padStart(8)} bytes`);
-    console.log(`  Expansion ratio:      ${expansionRatio.toFixed(2).padStart(8)}%`);
+    log(`  Compressed size:   ${String(compressedSize).padStart(8)} bytes`);
+    log(`  Decompressed size: ${String(decompressedSize).padStart(8)} bytes`);
+    log(`  Expansion ratio:      ${expansionRatio.toFixed(2).padStart(8)}%`);
 
     return decompressedData;
 }
 
 function globsToFiles(globs) {
     let files = [];
-    console.assert(globs.length > 0);
+    console.assert(globs.length > 0) ;
+    const globtions =  { nodir: true, ignore: '**/node_modules/**' };
     for (const glob of globs) {
-        const matches = globSync(glob, { nodir: true });
+        const matches = globSync(glob, globtions);
         files = files.concat(matches);
     }
     files = Array.from(new Set(files)).sort();
@@ -94,7 +102,7 @@ function globsToFiles(globs) {
 
 function processFiles(files, isDecompress, keep) {
     const verb = isDecompress ? 'decompress' : 'compress';
-    console.log(`Found ${files.length} files to ${verb}` + (files.length ? ':' : '.'));
+    log(`Found ${files.length} files to ${verb}` + (files.length ? ':' : '.'));
 
     // For printing overall statistics at the end.
     let totalInputSize = 0;
@@ -111,7 +119,7 @@ function processFiles(files, isDecompress, keep) {
                 } else {
                     outputFilename = inputFilename.slice(0, -2);
                 }
-                console.log(`  Decompressing to: ${outputFilename}`);
+                log(`  Decompressing to: ${outputFilename}`);
             } else {
                 if (path.extname(inputFilename) === '.z') {
                     console.warn(`  Warning: Input file already has a .z extension.`);
@@ -130,7 +138,7 @@ function processFiles(files, isDecompress, keep) {
 
             if (!keep) {
                 fs.unlinkSync(inputFilename);
-                console.log(`  Deleted input file.`);
+                log(`  Deleted input file.`);
             }
         } catch (err) {
             console.error(`Error ${verb}ing ${inputFilename}:`, err);
@@ -140,14 +148,14 @@ function processFiles(files, isDecompress, keep) {
     if (files.length > 1) {
         if (isDecompress) {
             const totalExpansionRatio = calculateExpansionRatio(totalInputSize, totalOutputSize);
-            console.log(`Total compressed sizes:   ${String(totalInputSize).padStart(9)} bytes`);
-            console.log(`Total decompressed sizes: ${String(totalOutputSize).padStart(9)} bytes`);
-            console.log(`Average expansion ratio:     ${totalExpansionRatio.toFixed(2).padStart(9)}%`);
+            log(`Total compressed sizes:   ${String(totalInputSize).padStart(9)} bytes`);
+            log(`Total decompressed sizes: ${String(totalOutputSize).padStart(9)} bytes`);
+            log(`Average expansion ratio:     ${totalExpansionRatio.toFixed(2).padStart(9)}%`);
         } else {
             const totalCompressionRatio = calculateCompressionRatio(totalInputSize, totalOutputSize);
-            console.log(`Total original sizes:   ${String(totalInputSize).padStart(9)} bytes`);
-            console.log(`Total compressed sizes: ${String(totalOutputSize).padStart(9)} bytes`);
-            console.log(`Average compression ratio: ${totalCompressionRatio.toFixed(2).padStart(9)}%`);
+            log(`Total original sizes:   ${String(totalInputSize).padStart(9)} bytes`);
+            log(`Total compressed sizes: ${String(totalOutputSize).padStart(9)} bytes`);
+            log(`Average compression ratio: ${totalCompressionRatio.toFixed(2).padStart(9)}%`);
         }
     }
 }

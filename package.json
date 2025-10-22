@@ -17,19 +17,20 @@
     "scripts": {
         "server": "node tests/server.mjs",
         "compress": "node utils/compress.mjs",
-        "decompress": "node utils/compress.mjs -d -k",
+        "decompress": "node utils/compress.mjs --decompress --keep ",
         "lint:check": "eslint **/*.{js,mjs,jsx,ts,tsx}",
         "pretty:check": "prettier --check ./",
         "pretty:format": "prettier --write ./",
         "format:check": "npm run pretty:check && npm run lint:check",
-        "test:chrome": "node tests/run-browser.mjs --browser chrome",
-        "test:firefox": "node tests/run-browser.mjs --browser firefox",
-        "test:safari": "node tests/run-browser.mjs --browser safari",
-        "test:edge": "node tests/run-browser.mjs --browser edge",
-        "test:shell": "npm run test:v8 && npm run test:jsc && npm run test:spidermonkey",
-        "test:v8": "node tests/run-shell.mjs --shell v8",
-        "test:jsc": "node tests/run-shell.mjs --shell jsc",
-        "test:spidermonkey": "node tests/run-shell.mjs --shell spidermonkey"
+        "test:prepare": "npm run decompress -- --quiet",
+        "test:chrome": "npm run test:prepare && node tests/run-browser.mjs --browser chrome",
+        "test:firefox": "npm run test:prepare && node tests/run-browser.mjs --browser firefox",
+        "test:safari": "npm run test:prepare && node tests/run-browser.mjs --browser safari",
+        "test:edge": "npm run test:prepare && node tests/run-browser.mjs --browser edge",
+        "test:shell": "npm run test:prepare && npm run test:v8 && npm run test:jsc && npm run test:spidermonkey",
+        "test:v8": "npm run test:prepare && node tests/run-shell.mjs --shell v8",
+        "test:jsc": "npm run test:prepare && node tests/run-shell.mjs --shell jsc",
+        "test:spidermonkey": "npm run test:prepare && node tests/run-shell.mjs --shell spidermonkey"
     },
     "devDependencies": {
         "@actions/core": "^1.11.1",
@@ -45,7 +46,7 @@
         "jsvu": "^2.5.1",
         "local-web-server": "^5.4.0",
         "prettier": "^2.8.8",
-        "selenium-webdriver": "^4.35.0"
+        "selenium-webdriver": "^4.36.0"
     },
     "dependencies": {
         "@dapplets/unicode-escape-webpack-plugin": "^0.1.1"

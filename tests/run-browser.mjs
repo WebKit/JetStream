@@ -61,6 +61,7 @@ async function runTests() {
     let success = true;
     try {
         success &&= await runEnd2EndTest("Run Single Suite", { test: "proxy-mobx" });
+        success &&= await runEnd2EndTest("Run Multiple Suites", { test: "prismjs-startup-es6,postcss-wtb" });
         success &&= await runEnd2EndTest("Run Tag No Prefetch",  { tag: "proxy", prefetchResources: "false" });
         success &&= await runEnd2EndTest("Run Disabled Suite", { tag: "disabled" });
         success &&= await runEnd2EndTest("Run Default Suite");
