@@ -68,15 +68,11 @@ jobs:
             - name: Install Node Packages
               run: npm ci
 
-            - name: Get changed files
-              id: changed-files
-              run: |
-                  if ${{ github.event_name == 'pull_request' }}; then
-                    echo "files=$(git diff --name-only -r HEAD^1 HEAD | tr '\n' ' ')" >> $GITHUB_OUTPUT
-                  else
-                    echo "files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | tr '\n' ' ')" >> $GITHUB_OUTPUT
-                  fi
-
             - name: Run Build
               run: |
-                  npm run test:build -- --changed-files ${{ steps.changed-files.outputs.files }}
+                  if ${{ github.event_name == 'pull_request' }}; then
+                    npm run test:build -- --diff="HEAD^...HEAD"
+                  else
+                    npm run test:build -- --diff="${{ github.event.before }}...${{ github.event.after }}"
+                  fi
+
