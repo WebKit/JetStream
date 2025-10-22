@@ -106,7 +106,7 @@ class Params {
             parsedParamKey = paramKey;
             result = parseResult;
         }
-        if (!hasParsedValue) {
+        if (!parsedParamKey) {
             return DefaultJetStreamParams[defaultParamKey];
         }
         return result;
