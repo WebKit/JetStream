@@ -332,17 +332,17 @@ class Driver {
             console.log("Total:");
             for (let [category, scores] of categoryScores) {
                 console.log(
-                    shellFriendlyLabel(`${category}-Score`),
+                    shellFriendlyLabel(`Total ${category}-Score`),
                     shellFriendlyScore(geomeanScore(scores)));
             }
             for (let [category, times] of categoryTimes) {
                 console.log(
-                    shellFriendlyLabel(`${category}-Time`),
+                    shellFriendlyLabel(`Total ${category}-Time`),
                     shellFriendlyDuration(geomeanScore(times)));
             }
             console.log("");
-            console.log(shellFriendlyLabel("Total-Score"), shellFriendlyScore(totalScore));
-            console.log(shellFriendlyLabel("Total-Time"), shellFriendlyDuration(totalTime));
+            console.log(shellFriendlyLabel("Total Score"), shellFriendlyScore(totalScore));
+            console.log(shellFriendlyLabel("Total Time"), shellFriendlyDuration(totalTime));
             console.log("");
         }
 
