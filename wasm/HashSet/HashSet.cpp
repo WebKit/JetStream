@@ -1199,7 +1199,7 @@ struct CustomHashTraits : public GenericHashTraits<T> {
         if (!HashFunctions::safeToCompareToEmptyOrDeleted)
             return;
         ASSERT(!HashTranslator::equal(KeyTraits::emptyValue(), key));
-        typename std::aligned_storage<sizeof(ValueType), std::alignment_of<ValueType>::value>::type deletedValueBuffer;
+        alignas(ValueType) std::byte deletedValueBuffer[sizeof(ValueType)];
         ValueType* deletedValuePtr = reinterpret_cast_ptr<ValueType*>(&deletedValueBuffer);
         ValueType& deletedValue = *deletedValuePtr;
         Traits::constructDeletedValue(deletedValue);

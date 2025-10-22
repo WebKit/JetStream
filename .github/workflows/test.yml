@@ -29,6 +29,8 @@ jobs:
 
             - name: Checkout Branch
               uses: actions/checkout@v4
+              with:
+                fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
 
             - name: Setup Node
               uses: actions/setup-node@v4
@@ -50,7 +52,16 @@ jobs:
                   echo "Running in $BROWSER"
                   npm run test:${{ matrix.browser }}
 
+            - name: Get changed files
+              id: changed-files
+              run: |
+                  if ${{ github.event_name == 'pull_request' }}; then
+                    echo "changed_files=$(git diff --name-only -r HEAD^1 HEAD | tr '\n' ' ')" >> $GITHUB_OUTPUT
+                  else
+                    echo "changed_files=$(git diff --name-only ${{ github.event.before }} ${{ github.event.after }} | tr '\n' ' ')" >> $GITHUB_OUTPUT
+                  fi
+
             - name: Run Build
               run: |
                   echo "Running in $BROWSER"
-                  npm run test:build
+                  npm run test:build -- --changed-files ${{ steps.changed-files.outputs.files }}

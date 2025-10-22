@@ -9,6 +9,7 @@ import { logError, logCommand, printHelp, runTest, sh } from "./helper.mjs";
 
 const optionDefinitions = [
   { name: "help", alias: "h", description: "Print this help text." },
+  { name: "changed-files", type: String, multiple: true, description: "A list of changed files to determine which builds to run." },
 ];
 
 const options = commandLineArgs(optionDefinitions);
@@ -37,6 +38,13 @@ async function runBuilds() {
     const packageJsonFiles = await findPackageJsonFiles(SRC_DIR);
     let success = true;
 
+    const changedDirs = new Set();
+    if (options["changed-files"]) {
+        for (const file of options["changed-files"]) {
+            changedDirs.add(path.join(SRC_DIR, path.dirname(file)));
+        }
+    }
+
     for (const file of packageJsonFiles) {
         const content = fs.readFileSync(file, "utf-8");
         const packageJson = JSON.parse(content);
@@ -45,6 +53,9 @@ async function runBuilds() {
         }
 
         const dir = path.dirname(file);
+        if (options["changed-files"] && !changedDirs.has(dir)) {
+            continue;
+        }
         const relativeDir = path.relative(SRC_DIR, dir);
         const testName = `Building ${relativeDir}`;
         
@@ -57,7 +68,7 @@ async function runBuilds() {
                 await sh("npm", "run", "build");
             } finally {
                 process.chdir(oldCWD);
-                // await sh("git", "reset", "--hard");
+                await sh("git", "reset", "--hard");
             }
         };
         
