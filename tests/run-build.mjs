@@ -28,6 +28,7 @@ if (options.diff) {
     for (const file of changedFiles) {
         let currentDir = path.dirname(file)
         while (currentDir !== ".") {
+            print(currentDir);
             changedDirs.add(path.join(SRC_DIR, currentDir));
             currentDir = path.dirname(currentDir);
         }
