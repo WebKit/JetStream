@@ -26,15 +26,12 @@ if (options.diff) {
     const changedDirs = new Set();
     const changedFiles = stdoutString.trim().split("\n");
     for (const file of changedFiles) {
-        console.log(currentDir)
         let currentDir = path.dirname(file)
         while (currentDir !== ".") {
-            console.log(currentDir);
             changedDirs.add(path.join(SRC_DIR, currentDir));
             currentDir = path.dirname(currentDir);
         }
     }
-    console.log(changedDirs)
     options.changedDirs = changedDirs;
 } else {
     options.changedDirs = undefined;
