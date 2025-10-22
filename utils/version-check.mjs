@@ -1,4 +1,5 @@
 // Copyright (C) 2007-2025 Apple Inc. All rights reserved.
+// Copyright (C) 2025 Google LLC
 
 // Redistribution and use in source and binary forms, with or without
 // modification, are permitted provided that the following conditions
@@ -21,39 +22,26 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-// Simple local server
-import * as path from "path";
-import commandLineArgs from "command-line-args";
-import esMain from "es-main";
-import LocalWebServer from "local-web-server";
+import fs from "node:fs/promises";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
-const ROOT_DIR = path.join(process.cwd(), "./");
+const dirname = path.dirname(fileURLToPath(import.meta.url));
+const projectRoot = path.join(dirname, "..");
+const packageJsonPath = path.join(projectRoot, "package.json");
 
-export default async function serve(port) {
-    if (!port)
-        throw new Error("Port is required");
-    const ws = await LocalWebServer.create({
-        port: port,
-        directory: ROOT_DIR,
-        corsOpenerPolicy: "same-origin",
-        corsEmbedderPolicy: "require-corp",
-    });
-    console.log(`Server started on http://localhost:${port}`);
-    process.on("exit", () => ws.server.close());
-    return {
-        close() {
-            ws.server.close();
-        }
-    };
+const packageJsonContent = await fs.readFile(packageJsonPath, "utf8");
+const pkg = JSON.parse(packageJsonContent);
+
+const nodeEngine = pkg.engines?.node;
+// Regex to parse simple ">= MAJOR[.MINOR[.PATCH]]"
+const match = nodeEngine.match(/>=?\s*(\d+)(\.\d+)?(\.\d+)?/);
+const requiredMajor = parseInt(match[1]);
+const currentMajor = parseInt(process.versions.node.split(".")[0]);
+
+if (currentMajor < requiredMajor) {
+    console.error(
+        `❌ Error: Node.js v${requiredMajor} or higher require. expected: "${nodeEngine}", current: ${process.version}).`
+    );
+    process.exit(1);
 }
-
-function main() {
-    const optionDefinitions = [
-        { name: "port", type: Number, defaultValue: 8010, description: "Set the test-server port, The default value is 8010." },
-    ];
-    const options = commandLineArgs(optionDefinitions);
-    serve(options.port);
-}
-
-if (esMain(import.meta))
-    main();
