@@ -51,7 +51,7 @@ async function runBuilds() {
     logInfo(`Found ${packageJsonFiles.length} package.json files`);
     const filteredPackageJsonFiles = packageJsonFiles.filter(file => {
         const dir = path.dirname(file);
-        return !changedDirs.has(dir);
+        return changedDirs.has(dir);
     });
     logInfo(`Found ${filteredPackageJsonFiles.length} package.json files to build`);
 
