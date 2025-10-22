@@ -58,7 +58,7 @@ async function runBuilds() {
     logInfo(`Found ${packageJsonFiles.length} package.json files`);
     let filteredPackageJsonFiles = packageJsonFiles;
     if (options.changedDirs?.size === 0) {
-        logInfo("No packages.json changes detected, skipping all");
+        logInfo("No file changes detected, skipping all");
     }
     if (options.changedDirs?.size > 0) {
         filteredPackageJsonFiles = packageJsonFiles.filter(file => {
