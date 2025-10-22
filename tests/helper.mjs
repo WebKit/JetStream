@@ -21,7 +21,6 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-import { styleText } from "node:util";
 import core from "@actions/core";
 import { spawn } from "child_process";
 import commandLineUsage from "command-line-usage";
