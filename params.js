@@ -172,7 +172,8 @@ let maybeCustomParams = DefaultJetStreamParams;
 if (globalThis?.JetStreamParamsSource) {
     try {
         maybeCustomParams = new Params(globalThis?.JetStreamParamsSource);
-        if (Object.entries(maybeCustomParams.nonDefaultParams).length === 0) {
+        // We might have parsed the same values again, do a poor-mans deep-equals:
+        if (JSON.stringify(maybeCustomParams) === JSON.stringify(DefaultJetStreamParams)) {
            maybeCustomParams = DefaultJetStreamParams 
         }
     } catch (e) {
