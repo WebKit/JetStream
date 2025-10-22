@@ -348,6 +348,13 @@ a.button {
     scroll-margin-bottom: 20vh;
 }
 
+.benchmark .result.detail {
+    display: none;
+}
+.details .benchmark .result.detail {
+    display: inline-block;
+}
+
 .benchmark h4,
 .benchmark .result,
 .benchmark label,
