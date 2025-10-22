@@ -22,9 +22,9 @@ if ("help" in options)
 
 
 if (options.diff) {
-    const { stdout } = await sh("git", "diff", "--name-only", options.diff);
+    const { stdoutString } = await sh("git", "diff", "--name-only", options.diff);
     const changedDirs = new Set();
-    const changedFiles = stdout.trim().split("\n");
+    const changedFiles = stdoutString.trim().split("\n");
     for (const file of changedFiles) {
         console.log(currentDir)
         let currentDir = path.dirname(file)
