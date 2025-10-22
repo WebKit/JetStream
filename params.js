@@ -78,8 +78,9 @@ class Params {
         if (this.report && !this.startDelay)
             this.startDelay = 4000;
 
-        for (const paramKey of ["tag", "tags", "test", "tests"])
+        for (const paramKey of ["tag", "tags", "test", "tests"]) {
             this.testList = this._parseTestListParam(sourceParams, paramKey);
+        }
 
         this.testIterationCount = this._parseIntParam(sourceParams, "iterationCount", 1);
         this.testWorstCaseCount = this._parseIntParam(sourceParams, "worstCaseCount", 1);
@@ -94,14 +95,18 @@ class Params {
             return this.testList;
         let testList = [];
         if (sourceParams?.getAll) {
-            testList = sourceParams?.getAll(key);
+            for (const param of sourceParams?.getAll(key)) {
+                testList.push(...param.split(","));
+            }
         } else {
             // fallback for cli sourceParams which is just a Map;
             testList = sourceParams.get(key).split(",");
         }
+        testList = testList.map(each => each.trim());
         sourceParams.delete(key);
-        if (this.testList.length > 0 && testList.length > 0)
+        if (this.testList.length > 0 && testList.length > 0) {
             throw new Error(`Overriding previous testList='${this.testList.join()}' with ${key} url-parameter.`);
+        }
         return testList;
     }
 

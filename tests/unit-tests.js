@@ -51,6 +51,23 @@ function assertThrows(message, func) {
   }
 })();
 
+
+(function tagsAreNotBenchmarkNames() {
+  const benchmarkNames = new Set(BENCHMARKS.map(e => e.name));
+  for (const benchmark of benchmarks) {
+    for (const tag of benchmark.tags) {
+      assertFalse(benchmarkNames.has(tag), `'${tag}' is also a benchmark name`);
+    }
+  }
+})();
+
+(function tagsHasWasmOrJS() {
+  for (const benchmark of benchmarks) {
+    const tags = benchmark.tags;
+    assertTrue(tags.has("wasm") || tags.has("js"), `'${benchmark.name}' has no 'js' or 'wasm' tag`);
+  }
+})();
+
 (function testDriverBenchmarksOrder() {
   const benchmarks = findBenchmarksByTag("all");
   const driver = new Driver(benchmarks);
