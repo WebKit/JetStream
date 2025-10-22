@@ -84,7 +84,7 @@ class Params {
 
         this.testList = this._parseOneOf(sourceParams, ["testList", "tag", "tags", "test", "tests"], this._parseTestListParam);
         this.testIterationCount = this._parseOneOf(sourceParams, ["testIterationCount", "iterationCount", "iterations" ], this._parseIntParam, 1);
-        this.testWorstCaseCount = this._parseOneOf(sourceParams, ["testWorstCaseCount", "worstCaseCount", ], this._parseIntParam, 1);
+        this.testWorstCaseCount = this._parseOneOf(sourceParams, ["testWorstCaseCount", "worstCaseCount", "worst"], this._parseIntParam, 1);
 
         const unused = Array.from(sourceParams.keys());
         if (unused.length > 0)
@@ -94,16 +94,16 @@ class Params {
     _parseOneOf(sourceParams, paramKeys, parseFunction, ...args) {
         const defaultParamKey = paramKeys[0]
         let result = undefined;
-        let hasParsedValue = false;
+        let parsedParamKey = undefined;
         for (const paramKey of paramKeys) {
             if (!sourceParams.has(paramKey)) {
                 continue;
             }
             const parseResult = parseFunction.call(this, sourceParams, paramKey, ...args);
-            if (hasParsedValue) {
-                throw new Error(`Cannot parse ${paramKey}, overriding previous value ${JSON.stringify(result)} with ${JSON.stringify(parseResult)}`)
+            if (parsedParamKey) {
+                throw new Error(`Cannot parse ${paramKey}, overriding previous "${parsedParamKey}" value ${JSON.stringify(result)} with ${JSON.stringify(parseResult)}`)
             }
-            hasParsedValue = true;
+            parsedParamKey = paramKey;
             result = parseResult;
         }
         if (!hasParsedValue) {
