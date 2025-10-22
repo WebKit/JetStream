@@ -5,7 +5,7 @@ import fs from "fs";
 import { fileURLToPath } from "url";
 import path from "path";
 
-import { logError, logCommand, printHelp, runTest, sh } from "./helper.mjs";
+import { logError, logCommand, printHelp, runTest, sh, logInfo } from "./helper.mjs";
 
 const optionDefinitions = [
   { name: "help", alias: "h", description: "Print this help text." },
@@ -41,11 +41,21 @@ async function runBuilds() {
     const changedDirs = new Set();
     if (options["changed-files"]) {
         for (const file of options["changed-files"]) {
-            changedDirs.add(path.join(SRC_DIR, path.dirname(file)));
+            let currentDir = path.dirname(file)
+            while (currentDir !== ".") {
+                changedDirs.add(path.join(SRC_DIR, currentDir));
+                currentDir = path.dirname(currentDir);
+            }
         }
     }
+    logInfo(`Found ${packageJsonFiles.length} package.json files`);
+    const filteredPackageJsonFiles = packageJsonFiles.filter(file => {
+        const dir = path.dirname(file);
+        return !changedDirs.has(dir);
+    });
+    logInfo(`Found ${filteredPackageJsonFiles.length} package.json files to build`);
 
-    for (const file of packageJsonFiles) {
+    for (const file of filteredPackageJsonFiles) {
         const content = fs.readFileSync(file, "utf-8");
         const packageJson = JSON.parse(content);
         if (!packageJson.scripts?.build) {
@@ -53,9 +63,6 @@ async function runBuilds() {
         }
 
         const dir = path.dirname(file);
-        if (options["changed-files"] && !changedDirs.has(dir)) {
-            continue;
-        }
         const relativeDir = path.relative(SRC_DIR, dir);
         const testName = `Building ${relativeDir}`;
         
