@@ -29,8 +29,6 @@ jobs:
 
             - name: Checkout Branch
               uses: actions/checkout@v4
-              with:
-                fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
 
             - name: Setup Node
               uses: actions/setup-node@v4
@@ -52,6 +50,25 @@ jobs:
                   echo "Running in $BROWSER"
                   npm run test:${{ matrix.browser }}
 
+    build:
+        name: Build
+        needs: test
+        runs-on: macos-latest
+        steps:
+            - name: Checkout Branch
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: package.json
+                  cache: npm
+
+            - name: Install Node Packages
+              run: npm ci
+
             - name: Get changed files
               id: changed-files
               run: |
@@ -63,5 +80,4 @@ jobs:
 
             - name: Run Build
               run: |
-                  echo "Running in $BROWSER"
                   npm run test:build -- --changed-files ${{ steps.changed-files.outputs.files }}
