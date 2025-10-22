@@ -184,6 +184,11 @@ img {
     height: 75px;
 }
 
+.animateUI .logo .logo-image {
+    animation: swingin 350ms ease-out forwards;
+    will-change: transform, opacity;
+}
+
 #jetstreams {
     background-repeat: no-repeat;
     background-size: contain;
@@ -191,6 +196,7 @@ img {
     padding: 2rem 0;
     margin: -2rem 0;
 }
+
 
 #jetstreams svg {
     width: 100%;
@@ -218,6 +224,15 @@ article,
 .summary {
     max-width: 70rem;
     margin: 0 auto 0 auto;
+}
+
+.summary {
+    opacity: 0;
+}
+
+article, .animateUI .summary {
+    animation: fadein 0.5s ease-in-out forwards;
+    animation-delay: 200ms;
 }
 
 article {
