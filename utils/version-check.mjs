@@ -1,3 +1,4 @@
+// Copyright (C) 2007-2025 Apple Inc. All rights reserved.
 // Copyright (C) 2025 Google LLC
 
 // Redistribution and use in source and binary forms, with or without
