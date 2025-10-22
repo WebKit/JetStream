@@ -55,7 +55,7 @@
             showNonDefaultParams();
         }
         if (JetStreamParams.startDelay === undefined) {
-            playIntro()
+            startIntroAnimations()
         }
         if (globalThis.allIsGood) {
             try {
@@ -87,7 +87,7 @@
         }
     }
 
-    function playIntro() {
+    function startIntroAnimations() {
         document.body.classList.add("animateUI");
         const timestamp = performance.now();
         document.getElementById('jetstreams').style.backgroundImage = `url('resources/jetstreams.svg?${timestamp}')`;
