@@ -21,8 +21,6 @@ if ("help" in options)
   printHelp(optionDefinitions);
 
 
-console.log("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$");
-console.log(options.diff);
 if (options.diff) {
     const { stdout } = await sh("git", "diff", "--name-only", options.diff);
     const changedDirs = new Set();
@@ -57,7 +55,6 @@ async function findPackageJsonFiles(dir, accumulator=[]) {
 }
 
 async function runBuilds() {
-    await sh("npm", "run", "test:prepare");
     const packageJsonFiles = await findPackageJsonFiles(SRC_DIR);
     let success = true;
 
