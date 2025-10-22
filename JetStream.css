@@ -72,11 +72,7 @@ table {
     border-spacing: 0;
 }
 
-.nonDefaultParams .logo .logo-image {
-    filter: hue-rotate(10deg);
-}
-
-.nonDefaultParams #jetstreams {
+body.nonDefaultParams {
     filter: hue-rotate(152deg);
 }
 
@@ -89,7 +85,6 @@ table {
     text-align: center;
 
     & h2 {
-        color: var(--benchmark-error-text-color);
         text-align: center;
     } 
 
@@ -101,8 +96,6 @@ table {
 .nonDefaultParams #non-default-params {
     display: block;
 }
-
-
 
 #non-standard-params-table {
     border-collapse: collapse;
