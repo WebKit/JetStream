@@ -3,7 +3,7 @@ import { spawn } from "child_process";
 import commandLineUsage from "command-line-usage";
 import { styleText } from "node:util";
 
-export const GITHUB_ACTIONS_OUTPUT = ("GITHUB_ACTIONS_OUTPUT" in process.env) || (GITHUB_EVENT_PATH in process.env);
+export const GITHUB_ACTIONS_OUTPUT = ("GITHUB_ACTIONS_OUTPUT" in process.env) || ("GITHUB_EVENT_PATH "in process.env);
 
 export function logInfo(...args) {
   const text = args.join(" ")
