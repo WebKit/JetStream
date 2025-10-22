@@ -82,7 +82,7 @@ class Params {
                  this.startDelay = 100;
         }
 
-        for (const paramKey of ["tag", "tags", "test", "tests"]) {
+        for (const paramKey of ["tag", "tags", "test", "tests", "testList"]) {
             this.testList = this._parseTestListParam(sourceParams, paramKey);
         }
 
@@ -125,8 +125,11 @@ class Params {
     _parseBooleanParam(sourceParams, paramKey) {
         if (!sourceParams.has(paramKey))
             return DefaultJetStreamParams[paramKey];
-        const value = sourceParams.get(paramKey).toLowerCase();
+        const rawValue = sourceParams.get(paramKey);;
         sourceParams.delete(paramKey);
+        if (rawValue === true || rawValue === false)
+            return true;
+        const value = rawValue.toLowerCase();
         return !(value === "false" || value === "0");
     }
 
@@ -155,9 +158,10 @@ class Params {
     get nonDefaultParams() {
         const diff = Object.create(null);
         for (const [key, value] of Object.entries(this)) {
-            if (value !== DefaultJetStreamParams[key]) {
-                diff[key] = value;
-            }
+            const defaultValue = DefaultJetStreamParams[key]
+            if (value == defaultValue) continue;
+            if (value?.length == 0 && defaultValue?.length == 0) continue;
+            diff[key] = value;
         }
         return diff;
     }
@@ -168,6 +172,9 @@ let maybeCustomParams = DefaultJetStreamParams;
 if (globalThis?.JetStreamParamsSource) {
     try {
         maybeCustomParams = new Params(globalThis?.JetStreamParamsSource);
+        if (Object.entries(maybeCustomParams.nonDefaultParams).length === 0) {
+           maybeCustomParams = DefaultJetStreamParams 
+        }
     } catch (e) {
         console.error("Invalid Params", e, "\nUsing defaults as fallback:", maybeCustomParams);
     }

@@ -72,8 +72,12 @@ table {
     border-spacing: 0;
 }
 
-body.nonDefaultParams {
-    background: radial-gradient(circle at bottom,white 60%, var(--benchmark-error-text-color));
+.nonDefaultParams .logo .logo-image {
+    filter: hue-rotate(10deg);
+}
+
+.nonDefaultParams #jetstreams {
+    filter: hue-rotate(152deg);
 }
 
 .nonDefaultParams .summary {
