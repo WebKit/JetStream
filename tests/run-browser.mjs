@@ -1,8 +1,35 @@
 #! /usr/bin/env node
 /* eslint-disable-next-line  no-unused-vars */
+
+// Copyright (C) 2007-2025 Apple Inc. All rights reserved.
+
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//  notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//  notice, this list of conditions and the following disclaimer in the
+//  documentation and/or other materials provided with the distribution.
+
+// THIS SOFTWARE IS PROVIDED BY APPLE INC. AND ITS CONTRIBUTORS ``AS IS''
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL APPLE INC. OR ITS CONTRIBUTORS
+// BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
+
 import serve from "./server.mjs";
-import { Builder, Capabilities } from "selenium-webdriver";
+import { Builder, Capabilities, logging } from "selenium-webdriver";
 import commandLineArgs from "command-line-args";
+import { promises as fs } from "fs";
+import path from "path";
+import os from "os";
 
 import {logInfo, logError, printHelp, runTest} from "./helper.mjs";
 
@@ -11,7 +38,6 @@ const optionDefinitions = [
     { name: "port", type: Number, defaultValue: 8010, description: "Set the test-server port, The default value is 8010." },
     { name: "help", alias: "h", description: "Print this help text." },
 ];
-
 
 const options = commandLineArgs(optionDefinitions);
 
@@ -26,6 +52,7 @@ let capabilities;
 switch (BROWSER) {
     case "safari":
         capabilities = Capabilities.safari();
+        capabilities.set("safari:diagnose", true);
         break;
 
     case "firefox": {
@@ -78,6 +105,7 @@ async function runEnd2EndTest(name, params) {
 
 async function testEnd2End(params) {
     const driver = await new Builder().withCapabilities(capabilities).build();
+    const sessionId = (await driver.getSession()).getId();
     const driverCapabilities = await driver.getCapabilities();
     logInfo(`Browser: ${driverCapabilities.getBrowserName()} ${driverCapabilities.getBrowserVersion()}`);
     const urlParams = Object.assign({
@@ -85,6 +113,7 @@ async function testEnd2End(params) {
             iterationCount: 3 
         }, params);
     let results;
+    let success = true;
     try {
         const url = new URL(`http://localhost:${PORT}/index.html`);
         url.search = new URLSearchParams(urlParams).toString();
@@ -102,9 +131,13 @@ async function testEnd2End(params) {
         results = await benchmarkResults(driver);
         // FIXME: validate results;
     } catch(e) {
+        success = false;
         throw e;
     } finally {
-        driver.quit();
+        await driver.quit();
+        if (!success) {
+            await printLogs(sessionId);
+        }
     }
 }
 
@@ -128,7 +161,6 @@ class JetStreamTestError extends Error {
         super(`Tests failed: ${errors.map(e => e.stack).join(", ")}`);
         this.errors = errors;
     }
-
 }
 
 const UPDATE_INTERVAL = 250;
@@ -160,6 +192,30 @@ function logIncrementalResult(previousResults, benchmarkResults) {
             continue;
         console.log(testName, testResults);
         previousResults.add(testName);
+    }
+}
+
+function printLogs(sessionId) {
+    if (BROWSER === "safari" && sessionId)
+        return printSafariLogs(sessionId);
+}
+
+async function printSafariLogs(sessionId) {
+    const sessionLogDir = path.join(os.homedir(), "Library", "Logs", "com.apple.WebDriver", sessionId);
+    try {
+        const files = await fs.readdir(sessionLogDir);
+        const logFiles = files.filter(f => f.startsWith("safaridriver.") && f.endsWith(".txt"));
+        if (logFiles.length === 0) {
+            logInfo(`No safaridriver log files found in session directory: ${sessionLogDir}`);
+            return;
+        }
+        for (const file of logFiles) {
+            const logPath = path.join(sessionLogDir, file);
+            const logContent = await fs.readFile(logPath, "utf8");
+            logGroup(`SafariDriver Log: ${file}`, () => console.log(logContent));
+        }
+    } catch (err) {
+        logError("Error reading SafariDriver logs:", err);
     }
 }
 

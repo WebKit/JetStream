@@ -82,16 +82,34 @@ class Params {
                  this.startDelay = 100;
         }
 
-        for (const paramKey of ["tag", "tags", "test", "tests"]) {
-            this.testList = this._parseTestListParam(sourceParams, paramKey);
-        }
-
-        this.testIterationCount = this._parseIntParam(sourceParams, "iterationCount", 1);
-        this.testWorstCaseCount = this._parseIntParam(sourceParams, "worstCaseCount", 1);
+        this.testList = this._parseOneOf(sourceParams, ["testList", "tag", "tags", "test", "tests"], this._parseTestListParam);
+        this.testIterationCount = this._parseOneOf(sourceParams, ["testIterationCount", "iterationCount", "iterations" ], this._parseIntParam, 1);
+        this.testWorstCaseCount = this._parseOneOf(sourceParams, ["testWorstCaseCount", "worstCaseCount", "worst"], this._parseIntParam, 1);
 
         const unused = Array.from(sourceParams.keys());
         if (unused.length > 0)
             console.error("Got unused source params", unused);
+    }
+
+    _parseOneOf(sourceParams, paramKeys, parseFunction, ...args) {
+        const defaultParamKey = paramKeys[0]
+        let result = undefined;
+        let parsedParamKey = undefined;
+        for (const paramKey of paramKeys) {
+            if (!sourceParams.has(paramKey)) {
+                continue;
+            }
+            const parseResult = parseFunction.call(this, sourceParams, paramKey, ...args);
+            if (parsedParamKey) {
+                throw new Error(`Cannot parse ${paramKey}, overriding previous "${parsedParamKey}" value ${JSON.stringify(result)} with ${JSON.stringify(parseResult)}`)
+            }
+            parsedParamKey = paramKey;
+            result = parseResult;
+        }
+        if (!parsedParamKey) {
+            return DefaultJetStreamParams[defaultParamKey];
+        }
+        return result;
     }
 
     _parseTestListParam(sourceParams, key) {
@@ -108,9 +126,6 @@ class Params {
         }
         testList = testList.map(each => each.trim());
         sourceParams.delete(key);
-        if (this.testList.length > 0 && testList.length > 0) {
-            throw new Error(`Overriding previous testList='${this.testList.join()}' with ${key} url-parameter.`);
-        }
         return testList;
     }
 
