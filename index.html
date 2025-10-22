@@ -54,6 +54,9 @@
         if (!JetStreamParams.isDefault) {
             showNonDefaultParams();
         }
+        if (JetStreamParams.startDelay === undefined) {
+            blowJetStreams()
+        }
         if (globalThis.allIsGood) {
             try {
                 await JetStream.initialize();
@@ -82,6 +85,11 @@
             row.insertCell().textContent = JSON.stringify(value);
             row.insertCell().textContent = JSON.stringify(defaultValue);
         }
+    }
+
+    function blowJetStreams() {
+        const timestamp = performance.now();
+        document.getElementById('jetstreams').style.backgroundImage = `url('resources/jetstreams.svg?${timestamp}')`;
     }
     </script>
 
