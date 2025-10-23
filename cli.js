@@ -41,7 +41,7 @@ const CLI_PARAMS = {
     param: "dumpJSONResults",
   },
   "dump-test-list": {
-    help: "Print test list instead of running.",
+    help: "Print the selected test list instead of running.",
     param: "dumpTestList",
   },
   ramification: {

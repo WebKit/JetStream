@@ -140,8 +140,9 @@ class Params {
     _parseBooleanParam(sourceParams, paramKey) {
         if (!sourceParams.has(paramKey))
             return DefaultJetStreamParams[paramKey];
-        const value = sourceParams.get(paramKey).toLowerCase();
+        const rawValue = sourceParams.get(paramKey);;
         sourceParams.delete(paramKey);
+        const value = rawValue.toLowerCase();
         return !(value === "false" || value === "0");
     }
 
@@ -170,9 +171,10 @@ class Params {
     get nonDefaultParams() {
         const diff = Object.create(null);
         for (const [key, value] of Object.entries(this)) {
-            if (value !== DefaultJetStreamParams[key]) {
-                diff[key] = value;
-            }
+            const defaultValue = DefaultJetStreamParams[key]
+            if (value == defaultValue) continue;
+            if (value?.length == 0 && defaultValue?.length == 0) continue;
+            diff[key] = value;
         }
         return diff;
     }
@@ -183,6 +185,10 @@ let maybeCustomParams = DefaultJetStreamParams;
 if (globalThis?.JetStreamParamsSource) {
     try {
         maybeCustomParams = new Params(globalThis?.JetStreamParamsSource);
+        // We might have parsed the same values again, do a poor-mans deep-equals:
+        if (JSON.stringify(maybeCustomParams) === JSON.stringify(DefaultJetStreamParams)) {
+           maybeCustomParams = DefaultJetStreamParams 
+        }
     } catch (e) {
         console.error("Invalid Params", e, "\nUsing defaults as fallback:", maybeCustomParams);
     }

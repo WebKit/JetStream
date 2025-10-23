@@ -302,11 +302,11 @@ class Driver {
             }
         }
 
-        const totalScore = geomeanScore(allScores);
-        console.assert(totalScore > 0, `Invalid total score: ${totalScore}`);
+        const overallScore = geomeanScore(allScores);
+        console.assert(overallScore > 0, `Invalid total score: ${overallScore}`);
 
         if (isInBrowser) {
-            let summaryHtml = `<div class="score">${uiFriendlyScore(totalScore)}</div>
+            let summaryHtml = `<div class="score">${uiFriendlyScore(overallScore)}</div>
                     <label>Score</label>`;
             summaryHtml += `<div class="benchmark benchmark-done">`;
             for (let [category, scores] of categoryScores) {
@@ -329,20 +329,20 @@ class Driver {
             summaryElement.onclick = displayCategoryScores;
             statusElement.innerHTML = "";
         } else if (!JetStreamParams.dumpJSONResults) {
-            console.log("Total:");
+            console.log("Overall:");
             for (let [category, scores] of categoryScores) {
                 console.log(
-                    shellFriendlyLabel(`Total ${category}-Score`),
+                    shellFriendlyLabel(`Overall ${category}-Score`),
                     shellFriendlyScore(geomeanScore(scores)));
             }
             for (let [category, times] of categoryTimes) {
                 console.log(
-                    shellFriendlyLabel(`Total ${category}-Time`),
+                    shellFriendlyLabel(`Overall ${category}-Time`),
                     shellFriendlyDuration(geomeanScore(times)));
             }
             console.log("");
-            console.log(shellFriendlyLabel("Total Score"), shellFriendlyScore(totalScore));
-            console.log(shellFriendlyLabel("Total Time"), shellFriendlyDuration(totalTime));
+            console.log(shellFriendlyLabel("Overall Score"), shellFriendlyScore(overallScore));
+            console.log(shellFriendlyLabel("Overall Wall-Time"), shellFriendlyDuration(totalTime));
             console.log("");
         }
 
@@ -835,8 +835,8 @@ class Benchmark {
 
     allTimes() {
         const allTimes = this.subTimes();
-        allTimes["Wall"] = this.wallTime;
         allTimes["Total"] = this.totalTime;
+        allTimes["Wall"] = this.wallTime;
         return allTimes;
     }
 
