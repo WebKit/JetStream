@@ -1,6 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import UnicodeEscapePlugin from "@dapplets/unicode-escape-webpack-plugin";
+import { LicenseWebpackPlugin } from "license-webpack-plugin";
 
 
 const __filename = fileURLToPath(import.meta.url);
@@ -22,7 +23,13 @@ function config({ filename, minify }) {
       libraryTarget: "assign",
       chunkFormat: "commonjs",
     },
-    plugins: [ new UnicodeEscapePlugin() ],
+    plugins: [
+      new UnicodeEscapePlugin(),
+      new LicenseWebpackPlugin({
+        perChunkOutput: true, 
+        outputFilename: "LICENSE.txt",
+      })
+    ],
     optimization: {
       minimize: minify,
     },

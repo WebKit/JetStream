@@ -2,6 +2,7 @@ import path from "path";
 import webpack from "webpack";
 import TerserPlugin from "terser-webpack-plugin";
 import UnicodeEscapePlugin  from "@dapplets/unicode-escape-webpack-plugin";
+import { LicenseWebpackPlugin } from "license-webpack-plugin";
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -32,6 +33,10 @@ function createConfig({ filename, minify }) {
       }),
       new UnicodeEscapePlugin({
         test: /\.(js|jsx|ts|tsx)$/, // Escape Unicode in JavaScript and TypeScript files
+      }),
+      new LicenseWebpackPlugin({
+        perChunkOutput: true, 
+        outputFilename: "LICENSE.txt",
       }),
     ],
     module: {
@@ -68,6 +73,7 @@ function createConfig({ filename, minify }) {
     optimization: {
       minimizer: [
         new TerserPlugin({
+          extractComments: false,
           terserOptions: {
             mangle: minify,
             format: {

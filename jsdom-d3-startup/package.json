@@ -1,7 +1,8 @@
 {
   "scripts": {
     "test": "node benchmark-node.mjs",
-    "prebuild": "rm -rf dist/*",
+    "clean": "rm -rf dist/*",
+    "prebuild": "npm run clean",
     "build": "webpack",
     "build:dev": "npm run prebuild && webpack --mode development"
   },
@@ -12,6 +13,7 @@
     "buffer": "^6.0.3",
     "d3": "^7.9.0",
     "jsdom": "^26.1.0",
+    "license-webpack-plugin": "^4.0.2",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
