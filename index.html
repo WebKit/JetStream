@@ -60,7 +60,6 @@
         }
         if (globalThis.allIsGood) {
             try {
-                await new Promise(r => setTimeout(r, 500));
                 await JetStream.initialize();
                 document.body.classList.add("ready");
             } catch (e) {
