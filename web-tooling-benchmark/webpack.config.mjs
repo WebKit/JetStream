@@ -66,7 +66,7 @@ export default async (env) => {
       new LicenseWebpackPlugin({
         perChunkOutput: true, 
         outputFilename: '[name].LICENSE.txt',
-    })
+      })
     ],
   };
 

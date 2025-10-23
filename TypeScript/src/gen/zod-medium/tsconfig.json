@@ -12,6 +12,7 @@
     "strict": true,
     "alwaysStrict": true,
     "noUncheckedIndexedAccess": false,
+    "types": [],
     "exactOptionalPropertyTypes": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -32,9 +33,6 @@
     "pretty": true,
     "customConditions": [
       "@zod/source"
-    ],
-    "types": [
-      "node"
     ]
   },
   "exclude": [
@@ -44,6 +42,7 @@
     "***.mts",
     "***.d.ts",
     "***.d.mts",
-    "packages/docs"
+    "packages/docs",
+    "vitest.root.mjs"
   ]
 }

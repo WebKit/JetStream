@@ -1,4 +1,3 @@
-/*! For license information please see bundle.es5.js.LICENSE.txt */
 !function(){var __webpack_modules__={19:function(){!function(Prism){
 /*ThouShaltNotCache*/
 var inner=/(?:\\.|[^\\\n\r]|(?:\n|\r\n?)(?![\r\n]))/.source;function createInline(pattern){
