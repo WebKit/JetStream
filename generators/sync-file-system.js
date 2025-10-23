@@ -37,7 +37,7 @@ const isLittleEndian = computeIsLittleEndian();
 let globalCounter = 0;
 
 function randomFileContents() {
-    const numBytes = (globalCounter % 128)  + 2056;
+    const numBytes = ((globalCounter * 1234.213784) % 2056);
     globalCounter++;
     let result = new ArrayBuffer(numBytes);
     let view = new Uint8Array(result);
@@ -55,6 +55,8 @@ class File {
     get data() { return this._data; }
 
     set data(dataView) { this._data = dataView; }
+
+    get byteLength() { return this._data.byteLength; }
 
     swapByteOrder() {
         let hash = 0x1a2b3c4d;
@@ -141,9 +143,28 @@ class Directory {
         return count;
     }
 
+    totalFileSize() {
+        let size = 0;
+        for (const file of this.forEachFileRecursively()) {
+            size += file.byteLength;
+        }
+        return size;
+    }
+
     rm(name) {
         return this.structure.delete(name);
     }
+
+    visit(visitor) {
+        visitor.visitDir(undefined, this);
+        for (const {name, entry, isDirectory} of this.ls()) {
+            if (isDirectory)
+                entry.visit(visitor);
+            else
+                visitor.visitFile(name, entry);
+        }
+    }
+
 }
 
 function setupDirectory() {
@@ -151,8 +172,8 @@ function setupDirectory() {
     let dirs = [fs];
     let counter = 0;
     for (let dir of dirs) {
-        for (let i = 0; i < 10; ++i) {
-            if (dirs.length < 400 && (counter % 3) <= 1) {
+        for (let i = 0; i < 15; ++i) {
+            if (dirs.length <= 5000) {
                 dirs.push(dir.addDirectory(`dir-${i}`));
             }
             counter++;
@@ -160,8 +181,8 @@ function setupDirectory() {
     }
 
     for (let dir of dirs) {
-        for (let i = 0; i < 5; ++i) {
-            if ((counter % 3) === 0) {
+        for (let i = 0; i < 3; ++i) {
+            if ((counter % 13)  === 0) {
                 dir.addFile(`file-${i}`, new File(randomFileContents()));
             }
             counter++;
@@ -171,20 +192,55 @@ function setupDirectory() {
     return fs;
 }
 
+class FSVisitor {
+    visitFile(name, file) {
+    }
+
+    visitDir(name, dir) {
+    }
+}
+
+class CountVisitor extends FSVisitor {
+    fileCount = 0;
+    dirCount = 0;
+
+    visitFile() {
+        this.fileCount++;
+    }
+
+    visitDir() {
+        this.dirCount++;
+    }
+}
+
+class CountDracula extends FSVisitor {
+    bytes = 0;
+    visitFile(name, file) {
+        this.bytes += file.byteLength;
+    }
+}
+
 class Benchmark {
-    EXPECTED_FILE_COUNT = 666;
+    EXPECTED_FILE_COUNT = 1154;
 
     totalFileCount = 0;
+    totalDirCount = 0;
     lastFileHash = undefined;
+    fs;
+
+    prepareForNextIteration() {
+    }
 
     runIteration() {
-        const fs = setupDirectory();
+        this.fs = setupDirectory();
 
-        for (let { entry: file } of fs.forEachFileRecursively()) {
+        for (let { entry: file } of this.fs.forEachFileRecursively()) {
             this.lastFileHash = file.swapByteOrder();
         }
 
-        for (let { name, entry: dir } of fs.forEachDirectoryRecursively()) {
+        let bytesDeleted = 0;
+        for (let { name, entry: dir } of this.fs.forEachDirectoryRecursively()) {
+            const oldTotalSize = dir.totalFileSize();
             if (dir.fileCount() > 3) {
                 for (let { name } of dir.forEachFile()) {
                     let result = dir.rm(name);
@@ -193,11 +249,37 @@ class Benchmark {
                     
                 }
             }
+            const totalReducedSize = oldTotalSize - dir.totalFileSize();
+            bytesDeleted += totalReducedSize;
         }
 
-        for (let _ of fs.forEachFileRecursively()) {
-            this.totalFileCount++;
+        const countVisitor = new CountVisitor();
+        this.fs.visit(countVisitor);
+
+        const countDracula = new CountDracula();
+        this.fs.visit(countDracula);
+
+        let fileCount = 0;
+        let fileBytes = 0;
+        for (const {entry: file} of this.fs.forEachFileRecursively()) {
+            fileCount++
+            fileBytes += file.byteLength;
         }
+        this.totalFileCount += fileCount;
+
+        let dirCount = 1;
+        for (let _ of this.fs.forEachDirectoryRecursively()) {
+            dirCount++;
+        }
+        this.totalDirCount += dirCount;
+
+        if (countVisitor.fileCount !== fileCount)
+            throw new Error(`Invalid total file count ${countVisitor.fileCount}, expected ${fileCount}.`);
+        if (countDracula.bytes !== fileBytes)
+            throw new Error(`Invalid total file bytes ${countDracula.bytes}, expected ${fileBytes}.`);
+        if (countVisitor.dirCount !== dirCount)
+            throw new Error(`Invalid total dir count ${countVisitor.dirCount}, expected ${dirCount}.`);
+
     }
 
     validate(iterations) {

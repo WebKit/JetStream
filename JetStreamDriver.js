@@ -842,8 +842,9 @@ class Benchmark {
 
     get prerunCode() { return null; }
 
+
     get preIterationCode() {
-        let code = `benchmark.prepareForNextIteration?.();`;
+        let code = this.prepareForNextIterationCode ;
         if (this.plan.deterministicRandom)
             code += `Math.random.__resetSeed();`;
 
@@ -851,6 +852,10 @@ class Benchmark {
             code += JetStreamParams.customPreIterationCode;
 
         return code;
+    }
+
+    get prepareForNextIterationCode() {
+        return "benchmark.prepareForNextIteration?.();"
     }
 
     get postIterationCode() {
@@ -1515,6 +1520,10 @@ class AsyncBenchmark extends DefaultBenchmark {
             `;
         }
         return str;
+    }
+
+    get prepareForNextIterationCode() {
+        return "await benchmark.prepareForNextIteration?.();"
     }
 
     get runnerCode() {
