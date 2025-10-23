@@ -35,7 +35,7 @@ function computeIsLittleEndian() {
 
 const isLittleEndian = computeIsLittleEndian();
 
-const randomFileContentsGen = (function *randomFileContents() {
+function *randomFileContents() {
     let counter = 1;
     while(true) {
         const numBytes = ((counter * 1192.18851371) % 2056);
@@ -46,7 +46,7 @@ const randomFileContentsGen = (function *randomFileContents() {
             view[i] = (i + counter) % 255;
         yield new DataView(result);
     }
-})();
+};
 
 
 class File {
@@ -147,7 +147,7 @@ class Directory {
 
     totalFileSize() {
         let size = 0;
-        for (const file of this.forEachFileRecursively()) {
+        for (const { entry:file } of this.forEachFileRecursively()) {
             size += file.byteLength;
         }
         return size;
@@ -169,29 +169,29 @@ class Directory {
 
 }
 
+const MAX_DIR_COUNT = 5000;
+const MAX_FILE_COUNT = 1200;
+
 function setupDirectory() {
     const fs = new Directory;
     let dirs = [fs];
-    let counter = 0;
     for (let dir of dirs) {
         for (let i = 0; i < 15; ++i) {
-            if (dirs.length <= 5000) {
-                dirs.push(dir.addDirectory(`dir-${i}`));
+            if (dirs.length < MAX_DIR_COUNT) {
+                dirs.push(dir.addDirectory(`dir-${dirs.length}`));
             }
-            counter++;
         }
     }
 
-    for (let dir of dirs) {
-        for (let i = 0; i < 3; ++i) {
-            if ((counter % 13)  === 0) {
-                const fileContents = randomFileContentsGen.next().value;
-                dir.addFile(`file-${i}`, new File(fileContents));
-            }
-            counter++;
-        }
+    let fileCounter = 0;
+    for (const fileContents of randomFileContents()) {
+        const dirIndex = fileCounter * 107;
+        const dir = dirs[dirIndex % dirs.length];
+        dir.addFile(`file-${fileCounter}`, new File(fileContents));
+        fileCounter++
+        if (fileCounter >= MAX_FILE_COUNT)
+            break;
     }
-
     return fs;
 }
 
@@ -224,7 +224,7 @@ class CountDracula extends FSVisitor {
 }
 
 class Benchmark {
-    EXPECTED_FILE_COUNT = 1154;
+    EXPECTED_FILE_COUNT = 1108;
 
     totalFileCount = 0;
     totalDirCount = 0;
@@ -242,19 +242,24 @@ class Benchmark {
         }
 
         let bytesDeleted = 0;
-        for (let { name, entry: dir } of this.fs.forEachDirectoryRecursively()) {
+        let counter = 0;
+        for (const { name, entry: dir } of this.fs.forEachDirectoryRecursively()) {
             const oldTotalSize = dir.totalFileSize();
-            if (dir.fileCount() > 3) {
-                for (let { name } of dir.forEachFile()) {
-                    let result = dir.rm(name);
-                    if (!result)
-                        throw new Error("rm should have returned true");
-                    
-                }
+            if (dir.fileCount() === 0)
+                continue;
+            counter++;
+            if (counter % 13 !== 0)
+                continue;
+            for (const { name } of dir.forEachFile()) {
+                const result = dir.rm(name);
+                if (!result)
+                    throw new Error("rm should have returned true");
             }
             const totalReducedSize = oldTotalSize - dir.totalFileSize();
             bytesDeleted += totalReducedSize;
         }
+        if (bytesDeleted === 0)
+            throw new Error("Did not delete any files");
 
         const countVisitor = new CountVisitor();
         this.fs.visit(countVisitor);

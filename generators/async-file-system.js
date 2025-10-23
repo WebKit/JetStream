@@ -34,9 +34,8 @@ function computeIsLittleEndian() {
 }
 
 const isLittleEndian = computeIsLittleEndian();
-let globalCounter = 0;
 
-const randomFileContentsGen = (function *randomFileContents() {
+async function *randomFileContents() {
     let counter = 1;
     while(true) {
         const numBytes = ((counter * 1192.18851371) % 2056);
@@ -47,7 +46,7 @@ const randomFileContentsGen = (function *randomFileContents() {
             view[i] = (i + counter) % 255;
         yield new DataView(result);
     }
-})();
+}
 
 
 class File {
@@ -174,27 +173,30 @@ class Directory {
 
 }
 
+const MAX_DIR_COUNT = 2500;
+const MAX_FILE_COUNT = 800;
+
 async function setupDirectory() {
     const fs = new Directory;
     let dirs = [fs];
     let counter = 0;
     for (let dir of dirs) {
         for (let i = 0; i < 15; ++i) {
-            if (dirs.length <= 3000) {
+            if (dirs.length <= MAX_DIR_COUNT) {
                 dirs.push(await dir.addDirectory(`dir-${i}`));
             }
             counter++;
         }
     }
 
-    for (let dir of dirs) {
-        for (let i = 0; i < 3; ++i) {
-            if ((counter % 13) === 0) {
-                const fileContents = randomFileContentsGen.next().value;
-                await dir.addFile(`file-${i}`, new File(fileContents));
-            }
-            counter++;
-        }
+    let fileCounter = 0;
+    for await (const fileContents of randomFileContents()) {
+        const dirIndex = fileCounter * 107;
+        const dir = dirs[dirIndex % dirs.length];
+        await dir.addFile(`file-${fileCounter}`, new File(fileContents));
+        fileCounter++
+        if (fileCounter >= MAX_FILE_COUNT)
+            break;
     }
 
     return fs;
@@ -230,7 +232,7 @@ class CountDracula extends FSVisitor {
 
 
 class Benchmark {
-    EXPECTED_FILE_COUNT = 693;
+    EXPECTED_FILE_COUNT = 739;
 
     totalFileCount = 0;
     totalDirCount = 0;
@@ -247,18 +249,24 @@ class Benchmark {
         }
 
         let bytesDeleted = 0;
-        for await (let { name, entry: dir } of this.fs.forEachDirectoryRecursively()) {
-            const oldTotalSize = dir.totalFileSize();
-            if ((await dir.fileCount()) > 3) {
-                for await (let { name } of dir.forEachFile()) {
-                    let result = await dir.rm(name);
-                    if (!result)
-                        throw new Error("rm should have returned true");
-                }
-                const totalReducedSize = oldTotalSize - dir.totalFileSize();
-                bytesDeleted += totalReducedSize;
+        let counter = 0;
+        for await (const { name, entry: dir } of this.fs.forEachDirectoryRecursively()) {
+            const oldTotalSize = await dir.totalFileSize();
+            if (await dir.fileCount() === 0)
+                continue;
+            counter++;
+            if (counter % 13 !== 0)
+                continue;
+            for await (const { name } of dir.forEachFile()) {
+                const result = await dir.rm(name);
+                if (!result)
+                    throw new Error("rm should have returned true");
             }
+            const totalReducedSize = oldTotalSize - dir.totalFileSize();
+            bytesDeleted += totalReducedSize;
         }
+        if (bytesDeleted === 0)
+            throw new Error("Did not delete any files");
 
         const countVisitor = new CountVisitor();
         await this.fs.visit(countVisitor);
