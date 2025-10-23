@@ -23,7 +23,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-load("./shell-config.js");
+load("./utils/shell-config.js");
 
 const CLI_PARAMS = {
   __proto__: null,
@@ -120,7 +120,7 @@ if (cliArgs.length) {
 if (cliParams.size) 
     globalThis.JetStreamParamsSource = cliParams;
 
-load("./params.js");
+load("./utils/params.js");
 
 
 async function runJetStream() {

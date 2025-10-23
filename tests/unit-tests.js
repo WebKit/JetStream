@@ -21,8 +21,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-load("shell-config.js");
-load("params.js");
+load("utils/shell-config.js");
+load("utils/params.js");
 load("startup-helper/StartupBenchmark.js");
 load("JetStreamDriver.js");
 
