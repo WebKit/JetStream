@@ -170,9 +170,10 @@ const doxbee = require("../lib/doxbee-async");
 
 globalThis.Benchmark = class {
   runIteration() {
-    const promises = new Array(10_000);
+    const innerIterations = 25_000;
+    const promises = new Array(innerIterations);
 
-    for (var i = 0; i < 10_000; i++)
+    for (var i = 0; i < innerIterations; i++)
       promises[i] = doxbee(i, "foo");
 
     return Promise.all(promises);
