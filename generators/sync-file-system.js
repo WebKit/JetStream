@@ -34,17 +34,19 @@ function computeIsLittleEndian() {
 }
 
 const isLittleEndian = computeIsLittleEndian();
-let globalCounter = 0;
 
-function randomFileContents() {
-    const numBytes = ((globalCounter * 1234.213784) % 2056);
-    globalCounter++;
-    let result = new ArrayBuffer(numBytes);
-    let view = new Uint8Array(result);
-    for (let i = 0; i < numBytes; ++i)
-        view[i] = (i + globalCounter) % 255;
-    return new DataView(result);
-}
+const randomFileContentsGen = (function *randomFileContents() {
+    let counter = 1;
+    while(true) {
+        const numBytes = ((counter * 1192.18851371) % 2056);
+        counter++;
+        let result = new ArrayBuffer(numBytes);
+        let view = new Uint8Array(result);
+        for (let i = 0; i < numBytes; ++i)
+            view[i] = (i + counter) % 255;
+        yield new DataView(result);
+    }
+})();
 
 
 class File {
@@ -183,7 +185,8 @@ function setupDirectory() {
     for (let dir of dirs) {
         for (let i = 0; i < 3; ++i) {
             if ((counter % 13)  === 0) {
-                dir.addFile(`file-${i}`, new File(randomFileContents()));
+                const fileContents = randomFileContentsGen.next().value;
+                dir.addFile(`file-${i}`, new File(fileContents));
             }
             counter++;
         }
