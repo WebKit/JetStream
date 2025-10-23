@@ -428,7 +428,6 @@ class Driver {
             }
             summaryHtml += "</div>";
             const summaryElement = document.getElementById("result-summary");
-            summaryElement.classList.add("done");
             summaryElement.innerHTML = summaryHtml;
             summaryElement.onclick = displayCategoryScores;
             statusElement.innerHTML = "";
@@ -474,6 +473,14 @@ class Driver {
             if (e.key === "Enter")
                 JetStream.start();
         });
+
+        const statusElement = document.getElementById("status");
+        statusElement.innerHTML = `<a href="javascript:JetStream.start()" class="button">Start Test</a>`;
+        statusElement.addEventListener("click", (e) => {
+            e.preventDefault();
+            JetStream.start();
+            return false;
+        }, { once: true});
     }
 
     reportError(benchmark, error) {
@@ -549,15 +556,6 @@ class Driver {
         }
 
         JetStream.loadCache = { }; // Done preloading all the files.
-
-        const statusElement = document.getElementById("status");
-        statusElement.classList.remove('loading');
-        statusElement.innerHTML = `<a href="javascript:JetStream.start()" class="button">Start Test</a>`;
-        statusElement.onclick = () => {
-            statusElement.onclick = null;
-            JetStream.start();
-            return false;
-        }
     }
 
     updateCounterUI() {

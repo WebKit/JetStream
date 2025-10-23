@@ -51,24 +51,29 @@
     }
 
     async function initialize() {
+        const bodyClassList = document.body.classList;
         if (!JetStreamParams.isDefault) {
             showNonDefaultParams();
         }
-        if (JetStreamParams.startDelay === undefined) {
-            startIntroAnimations()
+        if (JetStreamParams.startDelay !== undefined) {
+            bodyClassList.remove("animate");
         }
         if (globalThis.allIsGood) {
             try {
+                await new Promise(r => setTimeout(r, 500));
                 await JetStream.initialize();
+                document.body.classList.add("ready");
             } catch (e) {
                 globalThis.allIsGood = false;
                 console.error(e);
+            } finally {
+                bodyClassList.remove("loading");
+                bodyClassList.remove("animate-loading");
             }
         }
         if (!globalThis.allIsGood) {
+            bodyClassList.add('error');
             let statusElement = document.getElementById("status");
-            statusElement.classList.remove('loading');
-            statusElement.classList.add('error');
             statusElement.innerHTML = "<h2>ERROR</h2><p>Errors were encountered during page load. Refusing to run a partial benchmark suite.</p>";
         }
     }
@@ -87,18 +92,13 @@
         }
     }
 
-    function startIntroAnimations() {
-        document.body.classList.add("animateUI");
-        const timestamp = performance.now();
-        document.getElementById('jetstreams').style.backgroundImage = `url('resources/jetstreams.svg?${timestamp}')`;
-    }
     </script>
 
     <script src="utils/params.js"></script>
     <script src="JetStreamDriver.js"></script>
 
 </head>
-<body onload="initialize()">
+<body onload="initialize()" class="loading animate">
 <h1 class="logo">
     <div id="jetstreams">
         <a href="index.html" class="logo-image">JetStream Next</a>
@@ -127,7 +127,7 @@
     <p class="summary" id="mode-description"></p>
 
     <div id="result-summary"></div>
-    <div id="status" class="loading">
+    <div id="status">
         <div id="status-text">Loading Benchmark...</div>
         <div id="status-progress-container">
             <div id="status-progress-bar" style="width: 0%"></div>
