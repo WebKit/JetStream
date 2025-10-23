@@ -2267,7 +2267,7 @@ let BENCHMARKS = [
             US_DATA: "./jsdom-d3-startup/data/counties-albers-10m.json",
             AIRPORTS: "./jsdom-d3-startup/data/airports.csv",
         },
-        tags: ["d3", "startup", "jsdom"],
+        tags: ["default", "js", "d3", "startup", "jsdom"],
         iterations: 15,
         worstCaseCount: 2,
     }),
