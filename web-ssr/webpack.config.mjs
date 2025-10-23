@@ -49,7 +49,7 @@ function createConfig({ filename, minify }) {
                 }],
                 "@babel/preset-react"
               ],
-              plugins: [path.resolve(__dirname, "../startup-helper/BabelCacheBuster.mjs")],
+              plugins: [path.resolve(__dirname, "../utils/BabelCacheBuster.mjs")],
             },
           },
         },
@@ -59,7 +59,7 @@ function createConfig({ filename, minify }) {
           use: {
             loader: "babel-loader",
             options: {
-              plugins: [path.resolve(__dirname, "../startup-helper/BabelCacheBuster.mjs")],
+              plugins: [path.resolve(__dirname, "../utils/BabelCacheBuster.mjs")],
             },
           },
         },

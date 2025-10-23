@@ -23,7 +23,7 @@
 
 load("shell-config.js");
 load("params.js");
-load("startup-helper/StartupBenchmark.js");
+load("utils/StartupBenchmark.js");
 load("JetStreamDriver.js");
 
 function assertTrue(condition, message) {

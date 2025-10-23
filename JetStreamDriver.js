@@ -2257,7 +2257,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "jsdom-d3-startup",
         files: [
-            "./startup-helper/StartupBenchmark.js",
+            "./utils/StartupBenchmark.js",
             "./jsdom-d3-startup/benchmark.js",
         ],
         preload: {
@@ -2876,7 +2876,7 @@ let BENCHMARKS = [
 
 
 const PRISM_JS_FILES = [
-    "./startup-helper/StartupBenchmark.js",
+    "./utils/StartupBenchmark.js",
     "./prismjs/benchmark.js",
 ];
 const PRISM_JS_PRELOADS = {
