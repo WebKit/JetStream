@@ -64,7 +64,7 @@ body {
     background-position: center -5vw;
     background-size: 100vw;
     padding-bottom: 0px;
-    background-image: url('clouds.svg');
+    background-image: url("clouds.svg");
     padding-bottom: 0px;
     overflow-y: hidden;
     height: 100%;
@@ -209,10 +209,10 @@ img {
 }
 
 .loading.animate #jetstreams {
-    background-image: url("jetstreams.svg") !important;
+    background-image: url("jetstreams.svg");
 }
 
-.loadidng #jetstreams, .ready #jetstreams {
+.loading #jetstreams, .ready #jetstreams {
     background-image: url("jetstreams-static.svg");
 }
 
@@ -239,7 +239,7 @@ article,
     margin: 0 auto 0 auto;
 }
 
-.loading .summary {
+.loading.animate .summary {
     opacity: 0;
 }
 
