@@ -67,7 +67,14 @@ class StartupBenchmark {
   }
 
   async init() {
+    if (!JetStream.preload.BUNDLE) {
+      throw new Error("Missing JetStream.preload.BUNDLE");
+    }
     this.#sourceCode = await JetStream.getString(JetStream.preload.BUNDLE);
+    if (!this.sourceCode || !this.sourceCode.length) {
+      throw new Error("Couldn't load JetStream.preload.BUNDLE");
+    }
+
     const cacheCommentCount = this.sourceCode.match(
       CACHE_BUST_COMMENT_RE
     ).length;

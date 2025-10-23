@@ -2274,12 +2274,13 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "web-ssr",
         files: [
+            "./utils/StartupBenchmark.js",
             "./web-ssr/benchmark.js",
         ],
         preload: {
             // Debug Sources for nicer profiling.
-            // BUNDLE_BLOB: "./web-ssr/dist/bundle.js",
-            BUNDLE_BLOB: "./web-ssr/dist/bundle.min.js",
+            // BUNDLE: "./web-ssr/dist/bundle.js",
+            BUNDLE: "./web-ssr/dist/bundle.min.js",
         },
         tags: ["default", "js", "web", "ssr"],
         iterations: 30,
