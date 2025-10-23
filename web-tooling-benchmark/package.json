@@ -4,7 +4,9 @@
   "main": "src/cli.js",
   "scripts": {
     "benchmark": "node src/cli/cli.mjs",
-    "build": "webpack",
+    "build": "npm run build-prod; npm run build-dev",
+    "build-prod": "webpack --progress --env production",
+    "build-dev": "webpack --progress --env development",
     "test": "jest",
     "update-lock": "npm install --package-lock"
   },

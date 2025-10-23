@@ -6,7 +6,7 @@
   "scripts": {
     "test": "babel-node benchmark-node.mjs",
     "prebuild": "rm -rf dist/*",
-    "build": "webpack",
+    "build": "webpack --progress",
     "build:dev": "npm run prebuild && webpack --mode development"
   },
   "keywords": [],
