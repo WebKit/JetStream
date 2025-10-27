@@ -2434,7 +2434,7 @@ let BENCHMARKS = [
             "./workloads/js-tokens/js-tokens.js",
         ],
         preload: {
-            "jsTokensSourceCode": "./generators/js-tokens.js",
+            SOURCE_CODE: "./generators/js-tokens-input.js",
         },
         tags: ["default", "js", "Generators"],
     }),

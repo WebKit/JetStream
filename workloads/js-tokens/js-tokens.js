@@ -442,7 +442,7 @@ class Benchmark {
     jsTokensSourceCode = "";
 
     async init() {
-        this.jsTokensSourceCode = await JetStream.getString(JetStream.preload.jsTokensSourceCode);
+        this.jsTokensSourceCode = await JetStream.getString(JetStream.preload.SOURCE_CODE);
     }
 
     runIteration() {
