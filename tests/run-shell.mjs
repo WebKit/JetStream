@@ -39,44 +39,50 @@ const UNIT_TEST_PATH = path.join(SRC_DIR, "tests", "unit-tests.js");
 const TESTS = [
     {
         name: "UnitTests",
-        tags: ["main", "unit"],
+        tags: ["all", "main", "unit"],
         run(shell_binary) {
-          return runTest("UnitTests", () => sh(shell_binary, UNIT_TEST_PATH));
+            return runTest("UnitTests", () => sh(shell_binary, UNIT_TEST_PATH));
         },
     },
     {
         name: "Single Suite",
-        tags: ["main", "single"],
+        tags: ["all", "main", "single"],
         run(shell_binary) {
-          return runCLITest("Single Suite", shell_binary, "proxy-mobx");
+            return runCLITest("Single Suite", shell_binary, "proxy-mobx");
         },
     },
     {
         name: "Tag No Prefetch",
-        tags: ["main", "no-prefetch"],
+        tags: ["all", "main", "no-prefetch"],
         run(shell_binary) {
-            return runCLITest("Tag No Prefetch", shell_binary, "proxy", "argon2-wasm", "--no-prefetch");
+            return runCLITest(
+                "Tag No Prefetch",
+                shell_binary,
+                "proxy",
+                "argon2-wasm",
+                "--no-prefetch"
+            );
         },
     },
     {
         name: "Grouped with Details",
-        tags: ["main", "group-details"],
+        tags: ["all", "main", "group-details"],
         run(shell_binary) {
             return runCLITest("Grouped with Details", shell_binary, "SunSpider", "--group-details");
         },
     },
     {
         name: "Disabled Suite",
-        tags: ["disabled"],
+        tags: ["all", "disabled"],
         run(shell_binary) {
-          return runCLITest("Disabled Suite", shell_binary, "disabled");
+            return runCLITest("Disabled Suite", shell_binary, "disabled");
         },
     },
     {
         name: "Default Suite",
-        tags: ["default"],
+        tags: ["all", "default"],
         run(shell_binary) {
-          return runCLITest("Default Suite", shell_binary);
+            return runCLITest("Default Suite", shell_binary);
         },
     },
 ];
@@ -101,16 +107,21 @@ const optionDefinitions = [
 
 const options = commandLineArgs(optionDefinitions);
 
-if ("help" in options) printHelp("", optionDefinitions);
+if ("help" in options) {
+    printHelp("", optionDefinitions);
+}
 
-if (options.suite && !VALID_TAGS.includes(options.suite))
+if (options.suite && !VALID_TAGS.includes(options.suite)) {
     printHelp(
         `Invalid suite: ${options.suite}. Choices are: ${VALID_TAGS.join(", ")}`,
         optionDefinitions
     );
+}
 
 const JS_SHELL = options?.shell;
-if (!JS_SHELL) printHelp("No javascript shell specified, use --shell", optionDefinitions);
+if (!JS_SHELL) {
+    printHelp("No javascript shell specified, use --shell", optionDefinitions);
+}
 
 const SHELL_NAME = (function () {
     switch (JS_SHELL) {
@@ -140,7 +151,7 @@ function convertCliArgs(cli, ...cliArgs) {
 
 async function runTests() {
     const shell_binary = await logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
-    const suiteFilter = options.suite || "main";
+    const suiteFilter = options.suite || "all";
     let success = true;
     const testsToRun = TESTS.filter((test) => test.tags.includes(suiteFilter));
 

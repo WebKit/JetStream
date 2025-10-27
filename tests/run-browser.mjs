@@ -36,35 +36,35 @@ import {logInfo, logError, printHelp, runTest} from "./helper.mjs";
 const TESTS = [
     {
         name: "Run Single Suite",
-        tags: ["main"],
+        tags: ["all", "main"],
         run() {
             return runEnd2EndTest("Run Single Suite", { test: "proxy-mobx" });
         }
     },
     {
         name: "Run Multiple Suites",
-        tags: ["main"],
+        tags: ["all", "main"],
         run() {
-            runEnd2EndTest("Run Multiple Suites", { test: "prismjs-startup-es6,postcss-wtb" });
+            return runEnd2EndTest("Run Multiple Suites", { test: "prismjs-startup-es6,postcss-wtb" });
         }
     },
     {
         name: "Run Tag No Prefetch",
-        tags: ["main"],
+        tags: ["all", "all", "main"],
         run() {
             return runEnd2EndTest("Run Tag No Prefetch",  { tag: "proxy", prefetchResources: "false" });
         }
     },
     {
         name: "Run Disabled Suite",
-        tags: ["disabled"],
+        tags: ["all", "disabled"],
         run() {
             return runEnd2EndTest("Run Disabled Suite", { tag: "disabled" });
         }
     },
     {
         name: "Run Default Suite",
-        tags: ["default"],
+        tags: ["all", "default"],
         run() {
             return runEnd2EndTest("Run Default Suite");
         }
@@ -130,10 +130,13 @@ const server = await serve(PORT);
 
 async function runTests() {
     let success = true;
-    const suiteFilter = options.suite || "main";
+    const suiteFilter = options.suite || "all";
 
     const testsToRun = TESTS.filter(test => test.tags.includes(suiteFilter));
 
+    console.log(testsToRun)
+    console.log(testsToRun.length)
+    console.log(suiteFilter)
     if (testsToRun.length === 0) {
         console.error(`No suite found for filter: ${suiteFilter}`);
         process.exit(1);

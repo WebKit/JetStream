@@ -91,7 +91,7 @@ export function printHelp(message, optionDefinitions) {
           optionList: optionDefinitions,
       },
   ]);
-  if (!message || !message.length) {
+  if (!message?.length) {
       console.log(usage);
       process.exit(0);
   } else {
