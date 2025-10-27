@@ -410,7 +410,6 @@ function jsTokensWrapperFunction() {
     };
 };
 
-const jsTokensSourceCode = jsTokensWrapperFunction.toString();
 const jsxSourceCode = `
 
 function Comment(props) {
@@ -438,9 +437,9 @@ const jsTokens = jsTokensWrapperFunction();
 
 class Benchmark {
     EXPECTED_TOKEN_COUNT = 122200;
-    tokenCount = 0;
 
-    jsTokensSourceCode;
+    tokenCount = 0;
+    jsTokensSourceCode = "";
 
     async init() {
         this.jsTokensSourceCode = await JetStream.getString(JetStream.preload.jsTokensSourceCode);
