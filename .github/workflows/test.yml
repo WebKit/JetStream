@@ -19,6 +19,7 @@ jobs:
             fail-fast: false
             matrix:
                 browser: [chrome, firefox, safari]
+                suite: [default, disabled, main]
         steps:
             - name: Extract Week Number
               run: echo "WEEK_NUMBER=$(date +%W)" >> $GITHUB_ENV
@@ -42,7 +43,7 @@ jobs:
             - name: Run Tests
               run: |
                   echo "Running in $BROWSER"
-                  npm run test:${{ matrix.browser }}
+                  npm run test:${{ matrix.browser }} -- ${{ matrix.suite }}
     shell:
         name: Test Shell
         runs-on: ubuntu-latest
