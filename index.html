@@ -53,6 +53,7 @@
     async function initialize() {
         const bodyClassList = document.body.classList;
         if (!JetStreamParams.isDefault) {
+            bodyClassList.remove("animate");
             showNonDefaultParams();
         }
         if (JetStreamParams.startDelay !== undefined) {
