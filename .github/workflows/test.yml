@@ -10,8 +10,8 @@ on:
     workflow_dispatch:
 
 jobs:
-    build:
-        name: Build
+    test:
+        name: Test
         runs-on: macos-latest
         env:
             GITHUB_ACTIONS_OUTPUT: ""
@@ -49,3 +49,30 @@ jobs:
               run: |
                   echo "Running in $BROWSER"
                   npm run test:${{ matrix.browser }}
+
+    build:
+        name: Build
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Branch
+              uses: actions/checkout@v4
+              with:
+                fetch-depth: ${{ github.event_name == 'pull_request' && 2 || 0 }}
+
+            - name: Setup Node
+              uses: actions/setup-node@v4
+              with:
+                  node-version-file: package.json
+                  cache: npm
+
+            - name: Install Node Packages
+              run: npm ci
+
+            - name: Run Build
+              run: |
+                  if ${{ github.event_name == 'pull_request' }}; then
+                    npm run test:build -- --diff="HEAD^...HEAD"
+                  else
+                    npm run test:build -- --diff="${{ github.event.before }}...${{ github.event.after }}"
+                  fi
+

@@ -4,6 +4,8 @@
   "main": "src/cli.js",
   "scripts": {
     "benchmark": "node src/cli/cli.mjs",
+    "clean": "rm -rf dist/*",
+    "prebuild": "npm run clean",
     "build": "webpack",
     "test": "jest",
     "update-lock": "npm install --package-lock"
@@ -24,6 +26,7 @@
     "esprima-next": "^6.0.3",
     "jest": "^30.0.5",
     "lebab": "3.2.7",
+    "license-webpack-plugin": "^4.0.2",
     "lint-staged": "^16.1.5",
     "os-browserify": "^0.3.0",
     "path-browserify": "^1.0.1",

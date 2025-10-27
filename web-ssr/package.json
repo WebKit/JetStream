@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "babel-node benchmark-node.mjs",
-    "prebuild": "rm -rf dist/*",
+    "clean": "rm -rf dist/*",
+    "prebuild": "npm run clean",
     "build": "webpack",
     "build:dev": "npm run prebuild && webpack --mode development"
   },
@@ -18,10 +19,12 @@
     "@babel/node": "^7.28.0",
     "@babel/preset-env": "^7.28.0",
     "@babel/preset-react": "^7.27.1",
+    "@dapplets/unicode-escape-webpack-plugin": "^0.1.1",
     "assert": "^2.1.0",
     "babel-loader": "^10.0.0",
     "babel-node": "^0.0.1-security",
     "buffer": "^6.0.3",
+    "license-webpack-plugin": "^4.0.2",
     "path-browserify": "^1.0.1",
     "process": "^0.11.10",
     "react": "^19.1.1",

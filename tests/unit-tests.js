@@ -21,8 +21,8 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-load("shell-config.js");
-load("params.js");
+load("utils/shell-config.js");
+load("utils/params.js");
 load("utils/StartupBenchmark.js");
 load("JetStreamDriver.js");
 
@@ -298,6 +298,32 @@ async function testStartupBenchmarkInnerTests() {
       new StartupBenchmark({ iterationCount: 1, expectedCacheCommentCount: 0 });
     }
   );
+})();
+
+(function testDefaultParams() {
+  assertTrue(DefaultJetStreamParams.isDefault);
+  assertTrue(Object.isFrozen(DefaultJetStreamParams));
+  assertEquals(Object.entries(DefaultJetStreamParams.nonDefaultParams).length, 0);
+})();
+
+(function testCustomParamsSingle() {
+  const sourceParams = new Map(Object.entries({ developerMode: "true" }));
+  const params = new Params(sourceParams);
+  assertFalse(params.isDefault);
+  const nonDefaults = params.nonDefaultParams;
+  assertEquals(Object.entries(nonDefaults).length, 1);
+  assertEquals(nonDefaults.developerMode, true);
+})();
+
+
+(function testCustomParamsMultiple() {
+  const sourceParams = new Map(Object.entries({ iterationCount: 123, test: "wasm,js"}));
+  const params = new Params(sourceParams);
+  assertFalse(params.isDefault);
+  const nonDefaults = params.nonDefaultParams;
+  assertEquals(Object.entries(nonDefaults).length, 2);
+  assertEquals(nonDefaults.testIterationCount, 123);
+  assertEquals(JSON.stringify(nonDefaults.testList), JSON.stringify(["wasm", "js"]));
 })();
 
 
