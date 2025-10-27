@@ -62,13 +62,11 @@
         if (globalThis.allIsGood) {
             try {
                 await JetStream.initialize();
-                document.body.classList.add("ready");
             } catch (e) {
                 globalThis.allIsGood = false;
                 console.error(e);
             } finally {
                 bodyClassList.remove("loading");
-                bodyClassList.remove("animate-loading");
             }
         }
         if (!globalThis.allIsGood) {

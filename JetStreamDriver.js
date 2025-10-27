@@ -330,10 +330,7 @@ class Driver {
         this.benchmarks = Array.from(new Set(benchmarks));
         this.benchmarks.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? 1 : -1);
         console.assert(this.benchmarks.length, "No benchmarks selected");
-        this.counter = { };
-        this.counter.loadedResources = 0;
-        this.counter.totalResources = 0;
-        this.counter.failedPreloadResources = 0;
+        this.counter = { loadedResources: 0, totalResources: 0, failedPreloadResources: 0 };
     }
 
     async start() {
@@ -460,7 +457,7 @@ class Driver {
         }
     }
 
-    prepareBrowserUI() {
+    async prepareBrowserUI() {
         let text = "";
         for (const benchmark of this.benchmarks)
             text += benchmark.renderHTML();
@@ -474,13 +471,26 @@ class Driver {
                 JetStream.start();
         });
 
+        document.body.classList.add("ready");
         const statusElement = document.getElementById("status");
         statusElement.innerHTML = `<a href="javascript:JetStream.start()" class="button">Start Test</a>`;
+
+        await this.waitForBrowserUIStartupAnimation();
+
         statusElement.addEventListener("click", (e) => {
             e.preventDefault();
             JetStream.start();
             return false;
         }, { once: true});
+    }
+
+
+    async waitForBrowserUIStartupAnimation() {
+        if (!JetStreamParams.isDefault)
+            return
+        const cssValue = window.getComputedStyle(document.body).getPropertyValue("--startup-animation-duration");
+        const startupAnimationDuration = parseInt(cssValue.split("ms")[0])
+        await new Promise((resolve) => setTimeout(resolve, startupAnimationDuration));
     }
 
     reportError(benchmark, error) {
@@ -512,7 +522,7 @@ class Driver {
         await this.prefetchResources();
         this.benchmarks.sort((a, b) => a.name.toLowerCase() < b.name.toLowerCase() ? 1 : -1);
         if (isInBrowser)
-            this.prepareBrowserUI();
+            await this.prepareBrowserUI();
         this.isReady = true;
         if (isInBrowser) {
             globalThis.dispatchEvent(new Event("JetStreamReady"));

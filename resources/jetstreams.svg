@@ -11,22 +11,22 @@
 
         .line.second {
             animation-delay: 200ms;
-            animation-duration: 900ms;
+            animation-duration: 2900ms;
         }
 
         .line.third {
             animation-delay: 300ms;
-            animation-duration: 800ms;
+            animation-duration: 1800ms;
         }
 
         .line.fourth {
             animation-delay: 400ms;
-            animation-duration: 700ms;
+            animation-duration: 1700ms;
         }
 
         .line.fifth {
-            animation-delay: 500ms;
-            animation-duration: 600ms;
+            animation-delay: 900ms;
+            animation-duration: 1600ms;
         }
 
         @keyframes dash {

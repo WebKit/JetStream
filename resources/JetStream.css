@@ -41,6 +41,7 @@
     --benchmark-done-result-color: #4a4a4a;
     --gap: 3rem;
     --width: 200px;
+    --startup-animation-duration: 500ms;
     --nonDefaultRotate: 152deg;
 }
 
@@ -185,7 +186,7 @@ img {
 }
 
 .loading.animate .logo .logo-image {
-    animation: swingin 350ms ease-out forwards;
+    animation: swingin var(--startup-animation-duration) ease-out forwards;
     will-change: transform, opacity;
     animation-delay: 50ms;
 }
@@ -201,19 +202,21 @@ img {
     background-position: center;
     padding: 2rem 0;
     margin: -2rem 0;
+    background-image: url("jetstreams-static.svg");
 }
+
 
 #jetstreams svg {
     width: 100%;
     max-height: 120px;
 }
 
-.loading.animate #jetstreams {
+.animate #jetstreams {
     background-image: url("jetstreams.svg");
+    transition: background-image var(--startup-animation-duration) ease-in-out;
 }
-
-.loading #jetstreams, .ready #jetstreams {
-    background-image: url("jetstreams-static.svg");
+.ready #jetstreams {
+    background-image: url("jetstreams-static.svg") !important;
 }
 
 #magic {
@@ -244,7 +247,7 @@ article,
 }
 
 article, .loading.animate .summary {
-    animation: fadein 0.5s ease-in-out forwards;
+    animation: fadein var(--startup-animation-duration) ease-in-out forwards;
     animation-delay: 200ms;
 }
 
@@ -364,7 +367,7 @@ a:active {
     color: var(--link-hover-color);
 }
 
-#status label,
+#status-label,
 a.button {
     display: inline-block;
     font-weight: 500;
@@ -381,6 +384,12 @@ a.button {
     -webkit-touch-callout: none;
     user-select: none;
 }
+
+.animate a.button {
+    animation: fadein var(--startup-animation-duration) ease-in forwards, scaledown var(--startup-animation-duration) ease-in forwards;
+    opacity: 0;
+}
+
 
 #status label,
 .button:hover {
@@ -494,13 +503,12 @@ a.button {
     justify-content: space-around;
     gap: var(--gap);
     margin: 0 calc(var(--gap) * -1) 0 calc(-var(--gap) * -1);
-    animation: fadein 500ms ease-out forwards;
-    opacity: 0;
     overflow-y: auto;
     flex: 1;
     padding-bottom: var(--gap);
     box-sizing: border-box;
 }
+
 
 .benchmark {
     position: relative;
@@ -513,6 +521,12 @@ a.button {
     scroll-margin-top: 20vh;
     scroll-margin-bottom: 20vh;
 }
+
+.animate .benchmark {
+    animation: fadein var(--startup-animation-duration) ease-in forwards;
+    opacity: 0;
+}
+
 
 .benchmark .result.detail {
     display: none;
@@ -697,16 +711,6 @@ dt:target {
 
     to {
         transform: scale(1, 1);
-    }
-}
-
-@keyframes shine {
-    0% {
-        background-position: -1200px center;
-    }
-
-    100% {
-        background-position: 100vw center;
     }
 }
 
