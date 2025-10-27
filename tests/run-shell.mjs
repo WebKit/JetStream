@@ -31,20 +31,64 @@ import { fileURLToPath } from "url";
 
 import { logGroup, logInfo, printHelp, runTest, sh } from "./helper.mjs";
 
+const FILE_PATH = fileURLToPath(import.meta.url);
+const SRC_DIR = path.dirname(path.dirname(FILE_PATH));
+const CLI_PATH = path.join(SRC_DIR, "cli.js");
+const UNIT_TEST_PATH = path.join(SRC_DIR, "tests", "unit-tests.js");
+let SHELL_BINARY = "";
+
+const TESTS = [
+    {
+        name: "UnitTests",
+        tags: ["main"],
+        run: () => runTest("UnitTests", () => sh(SHELL_BINARY, UNIT_TEST_PATH))
+    },
+    {
+        name: "Single Suite",
+        tags: ["main"],
+        run: () => runCLITest("Single Suite", SHELL_BINARY, "proxy-mobx")
+    },
+    {
+        name: "Tag No Prefetch",
+        tags: ["main"],
+        run: () => runCLITest("Tag No Prefetch", SHELL_BINARY, "proxy", "argon2-wasm", "--no-prefetch")
+    },
+    {
+        name: "Grouped with Details",
+        tags: ["main"],
+        run: () => runCLITest("Grouped with Details", SHELL_BINARY, "SunSpider", "--group-details")
+    },
+    {
+        name: "Disabled Suite",
+        tags: ["disabled"],
+        run: () => runCLITest("Disabled Suite", SHELL_BINARY, "disabled")
+    },
+    {
+        name: "Default Suite",
+        tags: ["default"],
+        run: () => runCLITest("Default Suite",  SHELL_BINARY)
+    }
+];
+
+const VALID_TAGS = Array.from(new Set(TESTS.map(each => each.tags).flat()));
+
 const optionDefinitions = [
   { name: "shell", type: String, description: "Set the shell to test, choices are [jsc, v8, spidermonkey]." },
-  { name: "suite", type: String, description: "Run a specific suite." },
   { name: "help", alias: "h", description: "Print this help text." },
+  { name: "suite", type: String, defaultOption: true, typeLabel: `choices: ${VALID_TAGS.join(", ")}`, description: "Run a specific suite by name." }
 ];
 
 const options = commandLineArgs(optionDefinitions);
 
 if ("help" in options)
-  printHelp(optionDefinitions);
+    printHelp("", optionDefinitions);
+
+if (options.suite && !VALID_TAGS.includes(options.suite))
+    printHelp(`Invalid suite: ${options.suite}. Choices are: ${VALID_TAGS.join(", ")}`, optionDefinitions);
 
 const JS_SHELL= options?.shell;
 if (!JS_SHELL)
-  printHelp("No javascript shell specified, use --shell", optionDefinitions);
+    printHelp("No javascript shell specified, use --shell", optionDefinitions);
 
 const SHELL_NAME = (function() {
   switch (JS_SHELL) {
@@ -59,15 +103,11 @@ const SHELL_NAME = (function() {
           return "v8";
       }
       default: {
-          printHelp(`Invalid shell "${JS_SHELL}", choices are: "jsc", "spidermonkey" and "v8)`);
+          printHelp(`Invalid shell "${JS_SHELL}", choices are: "jsc", "spidermonkey" and "v8)`, optionDefinitions);
       }
   }
 })();
 
-const FILE_PATH = fileURLToPath(import.meta.url);
-const SRC_DIR = path.dirname(path.dirname(FILE_PATH));
-const CLI_PATH = path.join(SRC_DIR, "cli.js");
-const UNIT_TEST_PATH = path.join(SRC_DIR, "tests", "unit-tests.js");
 
 function convertCliArgs(cli, ...cliArgs) {
   if (SHELL_NAME == "spidermonkey")
@@ -76,22 +116,25 @@ function convertCliArgs(cli, ...cliArgs) {
 }
 
 
-async function runTests() {
-    const shellBinary = await logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
-    let success = true;
 
-    if (options.suite === "disabled") {
-        success &&= await runCLITest("Run Disabled Suite", shellBinary, "disabled");
-    } else if (options.suite === "default") {
-        success &&= await runCLITest("Run Default Suite",  shellBinary);
-    } else if (options.suite === "main" || !options.suite) {
-        success &&= await runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
-        success &&= await runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
-        success &&= await runCLITest("Run Tag No Prefetch", shellBinary, "proxy", "argon2-wasm", "--no-prefetch");
-        success &&= await runCLITest("Run Grouped with Details", shellBinary, "SunSpider", "--group-details");
+async function runTests() {
+    SHELL_BINARY = await logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
+    const suiteFilter = options.suite || "main";
+    let success = true;
+    const testsToRun = TESTS.filter(test => test.tags.includes(suiteFilter));
+
+    if (testsToRun.length === 0) {
+        console.error(`No suite found for filter: ${suiteFilter}`);
+        process.exit(1);
     }
-    if (!success)
-      process.exit(1);
+
+    for (const test of testsToRun) {
+        success &&= await test.run();
+    }
+
+    if (!success) {
+        process.exit(1);
+    }
 }
 
 function jsvuOSName() {

@@ -78,7 +78,7 @@ jobs:
             - name: Run Tests
               run: |
                   echo "Running in $BROWSER"
-                  npm run test:${{ matrix.shell }} -- --suite ${{ matrix.suite }}
+                  npm run test:${{ matrix.shell }} -- ${{ matrix.suite }}
     build:
         name: Test Build 
         runs-on: ubuntu-latest

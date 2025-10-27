@@ -96,8 +96,8 @@ export function printHelp(message = "", optionDefinitions) {
       process.exit(0);
   } else {
       console.error(message);
-      console.error();
-      console.error(usage);
+      console.log();
+      console.log(usage);
       process.exit(1);
   }
 }
