@@ -10,7 +10,7 @@ on:
     workflow_dispatch:
 
 jobs:
-    test-browser:
+    browser:
         name: Test Browser
         runs-on: macos-latest
         env:
@@ -43,8 +43,8 @@ jobs:
               run: |
                   echo "Running in $BROWSER"
                   npm run test:${{ matrix.browser }}
-    test-shell:
-        name: Test
+    shell:
+        name: Test Shell
         runs-on: ubuntu-latest
         env:
             GITHUB_ACTIONS_OUTPUT: ""
@@ -52,6 +52,7 @@ jobs:
             fail-fast: false
             matrix:
                 shell: [jsc, spidermonkey, v8]
+                suite: [default, disabled, main]
         steps:
             - name: Extract Week Number
               run: echo "WEEK_NUMBER=$(date +%W)" >> $GITHUB_ENV
@@ -77,9 +78,9 @@ jobs:
             - name: Run Tests
               run: |
                   echo "Running in $BROWSER"
-                  npm run test:${{ matrix.shell }}
+                  npm run test:${{ matrix.shell }} -- --suite ${{ matrix.suite }}
     build:
-        name: Build
+        name: Test Build 
         runs-on: ubuntu-latest
         steps:
             - name: Checkout Branch

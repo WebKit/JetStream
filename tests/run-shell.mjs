@@ -33,6 +33,7 @@ import { logGroup, logInfo, printHelp, runTest, sh } from "./helper.mjs";
 
 const optionDefinitions = [
   { name: "shell", type: String, description: "Set the shell to test, choices are [jsc, v8, spidermonkey]." },
+  { name: "suite", type: String, description: "Run a specific suite." },
   { name: "help", alias: "h", description: "Print this help text." },
 ];
 
@@ -78,12 +79,17 @@ function convertCliArgs(cli, ...cliArgs) {
 async function runTests() {
     const shellBinary = await logGroup(`Installing JavaScript Shell: ${SHELL_NAME}`, testSetup);
     let success = true;
-    success &&= await runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
-    success &&= await runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
-    success &&= await runCLITest("Run Tag No Prefetch", shellBinary, "proxy", "argon2-wasm", "--no-prefetch");
-    success &&= await runCLITest("Run Grouped with Details", shellBinary, "SunSpider", "--group-details");
-    success &&= await runCLITest("Run Disabled Suite", shellBinary, "disabled");
-    success &&= await runCLITest("Run Default Suite",  shellBinary);
+
+    if (options.suite === "disabled") {
+        success &&= await runCLITest("Run Disabled Suite", shellBinary, "disabled");
+    } else if (options.suite === "default") {
+        success &&= await runCLITest("Run Default Suite",  shellBinary);
+    } else if (options.suite === "main" || !options.suite) {
+        success &&= await runTest("Run UnitTests", () => sh(shellBinary, UNIT_TEST_PATH));
+        success &&= await runCLITest("Run Single Suite", shellBinary, "proxy-mobx");
+        success &&= await runCLITest("Run Tag No Prefetch", shellBinary, "proxy", "argon2-wasm", "--no-prefetch");
+        success &&= await runCLITest("Run Grouped with Details", shellBinary, "SunSpider", "--group-details");
+    }
     if (!success)
       process.exit(1);
 }
