@@ -437,11 +437,20 @@ function Comment(props) {
 const jsTokens = jsTokensWrapperFunction();
 
 class Benchmark {
+    EXPECTED_TOKEN_COUNT = 122200;
+    tokenCount = 0;
+
+    jsTokensSourceCode;
+
+    async init() {
+        this.jsTokensSourceCode = await JetStream.getString(JetStream.preload.jsTokensSourceCode);
+    }
+
     runIteration() {
         this.tokenCount = 0;
 
         for (var i = 0; i < 25; i++) {
-            for (const token of jsTokens(jsTokensSourceCode))
+            for (const token of jsTokens(this.jsTokensSourceCode))
                 this.tokenCount++;
         }
 
@@ -452,7 +461,7 @@ class Benchmark {
     }
 
     validate(iterations) {
-        if (this.tokenCount !== 113975)
-            throw new Error(`this.tokenCount of ${this.tokenCount} is invalid!`);
+        if (this.tokenCount !== this.EXPECTED_TOKEN_COUNT)
+            throw new Error(`Expected this.tokenCount of ${this.EXPECTED_TOKEN_COUNT}, but got ${this.tokenCount}!`);
     }
 }
