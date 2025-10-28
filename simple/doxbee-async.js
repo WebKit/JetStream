@@ -49,7 +49,7 @@ module.exports = async function doxbee(stream, idOrPath) {
     const previousId = file ? file.version : null;
     const version = {
       userAccountId: fakes.userAccount.id,
-      date: new Date(),
+      date: {},
       blobId: blobId,
       creatorId: fakes.userAccount.id,
       previousId: previousId
