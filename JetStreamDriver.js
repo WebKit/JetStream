@@ -40,7 +40,7 @@ if (!isInBrowser && JetStreamParams.prefetchResources) {
 
     // Load a polyfill for TextEncoder/TextDecoder in shells. Used when
     // decompressing a prefetched resource and converting it to text.
-    load("./polyfills/fast-text-encoding/1.0.3/text.js");
+    load("./utils/polyfills/fast-text-encoding/1.0.3/text.js");
 }
 
 // Used for the promise representing the current benchmark run.
@@ -2432,7 +2432,7 @@ let BENCHMARKS = [
     new WasmEMCCBenchmark({
         name: "sqlite3-wasm",
         files: [
-            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./utils/polyfills/fast-text-encoding/1.0.3/text.js",
             "./sqlite3/benchmark.js",
             "./sqlite3/build/jswasm/speedtest1.js",
         ],
@@ -2497,7 +2497,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "transformersjs-bert-wasm",
         files: [
-            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./utils/polyfills/fast-text-encoding/1.0.3/text.js",
             "./transformersjs/benchmark.js",
             "./transformersjs/task-bert.js",
         ],
@@ -2519,7 +2519,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "transformersjs-whisper-wasm",
         files: [
-            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./utils/polyfills/fast-text-encoding/1.0.3/text.js",
             "./transformersjs/benchmark.js",
             "./transformersjs/task-whisper.js",
         ],
@@ -2812,7 +2812,7 @@ let BENCHMARKS = [
     new WasmEMCCBenchmark({
         name: "8bitbench-wasm",
         files: [
-            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./utils/polyfills/fast-text-encoding/1.0.3/text.js",
             "./8bitbench/build/rust/pkg/emu_bench.js",
             "./8bitbench/benchmark.js",
         ],
