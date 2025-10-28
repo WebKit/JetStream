@@ -46,16 +46,31 @@ function spectralnorm(n) {
   return Math.sqrt(vBv/vv);
 }
 
-var total = 0;
 
-for (var i = 6; i <= 48; i *= 2) {
-    total += spectralnorm(i);
+function workload() {
+    var total = 0;
+
+    for (var i = 6; i <= 48; i *= 2) {
+        total += spectralnorm(i);
+    }
+
+    var expected = 5.086694231303284;
+
+    if (total != expected)
+        throw "ERROR: bad result: expected " + expected + " but got " + total;
+
+    postMessage("done");
+    close();
 }
 
-var expected = 5.086694231303284;
-
-if (total != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + total;
-
-postMessage("done");
-close();
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");

@@ -23,15 +23,30 @@
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE. 
  */
 
-bitwiseAndValue = 4294967296;
-for (var i = 0; i < 600000; i++)
-    bitwiseAndValue = bitwiseAndValue & i;
 
-var result = bitwiseAndValue;
+function workload() {
+    bitwiseAndValue = 4294967296;
+    for (var i = 0; i < 600000; i++)
+        bitwiseAndValue = bitwiseAndValue & i;
 
-var expected = 0;
-if (result != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + result;
+    var result = bitwiseAndValue;
 
-postMessage("done");
-close();
+    var expected = 0;
+    if (result != expected)
+        throw "ERROR: bad result: expected " + expected + " but got " + result;
+
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");

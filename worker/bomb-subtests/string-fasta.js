@@ -77,16 +77,31 @@ function fastaRandom(n, table) {
 }
 
 var ret = 0;
+function workload() {
 
-var count = 7;
-fastaRepeat(2*count*100000, ALU);
-fastaRandom(3*count*1000, IUB);
-fastaRandom(5*count*1000, HomoSap);
+  var count = 7;
+  fastaRepeat(2*count*100000, ALU);
+  fastaRandom(3*count*1000, IUB);
+  fastaRandom(5*count*1000, HomoSap);
 
-var expected = 1456000;
+  var expected = 1456000;
 
-if (ret != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + ret;
+  if (ret != expected)
+      throw "ERROR: bad result: expected " + expected + " but got " + ret;
 
-postMessage("done");
-close();
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");
+
