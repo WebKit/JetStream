@@ -55,7 +55,6 @@ module.exports = function doxbee(stream, idOrPath) {
       const previousId = file ? file.version : null;
       version = {
         userAccountId: fakes.userAccount.id,
-        date: {},
         blobId: blobId,
         creatorId: fakes.userAccount.id,
         previousId: previousId
