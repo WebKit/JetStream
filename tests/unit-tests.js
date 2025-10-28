@@ -1,6 +1,29 @@
-load("shell-config.js");
-load("params.js");
-load("startup-helper/StartupBenchmark.js");
+// Copyright (C) 2007-2025 Apple Inc. All rights reserved.
+
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions
+// are met:
+// 1. Redistributions of source code must retain the above copyright
+//  notice, this list of conditions and the following disclaimer.
+// 2. Redistributions in binary form must reproduce the above copyright
+//  notice, this list of conditions and the following disclaimer in the
+//  documentation and/or other materials provided with the distribution.
+
+// THIS SOFTWARE IS PROVIDED BY APPLE INC. AND ITS CONTRIBUTORS ``AS IS''
+// AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
+// THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
+// PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL APPLE INC. OR ITS CONTRIBUTORS
+// BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+// CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+// SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+// INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+// CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+// ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
+// THE POSSIBILITY OF SUCH DAMAGE.
+
+load("utils/shell-config.js");
+load("utils/params.js");
+load("utils/StartupBenchmark.js");
 load("JetStreamDriver.js");
 
 function assertTrue(condition, message) {
@@ -28,7 +51,7 @@ function assertThrows(message, func) {
   } catch (e) {
     didThrow = true;
   }
-  assertTrue(didThrow, message);
+  assertTrue(didThrow, `Test did not throw: ${message}`);
 }
 
 (function testTagsAreLowerCaseStrings() {
@@ -48,6 +71,23 @@ function assertThrows(message, func) {
     assertTrue(tags.has("all"));
     assertFalse(tags.has("All"));
     assertTrue(tags.has("default") ^ tags.has("disabled"));
+  }
+})();
+
+
+(function tagsAreNotBenchmarkNames() {
+  const benchmarkNames = new Set(BENCHMARKS.map(e => e.name));
+  for (const benchmark of benchmarks) {
+    for (const tag of benchmark.tags) {
+      assertFalse(benchmarkNames.has(tag), `'${tag}' is also a benchmark name`);
+    }
+  }
+})();
+
+(function tagsHasWasmOrJS() {
+  for (const benchmark of benchmarks) {
+    const tags = benchmark.tags;
+    assertTrue(tags.has("wasm") || tags.has("js"), `'${benchmark.name}' has no 'js' or 'wasm' tag`);
   }
 })();
 
@@ -258,4 +298,47 @@ async function testStartupBenchmarkInnerTests() {
       new StartupBenchmark({ iterationCount: 1, expectedCacheCommentCount: 0 });
     }
   );
+})();
+
+(function testDefaultParams() {
+  assertTrue(DefaultJetStreamParams.isDefault);
+  assertTrue(Object.isFrozen(DefaultJetStreamParams));
+  assertEquals(Object.entries(DefaultJetStreamParams.nonDefaultParams).length, 0);
+})();
+
+(function testCustomParamsSingle() {
+  const sourceParams = new Map(Object.entries({ developerMode: "true" }));
+  const params = new Params(sourceParams);
+  assertFalse(params.isDefault);
+  const nonDefaults = params.nonDefaultParams;
+  assertEquals(Object.entries(nonDefaults).length, 1);
+  assertEquals(nonDefaults.developerMode, true);
+})();
+
+
+(function testCustomParamsMultiple() {
+  const sourceParams = new Map(Object.entries({ iterationCount: 123, test: "wasm,js"}));
+  const params = new Params(sourceParams);
+  assertFalse(params.isDefault);
+  const nonDefaults = params.nonDefaultParams;
+  assertEquals(Object.entries(nonDefaults).length, 2);
+  assertEquals(nonDefaults.testIterationCount, 123);
+  assertEquals(JSON.stringify(nonDefaults.testList), JSON.stringify(["wasm", "js"]));
+})();
+
+
+(function testParseIterationCount() {
+  assertThrows("Cannot parse negative iterationCounts", 
+    () => {
+      const sourceParams = new Map(Object.entries({ iterationCount: -123, }));
+      new Params(sourceParams);
+    });
+  assertThrows("Cannot parse multiple iterationCounts", 
+    () => {
+      const sourceParams = new Map(Object.entries({ iterationCount: 123, testIterationCount: 10 }));
+      new Params(sourceParams);
+    });
+  let sourceParams = new Map(Object.entries({ iterationCount: 123 }));
+  let params = new Params(sourceParams);
+  assertEquals(params.testIterationCount, 123);
 })();

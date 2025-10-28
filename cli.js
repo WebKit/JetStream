@@ -23,7 +23,7 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-load("./shell-config.js");
+load("./utils/shell-config.js");
 
 const CLI_PARAMS = {
   __proto__: null,
@@ -41,7 +41,7 @@ const CLI_PARAMS = {
     param: "dumpJSONResults",
   },
   "dump-test-list": {
-    help: "Print test list instead of running.",
+    help: "Print the selected test list instead of running.",
     param: "dumpTestList",
   },
   ramification: {
@@ -120,7 +120,7 @@ if (cliArgs.length) {
 if (cliParams.size) 
     globalThis.JetStreamParamsSource = cliParams;
 
-load("./params.js");
+load("./utils/params.js");
 
 
 async function runJetStream() {

@@ -19,6 +19,7 @@
     "@types/node": "^24.2.0",
     "ansi-styles": "^6.2.1",
     "glob": "^11.0.3",
+    "license-webpack-plugin": "^4.0.2",
     "path-browserify": "^1.0.1",
     "typescript": "^5.9.2",
     "undici-types": "^7.13.0",

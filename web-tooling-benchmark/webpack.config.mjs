@@ -7,6 +7,7 @@ import webpack from "webpack";
 import { fileURLToPath } from "url";
 import { targetList } from "./src/cli/flags-helper.mjs";
 import { createRequire } from "module";
+import { LicenseWebpackPlugin } from "license-webpack-plugin";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -62,32 +63,35 @@ export default async (env) => {
         TextEncoder: ["text-encoder", "TextEncoder"],
         TextDecoder: ["text-encoder", "TextDecoder"],
       }),
+      new LicenseWebpackPlugin({
+        perChunkOutput: true, 
+        outputFilename: '[name].LICENSE.txt',
+      })
     ],
   };
 
-  return [
-    {
+  const prodConfig = {
+    ...baseConfig,
+    output: {
+      path: distDir,
+      filename: "[name].bundle.js",
+      library: {
+        name: "WTBenchmark",
+        type: "global",
+      },
+      //libraryTarget: "assign",
+      chunkFormat: "commonjs",
+    },
+    mode: "development",
+    devtool: false,
+  };
+  const devConfig = {
       ...baseConfig,
       output: {
         path: distDir,
-        filename: "[name].bundle.js",
-        library: {
-          name: "WTBenchmark",
-          type: "global",
-        },
-        //libraryTarget: "assign",
-        chunkFormat: "commonjs",
+        filename: "[name].min.js"
       },
-      mode: "development",
-      devtool: false,
-    },
-    // {
-    //   ...baseConfig,
-    //   output: {
-    //     path: distDir,
-    //     filename: "[name].min.js"
-    //   },
-    //   mode: "production"
-    // }
-  ];
+      mode: "production"
+  };
+  return [ prodConfig ];
 };

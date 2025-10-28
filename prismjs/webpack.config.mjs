@@ -1,8 +1,9 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import TerserPlugin from "terser-webpack-plugin";
-import CacheBusterCommentPlugin from "../startup-helper/BabelCacheBuster.mjs";
+import CacheBusterCommentPlugin from "../utils/BabelCacheBuster.mjs";
 import UnicodeEscapePlugin from "@dapplets/unicode-escape-webpack-plugin";
+import { LicenseWebpackPlugin } from "license-webpack-plugin";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -39,6 +40,10 @@ function config({ filename, minify, target }) {
       new UnicodeEscapePlugin({
         test: /\.(js|jsx|ts|tsx)$/, // Escape Unicode in JavaScript and TypeScript files
       }),
+      new LicenseWebpackPlugin({
+        perChunkOutput: true, 
+        outputFilename: "LICENSE.txt",
+      })
     ],
     resolve: {
       fallback: {},
@@ -46,6 +51,7 @@ function config({ filename, minify, target }) {
     optimization: {
       minimizer: [
         new TerserPlugin({
+          extractComments: false,
           terserOptions: {
             mangle: minify,
             format: {
