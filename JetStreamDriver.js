@@ -2646,7 +2646,7 @@ let BENCHMARKS = [
             PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
             CANNON_BLOB: "./babylonjs/data/cannon.glb",
         },
-        tags: ["scene", "es5", , "babylonjs"],
+        tags: ["scene", "es5", "babylonjs"],
         iterations: 5,
     }),
     new AsyncBenchmark({
@@ -2662,7 +2662,7 @@ let BENCHMARKS = [
             PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
             CANNON_BLOB: "./babylonjs/data/cannon.glb",
         },
-        tags: ["Default", "scene", "es6",, "babylonjs"],
+        tags: ["Default", "scene", "es6", "babylonjs"],
         iterations: 5,
     }),
     // WorkerTests
