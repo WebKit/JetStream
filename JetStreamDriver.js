@@ -2257,7 +2257,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "jsdom-d3-startup",
         files: [
-            "./startup-helper/StartupBenchmark.js",
+            "./utils/StartupBenchmark.js",
             "./jsdom-d3-startup/benchmark.js",
         ],
         preload: {
@@ -2274,12 +2274,13 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "web-ssr",
         files: [
+            "./utils/StartupBenchmark.js",
             "./web-ssr/benchmark.js",
         ],
         preload: {
             // Debug Sources for nicer profiling.
-            // BUNDLE_BLOB: "./web-ssr/dist/bundle.js",
-            BUNDLE_BLOB: "./web-ssr/dist/bundle.min.js",
+            // BUNDLE: "./web-ssr/dist/bundle.js",
+            BUNDLE: "./web-ssr/dist/bundle.min.js",
         },
         tags: ["default", "js", "web", "ssr"],
         iterations: 30,
@@ -2876,7 +2877,7 @@ let BENCHMARKS = [
 
 
 const PRISM_JS_FILES = [
-    "./startup-helper/StartupBenchmark.js",
+    "./utils/StartupBenchmark.js",
     "./prismjs/benchmark.js",
 ];
 const PRISM_JS_PRELOADS = {

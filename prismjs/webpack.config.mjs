@@ -1,7 +1,7 @@
 import path from "path";
 import { fileURLToPath } from "url";
 import TerserPlugin from "terser-webpack-plugin";
-import CacheBusterCommentPlugin from "../startup-helper/BabelCacheBuster.mjs";
+import CacheBusterCommentPlugin from "../utils/BabelCacheBuster.mjs";
 import UnicodeEscapePlugin from "@dapplets/unicode-escape-webpack-plugin";
 import { LicenseWebpackPlugin } from "license-webpack-plugin";
 

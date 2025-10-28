@@ -73,6 +73,10 @@ const TESTS = [
 
 const VALID_TAGS = Array.from(new Set(TESTS.map((each) => each.tags).flat()));
 
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
 const optionDefinitions = [
     { name: "browser", type: String, description: "Set the browser to test, choices are [safari, firefox, chrome, edge]. By default the $BROWSER env variable is used." },
     { name: "port", type: Number, defaultValue: 8010, description: "Set the test-server port, The default value is 8010." },
@@ -189,6 +193,8 @@ async function testEnd2End(params) {
         throw e;
     } finally {
         await driver.quit();
+        if (BROWSER === "safari")
+            await sleep(1000);
         if (!success) {
             await printLogs(sessionId);
         }
