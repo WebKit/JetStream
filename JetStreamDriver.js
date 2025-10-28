@@ -905,8 +905,11 @@ class Benchmark {
         }
         if (this.plan.preload) {
             let preloadCode = "";
-            for (let [ variableName, blobURLOrPath ] of this.preloads)
+            for (let [ variableName, blobURLOrPath ] of this.preloads) {
+                console.assert(variableName?.length > 0, "Invalid preload name.");
+                console.assert(blobURLOrPath?.length > 0, "Invalid preload data.");
                 preloadCode += `JetStream.preload[${JSON.stringify(variableName)}] = "${blobURLOrPath}";\n`;
+            }
             scripts.add(preloadCode);
         }
 
@@ -1060,8 +1063,8 @@ class Benchmark {
 
         if (this.plan.preload) {
             this.preloads = [];
-            for (let prop of Object.getOwnPropertyNames(this.plan.preload)) {
-                promises.push(this.loadBlob("preload", prop, this.plan.preload[prop]).then((blobData) => {
+            for (const [name, resource] of Object.entries(this.plan.preload)) {
+                promises.push(this.loadBlob("preload", name, resource).then((blobData) => {
                     if (!globalThis.allIsGood)
                         return;
                     this.preloads.push([ blobData.prop, blobData.blobURL ]);
@@ -1070,7 +1073,7 @@ class Benchmark {
                     // We'll try again later in retryPrefetchResourceForBrowser(). Don't throw an error.
                     if (!this.failedPreloads)
                         this.failedPreloads = { };
-                    this.failedPreloads[prop] = true;
+                    this.failedPreloads[name] = true;
                     JetStream.counter.failedPreloadResources++;
                 }));
             }
@@ -1127,9 +1130,8 @@ class Benchmark {
         }
 
         if (this.plan.preload) {
-            for (const prop of Object.getOwnPropertyNames(this.plan.preload)) {
-                const resource = this.plan.preload[prop];
-                const allDone = await this.retryPrefetchResource("preload", prop, resource);
+            for (const [name, resource] of Object.entries(this.plan.preload)) {
+                const allDone = await this.retryPrefetchResource("preload", name, resource);
                 if (allDone)
                     return true; // All resources loaded, nothing more to do.
             }
@@ -1149,21 +1151,21 @@ class Benchmark {
         if (!this.plan.preload) {
             return;
         }
-        for (let [name, file] of Object.entries(this.plan.preload)) {
-            const compressed = isCompressed(file);
+        for (let [name, resource] of Object.entries(this.plan.preload)) {
+            const compressed = isCompressed(resource);
             if (compressed && !JetStreamParams.prefetchResources) {
-                file = uncompressedName(file);
+                resource = uncompressedName(resource);
             }
 
             if (JetStreamParams.prefetchResources) {
-                let bytes = new Int8Array(read(file, "binary"));
+                let bytes = new Int8Array(read(resource, "binary"));
                 if (compressed) {
                     bytes = zlib.decompress(bytes);
                 }
-                this.shellPrefetchedResources[file] = bytes;
+                this.shellPrefetchedResources[resource] = bytes;
             }
 
-            this.preloads.push([name, file]);
+            this.preloads.push([name, resource]);
         }
     }
 
@@ -1753,10 +1755,10 @@ class WasmLegacyBenchmark extends Benchmark {
         }
 
         str += "};\n";
-
-        const keys = Object.keys(this.plan.preload);
-        for (let i = 0; i < keys.length; ++i) {
-            str += `JetStream.loadBlob("${keys[i]}", "${this.plan.preload[keys[i]]}", () => {\n`;
+        let preloadCount = 0;
+        for (const [name, resource] of Object.entries(this.plan.preload)) {
+            preloadCount++;
+            str += `JetStream.loadBlob(${JSON.stringify(name)}, "${resource}", () => {\n`;
         }
         if (this.plan.async) {
             str += `doRun().catch((e) => {
@@ -1767,7 +1769,7 @@ class WasmLegacyBenchmark extends Benchmark {
         } else {
             str += `doRun();`
         }
-        for (let i = 0; i < keys.length; ++i) {
+        for (let i = 0; i < preloadCount; ++i) {
             str += `})`;
         }
         str += `;`;
