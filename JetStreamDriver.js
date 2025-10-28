@@ -2606,7 +2606,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "babylonjs-startup-es5",
         files: [
-            "./startup-helper/StartupBenchmark.js",
+            "./utils/StartupBenchmark.js",
             "./babylonjs/benchmark/startup.js",
         ],
         preload: {
@@ -2615,13 +2615,13 @@ let BENCHMARKS = [
         arguments: {
             expectedCacheCommentCount: 23988,
         },
-        tags: ["startup", "class", "es5", "babylonjs"],
+        tags: ["startup",  "js", "class", "es5", "babylonjs"],
         iterations: 10,
     }),
     new AsyncBenchmark({
         name: "babylonjs-startup-es6",
         files: [
-            "./startup-helper/StartupBenchmark.js",
+            "./utils/StartupBenchmark.js",
             "./babylonjs/benchmark/startup.js",
         ],
         preload: {
@@ -2630,7 +2630,7 @@ let BENCHMARKS = [
         arguments: {
             expectedCacheCommentCount: 21222,
         },
-        tags: ["Default", "startup", "class", "es6", "babylonjs"],
+        tags: ["Default",  "js", "startup", "class", "es6", "babylonjs"],
         iterations: 10,
     }),
     new AsyncBenchmark({
@@ -2646,7 +2646,7 @@ let BENCHMARKS = [
             PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
             CANNON_BLOB: "./babylonjs/data/cannon.glb",
         },
-        tags: ["scene", "es5", "babylonjs"],
+        tags: ["scene", "js",  "es5", "babylonjs"],
         iterations: 5,
     }),
     new AsyncBenchmark({
@@ -2662,7 +2662,7 @@ let BENCHMARKS = [
             PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
             CANNON_BLOB: "./babylonjs/data/cannon.glb",
         },
-        tags: ["Default", "scene", "es6", "babylonjs"],
+        tags: ["Default", "js", "scene", "es6", "babylonjs"],
         iterations: 5,
     }),
     // WorkerTests
