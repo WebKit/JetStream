@@ -3,7 +3,7 @@ import { fileURLToPath } from "url";
 import TerserPlugin from "terser-webpack-plugin";
 import { LicenseFilePlugin } from "generate-license-file-webpack-plugin";
 
-import CacheBusterCommentPlugin from "../startup-helper/BabelCacheBuster.mjs";
+import CacheBusterCommentPlugin from "../utils/BabelCacheBuster.mjs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
