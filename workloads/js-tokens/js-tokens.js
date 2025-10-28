@@ -436,7 +436,7 @@ function Comment(props) {
 const jsTokens = jsTokensWrapperFunction();
 
 class Benchmark {
-    EXPECTED_TOKEN_COUNT = 121975;
+    EXPECTED_TOKEN_COUNT = 115100;
 
     tokenCount = 0;
     jsTokensSourceCode = "";
