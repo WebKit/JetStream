@@ -49,7 +49,7 @@ function createConfig({ filename, minify }) {
           use: {
             loader: "babel-loader",
             options: {
-              plugins: [ "../startup-helper/BabelCacheBuster.mjs" ],
+              plugins: [ "../utils/BabelCacheBuster.mjs" ],
             },
           },
         },
