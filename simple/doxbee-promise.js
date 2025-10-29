@@ -55,7 +55,6 @@ module.exports = function doxbee(stream, idOrPath) {
       const previousId = file ? file.version : null;
       version = {
         userAccountId: fakes.userAccount.id,
-        date: new Date(),
         blobId: blobId,
         creatorId: fakes.userAccount.id,
         previousId: previousId
@@ -65,8 +64,8 @@ module.exports = function doxbee(stream, idOrPath) {
     })
     .then(_ => {
       if (!file) {
-        const splitPath = idOrPath.split("/");
-        const fileName = splitPath[splitPath.length - 1];
+        const splitPath = idOrPath.lastIndexOf("/") + 1;
+        const fileName = idOrPath.substring(splitPath);
         const newId = fakes.uuid.v1();
         return fakes.self
           .createQuery(idOrPath, {
