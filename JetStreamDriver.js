@@ -30,7 +30,7 @@ const measureTotalTimeAsSubtest = false; // Once we move to preloading all resou
 const defaultIterationCount = 120;
 const defaultWorstCaseCount = 4;
 
-if (!JetStreamParams.prefetchResources)
+if (!JetStreamParams.prefetchResources && isInBrowser)
     console.warn("Disabling resource prefetching! All compressed files must have been decompressed using `npm run decompress`");
 
 if (!isInBrowser && JetStreamParams.prefetchResources) {
