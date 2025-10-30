@@ -26,6 +26,8 @@
 
 import serve from "./server.mjs";
 import { Builder, Capabilities, logging } from "selenium-webdriver";
+import { Options as ChromeOptions } from "selenium-webdriver/chrome.js";
+import { Options as FirefoxOptions } from "selenium-webdriver/firefox.js";
 import commandLineArgs from "command-line-args";
 import { promises as fs } from "fs";
 import path from "path";
@@ -95,8 +97,10 @@ if (options.suite && !VALID_TAGS.includes(options.suite))
 const BROWSER = options?.browser;
 if (!BROWSER)
     printHelp("No browser specified, use $BROWSER or --browser", optionDefinitions);
+const IS_HEADLESS = os.platform() === "linux" && !process.env.DISPLAY;
 
 let capabilities;
+let browserOptions;
 switch (BROWSER) {
     case "safari":
         capabilities = Capabilities.safari();
@@ -104,11 +108,19 @@ switch (BROWSER) {
         break;
 
     case "firefox": {
-        capabilities = Capabilities.firefox();
+        capabilities = Capabilities.firefox()
+        if (IS_HEADLESS) {
+            browserOptions = new FirefoxOptions();
+            browserOptions.addArguments("-headless"); 
+        }
         break;
     }
     case "chrome": {
-        capabilities = Capabilities.chrome();
+        capabilities = Capabilities.chrome()
+        if (IS_HEADLESS) {
+            browserOptions = new ChromeOptions();
+            browserOptions.addArguments("--headless"); 
+        }
         break;
     }
     case "edge": {
@@ -159,7 +171,20 @@ async function runEnd2EndTest(name, params) {
 }
 
 async function testEnd2End(params) {
-    const driver = await new Builder().withCapabilities(capabilities).build();
+    const builder =  new Builder().withCapabilities(capabilities);
+    if (browserOptions) {
+        switch(BROWSER) {
+            case "firefox":
+                builder.setFirefoxOptions(browserOptions);
+                break;
+            case "chrome":
+                builder.setChromeOptions(browserOptions);
+                break;
+            default:
+                break;
+        }
+    }
+    const driver = await builder.build();
     const sessionId = (await driver.getSession()).getId();
     const driverCapabilities = await driver.getCapabilities();
     logInfo(`Browser: ${driverCapabilities.getBrowserName()} ${driverCapabilities.getBrowserVersion()}`);
