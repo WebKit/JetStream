@@ -43,10 +43,14 @@ async function findPackageJsonFiles(dir, accumulator=[]) {
         if (dirent.name === "node_modules" || dirent.name === ".git")
             continue;
         const fullPath = path.join(dir, dirent.name);
-        if (dirent.isDirectory())
+        if (dirent.isDirectory()) {
+            if (fs.existsSync(path.join(fullPath, ".git"))) {
+                continue;
+            }
             findPackageJsonFiles(fullPath, accumulator);
-        else if (dirent.name === "package.json")
+        } else if (dirent.name === "package.json") {
             accumulator.push(fullPath)
+        }
     }
     return accumulator;
 }
