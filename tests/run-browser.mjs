@@ -25,7 +25,7 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 
 import serve from "./server.mjs";
-import { Builder, Capabilities, logging } from "selenium-webdriver";
+import { Builder, Capabilities, logging, firefox, chrome } from "selenium-webdriver";
 import commandLineArgs from "command-line-args";
 import { promises as fs } from "fs";
 import path from "path";
@@ -93,6 +93,7 @@ if (options.suite && !VALID_TAGS.includes(options.suite))
     printHelp(`Invalid suite: ${options.suite}. Choices are: ${VALID_TAGS.join(", ")}`);
 
 const BROWSER = options?.browser;
+const IS_HEADLESS = os.platform() === "linux" && !process.env.DISPLAY;
 if (!BROWSER)
     printHelp("No browser specified, use $BROWSER or --browser", optionDefinitions);
 
@@ -104,11 +105,17 @@ switch (BROWSER) {
         break;
 
     case "firefox": {
-        capabilities = Capabilities.firefox();
+        const options = new firefox.Options();
+        if (IS_HEADLESS)
+            options.addArguments("-headless");
+        capabilities = Capabilities.firefox().set("moz:firefoxOptions", options);
         break;
     }
     case "chrome": {
-        capabilities = Capabilities.chrome();
+        const options = new chrome.Options();
+        if (IS_HEADLESS)
+            options.addArguments("--headless");
+        capabilities = Capabilities.chrome().set("goog:chromeOptions", options);
         break;
     }
     case "edge": {
