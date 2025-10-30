@@ -215,7 +215,7 @@ function runCLITest(name, shellBinary, ...args) {
 async function runShell(shellBinary, ...args) {
     const result = await sh(shellBinary, ...args);
     // JSC does not set a non-0 exit status on async exceptions.
-    if (SHELL_NAME == "javascriptcore" && "JetStream3 failed") {
+    if (SHELL_NAME == "javascriptcore" && result.stdoutString.includes("JetStream3 failed")) {
         throw new Error("test failed");
     }
 }
