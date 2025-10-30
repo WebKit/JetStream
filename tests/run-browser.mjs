@@ -111,7 +111,7 @@ switch (BROWSER) {
         capabilities = Capabilities.firefox()
         if (IS_HEADLESS) {
             browserOptions = new firefox.Options();
-            browserOptions.addArguments("-headless");
+            browserOptions = browserOptions.headless();
         }
         break;
     }
