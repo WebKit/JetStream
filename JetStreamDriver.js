@@ -2572,7 +2572,7 @@ let BENCHMARKS = [
         iterations: 5,
         worstCaseCount: 1,
         allowUtf16: true,
-        tags: ["default", "Wasm", "transformersjs"],
+        tags: ["Wasm", "transformersjs"],
     }),
     new WasmLegacyBenchmark({
         name: "tfjs-wasm",
