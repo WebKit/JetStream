@@ -25,9 +25,9 @@
 // THE POSSIBILITY OF SUCH DAMAGE.
 
 import serve from "./server.mjs";
-import { Builder, Capabilities  } from "selenium-webdriver";
-import chrome from "selenium-webdriver/chrome.js";
-import firefox from "selenium-webdriver/firefox.js";
+import { Builder, Capabilities, logging } from "selenium-webdriver";
+import { Options as ChromeOptions } from "selenium-webdriver/chrome.js";
+import { Options as FirefoxOptions } from "selenium-webdriver/firefox.js";
 import commandLineArgs from "command-line-args";
 import { promises as fs } from "fs";
 import path from "path";
@@ -95,9 +95,9 @@ if (options.suite && !VALID_TAGS.includes(options.suite))
     printHelp(`Invalid suite: ${options.suite}. Choices are: ${VALID_TAGS.join(", ")}`);
 
 const BROWSER = options?.browser;
-const IS_HEADLESS = os.platform() === "linux" && !process.env.DISPLAY;
 if (!BROWSER)
     printHelp("No browser specified, use $BROWSER or --browser", optionDefinitions);
+const IS_HEADLESS = os.platform() === "linux" && !process.env.DISPLAY;
 
 let capabilities;
 let browserOptions;
@@ -110,16 +110,16 @@ switch (BROWSER) {
     case "firefox": {
         capabilities = Capabilities.firefox()
         if (IS_HEADLESS) {
-            browserOptions = new firefox.Options();
-            browserOptions = browserOptions.headless();
+            browserOptions = new FirefoxOptions();
+            browserOptions.addArguments("-headless"); 
         }
         break;
     }
     case "chrome": {
         capabilities = Capabilities.chrome()
         if (IS_HEADLESS) {
-            browserOptions = new chrome.Options();
-            browserOptions = browserOptions.headless();
+            browserOptions = new ChromeOptions();
+            browserOptions.addArguments("--headless"); 
         }
         break;
     }
