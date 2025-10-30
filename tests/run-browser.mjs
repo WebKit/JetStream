@@ -111,15 +111,15 @@ switch (BROWSER) {
         capabilities = Capabilities.firefox()
         if (IS_HEADLESS) {
             browserOptions = new firefox.Options();
-            options.addArguments("-headless");
+            browserOptions.addArguments("-headless");
         }
         break;
     }
     case "chrome": {
         capabilities = Capabilities.chrome()
         if (IS_HEADLESS) {
-            options = new chrome.Options();
-            options = options.headless();
+            browserOptions = new chrome.Options();
+            browserOptions = browserOptions.headless();
         }
         break;
     }
