@@ -43,10 +43,15 @@ async function findPackageJsonFiles(dir, accumulator=[]) {
         if (dirent.name === "node_modules" || dirent.name === ".git")
             continue;
         const fullPath = path.join(dir, dirent.name);
-        if (dirent.isDirectory())
+        if (dirent.isDirectory()) {
+            // Ignore third-party git dirs.
+            if (fs.existsSync(path.join(fullPath, ".git"))) {
+                continue;
+            }
             findPackageJsonFiles(fullPath, accumulator);
-        else if (dirent.name === "package.json")
+        } else if (dirent.name === "package.json") {
             accumulator.push(fullPath)
+        }
     }
     return accumulator;
 }
@@ -56,6 +61,7 @@ async function runBuilds() {
     let success = true;
 
     logInfo(`Found ${packageJsonFiles.length} package.json files`);
+    console.log(packageJsonFiles)
     let filteredPackageJsonFiles = packageJsonFiles;
     if (options.changedDirs?.size === 0) {
         logInfo("No file changes detected, skipping all");

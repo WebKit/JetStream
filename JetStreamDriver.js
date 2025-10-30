@@ -40,7 +40,7 @@ if (!isInBrowser && JetStreamParams.prefetchResources) {
 
     // Load a polyfill for TextEncoder/TextDecoder in shells. Used when
     // decompressing a prefetched resource and converting it to text.
-    load("./polyfills/fast-text-encoding/1.0.3/text.js");
+    load("./utils/polyfills/fast-text-encoding/1.0.3/text.js");
 }
 
 // Used for the promise representing the current benchmark run.
@@ -905,8 +905,11 @@ class Benchmark {
         }
         if (this.plan.preload) {
             let preloadCode = "";
-            for (let [ variableName, blobURLOrPath ] of this.preloads)
+            for (let [ variableName, blobURLOrPath ] of this.preloads) {
+                console.assert(variableName?.length > 0, "Invalid preload name.");
+                console.assert(blobURLOrPath?.length > 0, "Invalid preload data.");
                 preloadCode += `JetStream.preload[${JSON.stringify(variableName)}] = "${blobURLOrPath}";\n`;
+            }
             scripts.add(preloadCode);
         }
 
@@ -1060,8 +1063,8 @@ class Benchmark {
 
         if (this.plan.preload) {
             this.preloads = [];
-            for (let prop of Object.getOwnPropertyNames(this.plan.preload)) {
-                promises.push(this.loadBlob("preload", prop, this.plan.preload[prop]).then((blobData) => {
+            for (const [name, resource] of Object.entries(this.plan.preload)) {
+                promises.push(this.loadBlob("preload", name, resource).then((blobData) => {
                     if (!globalThis.allIsGood)
                         return;
                     this.preloads.push([ blobData.prop, blobData.blobURL ]);
@@ -1070,7 +1073,7 @@ class Benchmark {
                     // We'll try again later in retryPrefetchResourceForBrowser(). Don't throw an error.
                     if (!this.failedPreloads)
                         this.failedPreloads = { };
-                    this.failedPreloads[prop] = true;
+                    this.failedPreloads[name] = true;
                     JetStream.counter.failedPreloadResources++;
                 }));
             }
@@ -1127,9 +1130,8 @@ class Benchmark {
         }
 
         if (this.plan.preload) {
-            for (const prop of Object.getOwnPropertyNames(this.plan.preload)) {
-                const resource = this.plan.preload[prop];
-                const allDone = await this.retryPrefetchResource("preload", prop, resource);
+            for (const [name, resource] of Object.entries(this.plan.preload)) {
+                const allDone = await this.retryPrefetchResource("preload", name, resource);
                 if (allDone)
                     return true; // All resources loaded, nothing more to do.
             }
@@ -1149,21 +1151,21 @@ class Benchmark {
         if (!this.plan.preload) {
             return;
         }
-        for (let [name, file] of Object.entries(this.plan.preload)) {
-            const compressed = isCompressed(file);
+        for (let [name, resource] of Object.entries(this.plan.preload)) {
+            const compressed = isCompressed(resource);
             if (compressed && !JetStreamParams.prefetchResources) {
-                file = uncompressedName(file);
+                resource = uncompressedName(resource);
             }
 
             if (JetStreamParams.prefetchResources) {
-                let bytes = new Int8Array(read(file, "binary"));
+                let bytes = new Int8Array(read(resource, "binary"));
                 if (compressed) {
                     bytes = zlib.decompress(bytes);
                 }
-                this.shellPrefetchedResources[file] = bytes;
+                this.shellPrefetchedResources[resource] = bytes;
             }
 
-            this.preloads.push([name, file]);
+            this.preloads.push([name, resource]);
         }
     }
 
@@ -1753,10 +1755,10 @@ class WasmLegacyBenchmark extends Benchmark {
         }
 
         str += "};\n";
-
-        const keys = Object.keys(this.plan.preload);
-        for (let i = 0; i < keys.length; ++i) {
-            str += `JetStream.loadBlob("${keys[i]}", "${this.plan.preload[keys[i]]}", () => {\n`;
+        let preloadCount = 0;
+        for (const [name, resource] of Object.entries(this.plan.preload)) {
+            preloadCount++;
+            str += `JetStream.loadBlob(${JSON.stringify(name)}, "${resource}", () => {\n`;
         }
         if (this.plan.async) {
             str += `doRun().catch((e) => {
@@ -1767,7 +1769,7 @@ class WasmLegacyBenchmark extends Benchmark {
         } else {
             str += `doRun();`
         }
-        for (let i = 0; i < keys.length; ++i) {
+        for (let i = 0; i < preloadCount; ++i) {
             str += `})`;
         }
         str += `;`;
@@ -2432,7 +2434,7 @@ let BENCHMARKS = [
     new WasmEMCCBenchmark({
         name: "sqlite3-wasm",
         files: [
-            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./utils/polyfills/fast-text-encoding/1.0.3/text.js",
             "./sqlite3/benchmark.js",
             "./sqlite3/build/jswasm/speedtest1.js",
         ],
@@ -2497,7 +2499,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "transformersjs-bert-wasm",
         files: [
-            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./utils/polyfills/fast-text-encoding/1.0.3/text.js",
             "./transformersjs/benchmark.js",
             "./transformersjs/task-bert.js",
         ],
@@ -2519,7 +2521,7 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "transformersjs-whisper-wasm",
         files: [
-            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./utils/polyfills/fast-text-encoding/1.0.3/text.js",
             "./transformersjs/benchmark.js",
             "./transformersjs/task-whisper.js",
         ],
@@ -2542,7 +2544,7 @@ let BENCHMARKS = [
         iterations: 5,
         worstCaseCount: 1,
         allowUtf16: true,
-        tags: ["default", "Wasm", "transformersjs"],
+        tags: ["Wasm", "transformersjs"],
     }),
     new WasmLegacyBenchmark({
         name: "tfjs-wasm",
@@ -2602,6 +2604,68 @@ let BENCHMARKS = [
         deterministicRandom: true,
         allowUtf16: true,
         tags: ["default", "Wasm"],
+    }),
+    new AsyncBenchmark({
+        name: "babylonjs-startup-es5",
+        files: [
+            "./utils/StartupBenchmark.js",
+            "./babylonjs/benchmark/startup.js",
+        ],
+        preload: {
+            BUNDLE: "./babylonjs/dist/bundle.es5.min.js",
+        },
+        arguments: {
+            expectedCacheCommentCount: 23988,
+        },
+        tags: ["startup",  "js", "class", "es5", "babylonjs"],
+        iterations: 10,
+    }),
+    new AsyncBenchmark({
+        name: "babylonjs-startup-es6",
+        files: [
+            "./utils/StartupBenchmark.js",
+            "./babylonjs/benchmark/startup.js",
+        ],
+        preload: {
+            BUNDLE: "./babylonjs/dist/bundle.es6.min.js",
+        },
+        arguments: {
+            expectedCacheCommentCount: 21222,
+        },
+        tags: ["Default",  "js", "startup", "class", "es6", "babylonjs"],
+        iterations: 10,
+    }),
+    new AsyncBenchmark({
+        name: "babylonjs-scene-es5",
+        files: [
+            // Use non-minified sources for easier profiling:
+            // "./babylonjs/dist/bundle.es5.js",
+            "./babylonjs/dist/bundle.es5.min.js",
+            "./babylonjs/benchmark/scene.js",
+        ],
+        preload: {
+            PARTICLES_BLOB: "./babylonjs/data/particles.json",
+            PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
+            CANNON_BLOB: "./babylonjs/data/cannon.glb",
+        },
+        tags: ["scene", "js",  "es5", "babylonjs"],
+        iterations: 5,
+    }),
+    new AsyncBenchmark({
+        name: "babylonjs-scene-es6",
+        files: [
+            // Use non-minified sources for easier profiling:
+            // "./babylonjs/dist/bundle.es6.js",
+            "./babylonjs/dist/bundle.es6.min.js",
+            "./babylonjs/benchmark/scene.js",
+        ],
+        preload: {
+            PARTICLES_BLOB: "./babylonjs/data/particles.json",
+            PIRATE_FORT_BLOB: "./babylonjs/data/pirateFort.glb",
+            CANNON_BLOB: "./babylonjs/data/cannon.glb",
+        },
+        tags: ["Default", "js", "scene", "es6", "babylonjs"],
+        iterations: 5,
     }),
     // WorkerTests
     new AsyncBenchmark({
@@ -2812,7 +2876,7 @@ let BENCHMARKS = [
     new WasmEMCCBenchmark({
         name: "8bitbench-wasm",
         files: [
-            "./polyfills/fast-text-encoding/1.0.3/text.js",
+            "./utils/polyfills/fast-text-encoding/1.0.3/text.js",
             "./8bitbench/build/rust/pkg/emu_bench.js",
             "./8bitbench/benchmark.js",
         ],
