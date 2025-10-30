@@ -33,6 +33,45 @@ import os from "os";
 
 import {logInfo, logError, printHelp, runTest} from "./helper.mjs";
 
+const TESTS = [
+    {
+        name: "Run Single Suite",
+        tags: ["all", "main"],
+        run() {
+            return runEnd2EndTest("Run Single Suite", { test: "proxy-mobx" });
+        }
+    },
+    {
+        name: "Run Multiple Suites",
+        tags: ["all", "main"],
+        run() {
+            return runEnd2EndTest("Run Multiple Suites", { test: "prismjs-startup-es6,postcss-wtb" });
+        }
+    },
+    {
+        name: "Run Tag No Prefetch",
+        tags: ["all", "main"],
+        run() {
+            return runEnd2EndTest("Run Tag No Prefetch",  { tag: "proxy", prefetchResources: "false" });
+        }
+    },
+    {
+        name: "Run Disabled Suite",
+        tags: ["all", "disabled"],
+        run() {
+            return runEnd2EndTest("Run Disabled Suite", { tag: "disabled" });
+        }
+    },
+    {
+        name: "Run Default Suite",
+        tags: ["all", "default"],
+        run() {
+            return runEnd2EndTest("Run Default Suite");
+        }
+    }
+];
+
+const VALID_TAGS = Array.from(new Set(TESTS.map((each) => each.tags).flat()));
 
 function sleep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -42,12 +81,16 @@ const optionDefinitions = [
     { name: "browser", type: String, description: "Set the browser to test, choices are [safari, firefox, chrome, edge]. By default the $BROWSER env variable is used." },
     { name: "port", type: Number, defaultValue: 8010, description: "Set the test-server port, The default value is 8010." },
     { name: "help", alias: "h", description: "Print this help text." },
+    { name: "suite", type: String, defaultOption: true, typeLabel: `{underline choices}: ${VALID_TAGS.join(", ")}`, description: "Run a specific suite by name." }
 ];
 
 const options = commandLineArgs(optionDefinitions);
 
 if ("help" in options)
-    printHelp(optionDefinitions);
+    printHelp("". optionDefinitions);
+
+if (options.suite && !VALID_TAGS.includes(options.suite))
+    printHelp(`Invalid suite: ${options.suite}. Choices are: ${VALID_TAGS.join(", ")}`);
 
 const BROWSER = options?.browser;
 if (!BROWSER)
@@ -73,7 +116,7 @@ switch (BROWSER) {
         break;
     }
     default: {
-        printHelp(`Invalid browser "${BROWSER}", choices are: "safari", "firefox", "chrome", "edge"`);
+        printHelp(`Invalid browser "${BROWSER}", choices are: "safari", "firefox", "chrome", "edge"`, optionDefinitions);
     }
 }
 
@@ -91,12 +134,19 @@ const server = await serve(PORT);
 
 async function runTests() {
     let success = true;
+    const suiteFilter = options.suite || "all";
+
+    const testsToRun = TESTS.filter(test => test.tags.includes(suiteFilter));
+
+    if (testsToRun.length === 0) {
+        console.error(`No suite found for filter: ${suiteFilter}`);
+        process.exit(1);
+    }
+
     try {
-        success &&= await runEnd2EndTest("Run Single Suite", { test: "proxy-mobx" });
-        success &&= await runEnd2EndTest("Run Multiple Suites", { test: "prismjs-startup-es6,postcss-wtb" });
-        success &&= await runEnd2EndTest("Run Tag No Prefetch",  { tag: "proxy", prefetchResources: "false" });
-        success &&= await runEnd2EndTest("Run Disabled Suite", { tag: "disabled" });
-        success &&= await runEnd2EndTest("Run Default Suite");
+        for (const test of testsToRun) {
+            success &&= await test.run();
+        }
     } finally {
         server.close();
     }

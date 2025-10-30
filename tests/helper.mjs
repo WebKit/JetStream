@@ -81,7 +81,7 @@ export async function logGroup(name, body) {
 }
 
 
-export function printHelp(message = "", optionDefinitions) {
+export function printHelp(message, optionDefinitions) {
   const usage = commandLineUsage([
       {
           header: "Run all tests",
@@ -91,13 +91,13 @@ export function printHelp(message = "", optionDefinitions) {
           optionList: optionDefinitions,
       },
   ]);
-  if (!message) {
+  if (!message?.length) {
       console.log(usage);
       process.exit(0);
   } else {
       console.error(message);
-      console.error();
-      console.error(usage);
+      console.log();
+      console.log(usage);
       process.exit(1);
   }
 }
