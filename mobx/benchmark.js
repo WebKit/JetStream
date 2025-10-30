@@ -28,7 +28,7 @@ const EXPECTED_LOG_LENGTH = 6824;
 class Benchmark extends StartupBenchmark {
   lastResult;
 
-  constructor(iterationCount) {
+  constructor({iterationCount}) {
     super({
       iterationCount,
       expectedCacheCommentCount: 464,

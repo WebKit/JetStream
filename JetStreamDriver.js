@@ -2255,6 +2255,36 @@ let BENCHMARKS = [
         tags: ["default", "js", "Proxy"],
     }),
     new AsyncBenchmark({
+        name: "mobx-startup-es6",
+        files: [
+            "./utils/StartupBenchmark.js",
+            "./mobx/benchmark.js",
+        ],
+        preload: {
+            // Debug Sources for nicer profiling.
+            // BUNDLE: "./mobx/dist/bundle.es6.js",
+            BUNDLE: "./mobx/dist/bundle.es6.min.js",
+        },
+        tags: ["default", "js", "mobx", "startup", "es6"],
+        iterations: 15,
+        worstCaseCount: 2,
+    }),
+    new AsyncBenchmark({
+        name: "mobx-startup-es5",
+        files: [
+            "./utils/StartupBenchmark.js",
+            "./mobx/benchmark.js",
+        ],
+        preload: {
+            // Debug Sources for nicer profiling.
+            // BUNDLE: "./mobx/dist/bundle.es5.js",
+            BUNDLE: "./mobx/dist/bundle.es5.min.js",
+        },
+        tags: ["js", "mobx", "startup", "es5"],
+        iterations: 15,
+        worstCaseCount: 2,
+    }),
+    new AsyncBenchmark({
         name: "jsdom-d3-startup",
         files: [
             "./utils/StartupBenchmark.js",
