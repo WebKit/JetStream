@@ -50,7 +50,7 @@ const TESTS = [
     },
     {
         name: "Run Tag No Prefetch",
-        tags: ["all", "all", "main"],
+        tags: ["all", "main"],
         run() {
             return runEnd2EndTest("Run Tag No Prefetch",  { tag: "proxy", prefetchResources: "false" });
         }
@@ -138,9 +138,6 @@ async function runTests() {
 
     const testsToRun = TESTS.filter(test => test.tags.includes(suiteFilter));
 
-    console.log(testsToRun)
-    console.log(testsToRun.length)
-    console.log(suiteFilter)
     if (testsToRun.length === 0) {
         console.error(`No suite found for filter: ${suiteFilter}`);
         process.exit(1);
