@@ -33,7 +33,6 @@ globalThis.clearTimeout = () => { };
 class Benchmark extends StartupBenchmark {
     lastResult;
     totalHash = 0xdeadbeef;
-    currentIteration = 0;
 
     constructor({iterationCount}) {
         super({
@@ -52,10 +51,11 @@ class Benchmark extends StartupBenchmark {
         this.usData = JSON.parse(this.usDataJsonString);
     }
 
-    runIteration() {
-        let iterationSourceCode = this.iterationSourceCodes[this.currentIteration];
+    runIteration(iteration) {
+        // super.prepareForNextIteration() sets this up for us.
+        let iterationSourceCode = this.currentIterationSourceCode;
         if (!iterationSourceCode)
-            throw new Error(`Could not find source for iteration ${this.currentIteration}`);
+            throw new Error(`Could not find source for iteration ${iteration}`);
         // Module in sourceCode it assigned to the ReactRenderTest variable.
         let D3Test;
         eval(iterationSourceCode);
@@ -63,7 +63,6 @@ class Benchmark extends StartupBenchmark {
         const htmlHash = this.quickHash(html);
         this.lastResult = { html, htmlHash };
         this.totalHash ^= this.lastResult.htmlHash;
-        this.currentIteration++;
     }
 
     validate() {

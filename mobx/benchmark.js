@@ -37,9 +37,10 @@ class Benchmark extends StartupBenchmark {
   }
 
   runIteration(iteration) {
-    // Module is loaded into PrismJSBenchmark
+    // Module is loaded into MobXBenchmark
     let MobXBenchmark;
-    eval(this.iterationSourceCodes[iteration]);
+    // super.prepareForNextIteration() sets this up for us.
+    eval(this.currentIterationSourceCode);
     this.lastResult = MobXBenchmark.runTest();
   }
 
