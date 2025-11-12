@@ -25,7 +25,8 @@ class Benchmark extends StartupBenchmark {
   }
 
   runIteration(iteration) {
-    let sourceCode = this.iterationSourceCodes[iteration];
+    // super.prepareForNextIteration() sets this up for us.
+    let sourceCode = this.currentIterationSourceCode;
     if (!sourceCode)
       throw new Error(`Could not find source for iteration ${iteration}`);
     // Module in sourceCode it assigned to the ReactRenderTest variable.
@@ -41,7 +42,7 @@ class Benchmark extends StartupBenchmark {
 
     const loadTime = runStart - initStart;
     const runTime = end - runStart;
-    // For local debugging: 
+    // For local debugging:
     // print(`Iteration ${iteration}:`);
     // print(`  Load time: ${loadTime.toFixed(2)}ms`);
     // print(`  Render time: ${runTime.toFixed(2)}ms`);
