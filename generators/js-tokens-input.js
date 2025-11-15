@@ -406,61 +406,7 @@ function jsTokensWrapperFunction() {
                 type: mode.tag.startsWith("JSX") ? "JSXInvalid" : "Invalid",
                 value: firstCodePoint
             });
+
         }
     };
-};
-
-const jsxSourceCode = `
-
-function Comment(props) {
-  return (
-    <div className="Comment">
-      <div className="UserInfo">
-        <Avatar user={props.author} />
-        <div className="UserInfo-name">
-          {props.author.name}
-        </div>
-      </div>
-      <div className="Comment-text">
-        {props.text}
-      </div>
-      <div className="Comment-date">
-        {formatDate(props.date)}
-      </div>
-    </div>
-  );
-}
-
-`;
-
-const jsTokens = jsTokensWrapperFunction();
-
-class Benchmark {
-    EXPECTED_TOKEN_COUNT = 115100;
-
-    tokenCount = 0;
-    jsTokensSourceCode = "";
-
-    async init() {
-        this.jsTokensSourceCode = await JetStream.getString(JetStream.preload.SOURCE_CODE);
-    }
-
-    runIteration() {
-        this.tokenCount = 0;
-
-        for (var i = 0; i < 25; i++) {
-            for (const token of jsTokens(this.jsTokensSourceCode))
-                this.tokenCount++;
-        }
-
-        for (var i = 0; i < 250; i++) {
-            for (const token of jsTokens(jsxSourceCode, { jsx: true }))
-                this.tokenCount++;
-        }
-    }
-
-    validate(iterations) {
-        if (this.tokenCount !== this.EXPECTED_TOKEN_COUNT)
-            throw new Error(`Expected this.tokenCount of ${this.EXPECTED_TOKEN_COUNT}, but got ${this.tokenCount}!`);
-    }
-}
+  }
