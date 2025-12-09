@@ -539,7 +539,7 @@ class Benchmark {
       fibonacci(),
       take(78),
       windows(3),
-      flatMap(x => x * 2),
+      flatMap(window => window.map(x  => x * 2)),
       unique(),
       toArray(),
     );
