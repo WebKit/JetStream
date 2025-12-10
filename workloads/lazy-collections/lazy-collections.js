@@ -523,7 +523,7 @@ class Benchmark {
       toArray(),
     );
 
-    this.totalLength += example().length;
+    this.totalLength += this.checkLength(example(), 3);
 
     const factorials = pipe(
       factorial(),
@@ -533,7 +533,7 @@ class Benchmark {
       toArray(),
     );
 
-    this.totalLength += factorials().length;
+    this.totalLength += this.checkLength(factorials(), 100);
 
     const doubleFibonaccis = pipe(
       fibonacci(),
@@ -544,7 +544,7 @@ class Benchmark {
       toArray(),
     );
 
-    this.totalLength += doubleFibonaccis().length;
+    this.totalLength += this.checkLength(doubleFibonaccis(), 77);
 
     const mersennePrimes = pipe(
       naturalNumbers(),
@@ -554,7 +554,7 @@ class Benchmark {
       toArray(),
     );
 
-    this.totalLength += mersennePrimes().length;
+    this.totalLength += this.checkLength(mersennePrimes(), 5);
 
     const primes = pipe(
       naturalNumbers(),
@@ -563,7 +563,7 @@ class Benchmark {
       toArray(),
     );
 
-    this.totalLength += primes().length;
+    this.totalLength += this.checkLength(primes(), 150);
 
     const powersOfTwo = pipe(
       powers(1, 2),
@@ -573,7 +573,7 @@ class Benchmark {
       toArray(),
     );
 
-    this.totalLength += powersOfTwo().length;
+    this.totalLength += this.checkLength(powersOfTwo(), 100);
 
     const primeFactors = pipe(
       naturalNumbers(),
@@ -584,7 +584,7 @@ class Benchmark {
       toArray(),
     );
 
-    this.totalLength += primeFactors().length;
+    this.totalLength += this.checkLength(primeFactors(), 150);
 
     const fizzbuzz = pipe(
       naturalNumbers(),
@@ -598,7 +598,7 @@ class Benchmark {
       toArray(),
     );
 
-    this.totalLength += fizzbuzz().length;
+    this.totalLength += this.checkLength(fizzbuzz(), 100);
 
     const binaryTree = pipe(
       binaryRoot[Symbol.iterator](),
@@ -610,11 +610,20 @@ class Benchmark {
       toArray(),
     );
 
-    this.totalLength += binaryTree().length;
+    this.totalLength += this.checkLength(binaryTree(), 26);
+  }
+
+  checkLength(pipe, expected){
+    const length = pipe.length;
+    if (length !== expected) {
+        throw new Error(`Expected result.length == ${expected}, but got ${length}`);
+    }
+    return length;
   }
 
   validate(iterations) {
-    if (this.totalLength !== 635)
-      throw new Error(`this.totalLength of ${this.totalLength} is invalid!`);
+    const TOTAL_LENGTH = 711;
+    if (this.totalLength !== TOTAL_LENGTH)
+      throw new Error(`Expected this.totalLength of ${TOTAL_LENGTH} but got ${this.totalLength}!`);
   }
 }
