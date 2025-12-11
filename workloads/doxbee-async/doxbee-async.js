@@ -97,6 +97,7 @@ module.exports = {
 
 // a queryish object with all kinds of functions
 function Queryish() {}
+Queryish.count = 0;
 async function dummy_1() {
   Queryish.count++;
 }
@@ -104,7 +105,6 @@ async function dummy_2(a) {
   Queryish.count++;
 }
 
-Queryish.count = 0;
 Queryish.prototype.all = dummy_1;
 Queryish.prototype.exec = dummy_1;
 Queryish.prototype.execWithin = dummy_2;
