@@ -1057,8 +1057,14 @@ class Benchmark {
     updateCounter() {
         const counter = JetStream.counter;
         ++counter.loadedResources;
-        const statusElement = document.getElementById("status");
-        statusElement.innerHTML = `Loading ${counter.loadedResources} of ${counter.totalResources} ...`;
+
+        const statusElement = document.getElementById("status-text");
+        statusElement.innerText = `Loading ${counter.loadedResources} of ${counter.totalResources} ...`;
+
+        const percent = (counter.loadedResources / counter.totalResources) * 100;
+        const progressBar = document.getElementById("status-progress-bar");
+        progressBar.style.width = `${percent}%`;
+
     }
 
     prefetchResourcesForBrowser() {
