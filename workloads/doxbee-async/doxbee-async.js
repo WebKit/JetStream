@@ -98,10 +98,10 @@ module.exports = {
 // a queryish object with all kinds of functions
 function Queryish() {}
 async function dummy_1() {
-  return Queryish.count++;
+  Queryish.count++;
 }
 async function dummy_2(a) { 
-  //return Queryish.count++;
+  Queryish.count++;
 }
 
 Queryish.count = 0;
@@ -172,31 +172,29 @@ module.exports = {
   FileVersion,
   Version,
   db,
-  Queryish
+  Queryish,
 };
 
 },{}],3:[function(require,module,exports){
 const doxbee = require("../lib/doxbee-async");
 
 globalThis.Benchmark = class {
-  count = 0;
-
-  async runIteration() {
+  runIteration() {
     doxbee.fakes.Queryish.count = 0;
     const promises = new Array(10_000);
 
     for (var i = 0; i < 10_000; i++)
       promises[i] = doxbee.doxbee(i, "foo");
 
-    await Promise.all(promises);
-    this.count = doxbee.fakes.Queryish.count;
+    return Promise.all(promises);
   }
 
   validate() {
-    // const EXPECTED_COUNT = 60000;
-    // if (this.count !== EXPECTED_COUNT) {
-    //   throw new Error(`Expected this.count == ${EXPECTED_COUNT}, but got ${this.count}`);
-    // }
+    const EXPECTED_COUNT = 70000;
+    const count = doxbee.fakes.Queryish.count;
+    if (count !== EXPECTED_COUNT) {
+      throw new Error(`Expected this.count == ${EXPECTED_COUNT}, but got ${count}`);
+    }
   }
 };
 
