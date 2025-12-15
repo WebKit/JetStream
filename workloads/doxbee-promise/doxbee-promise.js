@@ -108,11 +108,16 @@ module.exports = function doxbee(stream, idOrPath) {
 },{"../lib/fakes-promises.js":2}],2:[function(require,module,exports){
 "use strict";
 
-function dummy_1() { return Promise.resolve(undefined); }
-function dummy_2(a) { return Promise.resolve(undefined); }
-
 // a queryish object with all kinds of functions
 function Queryish() {}
+Queryish.count = 0;
+async function dummy_1() {
+  Queryish.count++;
+}
+async function dummy_2(a) { 
+  Queryish.count++;
+}
+
 Queryish.prototype.all = dummy_1;
 Queryish.prototype.exec = dummy_1;
 Queryish.prototype.execWithin = dummy_2;
