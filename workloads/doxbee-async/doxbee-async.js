@@ -89,7 +89,7 @@ async function doxbee(stream, idOrPath) {
 
 module.exports = {
   doxbee,
-  fakes
+  fakes,
 };
 
 },{"../lib/fakes-async.js":2}],2:[function(require,module,exports){
