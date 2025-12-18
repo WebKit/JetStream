@@ -919,8 +919,12 @@ class Benchmark {
             throw new Error(`Cannot run Benchmark ${this.name} twice`);
         this._state = BenchmarkState.PREPARE;
 
-        if (JetStreamParams.forceGC)
+        if (JetStreamParams.forceGC) {
+            // This will trigger for individual benchmarks in
+            // GroupedBenchmarks since they delegate .run() to their inner
+            // benchmarks.
             globalThis?.gc();
+        }
 
         const scripts = isInBrowser ? new BrowserScripts(this.preloads) : new ShellScripts(this.preloads);
 
