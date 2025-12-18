@@ -82,7 +82,7 @@ const CLI_PARAMS = {
     param: "customPostIterationCode",
   },
   "force-gc": {
-    help: "Force garbage collection before each benchmark run, requires engine support.",
+    help: "Force garbage collection before each benchmark, requires engine support.",
     param: "forceGC",
   },
 };
