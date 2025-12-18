@@ -922,7 +922,7 @@ class Benchmark {
         if (JetStreamParams.forceGC) {
             // This will trigger for individual benchmarks in
             // GroupedBenchmarks since they delegate .run() to their inner
-            // benchmarks.
+            // non-grouped benchmarks.
             globalThis?.gc();
         }
 
