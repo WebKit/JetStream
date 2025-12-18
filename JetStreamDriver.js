@@ -30,8 +30,13 @@ const measureTotalTimeAsSubtest = false; // Once we move to preloading all resou
 const defaultIterationCount = 120;
 const defaultWorstCaseCount = 4;
 
-if (!JetStreamParams.prefetchResources && isInBrowser)
+if (!JetStreamParams.prefetchResources && isInBrowser) {
     console.warn("Disabling resource prefetching! All compressed files must have been decompressed using `npm run decompress`");
+}
+
+if (JetStreamParams.forceGC && typeof globalThis.gc === "undefined") {
+    console.warn("Force-gc is set, but globalThis.gc() is not available.");
+}
 
 if (!isInBrowser && JetStreamParams.prefetchResources) {
     // Use the wasm compiled zlib as a polyfill when decompression stream is
@@ -982,6 +987,9 @@ class Benchmark {
             magicFrame.contentDocument.close();
         else if (isD8)
             Realm.dispose(magicFrame);
+
+        if (JetStreamParams.forceGC)
+            globalThis?.gc();
     }
 
     async doLoadBlob(resource) {

@@ -43,6 +43,7 @@ class Params {
     groupDetails = false
 
     RAMification = false;
+    forceGC = false;
     dumpJSONResults = false;
     dumpTestList = false;
     // Override iteration and worst-case counts per workload.
@@ -70,6 +71,7 @@ class Params {
         this.dumpJSONResults = this._parseBooleanParam(sourceParams, "dumpJSONResults");
         this.groupDetails = this._parseBooleanParam(sourceParams, "groupDetails");
         this.dumpTestList = this._parseBooleanParam(sourceParams, "dumpTestList");
+        this.forceGC = this._parseBooleanParam(sourceParams, "forceGC");
 
         this.customPreIterationCode = this._parseStringParam(sourceParams, "customPreIterationCode");
         this.customPostIterationCode = this._parseStringParam(sourceParams, "customPostIterationCode");
