@@ -918,6 +918,10 @@ class Benchmark {
         if (this.isDone)
             throw new Error(`Cannot run Benchmark ${this.name} twice`);
         this._state = BenchmarkState.PREPARE;
+
+        if (JetStreamParams.forceGC)
+            globalThis?.gc();
+
         const scripts = isInBrowser ? new BrowserScripts(this.preloads) : new ShellScripts(this.preloads);
 
         if (!!this.plan.deterministicRandom)
@@ -987,9 +991,6 @@ class Benchmark {
             magicFrame.contentDocument.close();
         else if (isD8)
             Realm.dispose(magicFrame);
-
-        if (JetStreamParams.forceGC)
-            globalThis?.gc();
     }
 
     async doLoadBlob(resource) {
