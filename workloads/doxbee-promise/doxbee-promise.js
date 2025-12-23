@@ -116,11 +116,13 @@ module.exports = {
 // a queryish object with all kinds of functions
 function Queryish() {}
 Queryish.count = 0;
-async function dummy_1() {
+function dummy_1() {
   Queryish.count++;
+  return Promise.resolve(undefined);
 }
-async function dummy_2(a) { 
+function dummy_2(a) { 
   Queryish.count++;
+  return Promise.resolve(undefined);
 }
 
 Queryish.prototype.all = dummy_1;
