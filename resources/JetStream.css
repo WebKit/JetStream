@@ -24,21 +24,21 @@
 */
 
 :root {
-    --color-primary: #34AADC;
-    --color-secondary: #86D9FF;
+    --color-primary: #34aadc;
+    --color-secondary: #86d9ff;
     --text-color-inverse: white;
     --text-color-primary: black;
     --text-color-secondary: #555555;
     --text-color-tertiary: #444444;
     --text-color-subtle: #6c6c71;
-    --text-color-very-subtle: #8E8E93;
-    --heading-color: #2C98D1;
-    --link-hover-color: #0086BF;
+    --text-color-very-subtle: #8e8e93;
+    --heading-color: #2c98d1;
+    --link-hover-color: #0086bf;
     --button-color-primary: rgb(52, 170, 220);
     --error-text-color: #d24a59;
     --benchmark-heading-color: rgb(183, 183, 183);
     --benchmark-error-text-color: #ff8686;
-    --benchmark-done-result-color: #4A4A4A;
+    --benchmark-done-result-color: #4a4a4a;
     --gap: 3rem;
     --width: 200px;
     --nonDefaultRotate: 152deg;
@@ -64,7 +64,7 @@ body {
     background-position: center -5vw;
     background-size: 100vw;
     padding-bottom: 0px;
-    background-image: url('clouds.svg');
+    background-image: url("clouds.svg");
     overflow-y: hidden;
     height: 100%;
 }
@@ -92,7 +92,7 @@ body.nonDefaultParams {
 
     & h2 {
         text-align: center;
-    } 
+    }
 
     & p {
         text-align: center;
@@ -131,7 +131,6 @@ body.nonDefaultParams {
     color: var(--highlight);
 }
 
-
 .overflow-scroll {
     overflow-y: auto;
 }
@@ -139,7 +138,6 @@ body.nonDefaultParams {
 .overflow-visible {
     overflow: visible;
 }
-
 
 ::selection {
     background-color: var(--color-primary);
@@ -179,7 +177,7 @@ img {
     box-sizing: border-box;
     background-repeat: no-repeat;
     background-position: center;
-    background-image: url('JetStream3Logo.svg');
+    background-image: url("JetStream3Logo.svg");
     color: transparent;
     animation: swingin 350ms ease-out forwards;
     will-change: transform, opacity;
@@ -187,7 +185,7 @@ img {
 }
 
 #jetstreams {
-    background-image: url('jetstreams.svg');
+    background-image: url("jetstreams.svg");
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
@@ -237,7 +235,6 @@ h1 {
     margin-bottom: 0;
 }
 
-
 h2,
 h3,
 h4,
@@ -246,7 +243,6 @@ h6 {
     color: var(--heading-color);
     text-align: left;
 }
-
 
 h4,
 h5,
@@ -318,6 +314,19 @@ a.button {
     background-image: none;
 }
 
+#status.loading,
+#status-progress-bar {
+    background-image: linear-gradient(
+        132deg,
+        #96e5ff 0%,
+        #96e5ff 2%,
+        #86d9ff 42%,
+        #8bdaff 84%,
+        #96e5ff 98%,
+        #96e5ff 100%
+    );
+}
+
 #status.loading {
     position: absolute;
     top: 0;
@@ -328,9 +337,8 @@ a.button {
     font-size: 4rem;
     font-style: italic;
     font-weight: 500;
-    letter-spacing: -0.10rem;
+    letter-spacing: -0.1rem;
     color: transparent;
-    background-image: linear-gradient(132deg, #96E5FF 0%, #96E5FF 2%, #86D9FF 42%, #8BDAFF 84%, #96E5FF 98%, #96E5FF 100%);
     -webkit-background-clip: text;
     background-repeat: no-repeat;
     -webkit-touch-callout: none;
@@ -340,6 +348,18 @@ a.button {
 #status.error {
     max-width: 70rem;
     margin: 0 auto 1rem;
+}
+
+#status-progress-container {
+    height: 2.4rem;
+    width: 80%;
+    margin: 1rem auto;
+    overflow: hidden;
+}
+
+#status-progress-bar {
+    height: 100%;
+    width: 0%;
 }
 
 .error h2,
@@ -422,7 +442,8 @@ a.button {
 .benchmark h4,
 .benchmark .result,
 .benchmark label,
-.benchmark .plot {
+.benchmark .plot,
+#status-progress-container {
     color: transparent;
     background: linear-gradient(160deg, rgba(249, 249, 249, 1) 0%, rgba(238, 238, 238, 1) 100%);
     border-radius: 3px;
@@ -440,7 +461,6 @@ a.button {
     background-color: var(--color-secondary);
     background-image: none;
 }
-
 
 .benchmark-done h3,
 .benchmark-done h4,
@@ -494,10 +514,9 @@ a.button {
     vertical-align: middle;
     font-style: italic;
     font-weight: bold;
-    font-family: 'Times New Roman', Times, serif;
+    font-family: "Times New Roman", Times, serif;
     line-height: 1.6rem;
     margin-top: -0.2rem;
-
 }
 
 .benchmark-running a.info {
