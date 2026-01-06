@@ -81,6 +81,10 @@ const CLI_PARAMS = {
     help: "Custom code to run after each iteration.",
     param: "customPostIterationCode",
   },
+  "force-gc": {
+    help: "Force garbage collection before each benchmark, requires engine support.",
+    param: "forceGC",
+  },
 };
 
 const cliParams = new Map();

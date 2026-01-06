@@ -41,6 +41,7 @@
     --benchmark-done-result-color: #4A4A4A;
     --gap: 3rem;
     --width: 200px;
+    --nonDefaultRotate: 152deg;
 }
 
 html,
@@ -73,7 +74,12 @@ table {
 }
 
 body.nonDefaultParams {
-    filter: hue-rotate(152deg);
+    filter: hue-rotate(var(--nonDefaultRotate));
+}
+
+/* error gets rotated too, rotate it back so it's still red */
+.nonDefaultParams .error {
+    filter: hue-rotate(calc(360deg - var(--nonDefaultRotate)));
 }
 
 .nonDefaultParams .summary {
