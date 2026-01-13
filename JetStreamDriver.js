@@ -233,18 +233,14 @@ class BrowserFileLoader {
         JetStream.updateCounterUI();
     }
 
-    async prefetchResourceFile(file) {
-        return await this._prefetchResource(file);
-    }
-
     async prefetchResourcePreload(name, resource) {
-        const blobData = await this._prefetchResource(resource);
+        const blobData = await this.prefetchResourceFile(resource);
         if (!globalThis.allIsGood)
             return;
         return { name: name, resource: resource, blobURLOrPath: blobData.blobURL };
     } 
 
-    async _prefetchResource(resource) {
+    async prefetchResourceFile(resource) {
         this.counter.totalResources++;
         let blobDataOrPromise = this._blobDataCache[resource];
         if (!blobDataOrPromise) {
@@ -259,10 +255,11 @@ class BrowserFileLoader {
             this._blobDataCache[resource] = blobDataOrPromise;
         }
         const blobData = await blobDataOrPromise;
-        // Replace the potential promise in the cache.
-        this._blobDataCache[resource] = blobData;
         if (globalThis.allIsGood)
             this._updateCounter();
+        // Replace the potential promise in the cache.
+        this._blobDataCache[resource] = blobData;
+        blobData.refCount++;
         return blobData;
     }
 
@@ -323,6 +320,7 @@ class BrowserFileLoader {
             blobData.refCount--;
             if (!blobData.refCount) {
                 this._blobDataCache[file] = undefined;
+                console.log("DELETING", file);
             }
         }
     }
@@ -336,7 +334,6 @@ class Driver {
         this.isReady = false;
         this.isDone = false;
         this.errors = [];
-        this.fileLoader = isInBrowser ? browserFileLoader : shellFileLoader;
         // Make benchmark list unique and sort it.
         this.benchmarks = Array.from(new Set(benchmarks));
         this.benchmarks.sort((a, b) => a.plan.name.toLowerCase() < b.plan.name.toLowerCase() ? 1 : -1);
