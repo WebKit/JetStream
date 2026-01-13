@@ -255,11 +255,11 @@ class BrowserFileLoader {
             this._blobDataCache[resource] = blobDataOrPromise;
         }
         const blobData = await blobDataOrPromise;
-        if (globalThis.allIsGood)
-            this._updateCounter();
         // Replace the potential promise in the cache.
         this._blobDataCache[resource] = blobData;
         blobData.refCount++;
+        if (globalThis.allIsGood)
+            this._updateCounter();
         return blobData;
     }
 
