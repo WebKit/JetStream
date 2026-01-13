@@ -24,7 +24,7 @@
 // ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF
 // THE POSSIBILITY OF SUCH DAMAGE.
 
-import serve from "./server.mjs";
+import { serve, optionDefinitions as serverOptionDefinitions } from "./server.mjs";
 import { Builder, Capabilities, logging } from "selenium-webdriver";
 import { Options as ChromeOptions } from "selenium-webdriver/chrome.js";
 import { Options as FirefoxOptions } from "selenium-webdriver/firefox.js";
@@ -80,8 +80,8 @@ function sleep(ms) {
 }
 
 const optionDefinitions = [
+    ...serverOptionDefinitions,
     { name: "browser", type: String, description: "Set the browser to test, choices are [safari, firefox, chrome, edge]. By default the $BROWSER env variable is used." },
-    { name: "port", type: Number, defaultValue: 8010, description: "Set the test-server port, The default value is 8010." },
     { name: "help", alias: "h", description: "Print this help text." },
     { name: "suite", type: String, defaultOption: true, typeLabel: `{underline choices}: ${VALID_TAGS.join(", ")}`, description: "Run a specific suite by name." }
 ];
@@ -142,7 +142,7 @@ process.once("uncaughtException", (err) => {
 });
 
 const PORT = options.port;
-const server = await serve(PORT);
+const server = await serve(options);
 
 async function runTests() {
     let success = true;
