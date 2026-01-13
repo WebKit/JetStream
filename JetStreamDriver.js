@@ -1223,7 +1223,8 @@ class Benchmark {
     updateUIBeforeRunInBrowser() {
         const resultsBenchmarkUI = document.getElementById(`benchmark-${this.name}`);
         resultsBenchmarkUI.classList.add("benchmark-running");
-        resultsBenchmarkUI.scrollIntoView({ block: "nearest" });
+        const containerUI = resultsBenchmarkUI.parentNode;
+        containerUI.insertBefore(resultsBenchmarkUI, containerUI.firstChild);
 
         for (const id of this.allScoreIdentifiers())
             document.getElementById(id).innerHTML = "...";
