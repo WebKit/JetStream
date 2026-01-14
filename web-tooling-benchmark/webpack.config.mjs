@@ -70,28 +70,43 @@ export default async (env) => {
     ],
   };
 
-  const prodConfig = {
-    ...baseConfig,
-    output: {
-      path: distDir,
-      filename: "[name].bundle.js",
-      library: {
-        name: "WTBenchmark",
-        type: "global",
-      },
-      //libraryTarget: "assign",
-      chunkFormat: "commonjs",
-    },
-    mode: "development",
-    devtool: false,
+  const libraryConfig = {
+    name: "WTBenchmark",
+    type: "global",
   };
-  const devConfig = {
+
+  const configs = [];
+  if (env.production) {
+    configs.push({
+      ...baseConfig,
+      devtool: "source-map",
+      output: {
+        path: distDir,
+        filename: "[name].bundle.min.js",
+        library: libraryConfig,
+        chunkFormat: "commonjs",
+      },
+      optimization: {
+        minimize: true,
+      },
+      mode: "production",
+    });
+  }
+
+  if (env.development) {
+    configs.push({
       ...baseConfig,
       output: {
         path: distDir,
-        filename: "[name].min.js"
+        filename: "[name].bundle.js",
+        library: libraryConfig,
       },
-      mode: "production"
-  };
-  return [ prodConfig ];
+      optimization: {
+        minimize: false,
+      },
+      mode: "development"
+    });
+  }
+
+  return configs;
 };
