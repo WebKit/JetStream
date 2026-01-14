@@ -279,12 +279,13 @@ class BrowserFileLoader extends FileLoader {
     }
 
     async _fetchBlobData(blobData) {
-        const [isCompressed, resource] = this._decompressedResourceName(blobData.resource);
+        const originalResource = blobData.resource;
+        const [isCompressed, decompressedResource] = this._decompressedResourceName(blobData.resource);
 
         // If we aren't supposed to prefetch this then set the blobURL to just
         // be the resource URL.
         if (!JetStreamParams.prefetchResources) {
-            blobData.blobURL = resource;
+            blobData.blobURL = decompressedResource;
             return blobData;
         }
 
@@ -293,7 +294,7 @@ class BrowserFileLoader extends FileLoader {
         while (tries--) {
             let hasError = false;
             try {
-                response = await fetch(resource, { cache: "no-store" });
+                response = await fetch(originalResource, { cache: "no-store" });
             } catch (e) {
                 hasError = true;
             }
@@ -301,7 +302,7 @@ class BrowserFileLoader extends FileLoader {
                 break;
             if (tries) {
                 await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS));
-                console.warn(`Request failed, retrying: ${resource}`);
+                console.warn(`Request failed, retrying: ${originalResource}`);
                 continue;
             }
             globalThis.allIsGood = false;
