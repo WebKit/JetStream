@@ -36769,6 +36769,7 @@ async function getModelJSON(modelPath, fileName, fatal = true, options = {}) {
         // Return empty object
         return {};
     }
+
     return JSON.parse(text);
 }
 /**
