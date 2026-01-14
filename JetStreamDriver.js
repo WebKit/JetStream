@@ -169,7 +169,13 @@ class FileLoader {
         if (!globalThis.allIsGood) {
             return;
         }
-        return { name: name, resource: resource, blobURLOrPath: blobData.blobURL };
+        // Return blobData copy with name and original resource path.
+        return {
+            name,
+            resource,
+            blob: blobData.blob,
+            blobURL: blobData.blobURL,
+        };
     } 
 
 
@@ -248,13 +254,9 @@ class ShellFileLoader extends FileLoader {
             return blobData;
         }
 
-        let contents;
+        let contents = new Int8Array(read(resource, "binary"));
         if (isCompressed) {
-            const compressedBytes = new Int8Array(read(url, "binary"));
-            const decompressedBytes = zlib.decompress(compressedBytes);
-            contents = new TextDecoder().decode(decompressedBytes);
-        } else {
-            contents = readFile(resource);
+            contents = zlib.decompress(contents);
         }
 
         blobData.blob = contents;
@@ -336,7 +338,9 @@ class BrowserFileLoader extends FileLoader {
     }
 }
 
-const fileLoader = isInBrowser ?  new BrowserFileLoader() : new ShellFileLoader(); 
+const fileLoader = isInBrowser ? 
+        new BrowserFileLoader() :
+        new ShellFileLoader(); 
 
 class Driver {
     constructor(benchmarks) {
@@ -668,15 +672,19 @@ class Scripts {
         this._preparePreloads(preloads);
     }
 
+    static get prerunCode() {
+        throw new Error("Subclasses need to implement this");
+    }
+
     _preparePreloads(preloads) {
         let preloadsCode = "";
         let resourcesCode = "";
-        for (let { name, resource, blobURLOrPath } of preloads) {
+        for (let { name, resource, blobURL} of preloads) {
             console.assert(name?.length > 0, "Invalid preload name.");
             console.assert(resource?.length > 0, "Invalid preload resource.");
-            console.assert(blobURLOrPath?.length > 0, "Invalid preload data.");
-            preloadsCode += `${JSON.stringify(name)}: "${blobURLOrPath}",\n`;
-            resourcesCode += `${JSON.stringify(resource)}: "${blobURLOrPath}",\n`;
+            console.assert(blobURL?.length > 0, "Invalid preload data.");
+            preloadsCode += `${JSON.stringify(name)}: "${blobURL}",\n`;
+            resourcesCode += `${JSON.stringify(resource)}: "${blobURL}",\n`;
         }
         // Expose a globalThis.JetStream object to the workload. We use
         // a proxy to prevent prototype access and throw on unknown properties.
@@ -722,10 +730,6 @@ class Scripts {
         throw new Error("addWithURL not supported");
     }
 
-    addPrefetchedResources() {
-        throw new Error("addWithURL not supported");
-    }
-
     addBrowserTest() {
         this.add(`
             globalThis.JetStream.isInBrowser = ${isInBrowser};
@@ -762,7 +766,38 @@ class Scripts {
 class ShellScripts extends Scripts {
     constructor(preloads) {
         super(preloads);
-        this.prefetchedResources = Object.create(null);;
+        this.shellPrefetchedResources = Object.create(null);
+        this.addPrefetchedPreloads(preloads);
+    }
+
+    static get prerunCode() {
+       return `
+            JetStream.getBinary = async function(path) {
+                if ("ShellPrefetchedResources" in globalThis) {
+                    return ShellPrefetchedResources[path];
+                }
+                return new Int8Array(read(path, "binary"));
+            };
+
+            JetStream.getString = async function(path) {
+                if ("ShellPrefetchedResources" in globalThis) {
+                    return new ShellTextDecoder().decode(ShellPrefetchedResources[path]);
+                }
+                return read(path);
+            };
+
+            JetStream.dynamicImport = async function(path) {
+                try {
+                    // TODO: this skips the prefetched resources, but I'm
+                    // not sure of a way around that.
+                    return await import(path);
+                } catch (e) {
+                    // In shells, relative imports require different paths, so try with and
+                    // without the "./" prefix (e.g., JSC requires it).
+                    return await import(path.slice("./".length))
+                }
+            };
+        `;
     }
 
     run() {
@@ -799,9 +834,9 @@ class ShellScripts extends Scripts {
             globalObject.ShellTextDecoder = TextDecoder;
             // Store shellPrefetchedResources on ShellPrefetchedResources so that
             // getBinary and getString can find them.
-            globalObject.ShellPrefetchedResources = this.prefetchedResources;
+            globalObject.ShellPrefetchedResources = this.shellPrefetchedResources;
         } else {
-            console.assert(Object.values(this.prefetchedResources).length === 0, "Unexpected prefetched resources");
+            console.assert(Object.values(this.shellPrefetchedResources).length === 0, "Unexpected prefetched resources");
         }
 
         globalObject.performance ??= performance;
@@ -811,14 +846,16 @@ class ShellScripts extends Scripts {
         return isD8 ? realm : globalObject;
     }
 
-    addPrefetchedResources(prefetchedResources) {
-        for (let [file, bytes] of Object.entries(prefetchedResources)) {
-            this.prefetchedResources[file] = bytes;
+    addPrefetchedPreloads(preloads) {
+        if (JetStreamParams.prefetchResources) {
+            for (const {resource, blob} of preloads) {
+                this.shellPrefetchedResources[resource] = blob;
+            }
         }
     }
 
     addBlobData(blobData) {
-        this.add(blobData.blob);
+        this.add(`load("${blobData.blobURL}");`);
     }
 
     add(text) {
@@ -837,6 +874,24 @@ class BrowserScripts extends Scripts {
     constructor(preloads) {
         super(preloads);
         this.add("window.onerror = top.currentReject;");
+    }
+
+    static get prerunCode() {
+        return `
+            JetStream.getBinary = async function(blobURL) {
+                const response = await fetch(blobURL);
+                return new Int8Array(await response.arrayBuffer());
+            };
+
+            JetStream.getString = async function(blobURL) {
+                const response = await fetch(blobURL);
+                return response.text();
+            };
+
+            JetStream.dynamicImport = async function(blobURL) {
+                return await import(blobURL);
+            };
+        `;
     }
 
     run() {
@@ -873,10 +928,6 @@ class BrowserScripts extends Scripts {
         }
         this.scripts.push(`<script src="${url}"></script>`);
     }
-    addPrefetchedResources() {
-        // Nothing to do;
-    }
-
 }
 
 
@@ -1104,8 +1155,6 @@ class Benchmark {
             scripts.addDeterministicRandom()
         if (this._exposeBrowserTest)
             scripts.addBrowserTest();
-
-        scripts.addPrefetchedResources();
 
         const prerunCode = this.prerunCode;
         if (prerunCode)
@@ -1482,52 +1531,9 @@ class AsyncBenchmark extends DefaultBenchmark {
         // FIXME: It would be nice if these were available to any benchmark not just async ones but since these functions
         // are async they would only work in a context where the benchmark is async anyway. Long term, we should do away
         // with this class and make all benchmarks async.
-        if (isInBrowser) {
-            str += `
-                JetStream.getBinary = async function(blobURL) {
-                    const response = await fetch(blobURL);
-                    return new Int8Array(await response.arrayBuffer());
-                };
-
-                JetStream.getString = async function(blobURL) {
-                    const response = await fetch(blobURL);
-                    return response.text();
-                };
-
-                JetStream.dynamicImport = async function(blobURL) {
-                    return await import(blobURL);
-                };
-            `;
-        } else {
-            str += `
-                JetStream.getBinary = async function(path) {
-                console.log(path);
-                    if ("ShellPrefetchedResources" in globalThis) {
-                        return ShellPrefetchedResources[path];
-                    }
-                    return new Int8Array(read(path, "binary"));
-                };
-
-                JetStream.getString = async function(path) {
-                    if ("ShellPrefetchedResources" in globalThis) {
-                        return new ShellTextDecoder().decode(ShellPrefetchedResources[path]);
-                    }
-                    return read(path);
-                };
-
-                JetStream.dynamicImport = async function(path) {
-                    try {
-                        // TODO: this skips the prefetched resources, but I'm
-                        // not sure of a way around that.
-                        return await import(path);
-                    } catch (e) {
-                        // In shells, relative imports require different paths, so try with and
-                        // without the "./" prefix (e.g., JSC requires it).
-                        return await import(path.slice("./".length))
-                    }
-                };
-            `;
-        }
+        str += isInBrowser ? 
+            BrowserScripts.prerunCode :
+            ShellScripts.prerunCode;
         return str;
     }
 
