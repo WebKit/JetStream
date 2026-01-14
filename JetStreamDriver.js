@@ -169,12 +169,10 @@ class FileLoader {
         if (!globalThis.allIsGood) {
             return;
         }
-        // Return blobData copy with name and original resource path.
+        // Return blobData copy with the preload name.
         return {
+            ...blobData,
             name,
-            resource,
-            blob: blobData.blob,
-            blobURL: blobData.blobURL,
         };
     } 
 
@@ -183,7 +181,7 @@ class FileLoader {
         let blobDataOrPromise = this._blobDataCache[resource];
         if (!blobDataOrPromise) {
             const newBlobData = {
-                resource: resource,
+                resource,
                 blob: null,
                 blobURL: null,
                 refCount: 0
@@ -214,14 +212,14 @@ class FileLoader {
         return name.endsWith(".z");
     }
 
-    _uncompressedName(name) {
+    _decompressedName(name) {
         return name.slice(0, -2);
     }
 
-    _uncompressedResource(resource) {
+    _decompressedResourceName(resource) {
         const isCompressed = this._isCompressed(resource);
         if (isCompressed) {
-            return [isCompressed, this._uncompressedName(resource)];
+            return [isCompressed, this._decompressedName(resource)];
         }
         return [isCompressed, resource];
     }
@@ -245,8 +243,8 @@ class ShellFileLoader extends FileLoader {
 
     async _fetchBlobData(blobData) {
         const originalResource = blobData.resource;
-        const [isCompressed, resource] = this._uncompressedResource(originalResource);
-        blobData.blobURL = resource;
+        const [isCompressed, decompressedResource] = this._decompressedResourceName(originalResource);
+        blobData.blobURL = decompressedResource;
 
         if (!JetStreamParams.prefetchResources) {
             // If we aren't supposed to prefetch this, then handle this later 
@@ -259,8 +257,8 @@ class ShellFileLoader extends FileLoader {
         if (isCompressed) {
             contents = zlib.decompress(contents);
         }
-
         blobData.blob = contents;
+
         return blobData;;
     }
 };
@@ -281,7 +279,7 @@ class BrowserFileLoader extends FileLoader {
     }
 
     async _fetchBlobData(blobData) {
-        const [isCompressed, resource] = this._uncompressedResource(blobData.resource);
+        const [isCompressed, resource] = this._decompressedResourceName(blobData.resource);
 
         // If we aren't supposed to prefetch this then set the blobURL to just
         // be the resource URL.
