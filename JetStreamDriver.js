@@ -178,7 +178,6 @@ class FileLoader {
         };
     } 
 
-
     async prefetchResourceFile(resource) {
         this.counter.totalResources++;
         let blobDataOrPromise = this._blobDataCache[resource];
@@ -221,7 +220,7 @@ class FileLoader {
 
     _uncompressedResource(resource) {
         const isCompressed = this._isCompressed(resource);
-        if (isCompressed && !JetStreamParams.prefetchResources) {
+        if (isCompressed) {
             return [isCompressed, this._uncompressedName(resource)];
         }
         return [isCompressed, resource];
@@ -245,16 +244,18 @@ class ShellFileLoader extends FileLoader {
     }
 
     async _fetchBlobData(blobData) {
-        const [isCompressed, resource] = this._uncompressedResource(blobData.resource);
+        const originalResource = blobData.resource;
+        const [isCompressed, resource] = this._uncompressedResource(originalResource);
         blobData.blobURL = resource;
 
-        // If we aren't supposed to prefetch this then return code snippet that will load the url on-demand.
         if (!JetStreamParams.prefetchResources) {
-            blobData.blob = `load("${resource}");`;
+            // If we aren't supposed to prefetch this, then handle this later 
+            // in ShellScripts.addFile. Assumes that the files have been
+            // locally decompressed.
             return blobData;
         }
 
-        let contents = new Int8Array(read(resource, "binary"));
+        let contents = new Int8Array(read(originalResource, "binary"));
         if (isCompressed) {
             contents = zlib.decompress(contents);
         }
@@ -332,7 +333,6 @@ class BrowserFileLoader extends FileLoader {
             blobData.refCount--;
             if (!blobData.refCount) {
                 this._blobDataCache[file] = undefined;
-                console.log("DELETING", file);
             }
         }
     }
@@ -722,11 +722,7 @@ class Scripts {
         throw new Error("Subclasses need to implement this");
     }
 
-    addWithURL(url) {
-        throw new Error("addWithURL not supported");
-    }
-
-    addBlobData(blobData) {
+    addFile(blobData) {
         throw new Error("addWithURL not supported");
     }
 
@@ -767,14 +763,23 @@ class ShellScripts extends Scripts {
     constructor(preloads) {
         super(preloads);
         this.shellPrefetchedResources = Object.create(null);
-        this.addPrefetchedPreloads(preloads);
+        this._processPrefetchedPreloads(preloads);
+    }
+
+    _processPrefetchedPreloads(preloads) {
+        if (JetStreamParams.prefetchResources) {
+            for (const {resource, blobURL,  blob} of preloads) {
+                this.shellPrefetchedResources[blobURL] = blob;
+            }
+        }
     }
 
     static get prerunCode() {
        return `
             JetStream.getBinary = async function(path) {
                 if ("ShellPrefetchedResources" in globalThis) {
-                    return ShellPrefetchedResources[path];
+                    const data = ShellPrefetchedResources[path];
+                    return data;
                 }
                 return new Int8Array(read(path, "binary"));
             };
@@ -846,15 +851,8 @@ class ShellScripts extends Scripts {
         return isD8 ? realm : globalObject;
     }
 
-    addPrefetchedPreloads(preloads) {
-        if (JetStreamParams.prefetchResources) {
-            for (const {resource, blob} of preloads) {
-                this.shellPrefetchedResources[resource] = blob;
-            }
-        }
-    }
 
-    addBlobData(blobData) {
+    addFile(blobData) {
         this.add(`load("${blobData.blobURL}");`);
     }
 
@@ -863,10 +861,6 @@ class ShellScripts extends Scripts {
             throw new Error("Missing script source");
         }
         this.scripts.push(text);
-    }
-
-    addWithURL(url) {
-        console.assert(false, "Should not reach here in CLI");
     }
 }
 
@@ -911,7 +905,7 @@ class BrowserScripts extends Scripts {
         return magicFrame;
     }
 
-    addBlobData(blobData) {
+    addFile(blobData) {
         this.addWithURL(blobData.blobURL);
     }
 
@@ -1161,7 +1155,7 @@ class Benchmark {
             scripts.add(prerunCode);
 
         for (const file of this.files) {
-            scripts.addBlobData(fileLoader.getBlobData(file));
+            scripts.addFile(fileLoader.getBlobData(file));
         }
 
         const promise = new Promise((resolve, reject) => {
