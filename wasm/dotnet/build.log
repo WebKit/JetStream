@@ -1,6 +1,7 @@
-Built on 2025-09-16T10:18:00Z\n
+Built on 2026-01-15T14:54:21Z\n
 Toolchain versions
-9.0.305
+dotnet 9.0.305
+wasm-opt version 122 (version_122-92-g7508e81f0)
 Building interp...
 Copying symbol maps...
 Building aot...

@@ -128,7 +128,6 @@ class Benchmark {
         this.api = await this.dotnet.withModuleConfig({ locateFile: e => e }).withConfig(config).create();
         this.exports = await this.api.getAssemblyExports("dotnet.dll");
 
-
         // This drives the workload size for BenchTasks half of the test.
         this.benchTasksBatchSize = dotnetFlavor === "aot" ? 50 : 10;
 

@@ -1,4 +1,4 @@
-#! /bin/sh
+#! /bin/bash
 
 # Expects to have .NET SDK 9.0.3xx with `wasm-tools` installed.
 # Installation options:
@@ -17,35 +17,31 @@ BUILD_LOG="$(realpath build.log)"
 
 echo "Built on $(date -u '+%Y-%m-%dT%H:%M:%SZ')\n" | tee -a "$BUILD_LOG"
 echo "Toolchain versions" | tee -a "$BUILD_LOG"
+echo -n "dotnet " | tee -a "$BUILD_LOG"
 dotnet --version | tee -a "$BUILD_LOG"
+wasm-opt --version | tee -a "$BUILD_LOG"
 
-echo "Building interp..." | tee -a "$BUILD_LOG"
-dotnet publish -o ./build-interp ./src/dotnet/dotnet.csproj
+for version in "interp" "aot"; do
+    echo "Building $version..." | tee -a "$BUILD_LOG"
 
-# Workaround for `jsc` CLI
-printf '%s\n' 'import.meta.url ??= "";' | cat - ./src/dotnet/bin/Release/net9.0/wwwroot/_framework/dotnet.js > temp.js && mv temp.js ./build-interp/wwwroot/_framework/dotnet.js
-echo "Copying symbol maps..." | tee -a "$BUILD_LOG"
-cp ./src/dotnet/obj/Release/net9.0/wasm/for-publish/dotnet.native.js.symbols ./build-interp/wwwroot/_framework/
+    DOTNET_ARGS=""
+    if [ "$version" == "aot" ]; then
+        DOTNET_ARGS+=" -p:RunAOTCompilation=true"
+    fi
+    # Use deterministic builds and don't embed build directory paths to avoid spurious binary updates.
+    dotnet publish -o ./build-$version ./src/dotnet/dotnet.csproj -p:Deterministic=true -p:DeterministicSourcePaths=true $DOTNET_ARGS
 
-# Net9 and Net10 use Emscripten version 3.1.56, which emits legacy EH, see https://github.com/WebKit/JetStream/pull/188
-# FIXME: Update toolchain to Net11 once available, then remove this wasm-opt call.
-for wasmFile in $(find "./build-interp" -type f -name "*.wasm");
-do
-    wasm-opt "$wasmFile" --translate-to-exnref --enable-bulk-memory --enable-exception-handling --enable-simd --enable-reference-types --enable-multivalue -o "$wasmFile"
-done
+    # Silence warning on ArrayBuffer instantiation, which we intentionally use
+    # to keep the workload consistent between browsers and shells (the latter
+    # don't always support streaming compilation.)
+    perl -pi -e "s|\Q&&w('WebAssembly resource does not have the expected content type \"application/wasm\", so falling back to slower ArrayBuffer instantiation.')\E||g" ./build-$version/wwwroot/_framework/dotnet.js
 
+    echo "Copying symbol maps..." | tee -a "$BUILD_LOG"
+    cp ./src/dotnet/obj/Release/net9.0/wasm/for-publish/dotnet.native.js.symbols ./build-$version/wwwroot/_framework/
 
-echo "Building aot..." | tee -a "$BUILD_LOG"
-dotnet publish -o ./build-aot ./src/dotnet/dotnet.csproj -p:RunAOTCompilation=true
-
-# Workaround for `jsc` CLI
-printf '%s\n' 'import.meta.url ??= "";' | cat - ./build-aot/wwwroot/_framework/dotnet.js > temp.js && mv temp.js ./build-aot/wwwroot/_framework/dotnet.js
-echo "Copying symbol maps..." | tee -a "$BUILD_LOG"
-cp ./src/dotnet/obj/Release/net9.0/wasm/for-publish/dotnet.native.js.symbols ./build-aot/wwwroot/_framework/
-
-# Net9 and Net10 use Emscripten version 3.1.56, which emits legacy EH, see https://github.com/WebKit/JetStream/pull/188
-# FIXME: Update toolchain to Net11 once available, then remove this wasm-opt call.
-for wasmFile in $(find "./build-aot" -type f -name "*.wasm");
-do
-    wasm-opt "$wasmFile" --translate-to-exnref --enable-bulk-memory --enable-exception-handling --enable-simd --enable-reference-types --enable-multivalue -o "$wasmFile"
+    # Net9 and Net10 use Emscripten version 3.1.56, which emits legacy EH, see https://github.com/WebKit/JetStream/pull/188
+    # Only the `dotnetwasm` main file is a proper Wasm module, the rest is WebCIL, see https://github.com/dotnet/runtime/blob/main/docs/design/mono/webcil.md
+    # FIXME: Update toolchain to Net11 once available, then remove this wasm-opt call.
+    DOTNET_WASM_FILE="./build-$version/wwwroot/_framework/dotnet.native.wasm"
+    wasm-opt "$DOTNET_WASM_FILE" -o "$DOTNET_WASM_FILE" --translate-to-exnref --enable-bulk-memory --enable-exception-handling --enable-simd --enable-reference-types --enable-multivalue
 done
