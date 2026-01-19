@@ -279,7 +279,7 @@ class BrowserFileLoader {
             if (type == "preload") {
                 if (this.failedPreloads && this.failedPreloads[blobData.prop]) {
                     this.failedPreloads[blobData.prop] = false;
-                    this.preloads.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
+                    this._preloadBlobData.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
                     counter.failedPreloadResources--;
                 }
             }
@@ -292,7 +292,7 @@ class BrowserFileLoader {
             if (!globalThis.allIsGood)
                 return;
             if (blobData.type == "preload")
-                this.preloads.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
+                this._preloadBlobData.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
             this.updateCounter();
         });
 
@@ -1162,7 +1162,7 @@ class Benchmark {
             promises.push(browserFileLoader.loadBlob("preload", name, resource).then((blobData) => {
                 if (!globalThis.allIsGood)
                     return;
-                this.preloads.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
+                this._preloadBlobData.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
                 this.updateCounter();
             }).catch((error) => {
                 // We'll try again later in retryPrefetchResourceForBrowser(). Don't throw an error.
