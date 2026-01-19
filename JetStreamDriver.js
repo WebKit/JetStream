@@ -897,14 +897,6 @@ class Benchmark {
         return tags;
     }
 
-<<<<<<< HEAD
-    get name() { return this.plan.name; }
-    get files() { return this.plan.files; }
-||||||| parent of 1dbb861 (Improve Benchmark constructor and instance variables (#255))
-    get name() { return this.plan.name; }
-    get files() { return this.plan.files; }
-    get preloadFiles() { return Object.values(this.plan.preload ?? {}); }
-=======
     _processIterationCount(iterations) {
         if (this.name in JetStreamParams.testIterationCountMap)
             return JetStreamParams.testIterationCountMap[this.name];
@@ -924,7 +916,6 @@ class Benchmark {
             return worstCaseCount;
         return defaultWorstCaseCount;
     }
->>>>>>> 1dbb861 (Improve Benchmark constructor and instance variables (#255))
 
     get isDone() {
         return this._state == BenchmarkState.DONE || this._state == BenchmarkState.ERROR;
@@ -1093,16 +1084,8 @@ class Benchmark {
             scripts.add(prerunCode);
 
         if (!isInBrowser) {
-<<<<<<< HEAD
-            console.assert(this.scripts && this.scripts.length === this.plan.files.length);
-            for (const text of this.scripts)
-||||||| parent of 1dbb861 (Improve Benchmark constructor and instance variables (#255))
-            console.assert(this.scripts && this.scripts.length === this.files.length);
-            for (const text of this.scripts)
-=======
             console.assert(this._scripts && this._scripts.length === this.files.length);
             for (const text of this._scripts)
->>>>>>> 1dbb861 (Improve Benchmark constructor and instance variables (#255))
                 scripts.add(text);
         } else {
             const cache = browserFileLoader.blobDataCache;
@@ -1157,32 +1140,13 @@ class Benchmark {
     }
 
 
-<<<<<<< HEAD
     updateCounter() {
         const counter = JetStream.counter;
         ++counter.loadedResources;
         const statusElement = document.getElementById("status");
         statusElement.innerHTML = `Loading ${counter.loadedResources} of ${counter.totalResources} ...`;
-||||||| parent of 1dbb861 (Improve Benchmark constructor and instance variables (#255))
-    async prefetchResourcesForBrowser() {
-        console.assert(isInBrowser);
-        const promises = this.files.map((file) => browserFileLoader.prefetchResourceFile(file));
-        for (const [name, resource] of Object.entries(this.plan.preload ?? {})) {
-            promises.push(this.prefetchResourcePreload(name, resource));
-        }
-        await Promise.all(promises);
-=======
-    async prefetchResourcesForBrowser() {
-        console.assert(isInBrowser);
-        const promises = this.files.map((file) => browserFileLoader.prefetchResourceFile(file));
-        for (const [name, resource] of this.preloadEntries) {
-            promises.push(this.prefetchResourcePreload(name, resource));
-        }
-        await Promise.all(promises);
->>>>>>> 1dbb861 (Improve Benchmark constructor and instance variables (#255))
     }
 
-<<<<<<< HEAD
     prefetchResourcesForBrowser(counter) {
         console.assert(isInBrowser);
 
@@ -1234,31 +1198,14 @@ class Benchmark {
             }
         }
         return !counter.failedPreloadResources && counter.loadedResources == counter.totalResources;
-||||||| parent of 1dbb861 (Improve Benchmark constructor and instance variables (#255))
-    async prefetchResourcePreload(name, resource) {
-        const preloadData = await browserFileLoader.prefetchResourcePreload(name, resource);
-        this.preloads.push(preloadData);
-=======
-    async prefetchResourcePreload(name, resource) {
-        const preloadData = await browserFileLoader.prefetchResourcePreload(name, resource);
-        this._preloadBlobData.push(preloadData);
->>>>>>> 1dbb861 (Improve Benchmark constructor and instance variables (#255))
     }
 
     prefetchResourcesForShell() {
         // FIXME: move to ShellFileLoader.
         console.assert(!isInBrowser);
 
-<<<<<<< HEAD
-        console.assert(this.scripts === null, "This initialization should be called only once.");
-        this.scripts = this.plan.files.map(file => shellFileLoader.load(file));
-||||||| parent of 1dbb861 (Improve Benchmark constructor and instance variables (#255))
-        console.assert(this.scripts === null, "This initialization should be called only once.");
-        this.scripts = this.files.map(file => shellFileLoader.load(file));
-=======
         console.assert(this._scripts === null, "This initialization should be called only once.");
         this._scripts = this.files.map(file => shellFileLoader.load(file));
->>>>>>> 1dbb861 (Improve Benchmark constructor and instance variables (#255))
 
         console.assert(this._preloadBlobData.length === 0, "This initialization should be called only once.");
         this._shellPrefetchedResources = Object.create(null);
@@ -1392,25 +1339,6 @@ class Benchmark {
         }
         plotContainer.innerHTML = `<svg width="${width}px" height="${height}px">${circlesSVG}</svg>`;
     }
-<<<<<<< HEAD
-||||||| parent of 1dbb861 (Improve Benchmark constructor and instance variables (#255))
-
-    tearDown() {
-        if (isInBrowser) {
-            browserFileLoader.free(this.files);
-            browserFileLoader.free(this.preloadFiles);
-        }
-    }
-=======
-
-    tearDown() {
-        if (isInBrowser) {
-            browserFileLoader.free(this.files);
-            const preloadFiles = this.preloadEntries.map(([_, file]) => file);
-            browserFileLoader.free(preloadFiles);
-        }
-    }
->>>>>>> 1dbb861 (Improve Benchmark constructor and instance variables (#255))
 };
 
 class GroupedBenchmark extends Benchmark {
