@@ -1129,8 +1129,7 @@ class Benchmark {
     updateCounter() {
         const counter = JetStream.counter;
         ++counter.loadedResources;
-        const statusElement = document.getElementById("status");
-        statusElement.innerHTML = `Loading ${counter.loadedResources} of ${counter.totalResources} ...`;
+        JetStream.updateCounterUI();
     }
 
     prefetchResourcesForBrowser(counter) {
@@ -1322,8 +1321,8 @@ class Benchmark {
         for (let i = 0; i < scores.length; i++) {
             const result = scores[i];
             const cx = padding + i * xRatio;
-            const cy = padding + (result - minResult) * yRatio;
-            const title = `Iteration ${i + 1}: ${uiFriendlyDuration(result)}`;
+            const cy = height - padding - (result - minResult) * yRatio;
+            const title = `Iteration ${i + 1}: ${uiFriendlyScore(result)} (${uiFriendlyDuration(this.results[i])})`;
             circlesSVG += `<circle cx="${cx}" cy="${cy}" r="${radius}"><title>${title}</title></circle>`;
         }
         plotContainer.innerHTML = `<svg width="${width}px" height="${height}px">${circlesSVG}</svg>`;
