@@ -909,7 +909,7 @@ class Benchmark {
 
     _processWorstCaseCount(worstCaseCount) {
         if (this.name in JetStreamParams.testWorstCaseCountMap)
-            return JetStreamParams.testWorstCaseCountMap[plan.name];
+            return JetStreamParams.testWorstCaseCountMap[this.name];
         if (JetStreamParams.testWorstCaseCount)
             return JetStreamParams.testWorstCaseCount;
         if (worstCaseCount !== undefined)
