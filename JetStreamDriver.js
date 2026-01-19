@@ -1089,7 +1089,7 @@ class Benchmark {
                 scripts.add(text);
         } else {
             const cache = browserFileLoader.blobDataCache;
-            for (const file of this.plan.files) {
+            for (const file of this.files) {
                 scripts.addWithURL(cache[file].blobURL);
             }
         }
@@ -1150,7 +1150,7 @@ class Benchmark {
     prefetchResourcesForBrowser(counter) {
         console.assert(isInBrowser);
 
-        const promises = this.plan.files.map((file) => browserFileLoader.loadBlob("file", null, file).then((blobData) => {
+        const promises = this.files.map((file) => browserFileLoader.loadBlob("file", null, file).then((blobData) => {
                 if (!globalThis.allIsGood)
                     return;
                 this.updateCounter();
@@ -1158,21 +1158,19 @@ class Benchmark {
                 // We'll try again later in retryPrefetchResourceForBrowser(). Don't throw an error.
             }));
 
-        if (this.plan.preload) {
-            for (const [name, resource] of Object.entries(this.plan.preload)) {
-                promises.push(browserFileLoader.loadBlob("preload", name, resource).then((blobData) => {
-                    if (!globalThis.allIsGood)
-                        return;
-                    this.preloads.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
-                    this.updateCounter();
-                }).catch((error) => {
-                    // We'll try again later in retryPrefetchResourceForBrowser(). Don't throw an error.
-                    if (!this.failedPreloads)
-                        this.failedPreloads = { };
-                    this.failedPreloads[name] = true;
-                    counter.failedPreloadResources++;
-                }));
-            }
+        for (const [name, resource] of this.preloadEntries) {
+            promises.push(browserFileLoader.loadBlob("preload", name, resource).then((blobData) => {
+                if (!globalThis.allIsGood)
+                    return;
+                this.preloads.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
+                this.updateCounter();
+            }).catch((error) => {
+                // We'll try again later in retryPrefetchResourceForBrowser(). Don't throw an error.
+                if (!this.failedPreloads)
+                    this.failedPreloads = { };
+                this.failedPreloads[name] = true;
+                counter.failedPreloadResources++;
+            }));
         }
 
         JetStream.counter.totalResources += promises.length;
@@ -1183,19 +1181,17 @@ class Benchmark {
         // FIXME: Move to BrowserFileLoader.
         console.assert(isInBrowser);
 
-        for (const resource of this.plan.files) {
+        for (const resource of this.files) {
             const allDone = await browserFileLoader.retryPrefetchResource("file", null, resource);
             
             if (allDone)
                 return true; // All resources loaded, nothing more to do.
         }
 
-        if (this.plan.preload) {
-            for (const [name, resource] of Object.entries(this.plan.preload)) {
-                const allDone = await browserFileLoader.retryPrefetchResource("preload", name, resource);
-                if (allDone)
-                    return true; // All resources loaded, nothing more to do.
-            }
+        for (const [name, resource] of this.preloadEntries) {
+            const allDone = await browserFileLoader.retryPrefetchResource("preload", name, resource);
+            if (allDone)
+                return true; // All resources loaded, nothing more to do.
         }
         return !counter.failedPreloadResources && counter.loadedResources == counter.totalResources;
     }
