@@ -307,8 +307,9 @@ class BrowserFileLoader {
     }
 }
 
-const browserFileLoader = new BrowserFileLoader();
-const shellFileLoader = new ShellFileLoader();
+const fileLoader = isInBrowser ? 
+        new BrowserFileLoader() :
+        new ShellFileLoader();
 
 class Driver {
     constructor(benchmarks) {
@@ -533,7 +534,7 @@ class Driver {
     }
 
     updateCounterUI() {
-        const counter = JetStream.counter;
+        const counter = fileLoader.counter;
         const statusElement = document.getElementById("status-text");
         statusElement.innerText = `Loading ${counter.loadedResources} of ${counter.totalResources} ...`;
 
@@ -1081,7 +1082,7 @@ class Benchmark {
                 scripts.add(text);
         } else {
             for (const file of this.files) {
-                scripts.addWithURL(browserFileLoader.getBlobURL(file));
+                scripts.addWithURL(fileLoader.getBlobURL(file));
             }
         }
 
@@ -1130,25 +1131,18 @@ class Benchmark {
             Realm.dispose(magicFrame);
     }
 
-
-    updateCounter() {
-        const counter = JetStream.counter;
-        ++counter.loadedResources;
-        JetStream.updateCounterUI();
-    }
-
     async prefetchResourcesForBrowser() {
         console.assert(isInBrowser);
-        const promises = this.files.map((file) => browserFileLoader.prefetchResourceFile(file));
-        for (const [name, resource] of Object.entries(this.plan.preload ?? {})) {
+        const promises = this.files.map((file) => fileLoader.prefetchResourceFile(file));
+        for (const [name, resource] of this.preloadEntries) {
             promises.push(this.prefetchResourcePreload(name, resource));
         }
         await Promise.all(promises);
     }
 
     async prefetchResourcePreload(name, resource) {
-        const preloadData = await browserFileLoader.prefetchResourcePreload(name, resource);
-        this.preloads.push(preloadData);
+        const preloadData = await fileLoader.prefetchResourcePreload(name, resource);
+        this._preloadBlobData.push(preloadData);
     }
 
     prefetchResourcesForShell() {
@@ -1156,7 +1150,7 @@ class Benchmark {
         console.assert(!isInBrowser);
 
         console.assert(this._scripts === null, "This initialization should be called only once.");
-        this._scripts = this.files.map(file => shellFileLoader.load(file));
+        this._scripts = this.files.map(file => fileLoader.load(file));
 
         console.assert(this._preloadBlobData.length === 0, "This initialization should be called only once.");
         this._shellPrefetchedResources = Object.create(null);
@@ -1293,8 +1287,8 @@ class Benchmark {
 
     tearDown() {
         if (isInBrowser) {
-            browserFileLoader.free(this.files);
-            browserFileLoader.free(this.preloadFiles);
+            fileLoader.free(this.files);
+            fileLoader.free(this.preloadEntries.map(([_, file]) => file));
         }
     }
 };
