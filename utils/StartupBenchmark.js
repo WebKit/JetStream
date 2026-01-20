@@ -14,11 +14,11 @@ class StartupBenchmark {
   // Number of no-cache comments in the original #sourceCode.
   #expectedCacheCommentCount = 0;
   // How many times (separate iterations) should we reuse the source code.
-  // Use 0 to skip and only use a single #sourceCode string.
   #sourceCodeReuseCount = 1;
-  // #sourceCode for each iteration, number of unique sources is controlled
-  // by codeReuseCount;
-  #iterationSourceCodes = [];
+  // Current iteration being prepared
+  #currentIteration = 0;
+  // Source code for the current iteration
+  #currentIterationSourceCode = null;
 
   constructor({
     iterationCount,
@@ -36,8 +36,8 @@ class StartupBenchmark {
     );
     this.#expectedCacheCommentCount = expectedCacheCommentCount;
     console.assert(
-      sourceCodeReuseCount >= 0,
-      `Expected sourceCodeReuseCount to be non-negative, but got ${sourceCodeReuseCount}`
+      sourceCodeReuseCount > 0,
+      `Expected sourceCodeReuseCount to be positive, but got ${sourceCodeReuseCount}`
     );
     this.#sourceCodeReuseCount = sourceCodeReuseCount;
   }
@@ -62,8 +62,8 @@ class StartupBenchmark {
     return this.#sourceCodeReuseCount;
   }
 
-  get iterationSourceCodes() {
-    return this.#iterationSourceCodes;
+  get currentIterationSourceCode() {
+    return this.#currentIterationSourceCode;
   }
 
   async init() {
@@ -80,9 +80,6 @@ class StartupBenchmark {
     ).length;
     this.#sourceHash = this.quickHash(this.sourceCode);
     this.validateSourceCacheComments(cacheCommentCount);
-    for (let i = 0; i < this.iterationCount; i++)
-      this.#iterationSourceCodes[i] = this.createIterationSourceCode(i);
-    this.validateIterationSourceCodes();
   }
 
   validateSourceCacheComments(cacheCommentCount) {
@@ -92,27 +89,14 @@ class StartupBenchmark {
     );
   }
 
-  validateIterationSourceCodes() {
-    if (this.#iterationSourceCodes.some((each) => !each?.length))
-      throw new Error(`Got invalid iterationSourceCodes`);
-    let expectedSize = 1;
-    if (this.sourceCodeReuseCount !== 0)
-      expectedSize = Math.ceil(this.iterationCount / this.sourceCodeReuseCount);
-    const uniqueSources = new Set(this.iterationSourceCodes);
-    if (uniqueSources.size != expectedSize)
-      throw new Error(
-        `Expected ${expectedSize} unique sources, but got ${uniqueSources.size}.`
-      );
-  }
-
   createIterationSourceCode(iteration) {
+    if ((iteration % this.sourceCodeReuseCount) !== 0)
+      return this.#currentIterationSourceCode;
+
     // Alter the code per iteration to prevent caching.
     const cacheId =
       Math.floor(iteration / this.sourceCodeReuseCount) *
       this.sourceCodeReuseCount;
-    // Reuse existing sources if this.codeReuseCount > 1:
-    if (cacheId < this.iterationSourceCodes.length)
-      return this.iterationSourceCodes[cacheId];
 
     const sourceCode = this.sourceCode.replaceAll(
       CACHE_BUST_COMMENT_RE,
@@ -121,6 +105,11 @@ class StartupBenchmark {
     // Warm up quickHash.
     this.quickHash(sourceCode);
     return sourceCode;
+  }
+
+  prepareForNextIteration() {
+    this.#currentIterationSourceCode = this.createIterationSourceCode(this.#currentIteration);
+    this.#currentIteration++;
   }
 
   quickHash(str) {
