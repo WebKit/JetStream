@@ -151,26 +151,41 @@ NBodySystem.prototype.energy = function(){
    return e;
 }
 
-var ret = 0;
+function workload() {
+   var ret = 0;
 
-for ( var n = 3; n <= 24; n *= 2 ) {
-    (function(){
-        var bodies = new NBodySystem( Array(
-           Sun(),Jupiter(),Saturn(),Uranus(),Neptune()
-        ));
-        var max = n * 100;
-        
-        ret += bodies.energy();
-        for (var i=0; i<max; i++){
-            bodies.advance(0.01);
-        }
-        ret += bodies.energy();
-    })();
+   for ( var n = 3; n <= 24; n *= 2 ) {
+      (function(){
+         var bodies = new NBodySystem( Array(
+            Sun(),Jupiter(),Saturn(),Uranus(),Neptune()
+         ));
+         var max = n * 100;
+         
+         ret += bodies.energy();
+         for (var i=0; i<max; i++){
+               bodies.advance(0.01);
+         }
+         ret += bodies.energy();
+      })();
+   }
+
+   var expected = -1.3524862408537381;
+   if (ret != expected)
+      throw "ERROR: bad result: expected " + expected + " but got " + ret;
+
+    postMessage("done");
+    close();
 }
 
-var expected = -1.3524862408537381;
-if (ret != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + ret;
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");
 
-postMessage("done");
-close();

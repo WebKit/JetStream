@@ -438,12 +438,27 @@ for (var y = 0; y < size; y++) {\n\
     return s;
 }
 
-testOutput = arrayToCanvasCommands(raytraceScene());
+function workload() {
 
-var expectedLength = 20970;
+    testOutput = arrayToCanvasCommands(raytraceScene());
 
-if (testOutput.length != expectedLength)
-    throw "Error: bad result: expected length " + expectedLength + " but got " + testOutput.length;
+    var expectedLength = 20970;
 
-postMessage("done");
-close();
+    if (testOutput.length != expectedLength)
+        throw "Error: bad result: expected length " + expectedLength + " but got " + testOutput.length;
+
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");

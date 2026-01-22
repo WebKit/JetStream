@@ -219,11 +219,25 @@ for (var i = 0; i <4; i++) {
     plainText += plainText;
 }
 
-var sha1Output = hex_sha1(plainText);
+function workload() {
+    var sha1Output = hex_sha1(plainText);
+    var expected = "2524d264def74cce2498bf112bedf00e6c0b796d";
 
-var expected = "2524d264def74cce2498bf112bedf00e6c0b796d";
-if (sha1Output != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + sha1Output;
+    if (sha1Output != expected)
+        throw "ERROR: bad result: expected " + expected + " but got " + sha1Output;
 
-postMessage("done");
-close();
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");

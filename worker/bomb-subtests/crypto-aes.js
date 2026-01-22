@@ -418,11 +418,26 @@ And sails upon the bosom of the air.";
 
 var password = "O Romeo, Romeo! wherefore art thou Romeo?";
 
-var cipherText = AESEncryptCtr(plainText, password, 256);
-var decryptedText = AESDecryptCtr(cipherText, password, 256);
 
-if (decryptedText != plainText)
-    throw "ERROR: bad result: expected " + plainText + " but got " + decryptedText;
+function workload() {
+    var cipherText = AESEncryptCtr(plainText, password, 256);
+    var decryptedText = AESDecryptCtr(cipherText, password, 256);
 
-postMessage("done");
-close();
+    if (decryptedText != plainText)
+        throw "ERROR: bad result: expected " + plainText + " but got " + decryptedText;
+
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");
