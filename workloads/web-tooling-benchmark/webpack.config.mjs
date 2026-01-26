@@ -30,68 +30,71 @@ export default async (env) => {
     entries[target] = path.join(srcDir, `${target}.mjs`);
   }
 
-  const baseConfig = {
-    entry: entries,
-    target: ["web", "es6"],
-    resolve: {
-      alias: {
-        url: require.resolve("whatwg-url"),
+  function baseConfig(mode) {
+    const prodPlugins = (mode == "development") ? [] : [
+        new LicenseWebpackPlugin({
+          perChunkOutput: true, 
+          outputFilename: '[name].LICENSE.txt',
+        })
+      ];
+    return {
+      entry: entries,
+      target: ["web", "es6"],
+      resolve: {
+        alias: {
+          url: require.resolve("whatwg-url"),
+        },
+        fallback: {
+          path: require.resolve("path-browserify"),
+          assert: require.resolve("assert/"),
+          os: require.resolve("os-browserify/browser"),
+          crypto: require.resolve("crypto-browserify"),
+          stream: require.resolve("stream-browserify"),
+          url: require.resolve("url/"),
+          util: require.resolve("util/"),
+          vm: require.resolve("vm-browserify"),
+          buffer: require.resolve("buffer/"),
+          fs: false,
+          "fs/promises": false,
+          module: false,
+          perf_hooks: false,
+          process: false,
+          v8: false,
+          fsevents: false,
+          process: require.resolve("process/browser.js"),
+        },
       },
-      fallback: {
-        path: require.resolve("path-browserify"),
-        assert: require.resolve("assert/"),
-        os: require.resolve("os-browserify/browser"),
-        crypto: require.resolve("crypto-browserify"),
-        stream: require.resolve("stream-browserify"),
-        url: require.resolve("url/"),
-        util: require.resolve("util/"),
-        vm: require.resolve("vm-browserify"),
-        buffer: require.resolve("buffer/"),
-        fs: false,
-        "fs/promises": false,
-        module: false,
-        perf_hooks: false,
-        process: false,
-        v8: false,
-        fsevents: false,
-        process: require.resolve("process/browser.js"),
-      },
-    },
-    plugins: [
-      new webpack.ProvidePlugin({
-        process: "process/browser.js",
-        TextEncoder: ["text-encoder", "TextEncoder"],
-        TextDecoder: ["text-encoder", "TextDecoder"],
-      }),
-      new LicenseWebpackPlugin({
-        perChunkOutput: true, 
-        outputFilename: '[name].LICENSE.txt',
-      })
-    ],
+      plugins: [
+        new webpack.ProvidePlugin({
+          process: "process/browser.js",
+          TextEncoder: ["text-encoder", "TextEncoder"],
+          TextDecoder: ["text-encoder", "TextDecoder"],
+        }),
+        ...prodPlugins 
+      ],
+    };
   };
 
-  const prodConfig = {
-    ...baseConfig,
+  const devConfig = {
+    ...baseConfig("development"),
     output: {
       path: distDir,
-      filename: "[name].bundle.js",
-      library: {
-        name: "WTBenchmark",
-        type: "global",
-      },
-      //libraryTarget: "assign",
-      chunkFormat: "commonjs",
+      filename: "[name].bundle.dev.js",
+      library: { 
+        name: "WTBenchmark", 
+        type: "global", 
+      }, 
     },
-    mode: "development",
     devtool: false,
+    mode: "development",
   };
-  const devConfig = {
-      ...baseConfig,
+  const prodConfig = {
+      ...baseConfig("production"),
       output: {
         path: distDir,
-        filename: "[name].min.js"
+        filename: "[name].bundle.min.js"
       },
-      mode: "production"
+      mode: "production",
   };
-  return [ prodConfig ];
+  return [devConfig, prodConfig];
 };

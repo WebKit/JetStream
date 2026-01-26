@@ -7,6 +7,8 @@
     "clean": "rm -rf dist/*",
     "prebuild": "npm run clean",
     "build": "webpack",
+    "postbuild": "npm run compress",
+    "compress": "node ../utils/compress.mjs dist/*bundle.dev.js ",
     "test": "jest",
     "update-lock": "npm install --package-lock"
   },
