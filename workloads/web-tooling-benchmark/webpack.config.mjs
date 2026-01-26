@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { targetList } from "./src/cli/flags-helper.mjs";
 import { createRequire } from "module";
 import { LicenseWebpackPlugin } from "license-webpack-plugin";
+import TerserPlugin from "terser-webpack-plugin";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -76,6 +77,25 @@ function createConfig({entries, mode}) {
       }),
       ...prodPlugins 
     ],
+    optimization: {
+      minimize: !isDev,
+      minimizer: [
+        // Do not minify chai workload since it relies on the original names.
+        new TerserPlugin({
+          include: /chai/,
+          extractComments: false,
+          terserOptions: {
+            mangle: false,
+            compress: false,
+          },
+        }),
+        // minify everything else:
+        new TerserPlugin({
+          exclude: /chai/,
+          extractComments: false,
+        }),
+      ],
+    },
   };
 };
 
