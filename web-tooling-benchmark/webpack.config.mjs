@@ -8,6 +8,7 @@ import { fileURLToPath } from "url";
 import { targetList } from "./src/cli/flags-helper.mjs";
 import { createRequire } from "module";
 import { LicenseWebpackPlugin } from "license-webpack-plugin";
+import TerserPlugin from "terser-webpack-plugin";
 
 const require = createRequire(import.meta.url);
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -23,16 +24,27 @@ function getTargets(env) {
   return [...targetList];
 }
 
-export default async (env) => {
-  const targets = getTargets(env);
-  const entries = Object.create(null);
-  for (const target of targets) {
-    entries[target] = path.join(srcDir, `${target}.mjs`);
-  }
-
-  const baseConfig = {
+function createConfig({entries, mode}) {
+  const isDev = mode == "development";
+  const prodPlugins = isDev ? [] : [
+      new LicenseWebpackPlugin({
+        perChunkOutput: true, 
+        outputFilename: '[name].LICENSE.txt',
+      })
+    ];
+  return {
     entry: entries,
     target: ["web", "es6"],
+    output: {
+      path: distDir,
+      filename: isDev ? "[name].bundle.dev.js" : "[name].bundle.min.js",
+      library: { 
+        name: "WTBenchmark", 
+        type: "global", 
+      }, 
+    },
+    mode,
+    devtool: false,
     resolve: {
       alias: {
         url: require.resolve("whatwg-url"),
@@ -63,35 +75,39 @@ export default async (env) => {
         TextEncoder: ["text-encoder", "TextEncoder"],
         TextDecoder: ["text-encoder", "TextDecoder"],
       }),
-      new LicenseWebpackPlugin({
-        perChunkOutput: true, 
-        outputFilename: '[name].LICENSE.txt',
-      })
+      ...prodPlugins 
     ],
-  };
-
-  const prodConfig = {
-    ...baseConfig,
-    output: {
-      path: distDir,
-      filename: "[name].bundle.js",
-      library: {
-        name: "WTBenchmark",
-        type: "global",
-      },
-      //libraryTarget: "assign",
-      chunkFormat: "commonjs",
+    optimization: {
+      minimize: !isDev,
+      minimizer: [
+        // Do not minify chai workload since it relies on the original names.
+        new TerserPlugin({
+          include: /chai/,
+          extractComments: false,
+          terserOptions: {
+            mangle: false,
+            compress: false,
+          },
+        }),
+        // minify everything else:
+        new TerserPlugin({
+          exclude: /chai/,
+          extractComments: false,
+        }),
+      ],
     },
-    mode: "development",
-    devtool: false,
   };
-  const devConfig = {
-      ...baseConfig,
-      output: {
-        path: distDir,
-        filename: "[name].min.js"
-      },
-      mode: "production"
-  };
-  return [ prodConfig ];
+};
+
+export default async (env) => {
+  const targets = getTargets(env);
+  const entries = Object.create(null);
+  for (const target of targets) {
+    entries[target] = path.join(srcDir, `${target}.mjs`);
+  }
+
+  return [
+    createConfig({entries, mode: "development"}),
+    createConfig({entries, mode: "production"}),
+  ];
 };
