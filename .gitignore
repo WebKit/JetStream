@@ -13,3 +13,5 @@ v8.log
 workloads/RexBench/FlightPlanner/waypoints.js
 workloads/SeaMonster/inspector-json-payload.js
 workloads/argon2-wasm/build/argon2.wasm
+# Only check-in compressed non-minified dev files.
+workloads/*/dist/*.dev.js
