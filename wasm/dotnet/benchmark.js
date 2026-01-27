@@ -1,6 +1,6 @@
 class Benchmark {
     async init() {
-        const config = {
+        this.config = {
             mainAssemblyName: "dotnet.dll",
             globalizationMode: "custom",
             assets: [
@@ -123,10 +123,7 @@ class Benchmark {
                 }
             ]
         };
-
         this.dotnet = (await JetStream.dynamicImport(JetStream.preload.dotnetUrl)).dotnet;
-        this.api = await this.dotnet.withModuleConfig({ locateFile: e => e }).withConfig(config).create();
-        this.exports = await this.api.getAssemblyExports("dotnet.dll");
 
         // This drives the workload size for BenchTasks half of the test.
         this.benchTasksBatchSize = dotnetFlavor === "aot" ? 50 : 10;
@@ -137,6 +134,11 @@ class Benchmark {
         this.sceneHeight = dotnetFlavor === "aot" ? 100 : 50;
     }
     async runIteration() {
+        if (!this.exports) {
+            const api = await this.dotnet.withModuleConfig({ locateFile: e => e }).withConfig(this.config).create();
+            this.exports = await api.getAssemblyExports("dotnet.dll");
+        }
+
         await this.exports.Interop.RunIteration(this.benchTasksBatchSize, this.sceneWidth, this.sceneHeight, this.hardwareConcurrency);
     }
 }
