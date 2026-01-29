@@ -2428,7 +2428,7 @@ let BENCHMARKS = [
         ],
         tags: ["default", "js", "Generators"],
     }),
-    new DefaultBenchmark({
+    new AsyncBenchmark({
         name: "js-tokens",
         files: [
             "./workloads/js-tokens/js-tokens.js",

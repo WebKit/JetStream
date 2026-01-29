@@ -439,7 +439,7 @@ class Benchmark {
     jsTokensSourceCode;
 
     async init() {
-        this.jsTokensSourceCode = await JetStream.getString(JetStream.preload.US_DATA);
+        this.jsTokensSourceCode = await JetStream.getString(JetStream.preload.JS_SOURCE);
     }
 
     runIteration() {
@@ -457,7 +457,8 @@ class Benchmark {
     }
 
     validate(iterations) {
-        if (this.tokenCount !== 113975)
-            throw new Error(`this.tokenCount of ${this.tokenCount} is invalid!`);
+        const EXPECTED_TOKEN_COUNT = 121300;
+        if (this.tokenCount !== EXPECTED_TOKEN_COUNT)
+            throw new Error(`Expected this.tokenCount of ${EXPECTED_TOKEN_COUNT} but got ${this.tokenCount}`);
     }
 }
