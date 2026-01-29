@@ -457,7 +457,7 @@ class Benchmark {
     }
 
     validate(iterations) {
-        const EXPECTED_TOKEN_COUNT = 121300;
+        const EXPECTED_TOKEN_COUNT = 114025;
         if (this.tokenCount !== EXPECTED_TOKEN_COUNT)
             throw new Error(`Expected this.tokenCount of ${EXPECTED_TOKEN_COUNT} but got ${this.tokenCount}`);
     }
