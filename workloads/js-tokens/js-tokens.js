@@ -410,7 +410,6 @@ function jsTokensWrapperFunction() {
     };
 };
 
-const jsTokensSourceCode = jsTokensWrapperFunction.toString();
 const jsxSourceCode = `
 
 function Comment(props) {
@@ -437,11 +436,17 @@ function Comment(props) {
 const jsTokens = jsTokensWrapperFunction();
 
 class Benchmark {
+    jsTokensSourceCode;
+
+    async init() {
+        this.jsTokensSourceCode = await JetStream.getString(JetStream.preload.US_DATA);
+    }
+
     runIteration() {
         this.tokenCount = 0;
 
         for (var i = 0; i < 25; i++) {
-            for (const token of jsTokens(jsTokensSourceCode))
+            for (const token of jsTokens(this.jsTokensSourceCode))
                 this.tokenCount++;
         }
 

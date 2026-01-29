@@ -2433,6 +2433,11 @@ let BENCHMARKS = [
         files: [
             "./workloads/js-tokens/js-tokens.js",
         ],
+        preload: {
+            // FIXME: refactor this to use the same file once the resource
+            // loader has been rewritten.
+            JS_SOURCE: "./workloads/js-tokens/js-tokens-src.js",
+        },
         tags: ["default", "js", "Generators"],
     }),
     new DefaultBenchmark({
