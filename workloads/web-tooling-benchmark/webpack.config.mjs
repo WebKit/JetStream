@@ -26,12 +26,12 @@ function getTargets(env) {
 
 function createConfig({entries, mode}) {
   const isDev = mode == "development";
-  const prodPlugins = isDev ? [] : [
+  const licensePlugins = isDev ? [
       new LicenseWebpackPlugin({
         perChunkOutput: true, 
         outputFilename: '[name].LICENSE.txt',
       })
-    ];
+    ] : [];
   return {
     entry: entries,
     target: ["web", "es6"],
@@ -75,10 +75,10 @@ function createConfig({entries, mode}) {
         TextEncoder: ["text-encoder", "TextEncoder"],
         TextDecoder: ["text-encoder", "TextDecoder"],
       }),
-      ...prodPlugins 
+      ...licensePlugins 
     ],
     optimization: {
-      minimize: !isDev,
+      minimize: true,
       minimizer: [
         // Do not minify chai workload since it relies on the original names.
         new TerserPlugin({
@@ -87,12 +87,24 @@ function createConfig({entries, mode}) {
           terserOptions: {
             mangle: false,
             compress: false,
+            format: {
+              beautify: isDev,
+              comments: isDev,
+            },
           },
         }),
         // minify everything else:
         new TerserPlugin({
           exclude: /chai/,
           extractComments: false,
+          terserOptions: {
+            mangle: !isDev,
+            compress: !isDev,
+            format: {
+              beautify: isDev,
+              comments: isDev,
+            },
+          },
         }),
       ],
     },
