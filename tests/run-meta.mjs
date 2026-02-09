@@ -1,6 +1,7 @@
 /*
- * Copyright (C) 2025 Apple Inc. All rights reserved.
- *
+ * Copyright (C) 2026 Apple Inc. All rights reserved.
+ * Copyright 2026 Google LLC
+ * 
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions
  * are met:
@@ -25,43 +26,65 @@
 
 import { glob } from "glob";
 import * as fs from "fs";
+import * as path from "path";
 import { logInfo, logError } from "./helper.mjs";
 
 const IGNORE_PATTERNS = [
     "**/node_modules/**",
-    "**/dist/**",
-    "**/build/**",
     "**/.*/**",
+    "**/build/**",
+    "**/dotnet/build-*/**",
     // Existing benchmarks with common / non-standard license headers:
-    "**/worker/bomb-subtests/**",
+    "**/web-tooling-benchmark/third_party/**",
+    "**/8bitbench/**",
+    "**/ARES-6/Basic/test.js",
+    "**/RexBench/OfflineAssembler/expected.js",
     "**/SunSpider/**",
-    "**/third_party/**"
+    "**/class-fields/**",
+    "**/worker/bomb-subtests/**",
 ];
 
 async function checkLicenses() {
     const files = await glob("**/*.{js,mjs}", { ignore: IGNORE_PATTERNS, nodir: true });
-    let failed = false;
 
     logInfo(`Checking ${files.length} files for license headers...`);
 
     const offendingFiles = [];
+    const dirHasLicense = new Map();
 
     for (const file of files) {
-        const content = fs.readFileSync(file, "utf8");
+        const fileInfo = path.parse(file);
+        const dir = fileInfo.dir;
+        let hasLicenseFile = dirHasLicense.get(dir);
+        if (hasLicenseFile === undefined) {
+            hasLicenseFile =
+                fs.existsSync(path.join(dir, "LICENSE")) ||
+                fs.existsSync(path.join(dir, "LICENSE.txt"));
+            dirHasLicense.set(dir, hasLicenseFile);
+        }
+        if (hasLicenseFile === true) {
+            continue;
+        }
 
+        const content = fs.readFileSync(file, "utf8");
         const hasCopyright = /Copyright/i.test(content);
         const hasLicenseText = /Redistribution|Permission|License/i.test(content);
 
-        if (!hasCopyright || !hasLicenseText) {
-            offendingFiles.push(file);
-            failed = true;
+        if (hasCopyright && hasLicenseText) {
+            continue;
         }
+        const perFileLicense = path.join(dir, `${fileInfo.name}.LICENSE.txt`);
+        if (fs.existsSync(perFileLicense)) {
+            continue;
+        }
+
+        offendingFiles.push(file);
     }
 
-    if (failed) {
-        logError("The following files are missing license headers:");
+    if (offendingFiles.length) {
+        logError(`The following ${offendingFiles.length} file[s] have missing license headers:`);
         for (const file of offendingFiles) {
-             logError(`  ${file}`);
+            logError(`  ${file}`);
         }
         process.exit(1);
     } else {
