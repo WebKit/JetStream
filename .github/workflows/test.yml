@@ -108,3 +108,6 @@ jobs:
                     npm run test:build -- --diff="${{ github.event.before }}...${{ github.event.after }}"
                   fi
 
+            - name: Run License Checks
+              run: node run tests:license
+

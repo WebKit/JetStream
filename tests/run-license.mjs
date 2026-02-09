@@ -91,7 +91,7 @@ async function checkLicenses() {
         }
         process.exit(1);
     } else {
-        logInfo("All files have license headers.");
+        logInfo("   ");
     }
 }
 
