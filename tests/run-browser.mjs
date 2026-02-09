@@ -54,7 +54,7 @@ const TESTS = [
         name: "Run Tag No Prefetch",
         tags: ["all", "main"],
         run() {
-            return runEnd2EndTest("Run Tag No Prefetch",  { tag: "proxy", prefetchResources: "false" });
+            return runEnd2EndTest("Run Tag No Prefetch", { tag: "proxy", prefetchResources: "false" });
         }
     },
     {
@@ -179,7 +179,7 @@ async function runBrowserDriverTest(name, body) {
 }
 
 async function runBrowserDriver(body) {
-    const builder =  new Builder().withCapabilities(capabilities);
+    const builder = new Builder().withCapabilities(capabilities);
     if (browserOptions) {
         switch(BROWSER) {
             case "firefox":
@@ -255,7 +255,7 @@ async function benchmarkResults(driver) {
 }
 
 async function inDepthPageTest(driver) {
-    await driver.get( `http://localhost:${PORT}/in-depth.html`);
+    await driver.get(`http://localhost:${PORT}/in-depth.html`);
     const ids = await driver.executeScript(() => {
         return Array.from(document.querySelectorAll("#workload-details dt[id]")).map(each => each.id);
     });
@@ -270,7 +270,7 @@ async function inDepthPageTest(driver) {
         }
     });
     const idSet = new Set(ids);
-    await driver.get( `http://localhost:${PORT}/index.html?tags=all`);
+    await driver.get(`http://localhost:${PORT}/index.html?tags=all`);
     const benchmarkNames = await driver.executeScript(() => {
         return globalThis.JetStream.benchmarks.map(each => each.name);
     });
@@ -303,7 +303,7 @@ class JetStreamTestError extends Error {
 const UPDATE_INTERVAL = 250;
 async function pollResultsUntilDone(driver, resolve, reject) {
     const previousResults = new Set();
-    const intervalId = setInterval(async function logResult()  {
+    const intervalId = setInterval(async function logResult() {
         const {done, errors, resultsJSON} = await driver.executeScript(() => {
             return {
                 done: globalThis.JetStream.isDone,
