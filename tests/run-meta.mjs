@@ -35,12 +35,15 @@ const IGNORE_PATTERNS = [
     "**/build/**",
     "**/dotnet/build-*/**",
     // Existing benchmarks with common / non-standard license headers:
-    "**/web-tooling-benchmark/third_party/**",
     "**/8bitbench/**",
     "**/ARES-6/Basic/test.js",
     "**/RexBench/OfflineAssembler/expected.js",
     "**/SunSpider/**",
     "**/class-fields/**",
+    "**/wasm/tfjs-*",
+    "**/wasm/tfjs.js",
+    "**/wasm/tsf.js",
+    "**/web-tooling-benchmark/third_party/**",
     "**/worker/bomb-subtests/**",
 ];
 
