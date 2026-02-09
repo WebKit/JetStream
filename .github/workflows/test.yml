@@ -101,7 +101,7 @@ jobs:
             - *install-node-packages
 
             - name: Run License Checks
-              run: node run tests:license
+              run: npm run test:license
 
             - name: Run Build
               run: |
