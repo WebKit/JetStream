@@ -27,7 +27,7 @@
 import { glob } from "glob";
 import * as fs from "fs";
 import * as path from "path";
-import { logInfo, logError } from "./helper.mjs";
+import { logInfo, logError, runTest } from "./helper.mjs";
 
 const IGNORE_PATTERNS = [
     "**/node_modules/**",
@@ -87,12 +87,11 @@ async function checkLicenses() {
     if (offendingFiles.length) {
         logError(`The following ${offendingFiles.length} file[s] have missing license headers:`);
         for (const file of offendingFiles) {
-            logError(`  ${file}`);
+            logError(`  - ${file}`);
         }
-        process.exit(1);
-    } else {
-        logInfo("   ");
+        throw new Error("Missing license headers");
     }
 }
 
-checkLicenses();
+const success = await runTest("Check Licenses", checkLicenses);
+process.exit(success ? 0 : 1);

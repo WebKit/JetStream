@@ -100,6 +100,9 @@ jobs:
             - *setup-node
             - *install-node-packages
 
+            - name: Run License Checks
+              run: node run tests:license
+
             - name: Run Build
               run: |
                   if ${{ github.event_name == 'pull_request' }}; then
@@ -107,7 +110,4 @@ jobs:
                   else
                     npm run test:build -- --diff="${{ github.event.before }}...${{ github.event.after }}"
                   fi
-
-            - name: Run License Checks
-              run: node run tests:license
 
