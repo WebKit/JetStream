@@ -32,7 +32,8 @@
         "test:v8": "npm run test:prepare && node tests/run-shell.mjs --shell v8",
         "test:jsc": "npm run test:prepare && node tests/run-shell.mjs --shell jsc",
         "test:spidermonkey": "npm run test:prepare && node tests/run-shell.mjs --shell spidermonkey",
-        "test:build": "npm run test:prepare && node tests/run-build.mjs"
+        "test:build": "npm run test:prepare && node tests/run-build.mjs",
+        "test:license": "npm run test:prepare && node tests/run-license.mjs"
     },
     "devDependencies": {
         "@actions/core": "^1.11.1",
