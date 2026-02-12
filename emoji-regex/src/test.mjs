@@ -24,6 +24,7 @@
  */
 
 import emojiRegex from "emoji-regex";
+import { marked } from "marked";
 
 const regex = emojiRegex();
 
@@ -37,4 +38,9 @@ export function renderEmojis(content) {
       return `<img class="emoji" alt="${match}" src="img/emoji/${hexCode}.png" />`;
   });
   return newContent;
+}
+
+export function render(content) {
+    const html = marked.parse(content);
+    return renderEmojis(html);
 }

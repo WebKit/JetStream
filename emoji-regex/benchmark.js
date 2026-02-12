@@ -32,16 +32,21 @@ class Benchmark extends StartupBenchmark {
     constructor({iterationCount}) {
         super({
             iterationCount,
-            expectedCacheCommentCount: 1,
-            sourceCodeReuseCount: 1,
+            expectedCacheCommentCount: 122,
+            sourceCodeReuseCount: 4,
         });
     }
 
     async init() {
-        const fileNames = ["small.txt", "medium.txt", "large.txt"];
+        const mdFileNames = [
+            "small.md", "medium.md", "large.md",
+            "zh.md", "hi.md", "vi.md",
+            "msg1.md", "msg2.md", "msg3.md", "msg4.md", "msg5.md",
+            "msg6.md", "msg7.md", "msg8.md", "msg9.md", "msg10.md",
+        ];
         await Promise.all([
             super.init(),
-            ...fileNames.map(file => this.loadData(file)),
+            ...mdFileNames.map(file => this.loadData(file)),
         ]);
     }
 
@@ -56,8 +61,8 @@ class Benchmark extends StartupBenchmark {
         eval(this.iterationSourceCodes[iteration]);
 
         for (const sample of this.samples) {
-            const result = EmojiRegexBenchmark.renderEmojis(sample);
-            if (result.length <= 100) {
+            const result = EmojiRegexBenchmark.render(sample);
+            if (result.length <= 0) {
                 throw new Error(`Invalid result length: ${result.length}`);
             }
             this.totalHash ^= this.quickHash(result);

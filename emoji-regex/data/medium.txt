@@ -1,5 +1,0 @@
-Here is some more text. It has a few more emojis.
-Line 1: 🍎🍌🍇
-Line 2: 🐶🐱🐭
-Line 3: 🚗🚕🚙
-Hope this is enough for a medium test. 😉

@@ -94,6 +94,4 @@ function config({ filename, minify, target }) {
 export default [
   config({ filename: "bundle.es6.min.js", minify: true, target: "es6" }),
   config({ filename: "bundle.es6.js", minify: false, target: "es6" }),
-  config({ filename: "bundle.es5.min.js", minify: true, target: "es5" }),
-  config({ filename: "bundle.es5.js", minify: false, target: "es5" }),
 ];
