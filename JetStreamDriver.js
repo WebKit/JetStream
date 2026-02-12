@@ -2153,6 +2153,20 @@ let BENCHMARKS = [
         exposeBrowserTest: true,
         tags: ["default", "js",  "RexBench"],
     }),
+    new AsyncBenchmark({
+        name: "emoji-regexp",
+        files: [
+            "./utils/StartupBenchmark.js",
+            "./emoji-regex/benchmark.js",
+        ],
+        preload: {
+            BUNDLE: "./emoji-regex/dist/bundle.es6.min.js",
+            "small.txt": "./emoji-regex/data/small.txt",
+            "medium.txt": "./emoji-regex/data/medium.txt",
+            "large.txt": "./emoji-regex/data/large.txt",
+        },
+        tags: ["default", "js", "regexp"],
+    }),
     new DefaultBenchmark({
         name: "validatorjs",
         files: [
