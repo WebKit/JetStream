@@ -28,6 +28,9 @@
 
 globalThis.setTimeout = (callback, timeout) => callback();
 globalThis.requestAnimationFrame = (callback) => callback();
+self = undefined;
+globalThis.self = undefined;
+window.self = undefined;
 
 // JetStream benchmark.
 class Benchmark {
@@ -37,6 +40,7 @@ class Benchmark {
     cannonData: null,
     particlesJson: null,
   };
+  disposeScene;
 
   constructor(iterationCount) {
     this.iterationCount = iterationCount;
@@ -54,12 +58,13 @@ class Benchmark {
   }
 
   async runIteration() {
-    const {classNames, cameraRotationLength} = await BabylonJSBenchmark.runComplexScene(
+    const {classNames, cameraRotationLength, dispose} = await BabylonJSBenchmark.runComplexScene(
       this.preloaded.fortData,
       this.preloaded.cannonData,
       this.preloaded.particlesJson,
       100
     );
+    this.disposeScene = dispose;
     const lastResult = {
       classNames,
       cameraRotationLength
@@ -76,4 +81,10 @@ class Benchmark {
     if (value != expected)
       throw new Error(`Expected ${name} to be ${expected}, but got ${value}`);
   }
+
+  validate() {
+    // FIXME: move to measured phase. 
+    this.disposeScene();
+  }
 }
+

@@ -2705,7 +2705,7 @@ let BENCHMARKS = [
             "./workloads/babylonjs/benchmark/startup.js",
         ],
         preload: {
-            BUNDLE: "./workloads/babylonjs/dist/bundle.es6.min.js",
+            BUNDLE: "./workloads/babylonjs/dist/bundle.es6.js",
         },
         args: {
             expectedCacheCommentCount: 21222,
@@ -2734,7 +2734,7 @@ let BENCHMARKS = [
         files: [
             // Use non-minified sources for easier profiling:
             // "./workloads/babylonjs/dist/bundle.es6.js",
-            "./workloads/babylonjs/dist/bundle.es6.min.js",
+            "./workloads/babylonjs/dist/bundle.es6.js",
             "./workloads/babylonjs/benchmark/scene.js",
         ],
         preload: {
