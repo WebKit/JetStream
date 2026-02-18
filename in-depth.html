@@ -27,11 +27,14 @@
 
 <head>
     <meta charset="utf-8" />
+
     <title>JetStream 3 In-Depth Analysis</title>
+
     <link rel="stylesheet" href="resources/JetStream.css">
+
 </head>
 
-<body class="in-depth overflow-scroll">
+<body class="overflow-scroll">
     <h1 class="logo">
         <div id="jetstreams">
             <a href="index.html" class="logo-image">JetStream 3</a>
@@ -139,18 +142,9 @@
             </h3>
 
             <p>
-<<<<<<< HEAD
-                The <span style="color: var(--text-color-very-subtle);">greyed-out workloads</span> are not run by default but can be manually enabled on the command-line or via
-                the <code>?test=</code> URL parameter.
-                You can also click on the workload name to run that one individually, or on tags to run all workloads with a certain tag.
-||||||| 6588e89
-                The <span style="color: var(--text-color-very-subtle);">greyed-out workloads</span> are not run by default but can be manually enabled on the command-line or via
-                the <i>testList</i> URL parameter.
-=======
                 The <span style="color: var(--text-color-very-subtle);">greyed-out workloads</span> are not run by
                 default but can be manually enabled on the command-line or via
                 the <i>testList</i> URL parameter.
->>>>>>> main
             </p>
 
             <dl id="workload-details">
@@ -249,9 +243,9 @@
                         href="https://v8.github.io/web-tooling-benchmark/">Web Tooling Benchmark</a>,.
                     Source code: <a href="web-tooling-benchmark/src/babylon.mjs">babylon.mjs</a>
                 </dd>
-                <dt id="babylonjs-scene-es5">babylonjs-scene-es5</dt>
+                <dt id="babylonjs-scene-es5" class="non-default">babylonjs-scene-es5</dt>
                 <dt id="babylonjs-scene-es6">babylonjs-scene-es6</dt>
-                <dt id="babylonjs-startup-es5">babylonjs-startup-es5</dt>
+                <dt id="babylonjs-startup-es5" class="non-default">babylonjs-startup-es5</dt>
                 <dt id="babylonjs-startup-es6">babylonjs-startup-es6</dt>
                 <dd>
                     These benchmarks test the <a href="https://www.babylonjs.com/">Babylon.js</a> 3D engine.
@@ -271,14 +265,14 @@
                     This benchmark was previously published in <a href="https://browserbench.org/ARES-6/">ARES-6</a>.
                     Source code: <a href="ARES-6/Basic">Basic</a>
                 </dd>
-                <dt id="bigint-bigdenary">bigint-bigdenary</dt>
+                <dt id="bigint-bigdenary" class="non-default">bigint-bigdenary</dt>
                 <dd>
                     <a href="https://github.com/uzyn/bigdenary">BigDenary</a>, an arbitrary-precision
                     decimal arithmetic, implemented in JavaScript by U-Zyn Chua.
                     Tests arithmetic operations on BigInt.
                     Source code: <a href="bigint/bigdenary-bundle.js">bigdenary-bundle.js</a>
                 </dd>
-                <dt id="bigint-noble-bls12-381">bigint-noble-bls12-381</dt>
+                <dt id="bigint-noble-bls12-381" class="non-default">bigint-noble-bls12-381</dt>
                 <dd>
                     <a href="https://hackmd.io/@benjaminion/bls12-381">BLS12-381</a>, pairing-friendly
                     Barreto-Lynn-Scott elliptic curve construction,
@@ -294,7 +288,7 @@
                     by Paul Miller. Tests typed arrays and arithmetic operations on BigInt.
                     Source code: <a href="bigint/noble-ed25519-bundle.js">noble-ed25519-bundle.js</a>
                 </dd>
-                <dt id="bigint-noble-secp256k1">bigint-noble-secp256k1</dt>
+                <dt id="bigint-noble-secp256k1" class="non-default">bigint-noble-secp256k1</dt>
                 <dd>
                     <a href="https://www.secg.org/sec2-v2.pdf">secp256k1</a>, an elliptic curve that could
                     be used for asymmetric encryption, ECDH key agreement protocol and signature schemes,
@@ -302,7 +296,7 @@
                     by Paul Miller. Tests typed arrays and arithmetic operations on BigInt.
                     Source code: <a href="bigint/noble-secp256k1-bundle.js">noble-secp256k1-bundle.js</a>
                 </dd>
-                <dt id="bigint-paillier">bigint-paillier</dt>
+                <dt id="bigint-paillier" class="non-default">bigint-paillier</dt>
                 <dd>
                     <a href="https://en.wikipedia.org/wiki/Paillier_cryptosystem">Paillier cryptosystem</a>,
                     a probabilistic asymmetric algorithm for public key cryptography,
@@ -347,7 +341,7 @@
                     A similar version of this benchmark was previously published in Octane version 2.
                     Source code: <a href="Octane/crypto.js">crypto.js</a>
                 </dd>
-                <dt id="Dart-flute-complex-wasm">Dart-flute-complex-wasm</dt>
+                <dt id="Dart-flute-complex-wasm" class="non-default">Dart-flute-complex-wasm</dt>
                 <dt id="Dart-flute-todomvc-wasm">Dart-flute-todomvc-wasm</dt>
                 <dd>
                     Two Dart benchmark programs compiled to WasmGC that are using a simplified version of the Flutter UI
@@ -463,7 +457,7 @@
                     Source code: <a href="Octane/gbemu-part1.js">gbemu-part1.js</a>, <a
                         href="Octane/gbemu-part2.js">gbemu-part2.js</a>
                 </dd>
-                <dt id="gcc-loops-wasm">gcc-loops-wasm</dt>
+                <dt id="gcc-loops-wasm" class="non-default">gcc-loops-wasm</dt>
                 <dd>
                     Example loops used to tune the GCC and LLVM vectorizers, compiled to WebAssembly with
                     <a href="https://emscripten.org">Emscripten</a>. The original C++ version of this benchmark was
@@ -479,7 +473,7 @@
                     of this benchmark was originally published as part of the WebKit test suite.
                     Source code: <a href="simple/hash-map.js">hash-map.js</a>
                 </dd>
-                <dt id="HashSet-wasm">HashSet-wasm</dt>
+                <dt id="HashSet-wasm" class="non-default">HashSet-wasm</dt>
                 <dd>
                     A WebAssembly benchmark replaying a set of hash table operations performed in WebKit when loading
                     a web page. This benchmark was compiled from C++ to WebAssembly using <a
@@ -487,7 +481,7 @@
                     Source code: <a href="wasm/HashSet/HashSet.cpp">HashSet.cpp</a>, <a
                         href="wasm/HashSet/benchmark.js">HashSet.js</a>
                 </dd>
-                <dt id="intl">intl</dt>
+                <dt id="intl" class="non-default">intl</dt>
                 <dd>
                     This benchmark tests the performance of the <a
                         href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl">Intl
@@ -551,7 +545,7 @@
                     generators.
                     Source code: <a href="generators/lazy-collections.js">lazy-collections.js</a>
                 </dd>
-                <dt id="lebab-wtb">lebab-wtb</dt>
+                <dt id="lebab-wtb" class="non-default">lebab-wtb</dt>
                 <dd>
                     <a href="https://github.com/lebab/lebab">Lebab</a> transpiles ES5 code into ES6/ES7.
                     This benchmark runs Lebab on test JavaScript programs.
@@ -631,13 +625,6 @@
                     Source code: <a href="web-tooling-benchmark/src/postcss.mjs">postcss.mjs</a>
                 </dd>
                 <dt id="prettier-wtb">prettier-wtb</dt>
-<<<<<<< HEAD
-                <dd>TODO</dd>
-                <dt id="prismjs-startup-es5">prismjs-startup-es5</dt>
-||||||| 6588e89
-                <dd>TODO</dd>
-                <dt id="prismjs-startup-es5" class="non-default">prismjs-startup-es5</dt>
-=======
                 <dd>
                     This benchmark runs the <a href="https://prettier.io/">Prettier</a> code formatter on various
                     JavaScript
@@ -647,7 +634,6 @@
                     Source code: <a href="web-tooling-benchmark/src/prettier.mjs">prettier.mjs</a>
                 </dd>
                 <dt id="prismjs-startup-es5" class="non-default">prismjs-startup-es5</dt>
->>>>>>> main
                 <dt id="prismjs-startup-es6">prismjs-startup-es6</dt>
                 <dd>
                     These benchmarks measure the performance of the <a href="https://prismjs.com/">PrismJS</a> syntax
@@ -671,7 +657,7 @@
                     Tests get / set Proxy traps, as well as various Array methods.
                     Source code: <a href="proxy/vue-benchmark.js">vue-benchmark.js</a>
                 </dd>
-                <dt id="quicksort-wasm">quicksort-wasm</dt>
+                <dt id="quicksort-wasm" class="non-default">quicksort-wasm</dt>
                 <dd>
                     Quicksort benchmark, compiled to WebAssembly with <a href="https://emscripten.org">Emscripten</a>.
                     The original C version of this benchmark was previously published in the LLVM test suite.
@@ -898,8 +884,8 @@
                     order of existing files.
                     Source code: <a href="generators/sync-file-system.js">sync-file-system.js</a>
                 </dd>
-                <dt id="tfjs-wasm">tfjs-wasm</dt>
-                <dt id="tfjs-wasm-simd">tfjs-wasm-simd</dt>
+                <dt id="tfjs-wasm" class="non-default">tfjs-wasm</dt>
+                <dt id="tfjs-wasm-simd" class="non-default">tfjs-wasm-simd</dt>
                 <dd>
                     Tests <a href="https://github.com/tensorflow/tfjs">Tensorflow.js</a> pre-trained machine learning
                     models supported by <a
@@ -921,7 +907,7 @@
                     Source code: in the <a href="threejs/">threejs/</a> directory.
                 </dd>
                 <dt id="transformersjs-bert-wasm">transformersjs-bert-wasm</dt>
-                <dt id="transformersjs-whisper-wasm">transformersjs-whisper-wasm</dt>
+                <dt id="transformersjs-whisper-wasm" class="non-default">transformersjs-whisper-wasm</dt>
                 <dd>
                     Two machine learning tasks using the <a
                         href="https://huggingface.co/docs/transformers.js/en/index">Transformers.js</a> library, which
@@ -952,13 +938,6 @@
                     A similar version of this benchmark was previously published in Octane version 2.
                     Source code: <a href="Octane/typescript.js">typescript.js</a>
                 </dd>
-<<<<<<< HEAD
-                <dt id="typescript-octane">typescript-octane</dt>
-                <dd>TODO</dd>
-||||||| 6588e89
-                <dt id="typescript-octane" class="non-default">typescript-octane</dt>
-                <dd>TODO</dd>
-=======
                 <dt id="typescript-octane" class="non-default">typescript-octane</dt>
                 <dd>
                     The original <a href="https://developers.google.com/octane/">Octane</a> version of the TypeScript
@@ -966,7 +945,6 @@
                     stressing the performance of a large-scale JavaScript application with complex data structures.
                     Source code: <a href="Octane/typescript.js">typescript.js</a>
                 </dd>
->>>>>>> main
                 <dt id="UniPoker">UniPoker</dt>
                 <dd>
                     UniPoker is a 5 card stud poker simulation using the Unicode playing card code points,
@@ -1009,45 +987,8 @@
 
             <p><a href="index.html" class="button">&larr; Return to Tests</a></p>
         </article>
+
     </main>
-
-    <script>
-        const isInBrowser = true;
-    </script>
-    <script src="utils/params.js"></script>
-    <script src="JetStreamDriver.js"></script>
-    <script>
-        (function () {
-            for (const benchmark of BENCHMARKS) {
-                let dt = document.getElementById(benchmark.name);
-                if (!dt) {
-                    continue;
-                }
-
-                if (benchmark.tags.has("disabled")) {
-                    dt.classList.add("non-default");
-                }
-
-                const nameLink = document.createElement("a");
-                nameLink.href = `index.html?test=${benchmark.name}`;
-                nameLink.className = "workload-link";
-                nameLink.textContent = dt.textContent;
-                dt.textContent = "";
-                dt.appendChild(nameLink);
-                                          
-                const tags = Array.from(benchmark.tags).sort();
-                for (const tag of tags) {
-                    if (tag === "all" || tag === "default") {
-                        continue;
-                    }
-                    const link = document.createElement("a");
-                    link.href = `index.html?tags=${tag}`;
-                    link.textContent = tag;
-                    link.className = "tag-link";
-                    dt.appendChild(link);
-                }
-            }
-        })();
-    </script>
 </body>
+
 </html>
