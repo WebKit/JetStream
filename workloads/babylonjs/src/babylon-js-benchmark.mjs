@@ -36,14 +36,13 @@ export function runTest(frames = 10) {
   for (let i = 0; i < frames; i++) {
     scene.render();
   }
-  const result = {
+  return {
     classNames,
     cameraRotationLength: scene.cameras[0].rotation.length(),
     disposer() {
       disposeScene(scene, engine);
     }
   };
-  return result;
 }
 
 function createScene(engine) {
@@ -96,14 +95,13 @@ export async function runComplexScene(
     scene.render();
   }
   // Leak state to the outside.
-  const result = {
+  return {
     classNames,
     cameraRotationLength: scene.cameras[0].rotation.length(),
     disposer() {
       disposeScene(scene, engine);
     }
   };
-  return result;
 }
 
 async function createComplexScene(engine, fortData, cannonData, particleData) {
