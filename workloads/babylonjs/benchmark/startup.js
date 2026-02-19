@@ -83,7 +83,7 @@ class Benchmark extends StartupBenchmark {
       throw new Error(`Expected ${name} to be ${expected}, but got ${value}`);
   }
 
-  validate() {
+  postIteration() {
     // FIXME: move to measured phase.
     this.sceneDisposer();
   }
