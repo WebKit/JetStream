@@ -48,7 +48,7 @@ class Benchmark extends StartupBenchmark {
     eval(sourceCode);
     // const runStart = performance.now();
 
-    const { classNames, cameraRotationLength, dispose: disposer} = BabylonJSBenchmark.runTest(30);
+    const { classNames, cameraRotationLength, disposer} = BabylonJSBenchmark.runTest(30);
     this.sceneDisposer = disposer;
     const lastResult = {
       classNames,

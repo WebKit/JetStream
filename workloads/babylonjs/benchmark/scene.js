@@ -55,7 +55,7 @@ class Benchmark {
   }
 
   async runIteration() {
-    const {classNames, cameraRotationLength, dispose: disposer} = await BabylonJSBenchmark.runComplexScene(
+    const {classNames, cameraRotationLength, disposer} = await BabylonJSBenchmark.runComplexScene(
       this.preloaded.fortData,
       this.preloaded.cannonData,
       this.preloaded.particlesJson,
