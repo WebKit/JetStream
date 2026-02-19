@@ -39,7 +39,7 @@ export function runTest(frames = 10) {
   const result = {
     classNames,
     cameraRotationLength: scene.cameras[0].rotation.length(),
-    dispose() {
+    disposer() {
       disposeScene(scene, engine);
     }
   };
@@ -99,7 +99,7 @@ export async function runComplexScene(
   const result = {
     classNames,
     cameraRotationLength: scene.cameras[0].rotation.length(),
-    dispose() {
+    disposer() {
       disposeScene(scene, engine);
     }
   };

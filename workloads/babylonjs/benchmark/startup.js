@@ -27,7 +27,7 @@
 
 class Benchmark extends StartupBenchmark {
   iteration = 0;
-  disposeScene;
+  sceneDisposer;
 
   constructor({iterationCount, expectedCacheCommentCount}) {
     super({
@@ -48,8 +48,8 @@ class Benchmark extends StartupBenchmark {
     eval(sourceCode);
     // const runStart = performance.now();
 
-    const { classNames, cameraRotationLength, dispose} = BabylonJSBenchmark.runTest(30);
-    this.disposeScene = dispose;
+    const { classNames, cameraRotationLength, dispose: disposer} = BabylonJSBenchmark.runTest(30);
+    this.sceneDisposer = disposer;
     const lastResult = {
       classNames,
       cameraRotationLength,
@@ -85,6 +85,6 @@ class Benchmark extends StartupBenchmark {
 
   validate() {
     // FIXME: move to measured phase.
-    this.disposeScene();
+    this.sceneDisposer();
   }
 }
