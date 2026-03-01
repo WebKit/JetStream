@@ -5,6 +5,6 @@
 
 ARGV.each {
     | filename |
-    IO::write(filename, IO::read(filename).lines.reject{|v| v =~ /hash/i}.join())
+    File.write(filename, File.read(filename).lines.reject { |v| v =~ /hash/i }.join)
 }
 
