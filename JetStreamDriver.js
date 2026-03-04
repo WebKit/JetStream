@@ -1608,6 +1608,7 @@ class AsyncBenchmark extends DefaultBenchmark {
 
                 performance.measure(iterationMarkLabel, iterationMarkLabel);
 
+                benchmark.postIteration?.(i);
                 ${this.postIterationCode}
 
                 results.push(Math.max(1, end - start));
@@ -2692,7 +2693,7 @@ let BENCHMARKS = [
             BUNDLE: "./babylonjs/dist/bundle.es5.min.js",
         },
         args: {
-            expectedCacheCommentCount: 23988,
+            expectedCacheCommentCount: 23992,
         },
         tags: ["startup",  "js", "class", "es5", "babylonjs"],
         iterations: 10,
@@ -2707,7 +2708,7 @@ let BENCHMARKS = [
             BUNDLE: "./babylonjs/dist/bundle.es6.min.js",
         },
         args: {
-            expectedCacheCommentCount: 21222,
+            expectedCacheCommentCount: 21225,
         },
         tags: ["Default",  "js", "startup", "class", "es6", "babylonjs"],
         iterations: 10,
