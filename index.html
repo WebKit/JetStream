@@ -51,9 +51,6 @@
     }
 
     async function initialize() {
-        if (!JetStreamParams.isDefault) {
-            showNonDefaultParams();
-        }
         if (globalThis.allIsGood) {
             try {
                 await JetStream.initialize();
@@ -71,6 +68,8 @@
     }
     
     function showNonDefaultParams() {
+        document.body.classList.remove("animate");
+        document.body.classList.add("nonDefaultParams"); 
         const body = document.querySelector("#non-standard-params-table tbody");
         const nonDefaultParams = JetStreamParams.nonDefaultParams;
         console.warn(`Using non standard params: ${JSON.stringify(nonDefaultParams, null, 2)}`)
@@ -89,12 +88,6 @@
 
 </head>
 <body onload="initialize()" class="animate">
-<script>
-    if (!JetStreamParams.isDefault) {
-        document.body.classList.remove("animate");
-        document.body.classList.add("nonDefaultParams"); 
-    }
-</script>
 <h1 class="logo">
     <div id="jetstreams">
         <a href="index.html" class="logo-image">JetStream 3</a>
@@ -133,5 +126,10 @@
     <div id="results"></div>
 </main>
 <iframe id="magic"></iframe>
+<script>
+    if (!JetStreamParams.isDefault) {
+        showNonDefaultParams()
+    }
+</script>
 </body>
 </html>
