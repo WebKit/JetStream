@@ -71,7 +71,6 @@
     }
     
     function showNonDefaultParams() {
-        document.body.classList.add("nonDefaultParams"); 
         const body = document.querySelector("#non-standard-params-table tbody");
         const nonDefaultParams = JetStreamParams.nonDefaultParams;
         console.warn(`Using non standard params: ${JSON.stringify(nonDefaultParams, null, 2)}`)
@@ -93,6 +92,7 @@
 <script>
     if (!JetStreamParams.isDefault) {
         document.body.classList.remove("animate");
+        document.body.classList.add("nonDefaultParams"); 
     }
 </script>
 <h1 class="logo">
