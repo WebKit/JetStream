@@ -89,10 +89,10 @@
     <script src="JetStreamDriver.js"></script>
 
 </head>
-<body onload="initialize()">
+<body onload="initialize()" class="animate">
 <script>
     if (!JetStreamParams.isDefault) {
-        document.body.classList.add("no-animation");
+        document.body.classList.remove("animate");
     }
 </script>
 <h1 class="logo">
