@@ -51,6 +51,7 @@
     }
 
     async function initialize() {
+        const bodyClassList = document.body.classList;
         if (!JetStreamParams.isDefault) {
             showNonDefaultParams();
         }
@@ -60,16 +61,17 @@
             } catch (e) {
                 globalThis.allIsGood = false;
                 console.error(e);
+            } finally {
+                bodyClassList.remove("loading");
             }
         }
         if (!globalThis.allIsGood) {
+            bodyClassList.add('error');
             let statusElement = document.getElementById("status");
-            statusElement.classList.remove('loading');
-            statusElement.classList.add('error');
             statusElement.innerHTML = "<h2>ERROR</h2><p>Errors were encountered during page load. Refusing to run a partial benchmark suite.</p>";
         }
     }
-    
+
     function showNonDefaultParams() {
         document.body.classList.add("nonDefaultParams"); 
         const body = document.querySelector("#non-standard-params-table tbody");
@@ -84,12 +86,15 @@
         }
     }
     </script>
-
     <script src="utils/params.js"></script>
+    <script>
+        if (JetStreamParams.isDefault) {
+            document.body.classList.add("animate");
+        }
+    </script>
     <script src="JetStreamDriver.js"></script>
-
 </head>
-<body onload="initialize()">
+<body onload="initialize()" class="loading">
 <h1 class="logo">
     <div id="jetstreams">
         <a href="index.html" class="logo-image">JetStream 3</a>
@@ -118,7 +123,7 @@
     <p class="summary" id="mode-description"></p>
 
     <div id="result-summary"></div>
-    <div id="status" class="loading">
+    <div id="status">
         <div id="status-text">Loading Benchmark...</div>
         <div id="status-progress-container">
             <div id="status-progress-bar" style="width: 0%"></div>

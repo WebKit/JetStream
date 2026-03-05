@@ -41,6 +41,7 @@
     --benchmark-done-result-color: #4a4a4a;
     --gap: 3rem;
     --width: 200px;
+    --startup-animation-duration: 500ms;
     --nonDefaultRotate: 152deg;
 }
 
@@ -65,6 +66,7 @@ body {
     background-size: 100vw;
     padding-bottom: 0px;
     background-image: url("clouds.svg");
+    padding-bottom: 0px;
     overflow-y: hidden;
     height: 100%;
 }
@@ -179,23 +181,41 @@ img {
     background-position: center;
     background-image: url("JetStream3Logo.svg");
     color: transparent;
-    animation: swingin 350ms ease-out forwards;
-    will-change: transform, opacity;
     height: 75px;
 }
 
+.loading.animate .logo .logo-image {
+    animation: swingin var(--startup-animation-duration) ease-out forwards;
+    will-change: transform, opacity;
+    animation-delay: 50ms;
+}
+
+.ready .logo .logo-image {
+    animation: none;
+    opacity: 1;
+}
+
 #jetstreams {
-    background-image: url("jetstreams.svg");
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
     padding: 2rem 0;
     margin: -2rem 0;
+    background-image: url("jetstreams-static.svg");
 }
+
 
 #jetstreams svg {
     width: 100%;
     max-height: 120px;
+}
+
+.animate #jetstreams {
+    background-image: url("jetstreams.svg");
+    transition: background-image var(--startup-animation-duration) ease-in-out;
+}
+.ready #jetstreams {
+    background-image: url("jetstreams-static.svg") !important;
 }
 
 #magic {
@@ -219,8 +239,14 @@ article,
 .summary {
     max-width: 70rem;
     margin: 0 auto 0 auto;
+}
+
+.loading.animate .summary {
     opacity: 0;
-    animation: fadein 0.5s ease-in-out forwards;
+}
+
+article, .loading.animate .summary {
+    animation: fadein var(--startup-animation-duration) ease-in-out forwards;
     animation-delay: 200ms;
 }
 
@@ -340,7 +366,7 @@ a:active {
     color: var(--link-hover-color);
 }
 
-#status label,
+#status-label,
 a.button {
     display: inline-block;
     font-weight: 500;
@@ -358,18 +384,19 @@ a.button {
     user-select: none;
 }
 
-a.button {
-    animation: fadein 500ms ease-in forwards, scaledown 500ms ease-in forwards;
+.animate a.button {
+    animation: fadein var(--startup-animation-duration) ease-in forwards, scaledown var(--startup-animation-duration) ease-in forwards;
     opacity: 0;
 }
+
 
 #status label,
 .button:hover {
     background-image: none;
 }
 
-#status.loading,
-#status-progress-bar {
+.loading #status-text,
+.loading #status-progress-bar {
     background-image: linear-gradient(
         132deg,
         #96e5ff 0%,
@@ -381,11 +408,19 @@ a.button {
     );
 }
 
-#status.loading {
+.loading:not(.ready) #status {
     position: absolute;
-    top: 0;
-    left: 0;
-    margin: 48vh 0 0;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 100;
+}
+
+.loading #status-text {
     width: 100%;
     line-height: 1.2;
     font-size: 4rem;
@@ -397,9 +432,10 @@ a.button {
     background-repeat: no-repeat;
     -webkit-touch-callout: none;
     user-select: none;
+    text-align: center;
 }
 
-#status.error {
+.error #status {
     max-width: 70rem;
     margin: 0 auto 1rem;
 }
@@ -466,13 +502,12 @@ a.button {
     justify-content: space-around;
     gap: var(--gap);
     margin: 0 calc(var(--gap) * -1) 0 calc(-var(--gap) * -1);
-    animation: fadein 500ms ease-out forwards;
-    opacity: 0;
     overflow-y: auto;
     flex: 1;
     padding-bottom: var(--gap);
     box-sizing: border-box;
 }
+
 
 .benchmark {
     position: relative;
@@ -485,6 +520,12 @@ a.button {
     scroll-margin-top: 20vh;
     scroll-margin-bottom: 20vh;
 }
+
+.animate .benchmark {
+    animation: fadein var(--startup-animation-duration) ease-in forwards;
+    opacity: 0;
+}
+
 
 .benchmark .result.detail {
     display: none;
@@ -669,16 +710,6 @@ dt:target {
 
     to {
         transform: scale(1, 1);
-    }
-}
-
-@keyframes shine {
-    0% {
-        background-position: -1200px center;
-    }
-
-    100% {
-        background-position: 100vw center;
     }
 }
 
