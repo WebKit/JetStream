@@ -90,6 +90,11 @@
 
 </head>
 <body onload="initialize()">
+<script>
+    if (!JetStreamParams.isDefault) {
+        document.body.classList.add("no-animation");
+    }
+</script>
 <h1 class="logo">
     <div id="jetstreams">
         <a href="index.html" class="logo-image">JetStream 3</a>

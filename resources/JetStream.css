@@ -77,6 +77,17 @@ body.nonDefaultParams {
     filter: hue-rotate(var(--nonDefaultRotate));
 }
 
+body.no-animation *,
+body.no-animation *::before,
+body.no-animation *::after {
+    animation: none !important;
+    transition: none !important;
+}
+
+body.no-animation #jetstreams {
+    background-image: url("jetstreams-static.svg");
+}
+
 /* error gets rotated too, rotate it back so it's still red */
 .nonDefaultParams .error {
     filter: hue-rotate(calc(360deg - var(--nonDefaultRotate)));
