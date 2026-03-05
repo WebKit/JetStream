@@ -369,15 +369,6 @@ a.button {
     user-select: none;
 }
 
-a.button {
-    border: 1px solid var(--button-color-primary);
-    border-radius: 2px;
-    padding: 0.3rem 0.3rem 0.5rem;
-    text-align: center;
-    width: var(--width);
-    -webkit-touch-callout: none;
-    user-select: none;
-}
 
 body.animate a.button {
     animation: fadein 500ms ease-in forwards, scaledown 500ms ease-in forwards;
