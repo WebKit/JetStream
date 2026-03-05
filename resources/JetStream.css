@@ -179,18 +179,25 @@ img {
     background-position: center;
     background-image: url("JetStream3Logo.svg");
     color: transparent;
-    animation: swingin 350ms ease-out forwards;
     will-change: transform, opacity;
     height: 75px;
 }
 
+body.animate .logo .logo-image {
+    animation: swingin 350ms ease-out forwards;
+}
+
 #jetstreams {
-    background-image: url("jetstreams.svg");
+    background-image: url("jetstreams-static.svg");
     background-repeat: no-repeat;
     background-size: contain;
     background-position: center;
     padding: 2rem 0;
     margin: -2rem 0;
+}
+
+body.animate #jetstreams {
+    background-image: url("jetstreams.svg");
 }
 
 #jetstreams svg {
@@ -219,6 +226,10 @@ article,
 .summary {
     max-width: 70rem;
     margin: 0 auto 0 auto;
+}
+
+body.animate article,
+body.animate .summary {
     opacity: 0;
     animation: fadein 0.5s ease-in-out forwards;
     animation-delay: 200ms;
@@ -358,7 +369,8 @@ a.button {
     user-select: none;
 }
 
-a.button {
+
+body.animate a.button {
     animation: fadein 500ms ease-in forwards, scaledown 500ms ease-in forwards;
     opacity: 0;
 }
@@ -466,12 +478,15 @@ a.button {
     justify-content: space-around;
     gap: var(--gap);
     margin: 0 calc(var(--gap) * -1) 0 calc(-var(--gap) * -1);
-    animation: fadein 500ms ease-out forwards;
-    opacity: 0;
     overflow-y: auto;
     flex: 1;
     padding-bottom: var(--gap);
     box-sizing: border-box;
+}
+
+body.animate #results {
+    animation: fadein 500ms ease-out forwards;
+    opacity: 0;
 }
 
 .benchmark {

@@ -51,9 +51,6 @@
     }
 
     async function initialize() {
-        if (!JetStreamParams.isDefault) {
-            showNonDefaultParams();
-        }
         if (globalThis.allIsGood) {
             try {
                 await JetStream.initialize();
@@ -71,6 +68,7 @@
     }
     
     function showNonDefaultParams() {
+        document.body.classList.remove("animate");
         document.body.classList.add("nonDefaultParams"); 
         const body = document.querySelector("#non-standard-params-table tbody");
         const nonDefaultParams = JetStreamParams.nonDefaultParams;
@@ -89,7 +87,7 @@
     <script src="JetStreamDriver.js"></script>
 
 </head>
-<body onload="initialize()">
+<body onload="initialize()" class="animate">
 <h1 class="logo">
     <div id="jetstreams">
         <a href="index.html" class="logo-image">JetStream 3</a>
@@ -128,5 +126,10 @@
     <div id="results"></div>
 </main>
 <iframe id="magic"></iframe>
+<script>
+    if (!JetStreamParams.isDefault) {
+        showNonDefaultParams()
+    }
+</script>
 </body>
 </html>
