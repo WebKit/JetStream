@@ -53,11 +53,7 @@
     async function initialize() {
         const bodyClassList = document.body.classList;
         if (!JetStreamParams.isDefault) {
-            bodyClassList.remove("animate");
             showNonDefaultParams();
-        }
-        if (JetStreamParams.startDelay !== undefined) {
-            bodyClassList.remove("animate");
         }
         if (globalThis.allIsGood) {
             try {
@@ -75,7 +71,7 @@
             statusElement.innerHTML = "<h2>ERROR</h2><p>Errors were encountered during page load. Refusing to run a partial benchmark suite.</p>";
         }
     }
-    
+
     function showNonDefaultParams() {
         document.body.classList.add("nonDefaultParams"); 
         const body = document.querySelector("#non-standard-params-table tbody");
@@ -89,14 +85,16 @@
             row.insertCell().textContent = JSON.stringify(defaultValue);
         }
     }
-
     </script>
-
     <script src="utils/params.js"></script>
+    <script>
+        if (JetStreamParams.isDefault) {
+            document.body.classList.add("animate");
+        }
+    </script>
     <script src="JetStreamDriver.js"></script>
-
 </head>
-<body onload="initialize()" class="loading animate">
+<body onload="initialize()" class="loading">
 <h1 class="logo">
     <div id="jetstreams">
         <a href="index.html" class="logo-image">JetStream Next</a>
