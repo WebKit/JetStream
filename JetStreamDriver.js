@@ -2427,11 +2427,16 @@ let BENCHMARKS = [
         ],
         tags: ["default", "js", "Generators"],
     }),
-    new DefaultBenchmark({
+    new AsyncBenchmark({
         name: "js-tokens",
         files: [
             "./generators/js-tokens.js",
         ],
+        preload: {
+            // FIXME: refactor this to use the same file once the resource
+            // loader has been rewritten.
+            JS_SOURCE: "./generators/js-tokens-src.js",
+        },
         tags: ["default", "js", "Generators"],
     }),
     new DefaultBenchmark({
