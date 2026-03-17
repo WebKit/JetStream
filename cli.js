@@ -119,7 +119,7 @@ const printHelp = cliParams.delete("help");
 const dumpTestList = cliParams.delete("dumpTestList");
 
 if (cliArgs.length) {
-    let tests = cliParams.has("test") ? cliParams.get("tests").split(",") : []
+    let tests = cliParams.has("test") ? cliParams.get("test").split(",") : []
     tests = tests.concat(cliArgs);
     cliParams.set("test", tests.join(","));
 }
