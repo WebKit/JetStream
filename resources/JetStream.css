@@ -178,6 +178,7 @@ img {
     background-repeat: no-repeat;
     background-position: center;
     background-image: url("JetStream3Logo.svg");
+    background-size: contain;
     color: transparent;
     will-change: transform, opacity;
     height: 75px;
