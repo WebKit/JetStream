@@ -27,7 +27,7 @@
 <head>
     <meta charset="utf-8" />
 
-    <title>JetStream 3</title>
+    <title>JetStream 3.0</title>
 
     <link rel="stylesheet" href="resources/JetStream.css">
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes, viewport-fit=cover">
@@ -51,9 +51,6 @@
     }
 
     async function initialize() {
-        if (!JetStreamParams.isDefault) {
-            showNonDefaultParams();
-        }
         if (globalThis.allIsGood) {
             try {
                 await JetStream.initialize();
@@ -71,6 +68,7 @@
     }
     
     function showNonDefaultParams() {
+        document.body.classList.remove("animate");
         document.body.classList.add("nonDefaultParams"); 
         const body = document.querySelector("#non-standard-params-table tbody");
         const nonDefaultParams = JetStreamParams.nonDefaultParams;
@@ -89,15 +87,15 @@
     <script src="JetStreamDriver.js"></script>
 
 </head>
-<body onload="initialize()">
+<body onload="initialize()" class="animate">
 <h1 class="logo">
     <div id="jetstreams">
-        <a href="index.html" class="logo-image">JetStream 3</a>
+        <a href="index.html" class="logo-image">JetStream 3.0</a>
     </div>
 </h1>
 
 <main>
-    <p class="summary">JetStream 3 is a JavaScript and WebAssembly benchmark suite focused on the most advanced web applications. It rewards browsers that start up quickly, execute code quickly, and run smoothly. For more information, read the <a href="/in-depth.html">in-depth analysis</a>. Bigger scores are better.</p>
+    <p class="summary">JetStream 3.0 is a JavaScript and WebAssembly benchmark suite focused on the most advanced web applications. It rewards browsers that start up quickly, execute code quickly, and run smoothly. For more information, read the <a href="in-depth.html">in-depth analysis</a>. Bigger scores are better.</p>
     <div id="non-default-params">
         <h2>Non-standard Parameters</h2>
         <p>
@@ -128,5 +126,10 @@
     <div id="results"></div>
 </main>
 <iframe id="magic"></iframe>
+<script>
+    if (!JetStreamParams.isDefault) {
+        showNonDefaultParams()
+    }
+</script>
 </body>
 </html>
