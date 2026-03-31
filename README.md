@@ -1,6 +1,6 @@
 # What is JetStream?
 
-JetStream 3 is a JavaScript and WebAssembly benchmark suite.
+JetStream Next is a JavaScript and WebAssembly benchmark suite.
 For more information see the index and in-depth pages of the deployed benchmark.
 
 A preview of the current main branch is available at [https://webkit-jetstream-preview.netlify.app/](https://webkit-jetstream-preview.netlify.app/).

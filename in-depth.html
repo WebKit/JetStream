@@ -27,14 +27,14 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>JetStream 3 In-Depth Analysis</title>
+    <title>JetStream Next In-Depth Analysis</title>
     <link rel="stylesheet" href="resources/JetStream.css">
 </head>
 
 <body class="in-depth overflow-scroll">
     <h1 class="logo">
         <div id="jetstreams">
-            <a href="index.html" class="logo-image">JetStream 3</a>
+            <a href="index.html" class="logo-image">JetStream Next</a>
         </div>
     </h1>
     <main class="overflow-visible">
@@ -42,7 +42,7 @@
             <h2>In-Depth Analysis</h2>
 
             <p>
-                JetStream 3 combines together a variety of JavaScript and WebAssembly benchmarks, covering a variety of
+                JetStream Next combines together a variety of JavaScript and WebAssembly benchmarks, covering a variety of
                 advanced workloads and programming techniques, and reports a single score that balances them using the
                 geometric mean.
             </p>
@@ -52,15 +52,15 @@
                 up all benchmarks.
                 Some benchmarks demonstrate tradeoffs, and aggressive or specialized optimizations for one benchmark
                 might make another benchmark slower.
-                JetStream 3 rewards browsers that start up quickly, execute code quickly, and continue running smoothly.
+                JetStream Next rewards browsers that start up quickly, execute code quickly, and continue running smoothly.
             </p>
 
             <p>
-                Each benchmark in JetStream 3 computes its own individual score.
+                Each benchmark in JetStream Next computes its own individual score.
                 Scores in JetStream are dimensionless floating point numbers, where a higher score is better.
                 JetStream weighs each benchmark equally, taking the <a
                     href="https://en.wikipedia.org/wiki/Geometric_mean">geometric mean</a> over each individual
-                benchmark's score to compute the overall JetStream 3 score.
+                benchmark's score to compute the overall JetStream Next score.
                 The geometric mean ensures that a multiplicative improvement of any individual score has the same effect
                 on the aggregated score, regardless of the absolute value of the individual score.
                 For example, an improvement by 5% of the sub score of benchmark A has the same effect on the total score
@@ -76,7 +76,7 @@
             </p>
 
             <p>
-                For most of the JavaScript and WebAssembly benchmarks in JetStream 3, individual scores equally weigh
+                For most of the JavaScript and WebAssembly benchmarks in JetStream Next, individual scores equally weigh
                 startup performance, worst case performance, and average case performance.
                 These three metrics are crucial to running performant JavaScript and WebAssembly in the browser.
                 Fast startup times lead browsers to loading pages more quickly.
@@ -85,8 +85,8 @@
             </p>
 
             <p>
-                All but two of JetStream 3's benchmarks run for N iterations, where N is often 120.
-                JetStream 3 calculates the startup score from the time it takes to run the first iteration.
+                All but two of JetStream Next's benchmarks run for N iterations, where N is often 120.
+                JetStream Next calculates the startup score from the time it takes to run the first iteration.
                 The worst case score is the average of the worst M iterations, excluding the first iteration.
                 M is always less than N, and is usually 4.
                 The average case score is the average of all but the first iteration.
@@ -94,7 +94,7 @@
             </p>
 
             <p>
-                JetStream 3 also includes a JavaScript benchmark named WSL.
+                JetStream Next also includes a JavaScript benchmark named WSL.
                 WSL is an implementation of a GPU shading language written in JavaScript.
                 WSL does not use the above mechanism for scoring because it has a long running time.
                 Instead, the WSL benchmark computes its score as the geometric mean over two metrics: the time it takes
@@ -103,26 +103,26 @@
             </p>
 
             <p>
-                JetStream 3 includes parts of these benchmark suites that came before it:
+                JetStream Next includes parts of these benchmark suites that came before it:
                 <a href="https://webkit.org/perf/sunspider/sunspider.html">SunSpider</a>,
                 <a href="https://developers.google.com/octane/">Octane 2</a>,
                 <a href="https://browserbench.org/JetStream2.1/">JetStream 2</a>,
                 <a href="https://browserbench.org/ARES-6/">ARES-6</a>,
                 <a href="https://v8.github.io/web-tooling-benchmark/">Web Tooling Benchmark</a>,
                 and benchmarks inspired by <a href="https://krakenbenchmark.mozilla.org">Kraken</a>.
-                JetStream 3 also includes a new set of benchmarks that measure the performance of WebAssembly, Web
+                JetStream Next also includes a new set of benchmarks that measure the performance of WebAssembly, Web
                 Workers, Promises, async iteration, unicode regular expressions, and JavaScript parsing.
             </p>
 
             <p>
                 Earlier versions of JetStream also contained asm.js workloads.
                 With the release of WebAssembly, developers should switch to that technology instead.
-                JetStream 3 thus contains no asm.js workloads any longer and has converted some of the prior ones into
+                JetStream Next thus contains no asm.js workloads any longer and has converted some of the prior ones into
                 WebAssembly.
             </p>
 
             <p>
-                Besides the aforementioned averaging over multiple iterations, the JetStream 3 benchmark driver also
+                Besides the aforementioned averaging over multiple iterations, the JetStream Next benchmark driver also
                 tries to improve score stability by other means.
                 For example, it pre-fetches network resources prior to running the benchmarks.
                 This can reduce perturbations on the measurement of JavaScript execution time due to second order
@@ -130,12 +130,12 @@
             </p>
 
             <p>
-                Note that scores from JetStream 3 are not comparable to scores to other versions
+                Note that scores from JetStream Next are not comparable to scores to other versions
                 of any JetStream benchmark.
             </p>
 
             <h3>
-                JetStream 3 has 77 default workloads
+                JetStream Next has 77 default workloads
             </h3>
 
             <p>
@@ -344,7 +344,7 @@
                     Two Dart benchmark programs compiled to WasmGC that are using a simplified version of the Flutter UI
                     framework to layout and animate UI elements.
                     The <i>complex</i> variant contains a large number of widgets and is thus more of a stress test,
-                    disabled by default in JetStream 3.
+                    disabled by default in JetStream Next.
                     The <i>todomvc</i> variant is a more realistic TODO list application and enabled by default.
                     See <a href="Dart/README.md">Dart/README.md</a> for more information.
                     <br>
