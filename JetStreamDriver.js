@@ -2390,9 +2390,9 @@ let BENCHMARKS = [
         ],
         preload: {
             // Large test project:
-            // "tsconfig": "./TypeScript/src/gen/zod-medium/tsconfig.json",
+            // "tsconfig": "./TypeScript/src/gen/zod-medium/actually-a-type-script-config-please-dont-firewall-me.json",
             // "files": "./TypeScript/src/gen/zod-medium/files.json",
-            "tsconfig": "./TypeScript/src/gen/immer-tiny/tsconfig.json",
+            "tsconfig": "./TypeScript/src/gen/immer-tiny/actually-a-type-script-config-please-dont-firewall-me.json",
             "files": "./TypeScript/src/gen/immer-tiny/files.json",
         },
         iterations: 1,
@@ -3135,33 +3135,36 @@ const WTB_TESTS = {
     "prettier": true,
     "source-map": true,
 };
-const WPT_FILES = [
-  "angular-material-20.1.6.css",
-  "backbone-1.6.1.js",
-  "bootstrap-5.3.7.css",
-  "foundation-6.9.0.css",
-  "jquery-3.7.1.js",
-  "lodash.core-4.17.21.js",
-  "lodash-4.17.4.min.js.map",
-  "mootools-core-1.6.0.js",
-  "preact-8.2.5.js",
-  "preact-10.27.1.min.module.js.map",
-  "redux-5.0.1.min.js",
-  "redux-5.0.1.esm.js",
-  "source-map.min-0.5.7.js.map",
-  "source-map/lib/mappings.wasm",
-  "speedometer-es2015-test-2.0.js",
-  "todomvc/react/app.jsx",
-  "todomvc/react/footer.jsx",
-  "todomvc/react/todoItem.jsx",
-  "todomvc/typescript-angular.ts",
-  "underscore-1.13.7.js",
-  "underscore-1.13.7.min.js.map",
-  "vue-3.5.18.runtime.esm-browser.js",
-].reduce((acc, file) => {
-        acc[file] = `./web-tooling-benchmark/third_party/${file}`;
-        return acc
-}, Object.create(null));
+
+// These are mostly 1:1 but the .js.map files have to be renamed to work around firewall restrictions.
+const WPT_FILE_NAMES = {
+    "angular-material-20.1.6.css": "angular-material-20.1.6.css",
+    "backbone-1.6.1.js": "backbone-1.6.1.js",
+    "bootstrap-5.3.7.css": "bootstrap-5.3.7.css",
+    "foundation-6.9.0.css": "foundation-6.9.0.css",
+    "jquery-3.7.1.js": "jquery-3.7.1.js",
+    "lodash.core-4.17.21.js": "lodash.core-4.17.21.js",
+    "lodash-4.17.4.min.js.map": "lodash-4.17.4-actually-a-source-map.min.js",
+    "mootools-core-1.6.0.js": "mootools-core-1.6.0.js",
+    "preact-8.2.5.js": "preact-8.2.5.js",
+    "preact-10.27.1.min.module.js.map": "preact-10.27.1.min.module-actually-a-source-map.js",
+    "redux-5.0.1.min.js": "redux-5.0.1.min.js",
+    "redux-5.0.1.esm.js": "redux-5.0.1.esm.js",
+    "source-map.min-0.5.7.js.map": "source-map.min-0.5.7-actually-a-source-map.js",
+    "source-map/lib/mappings.wasm": "source-map/lib/mappings.wasm",
+    "speedometer-es2015-test-2.0.js": "speedometer-es2015-test-2.0.js",
+    "todomvc/react/app.jsx": "todomvc/react/app.jsx",
+    "todomvc/react/footer.jsx": "todomvc/react/footer.jsx",
+    "todomvc/react/todoItem.jsx": "todomvc/react/todoItem.jsx",
+    "todomvc/typescript-angular.ts": "todomvc/typescript-angular.ts",
+    "underscore-1.13.7.js": "underscore-1.13.7.js",
+    "underscore-1.13.7.min.js.map": "underscore-1.13.7-actually-a-source-map.min.js",
+    "vue-3.5.18.runtime.esm-browser.js": "vue-3.5.18.runtime.esm-browser.js",
+};
+
+const WPT_FILES = Object.create(null);
+for (const file in WPT_FILE_NAMES)
+    WPT_FILES[file] = `./web-tooling-benchmark/third_party/${WPT_FILE_NAMES[file]}`;
 
 
 for (const [name, enabled] of Object.entries(WTB_TESTS)) {
