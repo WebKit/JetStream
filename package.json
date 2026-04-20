@@ -33,7 +33,8 @@
         "test:jsc": "npm run test:prepare && node tests/run-shell.mjs --shell jsc",
         "test:spidermonkey": "npm run test:prepare && node tests/run-shell.mjs --shell spidermonkey",
         "test:build": "npm run test:prepare && node tests/run-build.mjs",
-        "test:license": "npm run test:prepare && node tests/run-license.mjs"
+        "test:license": "npm run test:prepare && node tests/run-license.mjs",
+        "test:in-depth": "npm run test:prepare && node tests/run-in-depth.mjs"
     },
     "devDependencies": {
         "@actions/core": "^1.11.1",
@@ -42,6 +43,7 @@
         "es-main": "^1.3.0",
         "eslint": "^8.38.0",
         "glob": "^11.0.3",
+        "jsdom": "^28.0.0",
         "jsvu": "^2.5.1",
         "local-web-server": "^5.4.0",
         "prettier": "^2.8.8",
