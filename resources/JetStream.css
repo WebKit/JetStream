@@ -177,7 +177,8 @@ img {
     box-sizing: border-box;
     background-repeat: no-repeat;
     background-position: center;
-    background-image: url("JetStream3Logo.svg");
+    background-image: url("JetStream30Logo.svg");
+    background-size: contain;
     color: transparent;
     will-change: transform, opacity;
     height: 75px;
