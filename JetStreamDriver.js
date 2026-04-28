@@ -3185,6 +3185,16 @@ for (const [name, enabled] of Object.entries(WTB_TESTS)) {
     }));
 }
 
+BENCHMARKS.push(new DefaultBenchmark({
+    name: "ace-echarts",
+    files: [
+        "./ace-echarts/dist/bundle.js",
+        "./ace-echarts/benchmark.js",
+    ],
+    tags: ["default", "js", "ace-echarts"],
+    iterations: 10,
+}));
+
 
 const benchmarksByName = new Map();
 const benchmarksByTag = new Map();
