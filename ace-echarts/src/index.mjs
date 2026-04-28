@@ -1,24 +1,42 @@
-import './mocks.js';
-import * as echarts from 'echarts';
-import * as ecStat from 'echarts-stat';
-import { originalData } from './data.js';
-import { JSHINT } from 'jshint';
+import "./mocks.js";
+import * as echarts from "echarts";
+import * as ecStat from "echarts-stat";
+import { originalData } from "./data.js";
+import { JSHINT } from "jshint";
 
 globalThis.echarts = echarts;
 globalThis.ecStat = ecStat;
+
+// Read the file ONCE at top level
+let codeToLint = "";
+try {
+    codeToLint = read(
+        "./ace-echarts/node_modules/ace-builds/src-min-noconflict/worker-javascript.js"
+    );
+} catch (e) {
+    // Fallback if read is not available or fails
+    codeToLint = "var a = " + JSON.stringify(new Array(10000).fill({ val: 1 })) + ";";
+}
 
 export function runTest() {
     // 1. Run the original clustering workload
     const step = ecStat.clustering.hierarchicalKMeans(originalData, {
         clusterCount: 6,
-        outputType: 'single',
+        outputType: "single",
         outputClusterIndexDimension: 2,
         outputCentroidDimensions: [3, 4],
-        stepByStep: true
+        stepByStep: true,
     });
 
     const colorAll = [
-        '#bbb', '#37A2DA', '#e06343', '#37a354', '#b55dba', '#b5bd48', '#8378EA', '#96BFFF'
+        "#bbb",
+        "#37A2DA",
+        "#e06343",
+        "#37a354",
+        "#b55dba",
+        "#b5bd48",
+        "#8378EA",
+        "#96BFFF",
     ];
     const ANIMATION_DURATION_UPDATE = 1500;
 
@@ -32,19 +50,19 @@ export function runTest() {
         const extra = { transition: [] };
         const contentColor = colorAll[clusterIdx];
         return {
-            type: 'circle',
+            type: "circle",
             x: coord[0],
             y: coord[1],
             shape: { cx: 0, cy: 0, r: 10 },
             extra: extra,
             style: {
                 fill: contentColor,
-                stroke: '#333',
+                stroke: "#333",
                 lineWidth: 1,
                 shadowColor: contentColor,
                 shadowBlur: isNewCluster ? 12 : 0,
-                transition: ['shadowBlur', 'fill']
-            }
+                transition: ["shadowBlur", "fill"],
+            },
         };
     }
 
@@ -55,19 +73,19 @@ export function runTest() {
         const center = api.coord([xVal, yVal]);
         const size = api.size([maxDist, maxDist]);
         return {
-            type: 'ellipse',
+            type: "ellipse",
             shape: {
                 cx: isNaN(center[0]) ? 0 : center[0],
                 cy: isNaN(center[1]) ? 0 : center[1],
                 rx: isNaN(size[0]) ? 0 : size[0] + 15,
-                ry: isNaN(size[1]) ? 0 : size[1] + 15
+                ry: isNaN(size[1]) ? 0 : size[1] + 15,
             },
             style: {
                 fill: null,
-                stroke: 'rgba(0,0,0,0.2)',
+                stroke: "rgba(0,0,0,0.2)",
                 lineDash: [4, 4],
-                lineWidth: 4
-            }
+                lineWidth: 4,
+            },
         };
     }
 
@@ -88,62 +106,62 @@ export function runTest() {
         option.options.push({
             series: [
                 {
-                    type: 'custom',
+                    type: "custom",
                     encode: { tooltip: [0, 1] },
                     renderItem: renderItemPoint,
-                    data: data
+                    data: data,
                 },
                 {
-                    type: 'custom',
+                    type: "custom",
                     renderItem: renderBoundary,
                     animationDuration: 3000,
                     silent: true,
-                    data: boundaryData
-                }
-            ]
+                    data: boundaryData,
+                },
+            ],
         });
     }
 
     const option = {
         timeline: {
-            top: 'center', right: 50, height: 300, width: 10, inverse: true, autoPlay: false,
-            playInterval: 2500, symbol: 'none', orient: 'vertical', axisType: 'category',
-            label: { formatter: 'step {value}', position: 10 },
+            top: "center",
+            right: 50,
+            height: 300,
+            width: 10,
+            inverse: true,
+            autoPlay: false,
+            playInterval: 2500,
+            symbol: "none",
+            orient: "vertical",
+            axisType: "category",
+            label: { formatter: "step {value}", position: 10 },
             checkpointStyle: { animationDuration: ANIMATION_DURATION_UPDATE },
-            data: []
+            data: [],
         },
         baseOption: {
             animationDurationUpdate: ANIMATION_DURATION_UPDATE,
-            transition: ['shape'],
+            transition: ["shape"],
             tooltip: {},
-            xAxis: { type: 'value' },
-            yAxis: { type: 'value' },
-            series: [{ type: 'scatter' }]
+            xAxis: { type: "value" },
+            yAxis: { type: "value" },
+            series: [{ type: "scatter" }],
         },
-        options: []
+        options: [],
     };
 
     makeStepOption(option, originalData);
-    option.timeline.data.push('0');
+    option.timeline.data.push("0");
     for (let i = 1, stepResult; !(stepResult = step.next()).isEnd; i++) {
         makeStepOption(
             option,
             echarts.util.clone(stepResult.data),
             echarts.util.clone(stepResult.centroids)
         );
-        option.timeline.data.push(i + '');
+        option.timeline.data.push(i + "");
     }
 
     // 2. Mimic regression by invoking JSHint on a large string
-    // Use a real source file to lint
-    let codeToLint = "";
-    try {
-        codeToLint = read('./ace-echarts/node_modules/ace-builds/src-min-noconflict/worker-javascript.js');
-    } catch (e) {
-        // Fallback if read is not available or fails
-        codeToLint = "var a = " + JSON.stringify(new Array(10000).fill({val: 1})) + ";";
-    }
-
+    // Use the pre-read code
     JSHINT(codeToLint, { esversion: 6 });
 
     return option;
