@@ -3191,7 +3191,7 @@ BENCHMARKS.push(new DefaultBenchmark({
         "./ace-echarts/dist/bundle.js",
         "./ace-echarts/benchmark.js",
     ],
-    tags: ["default", "js", "ace-echarts"],
+    tags: ["js", "echarts", "chart", "ace"],
     iterations: 10,
 }));
 
