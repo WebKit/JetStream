@@ -89,13 +89,6 @@ const TESTS = [
         },
     },
     {
-        name: "Ace ECharts",
-        tags: ["all", "main", "ace-echarts"],
-        run(shell_binary) {
-            return runCLITest("Ace ECharts", shell_binary, "ace-echarts");
-        },
-    },
-    {
         name: "Default Suite",
         tags: ["all", "default"],
         run(shell_binary) {

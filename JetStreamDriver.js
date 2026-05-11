@@ -3186,13 +3186,14 @@ for (const [name, enabled] of Object.entries(WTB_TESTS)) {
 }
 
 BENCHMARKS.push(new DefaultBenchmark({
-    name: "ace-echarts",
+    name: "ace-echarts-utf16",
     files: [
         "./ace-echarts/dist/bundle.js",
         "./ace-echarts/benchmark.js",
     ],
-    tags: ["js", "echarts", "chart", "ace"],
+    tags: ["js", "echarts", "chart", "ace", "utf16"],
     iterations: 10,
+    allowUtf16: true,
 }));
 
 
