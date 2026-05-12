@@ -2154,7 +2154,7 @@ let BENCHMARKS = [
         tags: ["default", "js",  "RexBench"],
     }),
     new AsyncBenchmark({
-        name: "emoji-regexp",
+        name: "emoji-regex",
         files: [
             "./utils/StartupBenchmark.js",
             "./emoji-regex/benchmark.js",
