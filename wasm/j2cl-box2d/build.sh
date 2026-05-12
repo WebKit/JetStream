@@ -1,5 +1,5 @@
 #!/bin/bash
-
+J2CL_REV=fbbe1e6db2928179f5e747ae382266beb3d2db38
 set -eo pipefail
 
 # Cleanup old files.
@@ -10,8 +10,9 @@ BUILD_LOG="$(realpath build.log)"
 echo -e "Built on $(date --rfc-3339=seconds)" | tee "$BUILD_LOG"
 
 # Build the benchmark from source.
-git clone git@github.com:google/j2cl.git |& tee -a "$BUILD_LOG"
+git clone https://github.com/google/j2cl.git |& tee -a "$BUILD_LOG"
 pushd j2cl/
+git checkout $J2CL_REV
 git log -1 --oneline | tee -a "$BUILD_LOG"
 git apply ../add-fixed-run-count-api.patch | tee -a "$BUILD_LOG"
 BUILD_SRC_DIR="benchmarking/java/com/google/j2cl/benchmarks/octane/"
