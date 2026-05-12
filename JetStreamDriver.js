@@ -2184,7 +2184,7 @@ let BENCHMARKS = [
         files: [
             // Use the unminified version for easier local profiling.
             // "./validatorjs/dist/bundle.es6.js",
-            "./validatorjs/dist/bundle.es5.min.js",
+            "./validatorjs/dist/bundle.es6.min.js",
             "./validatorjs/benchmark.js",
         ],
         tags: ["default", "js",  "regexp"],
