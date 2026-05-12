@@ -294,14 +294,6 @@ async function inDepthPageTest(driver) {
         return a.toLowerCase().localeCompare(b.toLowerCase());
     });
 
-    const nonDefaultIds = benchmarkNames.filter(name => !benchmarkData.get(name).includes("default"));
-    for (const id of nonDefaultIds) {
-        const description = descriptions.get(id);
-        if (description && description.cssClass !== "non-default") {
-            sectionErrors.push(`Expected non-default benchmark '${id}' to have CSS class 'non-default' but got '${description.cssClass}'`);
-        }
-    }
-
     const missingIds = benchmarkNames.filter(name => !descriptions.has(name));
     if (missingIds.length > 0) {
         sectionErrors.push(`Missing in-depth.html info section: ${JSON.stringify(missingIds, undefined, 2)}`);

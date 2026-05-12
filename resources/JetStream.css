@@ -265,24 +265,67 @@ h6 {
     color: var(--text-color-tertiary);
 }
 
+.in-depth h2,
+.in-depth h3,
+.in-depth dl {
+    margin: 0;
+}
+
+dl > dt:first-child {
+    margin-top: 0;
+}
+
 dt {
-    margin-top: 10px;
+    margin-top: 0.5rem;
     font-weight: bold;
     text-align: left;
     color: var(--text-color-secondary);
+    line-height: 2rem;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+dt > a.workload-link {
+    color: inherit;
+    text-decoration: none;
+}
+
+dt > a.workload-link:hover {
+    color: var(--color-primary);
+}
+
+.tag-link {
+    display: inline-block;
+    background-color: var(--color-secondary);
+    color: var(--text-color-secondary) !important;
+    padding: 0px 4px;
+    margin-left: 6px;
+    border-radius: 3px;
+    font-size: 1.2rem;
+    line-height: 1.8rem;
+    font-weight: normal;
+    text-decoration: none;
+}
+.tag-link::before {
+    content: "#";
+}
+
+.tag-link:hover {
+    background-color: var(--color-primary);
 }
 
 dt.non-default {
     color: var(--text-color-very-subtle);
 }
 
-dt.non-default:after {
+dt.non-default > *:first-child:after {
     content: " (not run by default)";
 }
 
 dd {
     text-align: left;
-    padding: 10px 20px;
+    padding: 0.5rem 0rem 1.5rem 2rem;
     margin: 0;
     color: var(--text-color-secondary);
 }
