@@ -2153,6 +2153,33 @@ let BENCHMARKS = [
         exposeBrowserTest: true,
         tags: ["default", "js",  "RexBench"],
     }),
+    new AsyncBenchmark({
+        name: "emoji-regex",
+        files: [
+            "./utils/StartupBenchmark.js",
+            "./emoji-regex/benchmark.js",
+        ],
+        preload: {
+            BUNDLE: "./emoji-regex/dist/bundle.es6.min.js",
+            "small.md": "./emoji-regex/data/small.md",
+            "medium.md": "./emoji-regex/data/medium.md",
+            "large.md": "./emoji-regex/data/large.md",
+            "zh.md": "./emoji-regex/data/zh.md",
+            "hi.md": "./emoji-regex/data/hi.md",
+            "vi.md": "./emoji-regex/data/vi.md",
+            "msg1.md": "./emoji-regex/data/msg1.md",
+            "msg2.md": "./emoji-regex/data/msg2.md",
+            "msg3.md": "./emoji-regex/data/msg3.md",
+            "msg4.md": "./emoji-regex/data/msg4.md",
+            "msg5.md": "./emoji-regex/data/msg5.md",
+            "msg6.md": "./emoji-regex/data/msg6.md",
+            "msg7.md": "./emoji-regex/data/msg7.md",
+            "msg8.md": "./emoji-regex/data/msg8.md",
+            "msg9.md": "./emoji-regex/data/msg9.md",
+            "msg10.md": "./emoji-regex/data/msg10.md",
+        },
+        tags: ["default", "js", "regexp", "markdown", "unicode"],
+    }),
     new DefaultBenchmark({
         name: "validatorjs",
         files: [
