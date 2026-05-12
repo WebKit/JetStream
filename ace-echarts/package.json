@@ -10,6 +10,7 @@
   "dependencies": {
     "echarts": "^5.5.0",
     "echarts-stat": "^1.2.0",
+    "generate-license-file-webpack-plugin": "^4.1.0",
     "jshint": "^2.13.4",
     "webpack": "^5.90.0",
     "webpack-cli": "^5.1.0"
