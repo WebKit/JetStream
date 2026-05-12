@@ -25,12 +25,13 @@
 "use strict";
 
 class LexerToken {
-    constructor(lexer, index, kind, text)
+    constructor(lexer, index, kind, text, lineNumber)
     {
         this._lexer = lexer;
         this._index = index;
         this._kind = kind;
         this._text = text;
+        this._lineNumber = lineNumber;
     }
     
     get lexer()
@@ -65,7 +66,7 @@ class LexerToken {
     
     get lineNumber()
     {
-        return this._lexer.lineNumberForIndex(this._index);
+        return this._lineNumber;
     }
     
     get originString()

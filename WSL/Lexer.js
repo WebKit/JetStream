@@ -35,11 +35,12 @@ class Lexer {
         this._text = text;
         this._index = 0;
         this._stack = [];
+        this._lineNumber = lineNumberOffset;
     }
     
     get lineNumber()
     {
-        return this.lineNumberForIndex(this._index);
+        return this._lineNumber;
     }
     
     get origin() { return this._origin; }
@@ -51,17 +52,22 @@ class Lexer {
     
     get originKind() { return this._originKind; }
     
-    lineNumberForIndex(index)
+    _countNewlines(str, length)
     {
-        let matches = this._text.substring(0, index).match(/\n/g);
-        return (matches ? matches.length : 0) + this._lineNumberOffset;
+        let count = 0;
+        for (let i = 0; i < length; i++) {
+            if (str[i] === '\n')
+                count++;
+        }
+        return count;
     }
     
-    get state() { return {index: this._index, stack: this._stack.concat()}; }
+    get state() { return {index: this._index, stack: this._stack.concat(), lineNumber: this._lineNumber}; }
     set state(value)
     {
         this._index = value.index;
         this._stack = value.stack;
+        this._lineNumber = value.lineNumber;
     }
     
     static _textIsIdentifierImpl(text)
@@ -87,7 +93,7 @@ class Lexer {
         
         let result = (kind) => {
             let text = RegExp.lastMatch;
-            let token = new LexerToken(this, this._index, kind, text);
+            let token = new LexerToken(this, this._index, kind, text, this._lineNumber);
             this._index += text.length;
             return token;
         };
@@ -96,13 +102,16 @@ class Lexer {
         for (;;) {
             relevantText = this._text.substring(this._index);
             if (/^\s+/.test(relevantText)) {
-                this._index += RegExp.lastMatch.length;
+                let ws = RegExp.lastMatch;
+                this._lineNumber += this._countNewlines(ws, ws.length);
+                this._index += ws.length;
                 continue;
             }
             if (/^\/\*/.test(relevantText)) {
                 let endIndex = relevantText.search(/\*\//);
                 if (endIndex < 0)
                     this.fail("Unterminated comment");
+                this._lineNumber += this._countNewlines(relevantText, endIndex);
                 this._index += endIndex;
                 continue;
             }
