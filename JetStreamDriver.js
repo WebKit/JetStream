@@ -2177,7 +2177,7 @@ let BENCHMARKS = [
             "msg9.md": "./emoji-regex/data/msg9.md",
             "msg10.md": "./emoji-regex/data/msg10.md",
         },
-        tags: ["default", "js", "regexp"],
+        tags: ["default", "js", "regexp", "markdown"],
     }),
     new DefaultBenchmark({
         name: "validatorjs",
