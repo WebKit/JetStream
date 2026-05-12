@@ -29,7 +29,7 @@ import { fileURLToPath } from "url";
 import TerserPlugin from "terser-webpack-plugin";
 import CacheBusterCommentPlugin from "../utils/BabelCacheBuster.mjs";
 import UnicodeEscapePlugin from "@dapplets/unicode-escape-webpack-plugin";
-import { LicenseWebpackPlugin } from "license-webpack-plugin";
+import { LicenseFilePlugin } from "generate-license-file-webpack-plugin";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -66,10 +66,9 @@ function config({ filename, minify, target }) {
       new UnicodeEscapePlugin({
         test: /\.(js|jsx|ts|tsx)$/, // Escape Unicode in JavaScript and TypeScript files
       }),
-      new LicenseWebpackPlugin({
-        perChunkOutput: true, 
-        outputFilename: "LICENSE.txt",
-      })
+      new LicenseFilePlugin({
+        outputFileName: "LICENSE.txt",
+      }),
     ],
     resolve: {
       fallback: {},
@@ -91,7 +90,10 @@ function config({ filename, minify, target }) {
   };
 }
 
-export default [
-  config({ filename: "bundle.es6.min.js", minify: true, target: "es6" }),
-  config({ filename: "bundle.es6.js", minify: false, target: "es6" }),
-];
+export default (env, argv) => {
+  const isDevelopment = argv.mode === "development";
+  return [
+    config({ filename: "bundle.es6.min.js", minify: !isDevelopment, target: "es6" }),
+    config({ filename: "bundle.es6.js", minify: false, target: "es6" }),
+  ];
+};
