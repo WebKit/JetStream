@@ -82,6 +82,13 @@ const TESTS = [
         },
     },
     {
+        name: "Test Flag With Positional Args",
+        tags: ["all", "main", "test-flag"],
+        run(shell_binary) {
+            return runCLITest("Test Flag With Positional Args", shell_binary, "--test=proxy-mobx", "proxy");
+        },
+    },
+    {
         name: "Disabled Suite",
         tags: ["all", "disabled"],
         run(shell_binary) {
