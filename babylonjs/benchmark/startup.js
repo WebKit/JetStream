@@ -26,7 +26,6 @@
 // console.log = () => {};
 
 class Benchmark extends StartupBenchmark {
-  iteration = 0;
 
   constructor({iterationCount, expectedCacheCommentCount}) {
     super({
@@ -36,10 +35,11 @@ class Benchmark extends StartupBenchmark {
     });
   }
 
-  runIteration() {
-    const sourceCode = this.iterationSourceCodes[this.iteration];
+  runIteration(iteration) {
+    // super.prepareForNextIteration() sets this up for us.
+    const sourceCode = this.currentIterationSourceCode;
     if (!sourceCode)
-      throw new Error(`Could not find source for iteration ${this.iteration}`);
+      throw new Error(`Could not find source for iteration ${iteration}`);
     // Module in sourceCode it assigned to the ClassStartupTest variable.
     let BabylonJSBenchmark;
 
@@ -57,10 +57,9 @@ class Benchmark extends StartupBenchmark {
     // const loadTime = runStart - initStart;
     // const runTime = end - runStart;
     // For local debugging:
-    // print(`Iteration ${this.iteration}:`);
+    // print(`Iteration ${iteration}:`);
     // print(`  Load time: ${loadTime.toFixed(2)}ms`);
     // print(`  Render time: ${runTime.toFixed(2)}ms`);
-    this.iteration++;
   }
 
   validateIteration(lastResult) {
