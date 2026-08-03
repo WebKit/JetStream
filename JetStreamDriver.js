@@ -3264,4 +3264,9 @@ if (JetStreamParams.testList.length) {
     benchmarks = findBenchmarksByTag("Default", defaultDisabledTags)
 }
 
+if (JetStreamParams.testExcludeList.length) {
+    const excludeList = new Set(JetStreamParams.testExcludeList.map(name => name.toLowerCase()));
+    benchmarks = benchmarks.filter(benchmark => !excludeList.has(benchmark.name.toLowerCase()));
+}
+
 this.JetStream = new Driver(benchmarks);

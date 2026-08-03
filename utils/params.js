@@ -35,6 +35,7 @@ class Params {
     startDelay = undefined;
 
     testList = [];
+    testExcludeList = [];
     testIterationCount = undefined;
     testWorstCaseCount = undefined;
     prefetchResources = true;
@@ -83,6 +84,7 @@ class Params {
         }
 
         this.testList = this._parseOneOf(sourceParams, ["testList", "tag", "tags", "test", "tests"], this._parseTestListParam);
+        this.testExcludeList = this._parseOneOf(sourceParams, ["testExcludeList", "exclude", "excludes"], this._parseTestListParam);
         this.testIterationCount = this._parseOneOf(sourceParams, ["testIterationCount", "iterationCount", "iterations" ], this._parseIntParam, 1);
         this.testWorstCaseCount = this._parseOneOf(sourceParams, ["testWorstCaseCount", "worstCaseCount", "worst"], this._parseIntParam, 1);
 

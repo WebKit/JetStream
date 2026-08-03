@@ -60,6 +60,10 @@ const CLI_PARAMS = {
     help: "Run a specific test or comma-separated list of tests.",
     param: "test",
   },
+  exclude: {
+    help: "Exclude a specific test or comma-separated list of tests.",
+    param: "exclude",
+  },
   tag: {
     help: "Run tests with a specific tag or comma-separated list of tags.",
     param: "tag",
@@ -119,7 +123,7 @@ const printHelp = cliParams.delete("help");
 const dumpTestList = cliParams.delete("dumpTestList");
 
 if (cliArgs.length) {
-    let tests = cliParams.has("test") ? cliParams.get("tests").split(",") : []
+    let tests = cliParams.has("test") ? cliParams.get("test").split(",") : []
     tests = tests.concat(cliArgs);
     cliParams.set("test", tests.join(","));
 }
