@@ -1,0 +1,13 @@
+{
+  "name": "filemorf-pdf-benchmark",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "esbuild src/specs.mjs --bundle --format=iife --global-name=FilemorfPdfCore --outfile=dist/bundle.js && esbuild src/specs.mjs --bundle --format=iife --global-name=FilemorfPdfCore --minify --outfile=dist/bundle.min.js"
+  },
+  "dependencies": {
+    "esbuild": "^0.28.2",
+    "jszip": "^3.10.1",
+    "pdf-lib": "^1.17.1"
+  }
+}
