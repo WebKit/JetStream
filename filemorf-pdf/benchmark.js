@@ -1,38 +1,22 @@
-// Polyfill Blob and File for JS Shells (v8, jsc, spidermonkey)
-if (typeof globalThis.Blob === "undefined") {
+if (!globalThis.Blob) {
   globalThis.Blob = class Blob {
-    constructor(parts = [], options = {}) {
-      this.parts = parts;
-      this.type = options.type || "";
-      let size = 0;
-      for (const part of parts) {
-        if (part instanceof ArrayBuffer) size += part.byteLength;
-        else if (part.buffer) size += part.byteLength;
-        else size += part.length || 0;
-      }
-      this.size = size;
+    constructor(parts) {
+      this._buffer = parts[0].buffer || parts[0];
+      this.size = this._buffer.byteLength;
     }
     async arrayBuffer() {
-      const result = new Uint8Array(this.size);
-      let offset = 0;
-      for (const part of this.parts) {
-        if (part instanceof ArrayBuffer) {
-          result.set(new Uint8Array(part), offset);
-          offset += part.byteLength;
-        } else if (part.buffer) {
-          result.set(new Uint8Array(part.buffer, part.byteOffset, part.byteLength), offset);
-          offset += part.byteLength;
-        }
-      }
-      return result.buffer;
+      // Create a new ArrayBuffer in the *current* Realm so `instanceof ArrayBuffer` checks
+      // inside PDF-lib pass successfully (passing the raw outer-realm ArrayBuffer fails!).
+      const dst = new Uint8Array(this.size);
+      dst.set(new Uint8Array(this._buffer));
+      return dst.buffer;
     }
   };
 }
-
-if (typeof globalThis.File === "undefined") {
+if (!globalThis.File) {
   globalThis.File = class File extends globalThis.Blob {
-    constructor(parts, name, options = {}) {
-      super(parts, options);
+    constructor(parts, name) {
+      super(parts);
       this.name = name;
     }
   };
@@ -54,14 +38,17 @@ class Benchmark {
 
     let requiredFiles = new Set();
     for (const spec of this.specsToRun) {
-      for (const input of spec.inputs) {
-        requiredFiles.add(input);
-      }
+      for (const input of spec.inputs) requiredFiles.add(input);
     }
 
     for (const filename of requiredFiles) {
-      const arrayBuf = await JetStream.getBinary('./filemorf-pdf/corpus/files/' + filename);
-      this.corpusMap.set(filename, new File([arrayBuf], filename, { type: "application/pdf" }));
+      let cachePath;
+      if (filename === "merge-00.pdf") cachePath = JetStream.preload.F0;
+      else if (filename === "merge-01.pdf") cachePath = JetStream.preload.F1;
+      else if (filename === "text-020.pdf") cachePath = JetStream.preload.F2;
+      
+      const arrayBuf = await JetStream.getBinary(cachePath);
+      this.corpusMap.set(filename, new File([arrayBuf], filename));
     }
   }
 
