@@ -1533,7 +1533,7 @@ class DefaultBenchmark extends Benchmark {
 
 class AsyncBenchmark extends DefaultBenchmark {
     get prerunCode() {
-        let str = `globalThis.JetStream.isInBrowser = ${isInBrowser};`;
+        let str = "";
         // FIXME: It would be nice if these were available to any benchmark not just async ones but since these functions
         // are async they would only work in a context where the benchmark is async anyway. Long term, we should do away
         // with this class and make all benchmarks async.
