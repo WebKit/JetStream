@@ -2736,9 +2736,9 @@ let BENCHMARKS = [
             "./filemorf-pdf/benchmark.js",
         ],
         preload: {
-            F0: "./filemorf-pdf/corpus/files/merge-00.pdf",
-            F1: "./filemorf-pdf/corpus/files/merge-01.pdf",
-            F2: "./filemorf-pdf/corpus/files/text-020.pdf",
+            "merge-00.pdf": "./filemorf-pdf/corpus/files/merge-00.pdf",
+            "merge-01.pdf": "./filemorf-pdf/corpus/files/merge-01.pdf",
+            "text-020.pdf": "./filemorf-pdf/corpus/files/text-020.pdf",
         },
         tags: ["js", "pdf", "es6", "filemorf"],
     }),

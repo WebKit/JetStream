@@ -1,4 +1,25 @@
-/**
+/*!
+ * Copyright (c) 2026 Jesse Delia
+ * 
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+/*!*
  * VENDORED VERBATIM from the FileMorf application source:
  *
  *   src/lib/converters/pdf.ts @ commit 20a7122 (2026-07-30)
@@ -26,7 +47,7 @@ function loadPdfLib(): Promise<PdfLibModule> {
   return pdfLibPromise;
 }
 
-/**
+/*!*
  * Helper to create a Blob from Uint8Array (handles TypeScript strict mode)
  */
 function createPdfBlob(data: Uint8Array): Blob {
@@ -37,7 +58,7 @@ function createPdfBlob(data: Uint8Array): Blob {
   return new Blob([buffer], { type: "application/pdf" });
 }
 
-/**
+/*!*
  * Load a PDF with pdf-lib, translating library errors into messages a user
  * can act on.
  */
@@ -74,7 +95,7 @@ export interface PdfSplitResult {
   originalSize: number;
 }
 
-/**
+/*!*
  * Merge multiple PDF files into a single PDF
  */
 export async function mergePdfs(
@@ -117,7 +138,7 @@ export async function mergePdfs(
   };
 }
 
-/**
+/*!*
  * Split a PDF into individual pages or page ranges
  */
 export async function splitPdf(
@@ -160,7 +181,7 @@ export async function splitPdf(
   };
 }
 
-/**
+/*!*
  * Extract specific pages from a PDF into a new PDF
  */
 export async function extractPages(
@@ -263,9 +284,9 @@ export type PageNumberFormat = "n" | "n-of-total" | "page-n" | "page-n-of-total"
 export interface AddPageNumbersOptions {
   position?: PageNumberPosition;
   format?: PageNumberFormat;
-  /** The number printed on the first numbered page. */
+  /*!* The number printed on the first numbered page. */
   startAt?: number;
-  /** Pages to stamp, e.g. "2-10" to skip a cover page. Defaults to all. */
+  /*!* Pages to stamp, e.g. "2-10" to skip a cover page. Defaults to all. */
   pageRanges?: string;
   fontSize?: number;
 }
@@ -309,7 +330,7 @@ function pageNumberCoords(
   return { x, y };
 }
 
-/**
+/*!*
  * Stamp page numbers onto a PDF. Runs entirely in the browser; original
  * content is untouched — numbers are drawn on top.
  */
@@ -370,16 +391,16 @@ export async function addPageNumbers(
 export type WatermarkLayout = "diagonal" | "center" | "tile";
 
 export interface WatermarkPdfOptions {
-  /** Text watermark; ignored when an image is provided. */
+  /*!* Text watermark; ignored when an image is provided. */
   text?: string;
-  /** Image watermark (PNG/JPEG). Takes precedence over text. */
+  /*!* Image watermark (PNG/JPEG). Takes precedence over text. */
   imageFile?: File;
   layout?: WatermarkLayout;
-  /** 0-100 */
+  /*!* 0-100 */
   opacity?: number;
   fontSize?: number;
   color?: "gray" | "black" | "red" | "blue";
-  /** Pages to stamp, e.g. "1-3". Defaults to all. */
+  /*!* Pages to stamp, e.g. "1-3". Defaults to all. */
   pageRanges?: string;
 }
 
@@ -458,7 +479,7 @@ async function toEmbeddableImage(_file: File): Promise<{ bytes: Uint8Array; kind
   throw new Error("Image watermarks are not part of the lab excerpt.");
 }
 
-/**
+/*!*
  * Stamp a text or image watermark across PDF pages. Runs entirely in the
  * browser. Watermarks are drawn over the content (visible on top of images
  * and scans, unlike underlays which scanned pages would hide).
