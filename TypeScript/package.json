@@ -26,5 +26,8 @@
     "util": "^0.12.5",
     "webpack": "^5.101.0",
     "webpack-cli": "^6.0.1"
+  },
+  "overrides": {
+    "fast-uri": "4.1.2"
   }
 }
