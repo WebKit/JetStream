@@ -2730,6 +2730,19 @@ let BENCHMARKS = [
         iterations: 5,
     }),
     new AsyncBenchmark({
+        name: "filemorf-pdf",
+        files: [
+            "./filemorf-pdf/dist/bundle.js",
+            "./filemorf-pdf/benchmark.js",
+        ],
+        preload: {
+            "merge-00.pdf": "./filemorf-pdf/corpus/files/merge-00.pdf",
+            "merge-01.pdf": "./filemorf-pdf/corpus/files/merge-01.pdf",
+            "text-020.pdf": "./filemorf-pdf/corpus/files/text-020.pdf",
+        },
+        tags: ["js", "pdf", "es6", "filemorf"],
+    }),
+    new AsyncBenchmark({
         name: "babylonjs-scene-es6",
         files: [
             // Use non-minified sources for easier profiling:
