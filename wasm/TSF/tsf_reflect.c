@@ -90,8 +90,8 @@ tsf_reflect_t *tsf_reflect_create(tsf_type_t *type) {
         ret->u.c.array = malloc(sizeof(tsf_reflect_t*) *
                                 ret->u.c.size);
         if (ret->u.c.array == NULL) {
-            free(ret);
             tsf_type_destroy(ret->type);
+            free(ret);
             tsf_set_errno("Could not allocate array of pointers in "
                           "tsf_reflect_create()");
             return NULL;
