@@ -23220,7 +23220,7 @@
                                             console.warn("Fatal error: no binary file found for ./wasm/tfjs-backend-wasm-simd.wasm and ./wasm/tfjs-backend-wasm.wasm");
                                         WebAssembly.instantiate(blob, info).then(function (output) {
                                             receiveInstance(output.instance, output.module);
-                                        });
+                                        }, readyPromiseReject);
                                         return {};
                                         // ************************ CHANGE END ************************
 

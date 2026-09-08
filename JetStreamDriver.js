@@ -489,6 +489,8 @@ class Driver {
         const benchmarkResultsUI = document.getElementById(`benchmark-${benchmark.name}`);
         benchmarkResultsUI.classList.remove("benchmark-running");
         benchmarkResultsUI.classList.add("benchmark-error");
+
+        this.reportErrorToRunBenchmarkRunner();
     }
 
     pushError(name, error) {
@@ -644,13 +646,22 @@ class Driver {
 
     async reportScoreToRunBenchmarkRunner()
     {
+        await this.postToRunBenchmarkRunner(this.resultsJSON());
+    }
+
+    async reportErrorToRunBenchmarkRunner()
+    {
+        await this.postToRunBenchmarkRunner(JSON.stringify({ errors: this.errors }));
+    }
+
+    async postToRunBenchmarkRunner(content)
+    {
         if (!isInBrowser)
             return;
 
         if (!JetStreamParams.report)
             return;
 
-        const content = this.resultsJSON();
         await fetch("/report", {
             method: "POST",
             headers: {
@@ -829,7 +840,13 @@ class ShellScripts extends Scripts {
 class BrowserScripts extends Scripts {
     constructor(preloads) {
         super(preloads);
-        this.add("window.onerror = top.currentReject;");
+        // Rejected promises that nobody handles never reach window.onerror, ex: a wasm module that doesn't
+        // compile hangs the run.
+        this.add(`(() => {
+            const reject = top.currentReject;
+            window.onerror = (message, source, lineno, colno, error) => reject(error ?? message);
+            window.onunhandledrejection = (event) => reject(event.reason);
+        })();`);
     }
 
     run() {
@@ -1815,9 +1832,7 @@ class AsyncWasmLegacyBenchmark extends Benchmark {
                 try {
                     andThen();
                 } catch(e) {
-                    console.log("error running wasm:", e);
-                    console.log(e.stack);
-                    throw e;
+                    top.currentReject(e);
                 }
             });
             `;
@@ -1829,11 +1844,7 @@ class AsyncWasmLegacyBenchmark extends Benchmark {
             preloadCount++;
             str += `JetStream.loadBlob(${JSON.stringify(name)}, "${resource}", () => {\n`;
         }
-        str += `doRun().catch((e) => {
-            console.log("error running wasm:", e);
-            console.log(e.stack)
-            throw e;
-        });`;
+        str += `doRun().catch((error) => { top.currentReject(error); });`;
         for (let i = 0; i < preloadCount; ++i) {
             str += `})`;
         }
