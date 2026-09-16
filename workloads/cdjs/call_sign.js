@@ -28,7 +28,13 @@ function CallSign(value) {
 }
 
 CallSign.prototype.compareTo = function(other) {
-    return this._value.localeCompare(other._value);
+    if (this._value < other._value) {
+        return -1;
+    } else if (this._value > other._value) {
+        return 1;
+    } else {
+        return 0;
+    }
 }
 
 CallSign.prototype.toString = function() {
