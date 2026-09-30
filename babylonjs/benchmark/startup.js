@@ -27,6 +27,7 @@
 
 class Benchmark extends StartupBenchmark {
   iteration = 0;
+  sceneDisposer;
 
   constructor({iterationCount, expectedCacheCommentCount}) {
     super({
@@ -47,7 +48,8 @@ class Benchmark extends StartupBenchmark {
     eval(sourceCode);
     // const runStart = performance.now();
 
-    const { classNames, cameraRotationLength } = BabylonJSBenchmark.runTest(30);
+    const { classNames, cameraRotationLength, disposer} = BabylonJSBenchmark.runTest(30);
+    this.sceneDisposer = disposer;
     const lastResult = {
       classNames,
       cameraRotationLength,
@@ -79,5 +81,10 @@ class Benchmark extends StartupBenchmark {
   expect(name, value, expected) {
     if (value != expected)
       throw new Error(`Expected ${name} to be ${expected}, but got ${value}`);
+  }
+
+  postIteration() {
+    // FIXME: move to measured phase.
+    this.sceneDisposer();
   }
 }

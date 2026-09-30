@@ -39,6 +39,9 @@ export function runTest(frames = 10) {
   return {
     classNames,
     cameraRotationLength: scene.cameras[0].rotation.length(),
+    disposer() {
+      disposeScene(scene, engine);
+    }
   };
 }
 
@@ -95,6 +98,9 @@ export async function runComplexScene(
   return {
     classNames,
     cameraRotationLength: scene.cameras[0].rotation.length(),
+    disposer() {
+      disposeScene(scene, engine);
+    }
   };
 }
 
@@ -316,4 +322,11 @@ async function createComplexScene(engine, fortData, cannonData, particleData) {
   smokeBlast.dispose();
 
   return scene;
+}
+
+function disposeScene(scene, engine) {
+  scene.disablePhysicsEngine();
+  engine.stopRenderLoop();
+  scene.dispose();
+  engine.dispose();
 }
