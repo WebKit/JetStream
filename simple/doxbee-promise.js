@@ -39,7 +39,7 @@
 
 const fakes = require("../lib/fakes-promises.js");
 
-module.exports = function doxbee(stream, idOrPath) {
+function doxbee(stream, idOrPath) {
   const blob = fakes.blobManager.create(fakes.account);
   const tx = fakes.db.begin();
   let version, blobId, fileId, file;
@@ -105,14 +105,26 @@ module.exports = function doxbee(stream, idOrPath) {
     });
 };
 
+module.exports = {
+  doxbee,
+  fakes,
+};
+
 },{"../lib/fakes-promises.js":2}],2:[function(require,module,exports){
 "use strict";
 
-function dummy_1() { return Promise.resolve(undefined); }
-function dummy_2(a) { return Promise.resolve(undefined); }
-
 // a queryish object with all kinds of functions
 function Queryish() {}
+Queryish.count = 0;
+function dummy_1() {
+  Queryish.count++;
+  return Promise.resolve(undefined);
+}
+function dummy_2(a) { 
+  Queryish.count++;
+  return Promise.resolve(undefined);
+}
+
 Queryish.prototype.all = dummy_1;
 Queryish.prototype.exec = dummy_1;
 Queryish.prototype.execWithin = dummy_2;
@@ -181,7 +193,8 @@ module.exports = {
   File,
   FileVersion,
   Version,
-  db
+  db,
+  Queryish,
 };
 
 },{}],3:[function(require,module,exports){
@@ -189,12 +202,21 @@ const doxbee = require("../lib/doxbee-promises");
 
 globalThis.Benchmark = class {
   runIteration() {
+    doxbee.fakes.Queryish.count = 0;
     const promises = new Array(10_000);
 
     for (var i = 0; i < 10_000; i++)
-      promises[i] = doxbee(i, "foo");
+      promises[i] = doxbee.doxbee(i, "foo");
 
     return Promise.all(promises);
+  }
+
+  validate() {
+    const EXPECTED_COUNT = 70000;
+    const count = doxbee.fakes.Queryish.count;
+    if (count !== EXPECTED_COUNT) {
+      throw new Error(`Expected this.count == ${EXPECTED_COUNT}, but got ${count}`);
+    }
   }
 };
 
