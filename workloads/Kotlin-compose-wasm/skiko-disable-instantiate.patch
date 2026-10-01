@@ -1,7 +1,7 @@
-diff --git a/Kotlin-compose/build/skiko.mjs b/Kotlin-compose/build/skiko.mjs
+diff --git a/workloads/Kotlin-compose-wasm/build/skiko.mjs b/workloads/Kotlin-compose-wasm/build/skiko.mjs
 index ca8cabd..157890b 100644
---- a/Kotlin-compose/build/skiko.mjs
-+++ b/Kotlin-compose/build/skiko.mjs
+--- a/workloads/Kotlin-compose-wasm/build/skiko.mjs
++++ b/workloads/Kotlin-compose-wasm/build/skiko.mjs
 @@ -8325,6 +8325,7 @@ export const {
      _releaseLocalCallbackScope
  } = SkikoCallbacks;

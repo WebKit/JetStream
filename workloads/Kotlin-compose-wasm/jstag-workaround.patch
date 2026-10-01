@@ -1,7 +1,7 @@
-diff --git a/Kotlin-compose/build/compose-benchmarks-benchmarks.uninstantiated.mjs b/Kotlin-compose/build/compose-benchmarks-benchmarks.uninstantiated.mjs
+diff --git a/workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.uninstantiated.mjs b/workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.uninstantiated.mjs
 index 3427ca2..882308d 100644
---- a/Kotlin-compose/build/compose-benchmarks-benchmarks.uninstantiated.mjs
-+++ b/Kotlin-compose/build/compose-benchmarks-benchmarks.uninstantiated.mjs
+--- a/workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.uninstantiated.mjs
++++ b/workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.uninstantiated.mjs
 @@ -383,7 +383,7 @@ export async function instantiate(imports={}, runInitializer=true) {
  
      const wasmFilePath = './compose-benchmarks-benchmarks.wasm';

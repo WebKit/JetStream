@@ -1,7 +1,7 @@
-diff --git a/transformersjs/build/transformers.js b/transformersjs/build/transformers.js
+diff --git a/workloads/transformersjs/build/transformers.js b/workloads/transformersjs/build/transformers.js
 index b8e1342..0c702e8 100644
---- a/transformersjs/build/transformers.js
-+++ b/transformersjs/build/transformers.js
+--- a/workloads/transformersjs/build/transformers.js
++++ b/workloads/transformersjs/build/transformers.js
 @@ -37868,11 +37868,10 @@ function quantize_embeddings(tensor, precision) {
  /******/ 
  /******/ /* webpack/runtime/publicPath */

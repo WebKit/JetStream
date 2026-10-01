@@ -1,7 +1,7 @@
-diff --git a/Kotlin-compose/build/compose-benchmarks-benchmarks.uninstantiated.mjs b/Kotlin-compose/build/compose-benchmarks-benchmarks.uninstantiated.mjs
+diff --git a/workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.uninstantiated.mjs b/workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.uninstantiated.mjs
 index f92d6ec..54cc4cf 100644
---- a/Kotlin-compose/build/compose-benchmarks-benchmarks.uninstantiated.mjs
-+++ b/Kotlin-compose/build/compose-benchmarks-benchmarks.uninstantiated.mjs
+--- a/workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.uninstantiated.mjs
++++ b/workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.uninstantiated.mjs
 @@ -111,8 +111,8 @@ export async function instantiate(imports={}, runInitializer=true) {
               },
          'kotlin.js.__convertKotlinClosureToJsClosure_(()->Unit)' : (f) => getCachedJsObject(f, () => wasmExports['__callFunction_(()->Unit)'](f, )),
