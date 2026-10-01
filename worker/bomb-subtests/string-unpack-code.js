@@ -11,6 +11,7 @@
     (c) 2005 Bob Ippolito.  All rights Reserved.
 ***/
 
+function workload() {
 var result = 0;
 
 for (var i = 0; i < 2; i++) {
@@ -75,10 +76,23 @@ result += decompressedPrototype.length;
 
 }
 
-var expected = 511508;
-if (result != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + result;
+    var expected = 511508;
+    if (result != expected)
+        throw "ERROR: bad result: expected " + expected + " but got " + result;
 
-postMessage("done");
-close();
 
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");

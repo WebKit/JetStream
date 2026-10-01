@@ -33,11 +33,25 @@ for(var y=0; y<256; y++) sum += func(y);
 return sum;
 }
 
-sum = TimeFunc(fast3bitlookup);
+function workload() {
+    const sum = TimeFunc(fast3bitlookup);
 
-var expected = 512000;
-if (sum != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + sum;
+    var expected = 512000;
+    if (sum != expected)
+        throw "ERROR: bad result: expected " + expected + " but got " + sum;
 
-postMessage("done");
-close();
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");

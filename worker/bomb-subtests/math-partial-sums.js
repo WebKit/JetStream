@@ -31,17 +31,32 @@ function partial(n){
     return a6 + a7 + a8 + a9;
 }
 
-var total = 0;
 
-for (var i = 1024; i <= 16384; i *= 2) {
-    total += partial(i);
+function workload() {
+    var total = 0;
+
+    for (var i = 1024; i <= 16384; i *= 2) {
+        total += partial(i);
+    }
+
+    var expected = 60.08994194659945;
+
+    if (total != expected) {
+        throw "ERROR: bad result: expected " + expected + " but got " + total;
+    }
+
+    postMessage("done");
+    close();
 }
 
-var expected = 60.08994194659945;
-
-if (total != expected) {
-    throw "ERROR: bad result: expected " + expected + " but got " + total;
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
 }
-
-postMessage("done");
-close();
+globalThis.postMessage("ready");

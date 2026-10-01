@@ -289,16 +289,30 @@ Date.prototype.formatDate = function (input,time) {
     return ia.join("");
 }
 
-var date = new Date("1/1/2007 1:11:11");
+function workload() {
+    var date = new Date("1/1/2007 1:11:11");
 
-for (i = 0; i < 500; ++i) {
-    var shortFormat = date.formatDate("Y-m-d");
-    var longFormat = date.formatDate("l, F d, Y g:i:s A");
-    date.setTime(date.getTime() + 84266956);
+    for (i = 0; i < 500; ++i) {
+        var shortFormat = date.formatDate("Y-m-d");
+        var longFormat = date.formatDate("l, F d, Y g:i:s A");
+        date.setTime(date.getTime() + 84266956);
+    }
+
+    // FIXME: Find a way to validate this test.
+    // https://bugs.webkit.org/show_bug.cgi?id=114849
+
+    postMessage("done");
+    close();
 }
 
-// FIXME: Find a way to validate this test.
-// https://bugs.webkit.org/show_bug.cgi?id=114849
-
-postMessage("done");
-close();
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");

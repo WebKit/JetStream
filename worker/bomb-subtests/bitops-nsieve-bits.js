@@ -30,16 +30,29 @@ function sieve() {
     return isPrime;
 }
 
-var result = sieve();
+function workload() {
+  var result = sieve();
 
-var sum = 0;
-for (var i = 0; i < result.length; ++i)
-    sum += result[i];
+  var sum = 0;
+  for (var i = 0; i < result.length; ++i)
+      sum += result[i];
 
-var expected = -1286749544853;
-if (sum != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + sum;
+  var expected = -1286749544853;
+  if (sum != expected)
+      throw "ERROR: bad result: expected " + expected + " but got " + sum;
 
-postMessage("done");
-close();
+    postMessage("done");
+    close();
+}
 
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");
