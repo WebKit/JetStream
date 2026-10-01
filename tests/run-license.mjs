@@ -35,16 +35,17 @@ const IGNORE_PATTERNS = [
     "**/build/**",
     "**/dotnet/build-*/**",
     // Existing benchmarks with common / non-standard license headers:
-    "**/8bitbench/**",
+    "**/8bitbench-wasm/**",
     "**/ARES-6/Basic/test.js",
     "**/RexBench/OfflineAssembler/expected.js",
     "**/SunSpider/**",
-    "**/class-fields/**",
-    "**/wasm/tfjs-*",
-    "**/wasm/tfjs.js",
-    "**/wasm/tsf.js",
+    "**/raytrace-public-class-fields/**",
+    "**/raytrace-private-class-fields/**",
+    "**/tfjs-wasm/tfjs-*",
+    "**/tfjs-wasm/tfjs.js",
+    "**/tsf-wasm/tsf.js",
     "**/web-tooling-benchmark/third_party/**",
-    "**/worker/bomb-subtests/**",
+    "**/bomb-workers/bomb-subtests/**",
 ];
 
 async function checkLicenses() {

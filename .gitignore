@@ -10,6 +10,6 @@ node_modules
 v8.log
 
 # Decompressed files go here
-RexBench/FlightPlanner/waypoints.js
-SeaMonster/inspector-json-payload.js
-wasm/argon2/build/argon2.wasm
+workloads/RexBench/FlightPlanner/waypoints.js
+workloads/SeaMonster/inspector-json-payload.js
+workloads/argon2-wasm/build/argon2.wasm
