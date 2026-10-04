@@ -65,7 +65,8 @@ class Benchmark extends StartupBenchmark {
   runIteration(iteration) {
     // Module is loaded into PrismJSBenchmark
     let PrismJSBenchmark;
-    eval(this.iterationSourceCodes[iteration]);
+    // super.prepareForNextIteration() sets this up for us.
+    eval(this.currentIterationSourceCode);
     this.lastResult = PrismJSBenchmark.runTest(this.samples);
 
     for (const result of this.lastResult) {
