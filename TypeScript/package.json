@@ -8,7 +8,7 @@
     "clean": "rm -rf dist/* && rm -rf src/gen/*.json",
     "import": "node ./build/import-src-project.mjs",
     "prebuild": "npm run clean  && npm run import",
-    "build": "webpack",
+    "build": "webpack --progress",
     "build:dev": "npm run prebuild && webpack --mode development"
   },
   "keywords": [],
