@@ -2244,6 +2244,14 @@ let BENCHMARKS = [
         worstCaseCount: 2,
         tags: ["default", "js", "json", "inspector", "SeaMonster"],
     }),
+    // Atomics
+    new DefaultBenchmark({
+        name: "atomics-ring-buffer",
+        files: [
+            "./atomics/benchmark.js",
+        ],
+        tags: ["js", "atomics"],
+    }),
     // BigInt
     new AsyncBenchmark({
         name: "bigint-noble-bls12-381",

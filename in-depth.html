@@ -197,6 +197,17 @@
                     existing files.
                     Source code: <a href="generators/async-file-system.js">async-file-system.js</a>
                 </dd>
+                <dt id="atomics-ring-buffer">atomics-ring-buffer</dt>
+                <dd>
+                    A shared-memory ring buffer, the pattern behind worker and main-thread queues
+                    such as audio graphs and UI state shared with a worker. The producer claims a
+                    slot with <code>Atomics.add</code>, writes the record with
+                    <code>Atomics.store</code>, and publishes it with
+                    <code>Atomics.compareExchange</code>. The consumer observes the slot with
+                    <code>Atomics.load</code>. Both sides run on one agent, which keeps worker
+                    scheduling out of the score.
+                    Source code: <a href="atomics/benchmark.js">atomics/benchmark.js</a>
+                </dd>
                 <dt id="babel-minify-wtb">babel-minify-wtb</dt>
                 <dd>
                     <a href="https://github.com/babel/minify">Babel Minify</a> is an ES2015+ aware minifier based on the
