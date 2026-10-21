@@ -3172,11 +3172,11 @@ for (const [name, enabled] of Object.entries(WTB_TESTS)) {
     BENCHMARKS.push(new AsyncBenchmark({
         name: `${name}-wtb`,
         files: [
-            `./web-tooling-benchmark/dist/${name}.bundle.js`,
+            `./web-tooling-benchmark/dist/${name}.bundle.min.js`,
             "./web-tooling-benchmark/benchmark.js",
         ],
         preload: {
-            BUNDLE: `./web-tooling-benchmark/dist/${name}.bundle.js`,
+            BUNDLE: `./web-tooling-benchmark/dist/${name}.bundle.min.js`,
             ...WPT_FILES,
         },
         iterations: 15,
