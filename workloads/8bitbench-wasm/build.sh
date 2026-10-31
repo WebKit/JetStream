@@ -17,11 +17,16 @@ cargo --version | tee -a "$BUILD_LOG"
 wasm-pack --version | tee -a "$BUILD_LOG"
 
 echo -e "Getting sources..." | tee -a "$BUILD_LOG"
-git clone https://github.com/justinmichaud/8bitbench.git |& tee -a "$BUILD_LOG"
+git clone -q https://github.com/justinmichaud/8bitbench.git 2>&1 | tee -a "$BUILD_LOG"
+pushd 8bitbench/
+git checkout -q 78938b5d3c54fe4b5e3c16b8c52064a95775fb9c
+git log -1 --oneline | tee -a "$BUILD_LOG"
 
 echo "Building..." | tee -a "$BUILD_LOG"
-pushd 8bitbench/
 pushd rust/
+# Update wasm-bindgen to a version compatible with newer rustc (>= 0.2.88).
+# Pin the exact version so that rebuilds produce the same glue code.
+cargo update -p wasm-bindgen --precise 0.2.129
 # Emulator itself.
 # NOTE: The 8bitbench README uses `--target web`, but that produces an ES6
 # module, so we use the `no-modules` here (which produces almost the same code).

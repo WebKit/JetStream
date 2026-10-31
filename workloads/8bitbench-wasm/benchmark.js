@@ -44,7 +44,7 @@ class Benchmark {
 
   async runIteration() {
     if (!this.isInstantiated) {
-      await wasm_bindgen(Module.wasmBinary);
+      await wasm_bindgen({ module_or_path: Module.wasmBinary });
       this.isInstantiated = true;
     }
 
