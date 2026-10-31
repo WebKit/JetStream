@@ -17,6 +17,11 @@ pushd util/
 npm install
 popd
 
+TRANSFORMERS_VERSION="$(grep -m1 '"version":' util/node_modules/@huggingface/transformers/package.json | cut -d '"' -f 4)"
+ORT_VERSION="$(grep -m1 '"version":' util/node_modules/onnxruntime-web/package.json | cut -d '"' -f 4)"
+echo "Transformers.js version: ${TRANSFORMERS_VERSION}" | tee -a "$BUILD_LOG"
+echo "ONNX Runtime Web version: ${ORT_VERSION}" | tee -a "$BUILD_LOG"
+
 echo "Download and convert audio input(s)..." | tee -a "$BUILD_LOG"
 wget https://huggingface.co/datasets/Xenova/transformers.js-docs/resolve/main/jfk.wav | tee -a "$BUILD_LOG"
 # Shorten the audio file to one sentence in the middle, to speed up a single iteration.
@@ -30,7 +35,6 @@ node util/test-models.mjs
 echo "Copy library files into build/..." | tee -a "$BUILD_LOG"
 
 cp util/node_modules/@huggingface/transformers/dist/transformers.js build/
-git apply transformers.js.patch
 
 # Transformers.js packages the ONNX runtime JSEP build by default, even when
 # only using the Wasm backend, which would be fine with the non-JSEP build.
