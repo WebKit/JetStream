@@ -69,6 +69,11 @@ class Benchmark {
       "--nomemstat",
       "--big-transactions" /*important for tests 410 and 510!*/,
       "--size", "2", // To speedup, default is 100 (and takes about 4s).
+      // Since SQLite 3.50, the default testset is the "mix1" list, which
+      // speedtest1 splits in place in a static buffer. Calling main() again in
+      // the same instance then runs only "main", so only the first iteration
+      // would run the other testsets. Run just "main" in every iteration.
+      "--testset", "main",
       "--vfs", vfs, // See VFS comment above.
     ];
 
