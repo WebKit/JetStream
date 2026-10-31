@@ -17,28 +17,53 @@ if (!globalThis.navigator.languages) {
 // Compose reads `window.isSecureContext` in its Clipboard feature:
 globalThis.isSecureContext = false;
 
+// Disable the browser CacheStorage API (`window.caches`) so Compose 1.12+'s
+// `ResourceWebCache` reads preloaded resources directly from the in-memory
+// `fetch` polyfill below in browsers just as it does in JS shells.
+Object.defineProperty(globalThis, 'caches', { value: undefined, configurable: true });
+
 // Disable explicit GC (it wouldn't work in browsers anyway).
 globalThis.gc = () => {
   // DEBUG
   // console.log("gc()");
 }
 
-class URL {
-  href;
-  constructor(url, base) {
-    // DEBUG
-    // console.log('URL', url, base);
-    this.href = url;
+if (typeof globalThis.AbortController === 'undefined') {
+  globalThis.AbortController = class {
+    constructor() {
+      this.signal = {};
+    }
+    abort() {}
+  };
+}
+
+class BlobPolyfill {
+  constructor(uint8, type = '') {
+    this._uint8 = uint8;
+    this._type = type;
+  }
+  get size() {
+    return this._uint8.byteLength;
+  }
+  get type() {
+    return this._type;
+  }
+  async arrayBuffer() {
+    return this._uint8.buffer;
+  }
+  slice(start = 0, end = this.size, type = this.type) {
+    return new BlobPolyfill(this._uint8.slice(start, end), type);
   }
 }
-globalThis.URL = URL;
 
-// We always polyfill `fetch` and `instantiateStreaming` for consistency between
-// engine shells and browsers and to avoid introducing network latency into the
-// first iteration / instantiation measurement.
-// The downside is that this doesn't test streaming Wasm instantiation, which we
-// are willing to accept.
-let preload = { /* Initialized in init() below due to async. */ };
+// Compose Multiplatform's `DefaultWebResourceReader` loads embedded UI assets
+// (PNG/JPG images and TTF fonts) via:
+//   `fetch('./composeResources/compose_benchmarks.benchmarks.generated.resources/<dir>/<filename>')`
+// followed by `.blob()`.
+// We always override `fetch` to serve these assets from `preloadResources`
+// (populated in `init()` below, keyed by `<filename>`) for consistency between
+// engine shells and browsers and to avoid network requests during iterations.
+let preloadResources = { /* Initialized in init() below due to async. */ };
 const originalFetch = globalThis.fetch ?? function(url) {
   throw new Error("no fetch available");
 }
@@ -46,28 +71,21 @@ globalThis.fetch = async function(url) {
   // DEBUG
   // console.log('fetch', url);
 
-  // Redirect some paths to cached/preloaded resources.
-  if (preload[url]) {
+  const filename = url.split('/').pop();
+  if (preloadResources[filename]) {
+    const buf = preloadResources[filename];
     return {
       ok: true,
       status: 200,
-      arrayBuffer() { return preload[url]; },
+      statusText: 'OK',
       async blob() {
-        return {
-          size: preload[url].byteLength,
-          async arrayBuffer() { return preload[url]; }
-        }
+        return new BlobPolyfill(new Uint8Array(buf));
       },
     };
   }
 
   // This should only be called in the browser, where fetch() is available.
   return originalFetch(url);
-};
-globalThis.WebAssembly.instantiateStreaming = async function(m,i) {
-  // DEBUG
-  // console.log('instantiateStreaming',m,i);
-  return WebAssembly.instantiate((await m).arrayBuffer(),i);
 };
 
 // Provide `setTimeout` for Kotlin coroutines.
@@ -92,40 +110,66 @@ globalThis.setTimeout = function(f, delayMs) {
   originalSetTimeout(f);
 }
 
-// Don't automatically run the main function on instantiation.
-globalThis.skipFunMain = true;
+// Compose 1.13 registers a `window.addEventListener('languagechange', ...)`
+// listener on scene initialization, and `kotlinx.coroutines` checks
+// `typeof window.addEventListener === 'function'` (`tryGetWindow`) to select
+// its browser `WindowMessageQueue` (`window.postMessage`) dispatcher.
+if (typeof globalThis.addEventListener === 'undefined') {
+  const messageListeners = [];
+  globalThis.addEventListener = function(type, listener) {
+    if (type === 'message') {
+      messageListeners.push(listener);
+    }
+  };
+  globalThis.postMessage = function(data) {
+    originalSetTimeout(() => {
+      const event = { source: globalThis, data, stopPropagation() {} };
+      for (const listener of messageListeners) {
+        listener(event);
+      }
+    });
+  };
+}
 
-// Prevent this from being detected as a shell environment, so that we use the
-// same code paths as in the browser.
-// See `compose-benchmarks-benchmarks.uninstantiated.mjs`.
-delete globalThis.d8;
-delete globalThis.inIon;
-delete globalThis.jscOptions;
+// Suppress Kotlin's console output unless WasmEMCCBenchmark's verbose mode is
+// enabled, so benchmark iterations don't spam stdout/stderr.
+if (typeof verbose === 'undefined' || !verbose) {
+  globalThis.console.log = () => {};
+  globalThis.console.warn = () => {};
+}
 
 class Benchmark {
-  skikoInstantiate;
-  mainInstantiate;
+  skikoModule;
+  skikoWasmBytes;
+  composeImportObjectModule;
+  composeWasmBytes;
   wasmInstanceExports;
 
   async init() {
     // DEBUG
     // console.log("init");
 
-    preload = {
-      'skiko.wasm': await JetStream.getBinary(JetStream.preload.skikoWasmBinary),
-      './compose-benchmarks-benchmarks.wasm': await JetStream.getBinary(JetStream.preload.composeWasmBinary),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/drawable/compose-multiplatform.png': await JetStream.getBinary(JetStream.preload.inputImageCompose),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/drawable/example1_cat.jpg': await JetStream.getBinary(JetStream.preload.inputImageCat),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/files/example1_compose-community-primary.png': await JetStream.getBinary(JetStream.preload.inputImageComposeCommunity),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/font/jetbrainsmono_italic.ttf': await JetStream.getBinary(JetStream.preload.inputFontItalic),
-      './composeResources/compose_benchmarks.benchmarks.generated.resources/font/jetbrainsmono_regular.ttf': await JetStream.getBinary(JetStream.preload.inputFontRegular),
-    };
+    this.skikoWasmBytes = await JetStream.getBinary(JetStream.preload.skikoWasmBinary);
+    this.composeWasmBytes = await JetStream.getBinary(JetStream.preload.composeWasmBinary);
+
+    // Preload all non-code Compose UI assets (images and fonts) from
+    // `JetStream.resources` (which maps `./workloads/Kotlin-compose-wasm/build/<filename>`
+    // to its preloaded URL), keyed by `<filename>` so the `fetch()` override
+    // above can match requests for `./composeResources/.../<dir>/<filename>`.
+    preloadResources = {};
+    for (const [path, url] of Object.entries(JetStream.resources)) {
+      if (!path.endsWith('.mjs') && !path.endsWith('.wasm')) {
+        const filename = path.split('/').pop();
+        preloadResources[filename] = await JetStream.getBinary(url);
+      }
+    }
 
     // We patched `skiko.mjs` to not immediately instantiate the `skiko.wasm`
     // module, so that we can move the dynamic JS import here but measure 
     // WebAssembly compilation and instantiation as part of the first iteration.
-    this.skikoInstantiate = (await JetStream.dynamicImport(JetStream.preload.skikoJsModule)).default;
-    this.mainInstantiate = (await JetStream.dynamicImport(JetStream.preload.composeJsModule)).instantiate;
+    this.skikoModule = await JetStream.dynamicImport(JetStream.preload.skikoJsModule);
+    globalThis.kotlinWasmImports = { './skiko.mjs': this.skikoModule };
+    this.composeImportObjectModule = await JetStream.dynamicImport(JetStream.preload.composeJsModule);
   }
 
   async runIteration() {
@@ -134,8 +178,31 @@ class Benchmark {
 
     // Compile once in the first iteration.
     if (!this.wasmInstanceExports) {
-      const skikoExports = (await this.skikoInstantiate()).wasmExports;
-      this.wasmInstanceExports = (await this.mainInstantiate({ './skiko.mjs': skikoExports })).exports;
+      // Pass Emscripten's `instantiateWasm` hook so `skiko.mjs` instantiates
+      // the preloaded `skiko.wasm` bytes directly without calling `fetch()`.
+      const { wasmExports: skikoWasmExports } = await this.skikoModule.default({
+        instantiateWasm: (imports, successCallback) => {
+          WebAssembly.instantiate(this.skikoWasmBytes, imports).then(
+            ({ instance, module }) => successCallback(instance, module)
+          );
+          return {};
+        },
+      });
+
+      const { importObject, setWasmExports } = this.composeImportObjectModule;
+      // Replace `skiko.mjs`'s lazy JS wrapper thunks with the direct Wasm
+      // exports from `skiko.wasm`, matching JetStream 3.0.
+      importObject['./skiko.mjs'] = skikoWasmExports;
+
+      const wasmOptions = { builtins: ['js-string'], importedStringConstants: "'" };
+      const { instance } = await WebAssembly.instantiate(
+        this.composeWasmBytes,
+        importObject,
+        wasmOptions
+      );
+      setWasmExports(Object.assign({ memory: importObject.intrinsics.memory }, instance.exports));
+      instance.exports._start();
+      this.wasmInstanceExports = instance.exports;
     }
 
     // We render/animate/process fewer frames than in the upstream benchmark,

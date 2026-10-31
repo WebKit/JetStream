@@ -1,0 +1,23 @@
+diff --git a/benchmarks/multiplatform/benchmarks/build.gradle.kts b/benchmarks/multiplatform/benchmarks/build.gradle.kts
+index f853762..83e7c14 100644
+--- a/benchmarks/multiplatform/benchmarks/build.gradle.kts
++++ b/benchmarks/multiplatform/benchmarks/build.gradle.kts
+@@ -69,13 +69,18 @@ kotlin {
+         binaries.configureEach {
+             compilation.compileTaskProvider.configure {
+                 compilerOptions {
+                     freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
++                    freeCompilerArgs.add("-Xwasm-kclass-fqn=false")
+                 }
+             }
+             linkTask.configure {
+                 compilerOptions {
+                     freeCompilerArgs.add("-Xwasm-use-new-exception-proposal")
++                    // TODO(https://youtrack.jetbrains.com/issue/KT-91066): Remove
++                    // -Xwasm-kclass-fqn=false once KClassImpl.hashCode() no longer
++                    // allocates and hashes "$packageName.$typeName" on every call.
++                    freeCompilerArgs.add("-Xwasm-kclass-fqn=false")
+                 }
+             }
+         }
+     }

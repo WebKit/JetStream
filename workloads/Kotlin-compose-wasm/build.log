@@ -1,5 +1,8 @@
-Built on 2025-08-14 12:27:42+02:00
-Cloning into 'compose-multiplatform'...
-84dad4d3f6 Use custom skiko (0.9.4.3) to fix the FinalizationRegistry API usage for web targets
+Built on 2026-11-03T15:30:00Z
+1574503571 Benchmarks: pass -Xwasm-use-new-exception-proposal to Wasm linkTask (#5787)
+Toolchain versions (Skiko follows from Compose):
+kotlin = "2.4.20"
+compose-multiplatform = "1.12.1"
+compose.version override = "1.13.0-beta01" (Skiko 0.156.0)
 Copying generated files into build/
 Build success
