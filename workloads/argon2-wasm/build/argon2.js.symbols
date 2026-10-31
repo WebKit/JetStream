@@ -38,3 +38,4 @@
 37:_emscripten_stack_restore
 38:_emscripten_stack_alloc
 39:emscripten_stack_get_current
+40:setThrew

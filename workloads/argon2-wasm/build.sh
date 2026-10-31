@@ -35,7 +35,8 @@ emcc -o build/argon2.js \
     ${SIMD_FLAGS[@]} \
     -g1 --emit-symbol-map \
     -DARGON2_NO_THREADS \
-    -s MODULARIZE=1 -s EXPORT_NAME=setupModule -s EXPORTED_RUNTIME_METHODS=stringToNewUTF8,UTF8ToString -s EXPORTED_FUNCTIONS=_argon2_hash,_argon2_verify,_argon2_encodedlen,_argon2_error_message,_malloc,_free,_strlen \
+    -s MODULARIZE=1 -s EXPORT_NAME=setupModule -s EXPORTED_RUNTIME_METHODS=stringToNewUTF8,UTF8ToString,HEAPU32 -s EXPORTED_FUNCTIONS=_argon2_hash,_argon2_verify,_argon2_encodedlen,_argon2_error_message,_malloc,_free,_strlen \
+    -s INCOMING_MODULE_JS_API=wasmBinary,print,printErr,preRun,postRun,noInitialRun \
     -Iinclude \
     ${SOURCES[@]} | tee -a "$BUILD_LOG"
 

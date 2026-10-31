@@ -13,3 +13,4 @@
 12:_emscripten_stack_restore
 13:_emscripten_stack_alloc
 14:emscripten_stack_get_current
+15:setThrew

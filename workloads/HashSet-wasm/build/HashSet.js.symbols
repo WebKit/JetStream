@@ -11,7 +11,7 @@
 10:WTF::HashTable<JSC::DFG::Node*, JSC::DFG::Node*, WTF::IdentityExtractor, WTF::PtrHash<JSC::DFG::Node*>, WTF::HashTraits<JSC::DFG::Node*>, WTF::HashTraits<JSC::DFG::Node*>>::rehash(unsigned int, JSC::DFG::Node**)
 11:WTF::HashTable<unsigned int, unsigned int, WTF::IdentityExtractor, WTF::IntHash<unsigned int>, WTF::UnsignedWithZeroKeyHashTraits<unsigned int>, WTF::UnsignedWithZeroKeyHashTraits<unsigned int>>::rehash(unsigned int, unsigned int*)
 12:abort
-13:__gettimeofday
+13:gettimeofday
 14:fiprintf
 15:__stdio_close
 16:__stdio_write
@@ -39,3 +39,4 @@
 38:_emscripten_stack_restore
 39:_emscripten_stack_alloc
 40:emscripten_stack_get_current
+41:setThrew

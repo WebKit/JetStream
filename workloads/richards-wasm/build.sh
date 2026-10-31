@@ -16,6 +16,7 @@ emcc -o build/richards.js \
     -g1 --emit-symbol-map \
     -s MODULARIZE=1 \
     -s EXPORT_NAME=setupModule -s EXPORTED_FUNCTIONS=_setup,_scheduleIter,_getQpktcount,_getHoldcount \
+    -s INCOMING_MODULE_JS_API=wasmBinary,print,printErr,preRun,postRun,noInitialRun \
     richards.c | tee -a "$BUILD_LOG"
 
 echo "Building done" | tee -a "$BUILD_LOG"

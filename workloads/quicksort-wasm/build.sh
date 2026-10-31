@@ -16,6 +16,7 @@ emcc -o build/quicksort.js \
     -g1 --emit-symbol-map \
     -s MODULARIZE=1 \
     -s EXPORT_NAME=setupModule \
+    -s INCOMING_MODULE_JS_API=wasmBinary,print,printErr,preRun,postRun,noInitialRun \
     quicksort.c | tee -a "$BUILD_LOG"
 
 echo "Building done" | tee -a "$BUILD_LOG"

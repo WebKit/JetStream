@@ -13,6 +13,7 @@ echo "Building..." | tee -a "$BUILD_LOG"
 mkdir -p build
 emcc \
     -o build/tsf.js -O2 -s MODULARIZE=1 -s EXPORT_NAME=setupModule -s WASM=1 -s TOTAL_MEMORY=52428800 -g1 --emit-symbol-map -s EXPORTED_FUNCTIONS=_runIteration \
+    -s INCOMING_MODULE_JS_API=wasmBinary,print,printErr,preRun,postRun,noInitialRun \
     -I. -DTSF_BUILD_SYSTEM=1 \
     tsf_asprintf.c\
     tsf_buffer.c\

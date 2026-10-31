@@ -1,6 +1,6 @@
-Built on 2025-02-12T12:38:44Z
+Built on 2026-10-28T19:39:18Z
 Toolchain versions
-emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 3.1.73 (ac676d5e437525d15df5fd46bc2c208ec6d376a3)
+emcc (Emscripten gcc/clang-like replacement + linker emulating GNU ld) 6.0.13 (e13ee988ce3d87a738dd8f3661d02223308c412a)
 Getting zpipe.c example source...
 Building...
 Building done

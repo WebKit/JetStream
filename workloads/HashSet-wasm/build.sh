@@ -15,6 +15,7 @@ em++ -o build/HashSet.js \
     -std=c++11 \
     -s WASM=1 -O2 \
     -s MODULARIZE=1 -s EXPORT_NAME=setupModule \
+    -s INCOMING_MODULE_JS_API=wasmBinary,print,printErr,preRun,postRun,noInitialRun \
     -g1 --emit-symbol-map \
     -s TOTAL_MEMORY=52428800 \
     HashSet.cpp | tee -a "$BUILD_LOG"
