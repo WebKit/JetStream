@@ -25,9 +25,15 @@ unzip "$SQLITE_SRC_FILE"
 # Paths and information in make output could be sensitive, so don't save in log.
 echo "Building..." | tee -a "$BUILD_LOG"
 pushd sqlite-src-*/
+# SQLite 3.48.0's JS glue predates Emscripten 4.0's async MODULARIZE factory,
+# see the patch description. Drop the patch when updating to SQLite >= 3.49.0.
+patch -p1 -i ../emscripten-4-post-load-init.patch
 ./configure
 cd ext/wasm
-make dist
+# Emscripten 6.0.2 removed `wasmBinary` from the default INCOMING_MODULE_JS_API
+# list, and setting the list replaces the default, so name every Module property
+# that benchmark.js and the speedtest1 glue code pass in.
+EMCC_CFLAGS="-sINCOMING_MODULE_JS_API=wasmBinary,print,printErr,preRun,postRun,noInitialRun" make dist
 popd
 
 echo "Copying files from sqlite-src-*/ext/wasm/ into build/" | tee -a "$BUILD_LOG"
