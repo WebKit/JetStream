@@ -25,6 +25,10 @@
 
 class Benchmark {
     async init() {
+        // Match the boot config that `dotnet publish` embeds in the AOT build's
+        // dotnet.js, which lists every assembly under `coreAssembly`.
+        const isCore = dotnetFlavor === "aot";
+
         this.config = {
             mainAssemblyName: "dotnet.dll",
             globalizationMode: "custom",
@@ -54,64 +58,67 @@ class Benchmark {
                     behavior: "icu"
                 },
                 {
-                    name: "System.Collections.Concurrent.wasm",
-                    resolvedUrl:  JetStream.preload.dllCollectionsConcurrentUrl,
-                    buffer: await JetStream.getBinary(JetStream.preload.dllCollectionsConcurrentUrl),
-                    behavior: "assembly"
-                },
-                {
                     name: "System.Collections.wasm",
                     resolvedUrl:  JetStream.preload.dllCollectionsUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllCollectionsUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.ComponentModel.Primitives.wasm",
                     resolvedUrl:  JetStream.preload.dllComponentModelPrimitivesUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllComponentModelPrimitivesUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.ComponentModel.TypeConverter.wasm",
                     resolvedUrl:  JetStream.preload.dllComponentModelTypeConverterUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllComponentModelTypeConverterUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.Drawing.Primitives.wasm",
                     resolvedUrl:  JetStream.preload.dllDrawingPrimitivesUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllDrawingPrimitivesUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.Drawing.wasm",
                     resolvedUrl:  JetStream.preload.dllDrawingUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllDrawingUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.IO.Pipelines.wasm",
                     resolvedUrl:  JetStream.preload.dllIOPipelinesUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllIOPipelinesUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.Linq.wasm",
                     resolvedUrl:  JetStream.preload.dllLinqUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllLinqUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.Memory.wasm",
                     resolvedUrl:  JetStream.preload.dllMemoryUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllMemoryUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.ObjectModel.wasm",
                     resolvedUrl:  JetStream.preload.dllObjectModelUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllObjectModelUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.Private.CoreLib.wasm",
@@ -128,16 +135,25 @@ class Benchmark {
                     isCore: true
                 },
                 {
+                    name: "System.Security.Cryptography.wasm",
+                    resolvedUrl:  JetStream.preload.dllSecurityCryptographyUrl,
+                    buffer: await JetStream.getBinary(JetStream.preload.dllSecurityCryptographyUrl),
+                    behavior: "assembly",
+                    isCore
+                },
+                {
                     name: "System.Text.Encodings.Web.wasm",
                     resolvedUrl:  JetStream.preload.dllTextEncodingsWebUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllTextEncodingsWebUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "System.Text.Json.wasm",
                     resolvedUrl:  JetStream.preload.dllTextJsonUrl,
                     buffer: await JetStream.getBinary(JetStream.preload.dllTextJsonUrl),
-                    behavior: "assembly"
+                    behavior: "assembly",
+                    isCore
                 },
                 {
                     name: "dotnet.wasm",
@@ -148,6 +164,7 @@ class Benchmark {
                 }
             ]
         };
+
         this.dotnet = (await JetStream.dynamicImport(JetStream.preload.dotnetUrl)).dotnet;
 
         // This drives the workload size for BenchTasks half of the test.
