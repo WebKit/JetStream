@@ -94,7 +94,7 @@ class Benchmark {
         let result = new MallocPtr(saltLength);
         const numWords = saltLength / 4;
         for (let i = 0; i < numWords; ++i)
-            Module.HEAPU32[result.ptr + i] = Math.floor(Math.random() * (2 ** 32));
+            Module.HEAPU32[(result.ptr >> 2) + i] = Math.floor(Math.random() * (2 ** 32));
         return result;
     }
 
