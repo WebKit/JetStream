@@ -5,9 +5,8 @@ This is a WasmGC build of the `flute` benchmark, a Dart application using the
 It performs the Wasm/compute-only part of rendering a certain number of frames.
 Since JetStream runs in JS engine shells, the actual rendering to a Canvas is
 stubbed out.
-The upstream repository containing pre-built WebAssembly binaries (which we
-use here) is at https://github.com/mkustermann/wasm_gc_benchmarks.
-The Dart source code of the flute application is at https://github.com/dart-lang/flute.
+The benchmark harness (`addTaskQueue`) in `benchmark.js` comes from https://github.com/mkustermann/wasm_gc_benchmarks,
+and `build.sh` compiles the WasmGC binaries directly from https://github.com/dart-lang/flute.
 
 ## Build Instructions
 
