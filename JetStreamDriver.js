@@ -2153,6 +2153,33 @@ let BENCHMARKS = [
         exposeBrowserTest: true,
         tags: ["default", "js",  "RexBench"],
     }),
+    new AsyncBenchmark({
+        name: "emoji-regex",
+        files: [
+            "./utils/StartupBenchmark.js",
+            "./workloads/emoji-regex/benchmark.js",
+        ],
+        preload: {
+            BUNDLE: "./workloads/emoji-regex/dist/bundle.es6.min.js",
+            "small.md": "./workloads/emoji-regex/data/small.md",
+            "medium.md": "./workloads/emoji-regex/data/medium.md",
+            "large.md": "./workloads/emoji-regex/data/large.md",
+            "zh.md": "./workloads/emoji-regex/data/zh.md",
+            "hi.md": "./workloads/emoji-regex/data/hi.md",
+            "vi.md": "./workloads/emoji-regex/data/vi.md",
+            "msg1.md": "./workloads/emoji-regex/data/msg1.md",
+            "msg2.md": "./workloads/emoji-regex/data/msg2.md",
+            "msg3.md": "./workloads/emoji-regex/data/msg3.md",
+            "msg4.md": "./workloads/emoji-regex/data/msg4.md",
+            "msg5.md": "./workloads/emoji-regex/data/msg5.md",
+            "msg6.md": "./workloads/emoji-regex/data/msg6.md",
+            "msg7.md": "./workloads/emoji-regex/data/msg7.md",
+            "msg8.md": "./workloads/emoji-regex/data/msg8.md",
+            "msg9.md": "./workloads/emoji-regex/data/msg9.md",
+            "msg10.md": "./workloads/emoji-regex/data/msg10.md",
+        },
+        tags: ["default", "js", "regexp", "markdown", "unicode"],
+    }),
     new DefaultBenchmark({
         name: "validatorjs",
         files: [
