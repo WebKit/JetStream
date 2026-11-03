@@ -23,6 +23,8 @@
  * THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+globalThis.allIsGood = true;
+
 const isInBrowser = false;
 if (typeof console == "undefined")
     console = {};
