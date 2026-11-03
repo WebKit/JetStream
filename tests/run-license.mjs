@@ -78,7 +78,8 @@ async function checkLicenses() {
             continue;
         }
         const perFileLicense = path.join(dir, `${fileInfo.name}.LICENSE.txt`);
-        if (fs.existsSync(perFileLicense)) {
+        const bundleLicense = path.join(dir, `${fileInfo.name.replace(/\.bundle(\.(min|dev))?$/, "")}.LICENSE.txt`);
+        if (fs.existsSync(perFileLicense) || fs.existsSync(bundleLicense)) {
             continue;
         }
 
