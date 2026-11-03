@@ -37,6 +37,7 @@ class Benchmark {
     cannonData: null,
     particlesJson: null,
   };
+  sceneDisposer;
 
   constructor(iterationCount) {
     this.iterationCount = iterationCount;
@@ -54,12 +55,13 @@ class Benchmark {
   }
 
   async runIteration() {
-    const {classNames, cameraRotationLength} = await BabylonJSBenchmark.runComplexScene(
+    const {classNames, cameraRotationLength, disposer} = await BabylonJSBenchmark.runComplexScene(
       this.preloaded.fortData,
       this.preloaded.cannonData,
       this.preloaded.particlesJson,
       100
     );
+    this.sceneDisposer = disposer;
     const lastResult = {
       classNames,
       cameraRotationLength
@@ -76,4 +78,10 @@ class Benchmark {
     if (value != expected)
       throw new Error(`Expected ${name} to be ${expected}, but got ${value}`);
   }
+
+  postIteration() {
+    // FIXME: move to measured phase. 
+    this.sceneDisposer();
+  }
 }
+
