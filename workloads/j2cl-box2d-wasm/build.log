@@ -1,5 +1,4 @@
-Built on 2025-08-20 17:36:29+02:00
-Cloning into 'j2cl'...
-fbbe1e6db2 [J2KT] Remove dangling readable files which were added by accident.
+Built on 2026-10-28T22:42:00Z
+6a6e6d7d5d Model java.lang.Enum super calls with the canonical implicit super call target.
 Copying generated files into build/
 Build success
