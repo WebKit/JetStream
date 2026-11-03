@@ -1,17 +1,40 @@
 diff --git a/workloads/Kotlin-compose-wasm/build/skiko.mjs b/workloads/Kotlin-compose-wasm/build/skiko.mjs
-index ca8cabd..157890b 100644
+index 0000000..0000000 100644
 --- a/workloads/Kotlin-compose-wasm/build/skiko.mjs
 +++ b/workloads/Kotlin-compose-wasm/build/skiko.mjs
-@@ -8325,6 +8325,7 @@ export const {
-     _releaseLocalCallbackScope
- } = SkikoCallbacks;
+@@ -12,7 +12,7 @@
+ }
+ );
+ })();
+-export default loadSkikoWASM;
++export default (...args) => loadSkikoWASM(...args);
  
-+/*
- export const loadedWasm = await loadSkikoWASM();
+ // This file is merged with skiko.js and skiko.mjs by emcc
+ // It used by setup.js and setup.mjs (see in the same directory)
+@@ -135,7 +135,14 @@ export const loadSkikoExtension = (extensionPath) => {
+     return loadPromise;
+ };
  
- export const { GL } = loadedWasm;
-@@ -9295,3 +9296,4 @@ export const {
-     skia_memSetDouble,
-     skia_memGetDouble,
- } = loadedWasm.wasmExports;
-+*/
+-const awaitSkikoCore = loadSkikoWASM().then((module) => {
++let resolveSkikoCore;
++const awaitSkikoCore = new Promise((resolve) => {
++    resolveSkikoCore = resolve;
++});
++
++const originalLoadSkikoWASM = loadSkikoWASM;
++loadSkikoWASM = async function(moduleArg = {}) {
++    const module = await originalLoadSkikoWASM(moduleArg);
+     const originalLocateFile = module.locateFile;
+ 
+     module.locateFile = (path, prefix) => {
+@@ -154,8 +161,9 @@ const awaitSkikoCore = loadSkikoWASM().then((module) => {
+         };
+     }
+     skikoGl = module.GL;
++    resolveSkikoCore(module);
+     return module;
+-});
++};
+ 
+ export const awaitSkiko = awaitSkikoCore.then(async (module) => {
+     await Promise.allSettled(

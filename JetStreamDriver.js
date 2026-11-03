@@ -2564,7 +2564,7 @@ let BENCHMARKS = [
         preload: {
             skikoJsModule: "./workloads/Kotlin-compose-wasm/build/skiko.mjs",
             skikoWasmBinary: "./workloads/Kotlin-compose-wasm/build/skiko.wasm",
-            composeJsModule: "./workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.uninstantiated.mjs",
+            composeJsModule: "./workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.import-object.mjs",
             composeWasmBinary: "./workloads/Kotlin-compose-wasm/build/compose-benchmarks-benchmarks.wasm",
             inputImageCompose: "./workloads/Kotlin-compose-wasm/build/compose-multiplatform.png",
             inputImageCat: "./workloads/Kotlin-compose-wasm/build/example1_cat.jpg",
