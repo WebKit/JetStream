@@ -1,0 +1,377 @@
+{
+  "schema": "filemorf-lab-corpus/1",
+  "description": "Fully synthetic, seeded PDF corpus for the FileMorf Conversion Lab. Regenerate byte-identically with lab/generate-corpus.ts.",
+  "files": [
+    {
+      "file": "text-005.pdf",
+      "pages": 5,
+      "bytes": 8857,
+      "sha256": "1116b46880c74446480795b89c4aa2d60375df83644d727f5cb1457d95b531ed",
+      "seed": 1005
+    },
+    {
+      "file": "text-020.pdf",
+      "pages": 20,
+      "bytes": 33187,
+      "sha256": "d809ae69fc5339a921a337c6d1568ce037723fc39c6a4d4c33437ce26871b784",
+      "seed": 1020
+    },
+    {
+      "file": "text-100.pdf",
+      "pages": 100,
+      "bytes": 162442,
+      "sha256": "4f727d8f4980e38a3ef6c922773d353e9ddb11b9d04fc05b85c2cd0d23d32612",
+      "seed": 1100
+    },
+    {
+      "file": "merge-00.pdf",
+      "pages": 3,
+      "bytes": 5603,
+      "sha256": "caf8f2312c21086d3f94c6a9de694bdcd05e5cd162148d9418da582bc33970ff",
+      "seed": 2000
+    },
+    {
+      "file": "merge-01.pdf",
+      "pages": 3,
+      "bytes": 5562,
+      "sha256": "88c7c8a3cd74562481c912c4015eea42c2663781c6f5e2fda26ada81c210b24b",
+      "seed": 2001
+    },
+    {
+      "file": "merge-02.pdf",
+      "pages": 3,
+      "bytes": 5612,
+      "sha256": "da1fc589eb77093aa222aed63c9045e10cfe508263f6bcf48fdeb8d7d76f8237",
+      "seed": 2002
+    },
+    {
+      "file": "merge-03.pdf",
+      "pages": 3,
+      "bytes": 5632,
+      "sha256": "b7fcf8eaa077b566561ff05f5f468e82891fba2c01f9834af8ebadd5adf1d541",
+      "seed": 2003
+    },
+    {
+      "file": "merge-04.pdf",
+      "pages": 3,
+      "bytes": 5622,
+      "sha256": "b68ba480f26f8bc83655af085d3d711a718222747c3136b2198c4356b32fc244",
+      "seed": 2004
+    },
+    {
+      "file": "merge-05.pdf",
+      "pages": 3,
+      "bytes": 5600,
+      "sha256": "11bfa39717b5e4f561cd2d02fedcaf86cc6d2c2523b7462afc83d07f3502b61d",
+      "seed": 2005
+    },
+    {
+      "file": "merge-06.pdf",
+      "pages": 3,
+      "bytes": 5594,
+      "sha256": "499852878dd5e3d1a988a52bece8e5770128b995b8fc39e06cd98f7ad3e1d6a9",
+      "seed": 2006
+    },
+    {
+      "file": "merge-07.pdf",
+      "pages": 3,
+      "bytes": 5615,
+      "sha256": "d547eb8de06803331af85a7ae8af50dbd257cb3c24fe44a0f615d2837aec4bc7",
+      "seed": 2007
+    },
+    {
+      "file": "merge-08.pdf",
+      "pages": 3,
+      "bytes": 5543,
+      "sha256": "e39d779968a46c00a715ea65162c3b3ea9719c97a83676107be08dbcddd4db82",
+      "seed": 2008
+    },
+    {
+      "file": "merge-09.pdf",
+      "pages": 3,
+      "bytes": 5624,
+      "sha256": "d3c3aeb1f788425908055eb7a68000334caff7cf79f07f32ad0392645afa1408",
+      "seed": 2009
+    },
+    {
+      "file": "merge-10.pdf",
+      "pages": 3,
+      "bytes": 5579,
+      "sha256": "87b7029fb77f1b1fa04a151f5053addaa3d17d760fc9ebec596eb585699fc1e0",
+      "seed": 2010
+    },
+    {
+      "file": "merge-11.pdf",
+      "pages": 3,
+      "bytes": 5609,
+      "sha256": "92537469a581f5d511c526d57bb1c439f674c20c67e3d1ba0832adea72895e69",
+      "seed": 2011
+    },
+    {
+      "file": "merge-12.pdf",
+      "pages": 3,
+      "bytes": 5586,
+      "sha256": "79ddb1b2ec2d707c413b1d88459a63ad786cd39d7d465d1400dd59e237c53ac2",
+      "seed": 2012
+    },
+    {
+      "file": "merge-13.pdf",
+      "pages": 3,
+      "bytes": 5557,
+      "sha256": "98acb00cb241d94bfd863a973b12e56c3c6e42f132914bcba77f48ec2b63e396",
+      "seed": 2013
+    },
+    {
+      "file": "merge-14.pdf",
+      "pages": 3,
+      "bytes": 5576,
+      "sha256": "2a2b921731e497bdf8144fd3794ed76ee32beb06deb426f61a86a9f7a43acc39",
+      "seed": 2014
+    },
+    {
+      "file": "merge-15.pdf",
+      "pages": 3,
+      "bytes": 5578,
+      "sha256": "20eb754f3c82f3fe1ea52e37ce66950ed157420a311847f53f69b567ab004097",
+      "seed": 2015
+    },
+    {
+      "file": "merge-16.pdf",
+      "pages": 3,
+      "bytes": 5614,
+      "sha256": "0e2d443fd8f6c7abd8e1aee7e187fe9443160a9074ad535b8b651e325ce033e9",
+      "seed": 2016
+    },
+    {
+      "file": "merge-17.pdf",
+      "pages": 3,
+      "bytes": 5534,
+      "sha256": "47a6dde52e46a36bc97916b2daa505789ae83f9965d50452582d262b2df470e6",
+      "seed": 2017
+    },
+    {
+      "file": "merge-18.pdf",
+      "pages": 3,
+      "bytes": 5570,
+      "sha256": "111352030b41d93008e99f683df139d88da374f9dbca4947ba7b23602851fde6",
+      "seed": 2018
+    },
+    {
+      "file": "merge-19.pdf",
+      "pages": 3,
+      "bytes": 5581,
+      "sha256": "a9b7e583ed4a030b47cc15977d3190f818c6a57c082752c6c43ddc842788d579",
+      "seed": 2019
+    },
+    {
+      "file": "merge-20.pdf",
+      "pages": 3,
+      "bytes": 5618,
+      "sha256": "f1b069d98c6424a5e6abca65715fbc6dc30d13de3a3a7430248c73c84ca262da",
+      "seed": 2020
+    },
+    {
+      "file": "merge-21.pdf",
+      "pages": 3,
+      "bytes": 5560,
+      "sha256": "d179b715505adef9bc2da3c3ba75769cc4fb19ccb370d2eff249ee2589f207df",
+      "seed": 2021
+    },
+    {
+      "file": "merge-22.pdf",
+      "pages": 3,
+      "bytes": 5580,
+      "sha256": "338d2c89232a3d93907550be8f580aa7238733980fa9b70a677d82d57017a24c",
+      "seed": 2022
+    },
+    {
+      "file": "merge-23.pdf",
+      "pages": 3,
+      "bytes": 5601,
+      "sha256": "31719386a469bac110b0c577a1ef3179ceee51f611f3f91256e5a4a9b0c22827",
+      "seed": 2023
+    },
+    {
+      "file": "merge-24.pdf",
+      "pages": 3,
+      "bytes": 5633,
+      "sha256": "4e80fb2a5640eaba1e3bd90b96d2f8bb966494755d5070292c9a4952a68a50f2",
+      "seed": 2024
+    },
+    {
+      "file": "merge-25.pdf",
+      "pages": 3,
+      "bytes": 5551,
+      "sha256": "53dcf28e9f4a2e8e0611ed2f1863c9103fc2ecbcd303d17163498d30c340fe26",
+      "seed": 2025
+    },
+    {
+      "file": "merge-26.pdf",
+      "pages": 3,
+      "bytes": 5579,
+      "sha256": "146573833855914d56dcfeda87d4a113ae81af5e04800c61480c3aca396f3a04",
+      "seed": 2026
+    },
+    {
+      "file": "merge-27.pdf",
+      "pages": 3,
+      "bytes": 5560,
+      "sha256": "be85c9d9604211ecc544022b9bb4ebd2880c56fb64f2a9601d882ffec948ca5e",
+      "seed": 2027
+    },
+    {
+      "file": "merge-28.pdf",
+      "pages": 3,
+      "bytes": 5545,
+      "sha256": "b512f778e758ef9ad2b27a2a41f01e329900af96668bf9ab24f9dc28755e2421",
+      "seed": 2028
+    },
+    {
+      "file": "merge-29.pdf",
+      "pages": 3,
+      "bytes": 5596,
+      "sha256": "692e8be04160dd8a791793d1ad7cbe7025607c2aec0b60806ef6a7f24d591e18",
+      "seed": 2029
+    },
+    {
+      "file": "merge-30.pdf",
+      "pages": 3,
+      "bytes": 5607,
+      "sha256": "df2c6eecc694d076b4d13cdc01f461615fe40bb7191fb8cf6a800fd14b99959f",
+      "seed": 2030
+    },
+    {
+      "file": "merge-31.pdf",
+      "pages": 3,
+      "bytes": 5561,
+      "sha256": "5939c0ae7a8840ec5008aefacc4d78127654fe4720bb29ca0bc8220fd5b5166f",
+      "seed": 2031
+    },
+    {
+      "file": "merge-32.pdf",
+      "pages": 3,
+      "bytes": 5539,
+      "sha256": "e4cf83ca9f373da46d374729228998612f7432fc9fbcefd9492e599c92ee7ce4",
+      "seed": 2032
+    },
+    {
+      "file": "merge-33.pdf",
+      "pages": 3,
+      "bytes": 5561,
+      "sha256": "4534526c21ae012ec4828fac150374a7c6958917c54696169da2d5d58cd30d68",
+      "seed": 2033
+    },
+    {
+      "file": "merge-34.pdf",
+      "pages": 3,
+      "bytes": 5551,
+      "sha256": "9b2d7d7e7ec5566146d5bd5eb4d7895b7f5c55a5784d911011a03906662b939b",
+      "seed": 2034
+    },
+    {
+      "file": "merge-35.pdf",
+      "pages": 3,
+      "bytes": 5548,
+      "sha256": "b23340a9db64dbfdc3e0b788669413e327f0aefb22cecfa7af79f2dd46a55148",
+      "seed": 2035
+    },
+    {
+      "file": "merge-36.pdf",
+      "pages": 3,
+      "bytes": 5555,
+      "sha256": "03922541f214fcb2c806b89e26ea729eba6cef10a7ece3f1f0484dc5f17654f7",
+      "seed": 2036
+    },
+    {
+      "file": "merge-37.pdf",
+      "pages": 3,
+      "bytes": 5561,
+      "sha256": "be1a4d2ed9588f4b95b812349abff22303a9edadfc7cbbd049d9f947c96354f9",
+      "seed": 2037
+    },
+    {
+      "file": "merge-38.pdf",
+      "pages": 3,
+      "bytes": 5651,
+      "sha256": "3b673a0473d24efa509dc107878dec7d6b2593813d74e200ca9c29f7d909a202",
+      "seed": 2038
+    },
+    {
+      "file": "merge-39.pdf",
+      "pages": 3,
+      "bytes": 5606,
+      "sha256": "7ef228de5d47640aa71accb86028ea1e1b3380a187916ee5cbdef0f81d9045ff",
+      "seed": 2039
+    },
+    {
+      "file": "merge-40.pdf",
+      "pages": 3,
+      "bytes": 5503,
+      "sha256": "ce82559508eff0deede1922b1225cebecb43a90fb73afa7258701b8f24c9ad6b",
+      "seed": 2040
+    },
+    {
+      "file": "merge-41.pdf",
+      "pages": 3,
+      "bytes": 5621,
+      "sha256": "f73f7c9085fc81bf9162c80a6f3c3a0a3f2fd24d9bf0bcd8c9db226ac4f28dfc",
+      "seed": 2041
+    },
+    {
+      "file": "merge-42.pdf",
+      "pages": 3,
+      "bytes": 5530,
+      "sha256": "4653d8fa2cf01dfd59bb3641a8b24d3d5b4ad44319b8e0534688b3fc446dd38d",
+      "seed": 2042
+    },
+    {
+      "file": "merge-43.pdf",
+      "pages": 3,
+      "bytes": 5634,
+      "sha256": "fe2d818ddee9e9d8fc80c27d6ad62a78d3625a723391ae02f5e5c1abb72da70a",
+      "seed": 2043
+    },
+    {
+      "file": "merge-44.pdf",
+      "pages": 3,
+      "bytes": 5595,
+      "sha256": "d21ddc0a8d43e20f3a0c6c3142207edeb128387a7dda94e0fa83440636d68fa8",
+      "seed": 2044
+    },
+    {
+      "file": "merge-45.pdf",
+      "pages": 3,
+      "bytes": 5612,
+      "sha256": "7fb45373c6866e665f3b3128dce15ee421467607f6a7e789975b1a48526e5af8",
+      "seed": 2045
+    },
+    {
+      "file": "merge-46.pdf",
+      "pages": 3,
+      "bytes": 5620,
+      "sha256": "0eb971762c4408ec822972d5f7cdfe8afc08086d238ccb19d7a66569d17afd24",
+      "seed": 2046
+    },
+    {
+      "file": "merge-47.pdf",
+      "pages": 3,
+      "bytes": 5580,
+      "sha256": "19e3b726247cde61d1dfb920e5355429828fa6e90dacf49929712715a36809b4",
+      "seed": 2047
+    },
+    {
+      "file": "merge-48.pdf",
+      "pages": 3,
+      "bytes": 5594,
+      "sha256": "a4023531e6e11158005a0386427f66da2c5e6308dc1743940b74ba75009c7543",
+      "seed": 2048
+    },
+    {
+      "file": "merge-49.pdf",
+      "pages": 3,
+      "bytes": 5633,
+      "sha256": "338068761aa0e6bc4450350489cc47b83bebdaead4161ee327716fd8e65e6092",
+      "seed": 2049
+    }
+  ]
+}
