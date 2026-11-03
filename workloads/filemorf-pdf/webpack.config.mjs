@@ -29,7 +29,7 @@ import TerserPlugin from "terser-webpack-plugin";
 import { LicenseFilePlugin } from "generate-license-file-webpack-plugin";
 import { fileURLToPath } from "url";
 import UnicodeEscapePlugin from "@dapplets/unicode-escape-webpack-plugin";
-import CacheBusterPlugin from "../utils/BabelCacheBuster.mjs";
+import CacheBusterPlugin from "../../utils/BabelCacheBuster.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 

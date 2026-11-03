@@ -2732,13 +2732,13 @@ let BENCHMARKS = [
     new AsyncBenchmark({
         name: "filemorf-pdf",
         files: [
-            "./filemorf-pdf/dist/bundle.js",
-            "./filemorf-pdf/benchmark.js",
+            "./workloads/filemorf-pdf/dist/bundle.js",
+            "./workloads/filemorf-pdf/benchmark.js",
         ],
         preload: {
-            "merge-00.pdf": "./filemorf-pdf/corpus/files/merge-00.pdf",
-            "merge-01.pdf": "./filemorf-pdf/corpus/files/merge-01.pdf",
-            "text-020.pdf": "./filemorf-pdf/corpus/files/text-020.pdf",
+            "merge-00.pdf": "./workloads/filemorf-pdf/corpus/files/merge-00.pdf",
+            "merge-01.pdf": "./workloads/filemorf-pdf/corpus/files/merge-01.pdf",
+            "text-020.pdf": "./workloads/filemorf-pdf/corpus/files/text-020.pdf",
         },
         tags: ["js", "pdf", "es6", "filemorf"],
     }),
