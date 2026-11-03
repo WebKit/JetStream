@@ -77,6 +77,7 @@ function tearDownPdfJS() {
       throw message;
     }
   }
+  canvas_logs = [];
   // Allow GC of global state.
   delete this.PDFJS;
   delete this.PdfJS_window;
@@ -33051,6 +33052,10 @@ var Metadata = PDFJS.Metadata = (function MetadataClosure() {
 class Benchmark {
     runIteration() {
         runPdfJS();
+    }
+
+    validate() {
+        tearDownPdfJS();
     }
 }
 
