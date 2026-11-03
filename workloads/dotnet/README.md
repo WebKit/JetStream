@@ -20,14 +20,12 @@ They run for different iterations/sizes, respectively for each half, depending o
 
 ## Build instructions
 
-Download .NET SDK 9.0.3xx
+Download .NET SDK 11.0
 
-- [dotnet-sdk-win-x64.zip](https://aka.ms/dotnet/9.0.3xx/daily/dotnet-sdk-win-x64.zip)
-- [dotnet-sdk-linux-x64.tar.gz](https://aka.ms/dotnet/9.0.3xx/daily/dotnet-sdk-linux-x64.tar.gz)
+- [dotnet-sdk-win-x64.zip](https://aka.ms/dotnet/11.0/daily/dotnet-sdk-win-x64.zip)
+- [dotnet-sdk-linux-x64.tar.gz](https://aka.ms/dotnet/11.0/daily/dotnet-sdk-linux-x64.tar.gz)
 
-Run `build.sh` script. It will install `wasm-tools` workload & build the benchmark code twice (for Mono interpreter & AOT).
-
-To run the benchmark code on `jsc`, we are prepending `import.meta.url ??= ""` to `dotnet.js`.
+Run `build.sh` script. It will build the benchmark code twice (for Mono interpreter & AOT).
 
 ## Background on .NET / build output files
 
