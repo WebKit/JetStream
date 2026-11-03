@@ -97,12 +97,27 @@ function cordic( runs ) {
   return end.getTime() - start.getTime();
 }
 
-cordic(25000);
+function workload() {
+    cordic(25000);
 
-var expected = 10362.570468755888;
+    var expected = 10362.570468755888;
 
-if (total != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + total;
+    if (total != expected)
+        throw "ERROR: bad result: expected " + expected + " but got " + total;
 
-postMessage("done");
-close();
+
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");

@@ -281,12 +281,27 @@ for (var i = 0; i <4; i++) {
     plainText += plainText;
 }
 
-var md5Output = hex_md5(plainText);
+function workload() {
+  var md5Output = hex_md5(plainText);
+  var expected = "a831e91e0f70eddcb70dc61c6f82f6cd";
 
-var expected = "a831e91e0f70eddcb70dc61c6f82f6cd";
+  if (md5Output != expected)
+      throw "ERROR: bad result: expected " + expected + " but got " + md5Output;
 
-if (md5Output != expected)
-    throw "ERROR: bad result: expected " + expected + " but got " + md5Output;
 
-postMessage("done");
-close();
+    postMessage("done");
+    close();
+}
+
+globalThis.onmessage = (event) => {
+    switch(event.data) {
+         case "start": {
+            workload();
+            break;
+         }
+         default:
+            throw new Error(`Unknown worker message: ${event.data}`)
+   }
+}
+globalThis.postMessage("ready");
+
