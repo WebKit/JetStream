@@ -3186,6 +3186,17 @@ for (const [name, enabled] of Object.entries(WTB_TESTS)) {
     }));
 }
 
+BENCHMARKS.push(new DefaultBenchmark({
+    name: "ace-echarts-utf16",
+    files: [
+        "./workloads/ace-echarts-utf16/dist/bundle.js",
+        "./workloads/ace-echarts-utf16/benchmark.js",
+    ],
+    tags: ["js", "echarts", "chart", "ace", "utf16"],
+    iterations: 10,
+    allowUtf16: true,
+}));
+
 
 const benchmarksByName = new Map();
 const benchmarksByTag = new Map();
