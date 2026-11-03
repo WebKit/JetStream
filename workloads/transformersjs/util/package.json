@@ -4,7 +4,7 @@
   "author": "Daniel Lehmann <dlehmann@chromium.org>",
   "license": "MIT",
   "dependencies": {
-    "@huggingface/transformers": "^3.7.2",
+    "@huggingface/transformers": "4.3.2",
     "wavefile": "^11.0.0"
   }
 }

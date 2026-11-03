@@ -14,6 +14,35 @@ class URL {
 }
 globalThis.URL = URL;
 
+class Headers {
+  constructor(init) {
+    this._headers = new Map();
+    if (init instanceof Headers) {
+      for (const [k, v] of init._headers) {
+        this._headers.set(k.toLowerCase(), v);
+      }
+    } else if (init) {
+      for (const [k, v] of Object.entries(init)) {
+        this._headers.set(k.toLowerCase(), String(v));
+      }
+    }
+  }
+  get(key) { return this._headers.get(key.toLowerCase()) ?? null; }
+  set(key, value) { this._headers.set(key.toLowerCase(), String(value)); }
+  has(key) { return this._headers.has(key.toLowerCase()); }
+  delete(key) { this._headers.delete(key.toLowerCase()); }
+  [Symbol.iterator]() { return this._headers.entries(); }
+}
+if (typeof globalThis.Headers === 'undefined') {
+  globalThis.Headers = Headers;
+}
+
+// We run ONNX Runtime single-threaded (numThreads = 1), so no pthread workers
+// are spawned. Delete Atomics.waitAsync so Emscripten's pthread mailbox init
+// in ort-wasm-simd-threaded.mjs does not register a never-resolved async waiter
+// that keeps the JSC shell alive after the benchmark completes.
+delete Atomics.waitAsync;
+
 // Polyfill fetch for shell-compatibility and to cache / preload model weights etc.
 let preload = { /* Initialized in init() below due to async. */ };
 
@@ -29,6 +58,7 @@ async function redirectingFetch(url) {
     return {
       ok: true,
       status: 200,
+      headers: new Headers(),
       arrayBuffer() { return preload[url]; },
       async blob() {
         return {
@@ -41,6 +71,7 @@ async function redirectingFetch(url) {
 
   throw new Error(`Unexpected resource requested in benchmark: ${url}`);
 };
+globalThis.fetch ??= redirectingFetch;
 
 // JetStream benchmark harness. Reuse for two different Transformers.js tasks.
 // Assumes `preloadFiles(module)`, `initPipeline(pipelineFromTransformersJs)`,
@@ -80,6 +111,7 @@ class Benchmark {
       env.allowRemoteModels = false;
       env.allowLocalModels = true;
       env.localModelPath = './workloads/transformersjs/build/models/';
+      env.fetch = redirectingFetch;
 
       // Always select the Wasm backend, nothing else.
       delete env.backends.onnx.webgl;
