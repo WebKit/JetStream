@@ -37,7 +37,7 @@ globalThis.ecStat = ecStat;
 let codeToLint = "";
 try {
     codeToLint = read(
-        "./ace-echarts/node_modules/ace-builds/src-min-noconflict/worker-javascript.js"
+        "./workloads/ace-echarts-utf16/node_modules/ace-builds/src-min-noconflict/worker-javascript.js"
     );
 } catch (e) {
     // Fallback if read is not available or fails
