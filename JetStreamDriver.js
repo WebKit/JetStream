@@ -277,9 +277,9 @@ class BrowserFileLoader {
             // The same preload blob may be used by multiple subtests. Though the blob is already loaded,
             // we still need to check if this subtest failed to load it before. If so, handle accordingly.
             if (type == "preload") {
-                if (this.failedPreloads && this.failedPreloads[blobData.prop]) {
-                    this.failedPreloads[blobData.prop] = false;
-                    this._preloadBlobData.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
+                if (this.failedPreloads && this.failedPreloads[prop]) {
+                    this.failedPreloads[prop] = false;
+                    this._preloadBlobData.push({ name: prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
                     counter.failedPreloadResources--;
                 }
             }
@@ -291,8 +291,8 @@ class BrowserFileLoader {
         await this.loadBlob(type, prop, file, false).then((blobData) => {
             if (!globalThis.allIsGood)
                 return;
-            if (blobData.type == "preload")
-                this._preloadBlobData.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
+            if (type == "preload")
+                this._preloadBlobData.push({ name: prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
             this.updateCounter();
         });
 
@@ -1172,7 +1172,7 @@ class Benchmark {
             promises.push(browserFileLoader.loadBlob("preload", name, resource).then((blobData) => {
                 if (!globalThis.allIsGood)
                     return;
-                this._preloadBlobData.push({ name: blobData.prop, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
+                this._preloadBlobData.push({ name, resource: blobData.resource, blobURLOrPath: blobData.blobURL });
                 this.updateCounter();
             }).catch((error) => {
                 // We'll try again later in retryPrefetchResourceForBrowser(). Don't throw an error.
@@ -2428,11 +2428,14 @@ let BENCHMARKS = [
         ],
         tags: ["default", "js", "Generators"],
     }),
-    new DefaultBenchmark({
+    new AsyncBenchmark({
         name: "js-tokens",
         files: [
             "./workloads/js-tokens/js-tokens.js",
         ],
+        preload: {
+            SOURCE_CODE: "./workloads/js-tokens/js-tokens.js",
+        },
         tags: ["default", "js", "Generators"],
     }),
     new DefaultBenchmark({
