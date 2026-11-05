@@ -372,7 +372,7 @@ var HashMap = (function() {
         
         this._capacity = calculateCapacity(capacity);
         this._elementCount = 0;
-        this._elementData = new Array(this.capacity);
+        this._elementData = new Array(this._capacity);
         this._loadFactor = loadFactor;
         this._modCount = 0;
         this._computeThreshold();
